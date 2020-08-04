@@ -72,11 +72,18 @@ export interface MountingDescription {
 	screenEffect: ScreenEffect[]; // List of internal api nodes to add to the screen, connected to datachains that will supply the values.
 	afterEffects: AfterEffect[];
 	validations: ValidationConfig[];
+	permissions: PermissionConfig[];
+	executions: ExecutionConfig[];
 	excludeFromController: boolean;
 }
 export interface DataChainConfiguration {
 	checkExistence?: CheckExistenceConfig;
 	simpleValidation?: SimpleValidationConfig;
+	copyConfig?: CopyConfig;
+	setBoolean?: SetBoolean;
+	setInteger?: SetInteger;
+	incrementInteger?: IncrementInteger;
+	incrementDouble?: IncrementDouble;
 	getExisting?: GetExistingConfig;
 	setProperties?: SetPropertiesConfig;
 }
@@ -180,6 +187,53 @@ export function CreateCheckExistence(): CheckExistenceConfig {
 		}
 	};
 }
+export function CheckCopyConfig(copyConfig: HalfRelation) {
+	if (!copyConfig.enabled) {
+		return true;
+	}
+	if (copyConfig.agentProperty && copyConfig.relationType === RelationType.Agent) {
+		return true;
+	}
+	if (copyConfig.modelProperty && copyConfig.relationType === RelationType.Model) {
+		return true;
+	}
+	return false;
+}
+
+export function CreateCopyConfig(): CopyConfig {
+	return {
+		agentProperty: '',
+		enabled: false,
+		modelProperty: '',
+		relationType: RelationType.Model
+	};
+}
+
+export function CreateHalf(): HalfRelation {
+	return {
+		agentProperty: '',
+		enabled: false,
+		modelProperty: '',
+		relationType: RelationType.Agent
+	};
+}
+
+export function CreateSetInteger(): SetInteger {
+	return { ...CreateHalf(), value: '0' };
+}
+
+export function CreateSetBoolean(): SetBoolean {
+	return { ...CreateHalf(), value: 'false' };
+}
+
+export function CreateIncrementDouble(): IncrementDouble {
+	return { ...CreateHalf(), value: '1.0' };
+}
+
+export function CreateIncrementInteger(): IncrementInteger {
+	return { ...CreateHalf(), value: '1' };
+}
+
 export function CreateSimpleValidation(): SimpleValidationConfig {
 	return {
 		relationType: RelationType.Agent,
@@ -210,8 +264,15 @@ export function SetupConfigInstanceInformation(
 	dataChainOptions: DataChainConfiguration,
 	methodDescription: MethodDescription
 ) {
+
 	dataChainOptions.checkExistence = dataChainOptions.checkExistence || CreateCheckExistence();
 	dataChainOptions.simpleValidation = dataChainOptions.simpleValidation || CreateSimpleValidation();
+	dataChainOptions.copyConfig = dataChainOptions.copyConfig || CreateCopyConfig();
+	dataChainOptions.setInteger = dataChainOptions.setInteger || CreateSetInteger();
+	dataChainOptions.setBoolean = dataChainOptions.setBoolean || CreateSetBoolean();
+	dataChainOptions.incrementDouble = dataChainOptions.incrementDouble || CreateIncrementDouble();
+	dataChainOptions.incrementInteger = dataChainOptions.incrementInteger || CreateIncrementInteger();
+
 	let checkExistence = dataChainOptions.checkExistence;
 	let properties: any[] = [];
 	let targetProperties: any[] = [];
@@ -242,7 +303,12 @@ export function SetupConfigInstanceInformation(
 		methodDescription,
 		properties,
 		targetProperties,
-		simpleValidation: dataChainOptions.simpleValidation
+		copyConfig: dataChainOptions.copyConfig,
+		simpleValidation: dataChainOptions.simpleValidation,
+		incrementDouble: dataChainOptions.incrementDouble,
+		incrementInteger: dataChainOptions.incrementInteger,
+		setBoolean: dataChainOptions.setBoolean,
+		setInteger: dataChainOptions.setInteger
 	};
 }
 
@@ -255,15 +321,29 @@ export function CreateGetExistence(): GetExistingConfig {
 		enabled: false
 	};
 }
-export interface AfterEffectRelations extends ConfigItem {
+export interface HalfRelation extends ConfigItem {
 	relationType: RelationType;
 	agentProperty: string; // The property used to find the model.
 	modelProperty: string; // The property used to find the model
+}
+export interface AfterEffectRelations extends HalfRelation {
 	targetProperty: string;
 }
 export interface CheckExistenceConfig extends AfterEffectRelations {
 	skipSettings: SkipSettings;
 	returnSetting: ReturnSettingConfig;
+}
+export interface CopyConfig extends HalfRelation {}
+export interface Setter extends HalfRelation {
+	value: string;
+}
+export interface SetBoolean extends Setter {
+}
+export interface SetInteger extends Setter {
+}
+export interface IncrementInteger extends Setter {
+}
+export interface IncrementDouble extends Setter {
 }
 
 export interface SimpleValidationConfig extends AfterEffectRelations {
@@ -311,8 +391,8 @@ export interface ConfigItem {
 export function CheckSimpleValidation(isvalidation: SimpleValidationConfig) {
 	if (!isvalidation.enabled) {
 		return true;
-  }
-  return true;
+	}
+	return true;
 }
 export function CheckIsExisting(isExisting: CheckExistenceConfig) {
 	if (!isExisting.enabled) {
@@ -345,6 +425,9 @@ export interface AfterEffect {
 	target: string;
 	afterEffectNode?: string;
 }
+
+export interface PermissionConfig extends ValidationConfig {}
+export interface ExecutionConfig extends ValidationConfig {}
 
 export interface ValidationConfig {
 	id: string;

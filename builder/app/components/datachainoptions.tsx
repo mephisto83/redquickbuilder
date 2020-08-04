@@ -14,6 +14,8 @@ import CheckExistanceConfig from './checkexistenceconfig';
 import GetExistanceConfig from './getexistenceconfig';
 import SetPropertiesConfig from './setpropertiesconfig';
 import SimpleValidationComponent from './simplevalidationconfig';
+import CopyConfigComponent from './copyconfig';
+import SetIntegerComponent from './setinteger';
 
 export default class DataChainOptions extends Component<any, any> {
 	constructor(props: any) {
@@ -39,6 +41,7 @@ export default class DataChainOptions extends Component<any, any> {
 				this.props.onChange();
 			}
 		};
+
 		return (
 			<TreeViewMenu
 				open={this.state.open}
@@ -52,6 +55,18 @@ export default class DataChainOptions extends Component<any, any> {
 				title={Titles.Configuration}
 			>
 				<CheckExistanceConfig
+					dataChainType={this.props.dataChainType}
+					methodDescription={methodDescription}
+					dataChainOptions={dataChainOptions}
+					onChange={onchange}
+				/>
+				<CopyConfigComponent
+					dataChainType={this.props.dataChainType}
+					methodDescription={methodDescription}
+					dataChainOptions={dataChainOptions}
+					onChange={onchange}
+				/>
+				<SetIntegerComponent
 					dataChainType={this.props.dataChainType}
 					methodDescription={methodDescription}
 					dataChainOptions={dataChainOptions}

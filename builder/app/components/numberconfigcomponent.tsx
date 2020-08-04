@@ -4,10 +4,11 @@ import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
 import CheckBox from './checkbox';
 import TreeViewMenu from './treeviewmenu';
-import { BooleanConfig } from '../interface/methodprops';
+import { BooleanConfig, NumberConfig } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
+import TextInput from './textinput';
 
-export default class BooleanConfigComponent extends Component<any, any> {
+export default class NumberConfigComponent extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
 		this.state = {};
@@ -15,26 +16,41 @@ export default class BooleanConfigComponent extends Component<any, any> {
 
 	render() {
 		let props: any = this.props;
-		let { booleanConfig }: { booleanConfig: BooleanConfig } = props;
+		let { numberConfig }: { numberConfig: NumberConfig } = props;
 
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				icon={booleanConfig.enabled ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+				icon={numberConfig.enabled ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
-				active
-				hide={!this.props.enabled}
-				greyed={booleanConfig.enabled}
+        active
+        hide={!this.props.enabled}
+				greyed={!numberConfig.enabled}
 				title={this.props.title}
 			>
 				<TreeViewItemContainer>
 					<CheckBox
 						label={Titles.Enabled}
-						value={booleanConfig.enabled}
+						value={numberConfig.enabled}
 						onChange={(value: boolean) => {
-							booleanConfig.enabled = value;
+							numberConfig.enabled = value;
+							this.setState({
+								turn: UIA.GUID()
+							});
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
+						}}
+					/>
+				</TreeViewItemContainer>
+				<TreeViewItemContainer>
+					<TextInput
+						label={this.props.title}
+						value={numberConfig.value}
+						onChange={(value: string) => {
+							numberConfig.value = value;
 							this.setState({
 								turn: UIA.GUID()
 							});

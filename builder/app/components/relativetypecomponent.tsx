@@ -54,6 +54,7 @@ export default class RelativeTypeComponent extends Component<any, any> {
 		let isValidation = false;
 		switch (this.props.dataChainType) {
 			case DataChainType.Validation:
+			case DataChainType.Execution:
 				isValidation = true;
 				ok = true;
 				break;
@@ -139,10 +140,10 @@ export default class RelativeTypeComponent extends Component<any, any> {
 						}}
 					/>
 				</TreeViewItemContainer>
-				<TreeViewItemContainer>
+				<TreeViewItemContainer hide={this.props.hideTargetProperty}>
 					<SelectInput
 						label={UIA.GetNodeTitle(methodDescription.properties.model)}
-						options={targetProperties}
+						options={targetProperties || []}
 						value={relations.targetProperty}
 						onChange={(value: string) => {
 							relations.targetProperty = value;

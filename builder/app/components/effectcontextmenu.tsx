@@ -38,6 +38,8 @@ import CheckBox from './checkbox';
 import AfterEffectsComponent from './aftereffectscomponent';
 import MountingItemConfig from './mountingitemconfig';
 import ValidationComponent from './validationcomponent';
+import PermissionComponent from './permissioncomponent';
+import ExecutionComponent from './executioncomponent';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class EffectContextMenu extends Component<any, any> {
@@ -335,7 +337,19 @@ class EffectContextMenu extends Component<any, any> {
 								>
 									{methodConstraints}
 								</TreeViewMenu>
+								<PermissionComponent
+									agent={agent}
+									mountingItem={effectItem}
+									methods={mode.methods}
+									methodDescription={effectItem.methodDescription}
+								/>
 								<ValidationComponent
+									agent={agent}
+									mountingItem={effectItem}
+									methods={mode.methods}
+									methodDescription={effectItem.methodDescription}
+								/>
+								<ExecutionComponent
 									agent={agent}
 									mountingItem={effectItem}
 									methods={mode.methods}

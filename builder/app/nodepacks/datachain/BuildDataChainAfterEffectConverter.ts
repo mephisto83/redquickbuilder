@@ -35,20 +35,32 @@ export interface AfterEffectConvertArgs {
 }
 export enum DataChainType {
 	Validation = 'Validation',
+	Permission = 'Permission',
+	Execution = 'Execution',
 	AfterEffect = 'AfterEffect'
 }
 export default function BuildDataChainAfterEffectConverter(args: AfterEffectConvertArgs, callback: Function) {
-	let { from, to, type, dataChain, afterEffectOptions, afterEffectParent, afterEffectChild, name } = args;
+	let {
+		from,
+		to,
+		type,
+		dataChain,
+		afterEffectOptions: dataChainConfigOptions,
+		afterEffectParent,
+		afterEffectChild,
+		name
+	} = args;
 	let checking_existence: string = '';
 	let get_existing: string = '#{{"key":"tomodel"}}.Create()';
 	let set_properties: string = '';
 	let guts: string = '';
+	let simplevalidation: string = '';
 	let can_complete = false;
 	let tempLambdaInsertArgumentValues: any = {};
 	tempLambdaInsertArgumentValues.model = { model: from.properties.model };
 	tempLambdaInsertArgumentValues.agent = { model: from.properties.agent };
-	if (afterEffectOptions) {
-		if (afterEffectOptions.checkExistence && afterEffectOptions.checkExistence.enabled) {
+	if (dataChainConfigOptions) {
+		if (dataChainConfigOptions.checkExistence && dataChainConfigOptions.checkExistence.enabled) {
 			let {
 				relationType,
 				modelProperty,
@@ -56,7 +68,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				targetProperty,
 				skipSettings,
 				returnSetting
-			} = afterEffectOptions.checkExistence;
+			} = dataChainConfigOptions.checkExistence;
 			tempLambdaInsertArgumentValues['agent.prop'] = { property: agentProperty };
 			tempLambdaInsertArgumentValues['model.prop'] = { property: modelProperty };
 			let onTrue = '';
@@ -108,11 +120,11 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 					break;
 			}
 		}
-		if (afterEffectOptions.getExisting && afterEffectOptions.getExisting.enabled) {
-			if (afterEffectOptions.checkExistence && afterEffectOptions.checkExistence.enabled) {
+		if (dataChainConfigOptions.getExisting && dataChainConfigOptions.getExisting.enabled) {
+			if (dataChainConfigOptions.checkExistence && dataChainConfigOptions.checkExistence.enabled) {
 				get_existing = 'checkModel.FirstOrDefault()';
 			} else {
-				let { relationType, modelProperty, agentProperty, targetProperty } = afterEffectOptions.getExisting;
+				let { relationType, modelProperty, agentProperty, targetProperty } = dataChainConfigOptions.getExisting;
 
 				tempLambdaInsertArgumentValues['agent.prop'] = tempLambdaInsertArgumentValues['agent.prop'] || {
 					property: agentProperty
@@ -133,8 +145,8 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				}
 			}
 		}
-		if (afterEffectOptions.setProperties && afterEffectOptions.setProperties.enabled) {
-			set_properties = afterEffectOptions.setProperties.properties
+		if (dataChainConfigOptions.setProperties && dataChainConfigOptions.setProperties.enabled) {
+			set_properties = dataChainConfigOptions.setProperties.properties
 				.map((afterEffectSetupProperty: SetProperty) => {
 					let {
 						setPropertyType,
@@ -198,6 +210,8 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				})
 				.join(NEW_LINE);
 		}
+		if (dataChainConfigOptions.simpleValidation) {
+		}
 	}
 	let from_parameter_template = '';
 	switch (type) {
@@ -214,6 +228,8 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
           // build model value here.
 
           {{guts}}
+
+          {{simplevalidation}}
 
           return true;
        };
@@ -254,6 +270,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		get_existing,
 		set_properties,
 		guts,
+		simplevalidation,
 		from_model: `${GetCodeName(from.properties.model_output || from.properties.model || from.properties.agent)}`,
 		agent_type: `${GetCodeName(from.properties.agent || from.properties.model_output || from.properties.model)}`,
 		model: `${GetCodeName(

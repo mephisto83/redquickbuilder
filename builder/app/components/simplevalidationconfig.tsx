@@ -25,7 +25,8 @@ import {
 	CheckExistenceConfig,
 	SetupConfigInstanceInformation,
 	CheckSimpleValidation,
-	SimpleValidationConfig
+	SimpleValidationConfig,
+	CreateSimpleValidation
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
@@ -41,6 +42,8 @@ import { mount } from 'enzyme';
 import ReturnSettings from './returnsettings';
 import DataChainOptions from './datachainoptions';
 import RelativeTypeComponent from './relativetypecomponent';
+import BooleanConfigComponent from './booleanconfigcomponent';
+import NumberConfigComponent from './numberconfigcomponent';
 
 export default class SimpleValidationComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -103,97 +106,53 @@ export default class SimpleValidationComponent extends Component<any, any> {
 				<RelativeTypeComponent
 					methodDescription={methodDescription}
 					relations={simpleValidation}
+					valid={
+						dataChainOptions &&
+						dataChainOptions.simpleValidation &&
+						dataChainOptions.simpleValidation.enabled &&
+						((dataChainOptions.simpleValidation.relationType === RelationType.Agent &&
+							dataChainOptions.simpleValidation.agentProperty) ||
+							(dataChainOptions.simpleValidation.relationType === RelationType.Model &&
+								dataChainOptions.simpleValidation.modelProperty))
+					}
+					dataChainOptions={dataChainOptions}
+					enabled={simpleValidation.enabled}
 					properties={properties}
+					dataChainType={this.props.dataChainType}
 					targetProperties={targetProperties}
+					hideTargetProperty
 				/>
-				{/* <TreeViewMenu
-					hide={!simpleValidation || !simpleValidation.enabled}
-					open={this.state.config && simpleValidation.enabled}
-					icon={CheckSimpleValidation(simpleValidation) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
-					onClick={() => {
-						this.setState({ config: !this.state.config });
-					}}
-					active
-					greyed={simpleValidation.enabled}
-					title={Titles.RelationType}
-				>
-					<TreeViewItemContainer>
-						<SelectInput
-							label={
-								simpleValidation.relationType === RelationType.Agent ? (
-									UIA.GetNodeTitle(methodDescription.properties.agent)
-								) : (
-									UIA.GetNodeTitle(
-										methodDescription.properties.model_output || methodDescription.properties.model
-									)
-								)
-							}
-							options={Object.values(RelationType).map((v: RelationType) => ({ title: v, value: v }))}
-							value={simpleValidation.relationType}
-							onChange={(value: RelationType) => {
-								simpleValidation.relationType = value;
-								this.setState({
-									turn: UIA.GUID()
-								});
-								if (this.props.onChange) {
-									this.props.onChange();
-								}
-							}}
-						/>
-					</TreeViewItemContainer>{' '}
-					<TreeViewItemContainer>
-						<SelectInput
-							label={Titles.Property}
-							options={properties}
-							value={
-								simpleValidation.relationType === RelationType.Agent ? (
-									simpleValidation.agentProperty
-								) : (
-									simpleValidation.modelProperty
-								)
-							}
-							onChange={(value: string) => {
-								switch (simpleValidation.relationType) {
-									case RelationType.Agent:
-										simpleValidation.agentProperty = value;
-										break;
-									case RelationType.Model:
-										simpleValidation.modelProperty = value;
-										break;
-								}
-								this.setState({
-									turn: UIA.GUID()
-								});
-								if (this.props.onChange) {
-									this.props.onChange();
-								}
-							}}
-						/>
-					</TreeViewItemContainer>
-					<TreeViewItemContainer>
-						<SelectInput
-							label={UIA.GetNodeTitle(methodDescription.properties.model)}
-							options={targetProperties}
-							value={simpleValidation.targetProperty}
-							onChange={(value: string) => {
-								simpleValidation.targetProperty = value;
-								this.setState({
-									turn: UIA.GUID()
-								});
-								if (this.props.onChange) {
-									this.props.onChange();
-								}
-							}}
-						/>
-					</TreeViewItemContainer>
-				</TreeViewMenu>
-				<TreeViewButtonGroup /> */}
+				<NumberConfigComponent
+					enabled={simpleValidation.enabled}
+					numberConfig={simpleValidation.maxLength}
+					title={Titles.MaxLength}
+				/>
+				<NumberConfigComponent
+					enabled={simpleValidation.enabled}
+					numberConfig={simpleValidation.minLength}
+					title={Titles.MinLength}
+				/>
+				<BooleanConfigComponent
+					enabled={simpleValidation.enabled}
+					booleanConfig={simpleValidation.isNotNull}
+					title={Titles.IsNotNull}
+				/>
+				<BooleanConfigComponent
+					enabled={simpleValidation.enabled}
+					booleanConfig={simpleValidation.isNull}
+					title={Titles.IsNull}
+				/>
+				<BooleanConfigComponent
+					enabled={simpleValidation.enabled}
+					booleanConfig={simpleValidation.alphaOnlyWithSpaces}
+					title={Titles.AlphaOnlyWithSpaces}
+				/>
 			</TreeViewMenu>
 		);
 	}
 
 	private setupInstanceInfo(dataChainOptions: DataChainConfiguration) {
-		dataChainOptions.simpleValidation = dataChainOptions.simpleValidation || CreateCheckExistence();
+		dataChainOptions.simpleValidation = dataChainOptions.simpleValidation || CreateSimpleValidation();
 		let methodDescription: MethodDescription = this.props.methodDescription;
 		return SetupConfigInstanceInformation(dataChainOptions, methodDescription);
 	}

@@ -7,7 +7,7 @@ import TextInput from './textinput';
 import TreeViewMenu from './treeviewmenu';
 import {
 	MountingDescription,
-	ValidationConfig
+	PermissionConfig
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes } from '../constants/nodetypes';
@@ -19,14 +19,14 @@ import BuildDataChainAfterEffectConverter, {
 } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import DataChainOptions from './datachainoptions';
 
-export default class ValidationComponentItem extends Component<any, any> {
+export default class PermissionComponentItem extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
 		this.state = {};
 	}
 	render() {
-		let validationConfig: ValidationConfig = this.props.validationConfig;
-		if (!validationConfig) {
+		let permissionConfig: PermissionConfig = this.props.permissionConfig;
+		if (!permissionConfig) {
 			return <span />;
 		}
 		let mountingItem: MountingDescription = this.props.mountingItem;
@@ -38,14 +38,14 @@ export default class ValidationComponentItem extends Component<any, any> {
 					this.setState({ open: !this.state.open });
 				}}
 				active
-				title={validationConfig.name || this.props.title || Titles.Validation}
+				title={permissionConfig.name || Titles.Validation}
 			>
 				<TreeViewItemContainer>
 					<TextInput
 						label={Titles.Name}
-						value={validationConfig.name}
+						value={permissionConfig.name}
 						onChange={(value: string) => {
-							validationConfig.name = value;
+							permissionConfig.name = value;
 							this.setState({
 								turn: UIA.GUID()
 							});
@@ -59,9 +59,9 @@ export default class ValidationComponentItem extends Component<any, any> {
 					<SelectInput
 						label={Titles.DataChain}
 						options={UIA.NodesByType(null, NodeTypes.DataChain).toNodeSelect()}
-						value={validationConfig.dataChain}
+						value={permissionConfig.dataChain}
 						onChange={(value: string) => {
-							validationConfig.dataChain = value;
+							permissionConfig.dataChain = value;
 							this.setState({
 								turn: UIA.GUID()
 							});
@@ -71,19 +71,19 @@ export default class ValidationComponentItem extends Component<any, any> {
 						}}
 					/>
 				</TreeViewItemContainer>
-				{validationConfig && validationConfig.dataChain ? (
+				{permissionConfig && permissionConfig.dataChain ? (
 					<DataChainOptions
 						methods={this.props.methods}
 						methodDescription={this.props.methodDescription}
 						currentDescription={mountingItem}
-						dataChainType={this.props.dataChainType || DataChainType.Validation}
+						dataChainType={DataChainType.Permission}
 						previousEffect={this.props.previousEffect}
-						dataChainOptions={validationConfig.dataChainOptions}
+						dataChainOptions={permissionConfig.dataChainOptions}
 					/>
 				) : null}
 				<TreeViewButtonGroup>
 					<TreeViewGroupButton
-						title={`${Titles.Delete}`}
+						title={`${Titles.RemoveScrenEffect}`}
 						onClick={() => {
 							if (this.props.onDelete) {
 								this.props.onDelete();
@@ -97,20 +97,20 @@ export default class ValidationComponentItem extends Component<any, any> {
 					<TreeViewGroupButton
 						title={`Build Datachain`}
 						onClick={() => {
-							if (validationConfig) {
+							if (permissionConfig) {
 								if (mountingItem) {
 									let { methodDescription } = mountingItem;
 									if (methodDescription) {
 										BuildDataChainAfterEffectConverter(
 											{
-												name: validationConfig.name,
+												name: permissionConfig.name,
 												from: methodDescription,
-												dataChain: validationConfig.dataChain,
-												type: DataChainType.Validation,
-												afterEffectOptions: validationConfig.dataChainOptions
+												dataChain: permissionConfig.dataChain,
+												type: DataChainType.Permission,
+												afterEffectOptions: permissionConfig.dataChainOptions
 											},
 											(dataChain: Node) => {
-												validationConfig.dataChain = dataChain.id;
+												permissionConfig.dataChain = dataChain.id;
 												this.setState({
 													turn: UIA.GUID()
 												});
