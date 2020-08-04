@@ -12,8 +12,9 @@ import SetterComponent from './settercomponent';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import TextInput from './textinput';
 import { GUID } from '../actions/uiactions';
+import SelectInput from './selectinput';
 
-export default class SetIntegerComponent extends Component<any, any> {
+export default class SetBooleanComponent extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
 		this.state = {};
@@ -25,23 +26,24 @@ export default class SetIntegerComponent extends Component<any, any> {
 			return <span />;
 		}
 
-		let { setInteger } = this.setupInstanceInfo(dataChainOptions);
+		let { setBoolean } = this.setupInstanceInfo(dataChainOptions);
 		return (
 			<SetterComponent
-				getFromInfo={(temp: { setInteger: SetInteger }) => {
-					return temp.setInteger;
-        }}
-        methodDescription={this.props.methodDescription}
+				getFromInfo={(temp: { setBoolean: SetInteger }) => {
+					return temp.setBoolean;
+				}}
+				methodDescription={this.props.methodDescription}
 				dataChainType={this.props.dataChainType}
 				dataChainOptions={dataChainOptions}
-				title={Titles.SetInteger}
+				title={Titles.SetBoolean}
 			>
 				<TreeViewItemContainer>
-					<TextInput
+					<SelectInput
 						label={Titles.Value}
-						value={setInteger.value}
+						options={[ 'true', 'false' ].map((v: string) => ({ title: v, value: v }))}
+						value={setBoolean.value}
 						onChange={(value: string) => {
-							setInteger.value = value;
+							setBoolean.value = value;
 							this.setState({
 								turn: GUID()
 							});

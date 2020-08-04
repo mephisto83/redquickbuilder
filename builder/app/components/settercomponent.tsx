@@ -10,7 +10,7 @@ import {
 	CreateCheckExistence,
 	RelationType,
 	SetupConfigInstanceInformation,
-	CheckCopyConfig,
+	CheckSetter,
 	CopyConfig,
 	Setter
 } from '../interface/methodprops';
@@ -46,12 +46,12 @@ export default class SetterComponent extends Component<any, any> {
 			methodDescription: MethodDescription;
 			targetProperties: any[];
 			properties: any[];
-    } = info;
+		} = info;
 		let setter: Setter = this.props.getFromInfo(info);
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				icon={CheckCopyConfig(setter) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+				icon={CheckSetter(setter) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
@@ -83,6 +83,7 @@ export default class SetterComponent extends Component<any, any> {
 						((setter.relationType === RelationType.Agent && setter.agentProperty) ||
 							(setter.relationType === RelationType.Model && setter.modelProperty))
 					}
+					hideModelAgent
 					dataChainOptions={dataChainOptions}
 					enabled={setter.enabled}
 					properties={properties}

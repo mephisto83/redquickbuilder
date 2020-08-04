@@ -16,6 +16,9 @@ import SetPropertiesConfig from './setpropertiesconfig';
 import SimpleValidationComponent from './simplevalidationconfig';
 import CopyConfigComponent from './copyconfig';
 import SetIntegerComponent from './setinteger';
+import SetBooleanComponent from './setbooleancomponent';
+import IncrementIntegerComponent from './incrementinteger';
+import IncrementDoubleComponent from './incrementdouble';
 
 export default class DataChainOptions extends Component<any, any> {
 	constructor(props: any) {
@@ -67,6 +70,24 @@ export default class DataChainOptions extends Component<any, any> {
 					onChange={onchange}
 				/>
 				<SetIntegerComponent
+					dataChainType={this.props.dataChainType}
+					methodDescription={methodDescription}
+					dataChainOptions={dataChainOptions}
+					onChange={onchange}
+				/>
+				<SetBooleanComponent
+					dataChainType={this.props.dataChainType}
+					methodDescription={methodDescription}
+					dataChainOptions={dataChainOptions}
+					onChange={onchange}
+				/>
+				<IncrementDoubleComponent
+					dataChainType={this.props.dataChainType}
+					methodDescription={methodDescription}
+					dataChainOptions={dataChainOptions}
+					onChange={onchange}
+				/>
+				<IncrementIntegerComponent
 					dataChainType={this.props.dataChainType}
 					methodDescription={methodDescription}
 					dataChainOptions={dataChainOptions}

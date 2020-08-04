@@ -200,6 +200,16 @@ export function CheckCopyConfig(copyConfig: HalfRelation) {
 	return false;
 }
 
+export function CheckSetter(copyConfig: Setter) {
+	if (!copyConfig.enabled) {
+		return true;
+	}
+	if (copyConfig.value) {
+		return true;
+	}
+	return false;
+}
+
 export function CreateCopyConfig(): CopyConfig {
 	return {
 		agentProperty: '',
@@ -264,7 +274,6 @@ export function SetupConfigInstanceInformation(
 	dataChainOptions: DataChainConfiguration,
 	methodDescription: MethodDescription
 ) {
-
 	dataChainOptions.checkExistence = dataChainOptions.checkExistence || CreateCheckExistence();
 	dataChainOptions.simpleValidation = dataChainOptions.simpleValidation || CreateSimpleValidation();
 	dataChainOptions.copyConfig = dataChainOptions.copyConfig || CreateCopyConfig();
@@ -337,14 +346,10 @@ export interface CopyConfig extends HalfRelation {}
 export interface Setter extends HalfRelation {
 	value: string;
 }
-export interface SetBoolean extends Setter {
-}
-export interface SetInteger extends Setter {
-}
-export interface IncrementInteger extends Setter {
-}
-export interface IncrementDouble extends Setter {
-}
+export interface SetBoolean extends Setter {}
+export interface SetInteger extends Setter {}
+export interface IncrementInteger extends Setter {}
+export interface IncrementDouble extends Setter {}
 
 export interface SimpleValidationConfig extends AfterEffectRelations {
 	minLength: NumberConfig;

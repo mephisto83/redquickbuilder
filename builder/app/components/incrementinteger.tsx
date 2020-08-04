@@ -12,8 +12,9 @@ import SetterComponent from './settercomponent';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import TextInput from './textinput';
 import { GUID } from '../actions/uiactions';
+import SelectInput from './selectinput';
 
-export default class SetIntegerComponent extends Component<any, any> {
+export default class IncrementIntegerComponent extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
 		this.state = {};
@@ -25,23 +26,23 @@ export default class SetIntegerComponent extends Component<any, any> {
 			return <span />;
 		}
 
-		let { setInteger } = this.setupInstanceInfo(dataChainOptions);
+		let { incrementInteger } = this.setupInstanceInfo(dataChainOptions);
 		return (
 			<SetterComponent
-				getFromInfo={(temp: { setInteger: SetInteger }) => {
-					return temp.setInteger;
-        }}
-        methodDescription={this.props.methodDescription}
+				getFromInfo={(temp: { incrementInteger: SetInteger }) => {
+					return temp.incrementInteger;
+				}}
+				methodDescription={this.props.methodDescription}
 				dataChainType={this.props.dataChainType}
 				dataChainOptions={dataChainOptions}
-				title={Titles.SetInteger}
+				title={Titles.IncrementInteger}
 			>
 				<TreeViewItemContainer>
 					<TextInput
 						label={Titles.Value}
-						value={setInteger.value}
+						value={incrementInteger.value}
 						onChange={(value: string) => {
-							setInteger.value = value;
+							incrementInteger.value = value;
 							this.setState({
 								turn: GUID()
 							});

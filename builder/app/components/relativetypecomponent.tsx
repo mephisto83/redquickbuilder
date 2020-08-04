@@ -87,7 +87,7 @@ export default class RelativeTypeComponent extends Component<any, any> {
 				greyed={!this.props.enabled}
 				title={Titles.RelationType}
 			>
-				<TreeViewItemContainer>
+				<TreeViewItemContainer  hide={this.props.hideModelAgent}>
 					<SelectInput
 						label={
 							relations.relationType === RelationType.Agent ? (
@@ -111,7 +111,7 @@ export default class RelativeTypeComponent extends Component<any, any> {
 						}}
 					/>
 				</TreeViewItemContainer>
-				<TreeViewItemContainer>
+				<TreeViewItemContainer  hide={this.props.hideModelAgent}>
 					<SelectInput
 						label={Titles.Property}
 						options={properties}

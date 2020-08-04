@@ -7,13 +7,13 @@ import {
 	MethodDescription,
 	SetupConfigInstanceInformation
 } from '../interface/methodprops';
-import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import SetterComponent from './settercomponent';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import TextInput from './textinput';
 import { GUID } from '../actions/uiactions';
+import SelectInput from './selectinput';
 
-export default class SetIntegerComponent extends Component<any, any> {
+export default class IncrementDoubleComponent extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
 		this.state = {};
@@ -25,23 +25,23 @@ export default class SetIntegerComponent extends Component<any, any> {
 			return <span />;
 		}
 
-		let { setInteger } = this.setupInstanceInfo(dataChainOptions);
+		let { incrementDouble } = this.setupInstanceInfo(dataChainOptions);
 		return (
 			<SetterComponent
-				getFromInfo={(temp: { setInteger: SetInteger }) => {
-					return temp.setInteger;
-        }}
-        methodDescription={this.props.methodDescription}
+				getFromInfo={(temp: { incrementDouble: SetInteger }) => {
+					return temp.incrementDouble;
+				}}
+				methodDescription={this.props.methodDescription}
 				dataChainType={this.props.dataChainType}
 				dataChainOptions={dataChainOptions}
-				title={Titles.SetInteger}
+				title={Titles.IncrementInteger}
 			>
 				<TreeViewItemContainer>
 					<TextInput
 						label={Titles.Value}
-						value={setInteger.value}
+						value={incrementDouble.value}
 						onChange={(value: string) => {
-							setInteger.value = value;
+							incrementDouble.value = value;
 							this.setState({
 								turn: GUID()
 							});
