@@ -10,9 +10,11 @@ export default function ClearExecutor(args: any = {}) {
 	}).toNodeSelect();
 
 	return addProperty(
-		propertyNodes.filter((x: any) => !UIA.GetNodeProp(x.value, NodeProperties.IsDefaultProperty)).map((t: { value: any; }) => {
-			return t.value;
-		}),
+		propertyNodes
+			.filter((x: any) => !UIA.GetNodeProp(x.value, NodeProperties.IsDefaultProperty))
+			.map((t: { value: any }) => {
+				return t.value;
+			}),
 		currentNode
 	);
 }
@@ -24,7 +26,8 @@ let addProperty = (values: any, currentNode: any) => {
 	var operation = values
 		.map((value: any) => {
 			var id = currentNode.id;
-			executor = addValidatator(executor, { id: value });
+			let vl: any = { id: value };
+			executor = addValidatator(executor, vl);
 
 			return [
 				{

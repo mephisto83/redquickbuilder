@@ -22,6 +22,7 @@ export const NodeTypes = {
 	NavigationScreen: 'NavigationScreen',
 	Lists: 'Lists',
 	EventMethodInstance: 'EventMethodInstance',
+	PermissionDataChain: 'PermissionDataChain',
 	LifeCylceMethod: 'LifeCylceMethod',
 	EventArgument: 'EventArgument',
 	LifeCylceMethodInstance: 'LifeCylceMethodInstance',
@@ -333,11 +334,13 @@ export const NodeProperties = {
 	DefaultPropertyValueType: 'DefaultPropertyValueType',
 	DefaultPropertyValue: 'DefaultPropertyValue',
 	GridPlacement: 'GridPlacement',
+	CompleteFunction: 'CompleteFunction',
 	IsFetchDataChainStorage: 'IsFetchDataChainStorage',
 	IsDashboard: 'IsDashboard',
 	GridRowCount: 'GridRowCount',
 	MergeNode: 'MergeNode',
 	DataChainTypeName: 'DataChainTypeName',
+	DataChainTypeCategory: 'DataChainTypeCategory',
 	IsHomeLaunchView: 'IsHomeLaunchView',
 	UseDefaultValue: 'UseDefaultValue',
 	DefaultValue: 'DefaultValue',
@@ -689,6 +692,7 @@ export const LinkType = {
 	UserOfAgentType: 'UserOfAgentType',
 	DataChainShouldShow: 'DataChainShouldShow',
 	ContextParameters: 'ContextParameters',
+	PermissionDataChain: 'PermissionDataChain',
 	DataChainIsDisabled: 'DataChainIsDisabled',
 	StateKey: 'StateKey',
 	DataChainScreenEffect: 'DataChainScreenEffect',
@@ -973,6 +977,9 @@ export const LinkProperties = {
 	},
 	DataChainAfterEffectConverter: {
 		type: LinkType.DataChainAfterEffectConverter
+	},
+	PermissionDataChain: {
+		type: LinkType.PermissionDataChain
 	},
 	DataChainAfterEffectConverterTarget: {
 		type: LinkType.DataChainAfterEffectConverterTarget
@@ -2189,10 +2196,10 @@ export const ExecutorUI: any = {
 			[ProgrammingLanguages.CSHARP]: 'DataChain'
 		},
 		arguments: {
-      nodeType: NodeTypes.DataChain,
+			nodeType: NodeTypes.DataChain,
 			reference: {
 				types: [ NodeTypes.DataChain ],
-        title: NodeTypes.DataChain,
+				title: NodeTypes.DataChain,
 				properties: {
 					[NodeProperties.CS]: true,
 					[NodeProperties.NODEType]: NodeTypes.DataChain,

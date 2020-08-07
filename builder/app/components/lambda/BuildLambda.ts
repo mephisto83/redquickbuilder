@@ -47,3 +47,24 @@ export function GetJSONReferenceInserts(lambdaText: string) {
 			return _insert.key;
 		});
 }
+
+export function GetJSONReferenceInsertsMap(lambdaText: string) {
+	let res: {
+		[str: string]: {
+			template: string;
+			insert: ReferenceInsert;
+		};
+  } = {};
+
+	getJSONReferenceInserts(lambdaText || '').map((v) => v.substr(2, v.length - 4)).map((v: string) => {
+		let ri: ReferenceInsert = JSON.parse(v);
+		res[ri.key] = {
+			template: `#{${v}}#`,
+			insert: ri
+		};
+	});
+	// .unique((_insert: ReferenceInsert) => {
+	// 	return _insert.key;
+	// });
+	return res;
+}

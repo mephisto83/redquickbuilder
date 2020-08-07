@@ -4,15 +4,11 @@ import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
 import TreeViewMenu from './treeviewmenu';
 import {
-	AfterEffect,
-	TargetMethodType,
 	MountingDescription,
-	ValidationConfig,
 	PermissionConfig
 } from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
-import AfterEffectComponent from './aftereffectcomponent';
 import ValidationComponentItem from './validationcomponentitem';
 import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 

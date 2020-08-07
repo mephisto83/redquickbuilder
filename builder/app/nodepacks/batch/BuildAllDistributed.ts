@@ -43,6 +43,7 @@ import AddUserRequirements from './AddUserRequirements';
 import ModifyAgentMethods from './ModifyAgentMethods';
 import AddAgentAccessMethods from './AddAgentAccessMethods';
 import UpdateScreenParameters from '../screens/UpdateScreenParameters';
+import ApplyPremissionChains from './ApplyPremissionChains';
 
 interface BuildStep {
 	progress?: number;
@@ -192,6 +193,7 @@ export const ApplyValidationFromProperties = 'ApplyValidationFromProperties';
 export const CollectionComponentNodes = 'CollectionComponentNodes';
 export const CollectionScreenNodes = 'CollectionScreenNodes';
 export const CollectionConnectDataChainCollection = 'CollectionConnectDataChainCollection';
+export const APPLY_PERMISSION_CHAINS = 'Apply Permission Chains';
 const Collect_Into_Graph = 'Collect_Into_Graph';
 const COMPLETED_BUILD = 'COMPLETED_BUILD';
 
@@ -236,6 +238,7 @@ const buildAllProgress = [
 	...waiting(CollectionComponentNodes),
 	...waiting(CollectionScreenNodes),
 	...waiting(CollectionConnectDataChainCollection),
+	{ name: APPLY_PERMISSION_CHAINS },
 	{ name: COMPLETED_BUILD }
 ];
 export const BuildAllInfo = {
@@ -327,7 +330,11 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 
 		await run(buildAllProgress, Collect_Into_Graph, async (progresFunc: (arg0: number) => any) => {
 			await JobService.CollectForJob(currentJobFile);
-		});
+    });
+
+		await run(buildAllProgress, APPLY_PERMISSION_CHAINS, async (progressFunc) => {
+      await ApplyPremissionChains();
+    });
 
 		await run(buildAllProgress, Add_Filters_To_Get_All, async (progresFunc: any) => {
 			await AddFiltersToGetAll(progresFunc);

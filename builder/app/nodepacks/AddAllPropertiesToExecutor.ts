@@ -24,7 +24,8 @@ let addProperty = (values: any, currentNode: any) => {
 	var operation = values
 		.map((value: any) => {
 			var id = currentNode.id;
-			executor = addValidatator(executor, { id: value });
+			let vl: any = { id: value };
+			executor = addValidatator(executor, vl);
 
 			return [
 				{

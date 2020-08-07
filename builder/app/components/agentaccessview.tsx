@@ -472,12 +472,7 @@ class AgentAccessView extends Component<any, any> {
 											);
 											this.setState({
 												agents: onlyAgents.map((v) => v.id),
-												models: GetNodesByProperties(
-													{
-														[NodeProperties.NODEType]: NodeTypes.Model
-													},
-													graph
-												).map((d) => d.id),
+												models: NodesByType(null, NodeTypes.Model).map((d: Node) => d.id),
 												dashboards: GetNodesByProperties(
 													{
 														[NodeProperties.NODEType]: NodeTypes.NavigationScreen,
@@ -2204,7 +2199,7 @@ function validateEffect(
 						}
 						if (!afterEffect.target) {
 							messages.push(`Missing method target for ${afterEffect.name}.`);
-            }
+						}
 					});
 				}
 				if (messages.length) {

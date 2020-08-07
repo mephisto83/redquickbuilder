@@ -5,10 +5,7 @@ import * as Titles from './titles';
 import SelectInput from './selectinput';
 import TextInput from './textinput';
 import TreeViewMenu from './treeviewmenu';
-import {
-	MountingDescription,
-	ValidationConfig
-} from '../interface/methodprops';
+import { MountingDescription, ValidationConfig } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes } from '../constants/nodetypes';
 import TreeViewButtonGroup from './treeviewbuttongroup';
@@ -106,7 +103,7 @@ export default class ValidationComponentItem extends Component<any, any> {
 												name: validationConfig.name,
 												from: methodDescription,
 												dataChain: validationConfig.dataChain,
-												type: DataChainType.Validation,
+												type: this.props.dataChainType || DataChainType.Validation,
 												afterEffectOptions: validationConfig.dataChainOptions
 											},
 											(dataChain: Node) => {

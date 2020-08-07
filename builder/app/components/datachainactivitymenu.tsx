@@ -142,11 +142,11 @@ class DataChainActvityMenu extends Component<any, any> {
 
 					return (
 						<SelectLambdaInsertProperty
-							label={key}
-							type={type}
 							valueKey={key}
+							title={key}
 							value={lambdaInsertArgumentValues}
 							node={currentNode}
+							type={type}
 							options={nodes}
 						/>
 					);
@@ -631,7 +631,7 @@ class DataChainActvityMenu extends Component<any, any> {
 									});
 								this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
 									prop: UIA.NodeProperties.DataChainReferences,
-									id,
+									id: item.value,
 									value: currentValue
 								});
 							}}

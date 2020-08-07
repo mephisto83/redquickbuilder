@@ -57,6 +57,7 @@ import TreeViewItemContainer from './treeviewitemcontainer';
 import SelectInput from './selectinput';
 import { NodesByType, GetNodeProp } from '../methods/graph_methods';
 import CreateClaimService from '../nodepacks/batch/CreateClaimService';
+import ApplyPremissionChains from '../nodepacks/batch/ApplyPremissionChains';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -246,6 +247,12 @@ class QuickMethods extends Component<any, any, any> {
 											() => {},
 											(v: Node) => GetNodeProp(v, NodeProperties.IsDashboard)
 										);
+									}}
+								/>
+								<TreeViewMenu
+									title="Apply Permission Chains"
+									onClick={() => {
+										ApplyPremissionChains();
 									}}
 								/>
 								<TreeViewMenu

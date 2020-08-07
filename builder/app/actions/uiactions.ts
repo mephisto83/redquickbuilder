@@ -5,7 +5,13 @@ import * as GraphTypes from '../methods/graph_types';
 import * as NodeConstants from '../constants/nodetypes';
 import * as Titles from '../components/titles';
 import { NavigateTypes } from '../constants/nodetypes';
-import { MethodFunctions, bindTemplate, bindReferenceTemplate, FunctionTemplateKeys } from '../constants/functiontypes';
+import {
+	MethodFunctions,
+	bindTemplate,
+	bindReferenceTemplate,
+	FunctionTemplateKeys,
+	bindReferenceJSONTemplates
+} from '../constants/functiontypes';
 import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachain';
 import { uuidv4, addNewLine } from '../utils/array';
 import { getReferenceInserts, getJSONReferenceInserts } from '../utils/utilservice';
@@ -18,7 +24,13 @@ import * as _ from '../methods/graph_types';
 import JobService, { Job, JobAssignment, JobFile, JobServiceConstants } from '../jobs/jobservice';
 import { AgentProject } from '../jobs/interfaces';
 import { RouteSourceType, RouteSource } from '../interface/methodprops';
-import { ReferenceInsert, GetJSONReferenceInserts } from '../components/lambda/BuildLambda';
+import {
+	ReferenceInsert,
+	GetJSONReferenceInserts,
+	GetJSONReferenceInsertsMap,
+	ReferenceInsertType
+} from '../components/lambda/BuildLambda';
+import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 const fs = require('fs');
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';
@@ -395,18 +407,17 @@ export function CreateNewNode(props: any, callback?: Function) {
 export function AddInsertArgumentsForDataChain(id: string) {
 	let lambdaText = GetNodeProp(id, NodeProperties.Lambda);
 	const value: GraphTypes.LambdaInserts = GetNodeProp(id, NodeProperties.LambdaInsertArguments) || {};
-	GetJSONReferenceInserts(lambdaText || '')
-		.map((_insert: ReferenceInsert) => {
-			if (_insert.model) {
-				if (_insert.property) {
-					value[_insert.key] = _insert.property;
-				} else {
-					value[_insert.key] = _insert.model;
-				}
+	GetJSONReferenceInserts(lambdaText || '').map((_insert: ReferenceInsert) => {
+		if (_insert.model) {
+			if (_insert.property) {
+				value[_insert.key] = _insert.property;
 			} else {
-				value[_insert.key] = '';
+				value[_insert.key] = _insert.model;
 			}
-		});
+		} else {
+			value[_insert.key] = '';
+		}
+	});
 	updateComponentProperty(id, NodeProperties.LambdaInsertArguments, value);
 }
 export function SetSharedComponent(args: any) {
@@ -1189,17 +1200,29 @@ export function GenerateCSChainFunction(id: string) {
 			}
 		}
 	}
-	const method = `public class ${GetCodeName(id)}
-{
-${arbiterProperties}
-    public ${GetCodeName(id)}(${arbiterInterfaces}) {
-${arbiterSets}
-    }
-    public async Task<${alternateOutputType || GetCodeName(outputType)}> Execute(${_arguments}) {
-      ${lastNodeName}
-    }
-}`;
+	let method = '';
+	if (GetNodeProp(id, NodeProperties.CompleteFunction)) {
+		method = `public class ${GetCodeName(id)}
+              {
+              ${arbiterProperties}
 
+                  public ${GetCodeName(id)}(${arbiterInterfaces}) {
+              ${arbiterSets}
+                  }
+                  ${lastNodeName}
+              }`;
+	} else {
+		method = `public class ${GetCodeName(id)}
+            {
+            ${arbiterProperties}
+                public ${GetCodeName(id)}(${arbiterInterfaces}) {
+            ${arbiterSets}
+                }
+                public async Task<${alternateOutputType || GetCodeName(outputType)}> Execute(${_arguments}) {
+                  ${lastNodeName}
+                }
+            }`;
+	}
 	return method;
 }
 export function GenerateChainFunction(id: any, options: { language: any }) {
@@ -1925,6 +1948,14 @@ export function GetOutputTypeInCSDataChainMethod(id: string, callback?: any) {
 				}
 			});
 	}
+	let category = GetNodeProp(id, NodeProperties.DataChainTypeCategory);
+	switch (category) {
+		case DataChainType.Permission:
+			if (callback) {
+				callback('bool');
+			}
+			break;
+	}
 	return result;
 }
 export function GenerateCDDataChainMethod(id: string) {
@@ -1934,6 +1965,40 @@ export function GenerateCDDataChainMethod(id: string) {
 	const lambdaInsertArguments = GetNodeProp(node, NodeProperties.LambdaInsertArguments);
 	switch (functionType) {
 		case DataChainFunctionKeys.Lambda:
+			let lambdaText = GetNodeProp(id, functionType);
+			let temp = GetJSONReferenceInsertsMap(lambdaText);
+			if (temp) {
+				Object.values(temp).map((v: { template: string; insert: ReferenceInsert }) => {
+					let { key, type = ReferenceInsertType.Model } = v.insert;
+					let valueKey = key;
+					if (
+						lambdaInsertArguments &&
+						lambdaInsertArguments[valueKey] &&
+						lambdaInsertArguments[valueKey][type]
+					) {
+						let codeName = GetCodeName(lambdaInsertArguments[valueKey][type]);
+						if (type == ReferenceInsertType.EnumerationValue) {
+							let enumerationValues =
+								GetNodeProp(
+									lambdaInsertArguments[key]
+										? lambdaInsertArguments[key][ReferenceInsertType.Enumeration]
+										: null,
+									NodeProperties.Enumeration
+								) || [];
+							let temp: any = enumerationValues.find(
+								(v: { id: string }) => v.id === lambdaInsertArguments[valueKey][type]
+							);
+							if (temp) {
+								codeName = `${temp.value}`.toUpperCase();
+							}
+						}
+						lambda = bindReferenceJSONTemplates(lambda, {
+							[v.template]: codeName
+						});
+					}
+				});
+			}
+
 			getReferenceInserts(lambda).map((v) => v.substr(2, v.length - 3)).unique().map((_insert: string) => {
 				const temp = _insert.split('@');
 				const insert = temp.length > 1 ? temp[1] : temp[0];
@@ -2499,6 +2564,33 @@ export function GetCombinedCondition(id: any, language = NodeConstants.Programmi
 		const res = GetCustomMethodClauses(customMethod, methodNodeParameters, language);
 		clauses = [ ...clauses, ...res.map((t) => t.clause) ];
 	});
+
+	switch (GetNodeProp(node, NodeProperties.NODEType)) {
+		case NodeTypes.Permission:
+			let permissionDataChains = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+				id: id,
+				componentType: NodeTypes.PermissionDataChain
+			});
+
+			permissionDataChains.forEach((permissionDataChain: _.Node, index: number) => {
+				let dataChain = GraphMethods.GetNodeLinkedTo(GetCurrentGraph(), {
+					id: permissionDataChain.id,
+					componentType: NodeTypes.DataChain
+				});
+				let permissionParameters = GetMethodPermissionParameters(id, false);
+				if (!permissionParameters) {
+					throw new Error('missing permission parameters: GetCombinedCondition');
+				}
+				clauses.push(
+					`var {{result}} = await DC.${GetCodeName(dataChain)}.Execute(${permissionParameters
+						.map((v: any) => {
+							return `${v.paramName}: ${v.value}`;
+						})
+						.join()});`
+				);
+			});
+			break;
+	}
 	const finalClause = clauses.map((_, index) => `res_` + index).join(' && ') || 'true';
 	if (options.finalResult) {
 		finalResult = options.finalResult;
@@ -3637,13 +3729,15 @@ export function removeCurrentNode() {
 export function togglePinned() {
 	const state = _getState();
 	const currentNode: _.Node = Node(state, Visual(state, SELECTED_NODE));
-	_dispatch(
-		graphOperation(CHANGE_NODE_PROPERTY, {
-			prop: NodeProperties.Pinned,
-			id: currentNode.id,
-			value: !GetNodeProp(currentNode, NodeProperties.Pinned)
-		})
-	);
+	if (currentNode) {
+		_dispatch(
+			graphOperation(CHANGE_NODE_PROPERTY, {
+				prop: NodeProperties.Pinned,
+				id: currentNode.id,
+				value: !GetNodeProp(currentNode, NodeProperties.Pinned)
+			})
+		);
+	}
 }
 export function GetGraphNode(id: string) {
 	const state = _getState();

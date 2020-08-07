@@ -11,7 +11,21 @@ import {
 	GetNodeProp
 } from '../actions/uiactions';
 import { NodeProperties } from '../constants/nodetypes';
-class SelectLambdaInsertProperty extends Component<any, any> {
+import { GraphNode } from 'webcola';
+import { Node } from '../methods/graph_types';
+class SelectLambdaInsertProperty extends Component<
+	{
+		valueKey: string;
+		currentNode: any;
+		options: any;
+		value: any;
+		title: any;
+		type: string;
+		node: Node;
+		graphOperation: Function;
+	},
+	any
+> {
 	render() {
 		let { value, type, valueKey } = this.props;
 		let currentNode = this.props.node;
@@ -37,7 +51,7 @@ class SelectLambdaInsertProperty extends Component<any, any> {
 						properties: { ...LinkProperties.LambdaInsertArguments }
 					});
 				}}
-				label={this.props.label}
+				label={this.props.title}
 				value={value && value[valueKey] ? value[valueKey][type] : null}
 				options={this.props.options}
 			/>

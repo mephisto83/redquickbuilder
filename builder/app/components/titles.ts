@@ -306,6 +306,7 @@ export const Delete = 'Delete';
 export const IncrementInteger = 'Increment Integer';
 export const SetBoolean = 'Set boolean';
 export const CompareEnumeration = 'Compare Enumeration';
+export const MatchPropertyToEnum = 'Match property to enumeration';
 export const PermissionAttributes = 'Permission Attributes';
 export const OwnedResourcesDescription = 'Check if permissions are for resources owned by source model.';
 export const PermissionActions = 'Permission Actions';

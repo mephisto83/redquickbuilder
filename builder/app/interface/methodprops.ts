@@ -1,5 +1,5 @@
 import { Config } from 'electron';
-import { GetModelPropertyChildren } from '../actions/uiactions';
+import { GetModelPropertyChildren, GUID } from '../actions/uiactions';
 import datachainactivitymenu from '../components/datachainactivitymenu';
 
 export interface DashboardAccessProps {
@@ -86,6 +86,7 @@ export interface DataChainConfiguration {
 	incrementInteger?: IncrementInteger;
 	incrementDouble?: IncrementDouble;
 	compareEnumeration?: CompareEnumeration;
+	compareEnumerations?: CompareEnumeration[];
 	getExisting?: GetExistingConfig;
 	setProperties?: SetPropertiesConfig;
 }
@@ -96,6 +97,7 @@ export interface SetPropertiesConfig extends ConfigItem {
 export function CreateSetProperties(): SetPropertiesConfig {
 	return {
 		enabled: false,
+		id: GUID(),
 		properties: []
 	};
 }
@@ -182,8 +184,10 @@ export function CreateCheckExistence(): CheckExistenceConfig {
 		modelProperty: '',
 		targetProperty: '',
 		enabled: false,
+		id: GUID(),
 		skipSettings: SkipSettings.DontSkip,
 		returnSetting: {
+      id: GUID(),
 			enabled: false,
 			setting: ReturnSetting.ReturnFalse
 		}
@@ -217,6 +221,7 @@ export function CreateCopyConfig(): CopyConfig {
 		agentProperty: '',
 		enabled: false,
 		modelProperty: '',
+		id: GUID(),
 		relationType: RelationType.Model
 	};
 }
@@ -225,6 +230,7 @@ export function CreateHalf(): HalfRelation {
 	return {
 		agentProperty: '',
 		enabled: false,
+		id: GUID(),
 		modelProperty: '',
 		relationType: RelationType.Agent
 	};
@@ -254,22 +260,28 @@ export function CreateSimpleValidation(): SimpleValidationConfig {
 		relationType: RelationType.Agent,
 		agentProperty: '',
 		modelProperty: '',
+		id: GUID(),
 		targetProperty: '',
 		enabled: false,
 		alphaOnlyWithSpaces: {
+      id: GUID(),
 			enabled: false
 		},
 		isNotNull: {
+      id: GUID(),
 			enabled: false
 		},
 		isNull: {
+      id: GUID(),
 			enabled: false
 		},
 		maxLength: {
+      id: GUID(),
 			enabled: false,
 			value: '500'
 		},
 		minLength: {
+      id: GUID(),
 			enabled: false,
 			value: '1'
 		}
@@ -287,6 +299,7 @@ export function SetupConfigInstanceInformation(
 	dataChainOptions.incrementDouble = dataChainOptions.incrementDouble || CreateIncrementDouble();
 	dataChainOptions.incrementInteger = dataChainOptions.incrementInteger || CreateIncrementInteger();
 	dataChainOptions.compareEnumeration = dataChainOptions.compareEnumeration || CreateCompareEnumeration();
+	dataChainOptions.compareEnumerations = dataChainOptions.compareEnumerations || [ CreateCompareEnumeration() ];
 	let checkExistence = dataChainOptions.checkExistence;
 	let properties: any[] = [];
 	let targetProperties: any[] = [];
@@ -323,13 +336,15 @@ export function SetupConfigInstanceInformation(
 		incrementInteger: dataChainOptions.incrementInteger,
 		setBoolean: dataChainOptions.setBoolean,
 		setInteger: dataChainOptions.setInteger,
-		compareEnumeration: dataChainOptions.compareEnumeration
+		compareEnumeration: dataChainOptions.compareEnumeration,
+		compareEnumerations: dataChainOptions.compareEnumerations
 	};
 }
 
 export function CreateGetExistence(): GetExistingConfig {
 	return {
 		relationType: RelationType.Agent,
+    id: GUID(),
 		agentProperty: '',
 		modelProperty: '',
 		targetProperty: '',
@@ -386,6 +401,7 @@ export interface ReturnSettingConfig extends ConfigItem {
 }
 export function createReturnSetting(): ReturnSettingConfig {
 	return {
+    id: GUID(),
 		setting: ReturnSetting.ReturnTrue,
 		enabled: false
 	};
@@ -402,6 +418,7 @@ export enum SkipSettings {
 }
 export interface ConfigItem {
 	enabled: boolean;
+	id: string;
 }
 export function CheckSimpleValidation(isvalidation: SimpleValidationConfig) {
 	if (!isvalidation.enabled) {

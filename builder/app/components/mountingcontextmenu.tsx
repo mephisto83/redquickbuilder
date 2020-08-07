@@ -41,6 +41,9 @@ import CheckBox from './checkbox';
 import ScreenEffectsComponent from './screenEffectsComponent';
 import AfterEffectsComponent from './aftereffectscomponent';
 import MountingItemConfig from './mountingitemconfig';
+import ExecutionComponent from './executioncomponent';
+import ValidationComponent from './validationcomponent';
+import PermissionComponent from './permissioncomponent';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -368,12 +371,30 @@ class ContextMenu extends Component<any, any> {
 									{methodConstraints}
 								</TreeViewMenu>
 								<ScreenEffectsComponent agent={agent} screenEffects={mountingItem.screenEffect} />
+								<PermissionComponent
+									agent={agent}
+									mountingItem={mountingItem}
+									methods={mode.methods}
+									methodDescription={mountingItem.methodDescription}
+								/>
+								<ValidationComponent
+									agent={agent}
+									mountingItem={mountingItem}
+									methods={mode.methods}
+									methodDescription={mountingItem.methodDescription}
+								/>
+								<ExecutionComponent
+									agent={agent}
+									mountingItem={mountingItem}
+									methods={mode.methods}
+									methodDescription={mountingItem.methodDescription}
+								/>
 								<AfterEffectsComponent
 									agent={agent}
-									methods={mode.methods}
 									mountingItem={mountingItem}
-									methodDescription={mountingItem.methodDescription}
+									methods={mode.methods}
 									afterEffects={mountingItem.afterEffects}
+									methodDescription={mountingItem.methodDescription}
 								/>
 								<TreeViewButtonGroup>
 									<TreeViewGroupButton

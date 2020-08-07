@@ -5,7 +5,8 @@ import {
 	SkipSettings,
 	SetProperty,
 	SetPropertyType,
-	ReturnSetting
+	ReturnSetting,
+	CompareEnumeration
 } from '../../interface/methodprops';
 import { FunctionMethodTypes, MethodFunctions, bindTemplate } from '../../constants/functiontypes';
 import {
@@ -53,6 +54,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 	let checking_existence: string = '';
 	let get_existing: string = '#{{"key":"tomodel"}}.Create()';
 	let set_properties: string = '';
+	let compare_enumeration: string = '';
 	let guts: string = '';
 	let simplevalidation: string = '';
 	let can_complete = false;
@@ -60,6 +62,17 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 	tempLambdaInsertArgumentValues.model = { model: from.properties.model };
 	tempLambdaInsertArgumentValues.agent = { model: from.properties.agent };
 	if (dataChainConfigOptions) {
+		let { compareEnumeration, compareEnumerations } = dataChainConfigOptions;
+		if (compareEnumeration) {
+			compare_enumeration = CompareEnumerationFunc(compareEnumeration, tempLambdaInsertArgumentValues);
+		}
+		if (compareEnumerations) {
+			compare_enumeration = compareEnumerations
+				.map((compareEnumeration: CompareEnumeration) => {
+					return CompareEnumerationFunc(compareEnumeration, tempLambdaInsertArgumentValues);
+				})
+				.join(NEW_LINE);
+		}
 		if (dataChainConfigOptions.checkExistence && dataChainConfigOptions.checkExistence.enabled) {
 			let {
 				relationType,
@@ -215,12 +228,30 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 	}
 	let from_parameter_template = '';
 	switch (type) {
+		case DataChainType.Permission:
+			can_complete = true;
+			from_parameter_template = `
+      public async Task<bool> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent)
+      {
+
+        Func<#{{"key":"model"}}#, #{{"key":"agent"}}#, Task<bool>> func = async (#{{"key":"model"}}# model, #{{"key":"agent"}}# agent) => {
+          // build model value here.
+
+          {{compare_enumeration}}
+
+          return true;
+        };
+
+        return await func(model, agent);
+      }
+  `;
+			break;
 		case DataChainType.Validation:
 			if (from && from.functionType) {
 				can_complete = true;
 			}
 			from_parameter_template = `
-        Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"agent"}}#ChangeBy#{{"key":"model"}}#, Task<bool>> func = async (#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change_parameter) => {
+        Func<#{{"key":"model"}}#, #{{"key":"agent"}}#, #{{"key":"agent"}}#ChangeBy#{{"key":"model"}}#, Task<bool>> func = async (#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change_parameter) => {
           var arbiter#{{"key":"agent"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"agent"}}#>>();
           var arbiter#{{"key":"model"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"model"}}#>>();
 
@@ -268,6 +299,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 	from_parameter_template = bindTemplate(from_parameter_template, {
 		checking_existence,
 		get_existing,
+		compare_enumeration,
 		set_properties,
 		guts,
 		simplevalidation,
@@ -291,6 +323,8 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				...lambdaInsertArgumentValues
 			});
 			updateComponentProperty(dataChain, NodeProperties.Lambda, from_parameter_template);
+			updateComponentProperty(dataChain, NodeProperties.DataChainTypeCategory, type);
+			updateComponentProperty(dataChain, NodeProperties.CompleteFunction, true);
 			updateComponentProperty(dataChain, NodeProperties.UIText, name);
 		} else if (methodFunction) {
 			graphOperation(
@@ -300,6 +334,8 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 						[NodeProperties.NODEType]: NodeTypes.DataChain,
 						[NodeProperties.CS]: true,
 						[NodeProperties.CSEntryPoint]: true,
+						[NodeProperties.DataChainTypeCategory]: type,
+						[NodeProperties.CompleteFunction]: true,
 						[NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Lambda,
 						[NodeProperties.LambdaInsertArguments]: lambdaInsertArgumentValues,
 						[NodeProperties.Lambda]: from_parameter_template
@@ -311,4 +347,42 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			)(GetDispatchFunc(), GetStateFunc());
 		}
 	}
+}
+function CompareEnumerationFunc(compareEnumeration: CompareEnumeration, tempLambdaInsertArgumentValues: any) {
+	let compare_enumeration = '';
+	if (compareEnumeration) {
+		let { enabled, relationType, agentProperty, modelProperty, enumeration, value } = compareEnumeration;
+		if (enabled) {
+			let prop_string: string;
+			let relative_type_name = '';
+			switch (relationType) {
+				case RelationType.Agent:
+					prop_string = agentProperty;
+					relative_type_name = 'agent';
+					break;
+				case RelationType.Model:
+					prop_string = modelProperty;
+					relative_type_name = 'model';
+					break;
+			}
+			let enumNode = GetNodeById(enumeration);
+			let enumprops = GetNodeProp(enumNode, NodeProperties.Enumeration) || [];
+			let propName = GetCodeName(prop_string);
+			let enumProp: { value: string; id: string } = enumprops.find((v: { id: string }) => v.id === value);
+			tempLambdaInsertArgumentValues[GetJSCodeName(enumeration)] = { enumeration: enumeration };
+			tempLambdaInsertArgumentValues[`${GetJSCodeName(enumeration)}.${enumProp.value}`] = {
+				enumeration,
+				enumerationvalue: value
+			};
+			tempLambdaInsertArgumentValues[`${relative_type_name}.${propName}`] = { property: prop_string };
+			compare_enumeration = `if(${relative_type_name}.#{{"key":"${relative_type_name}.${propName}","type":"property","model":"${relative_type_name}"}}# != #{{"key":"${GetJSCodeName(
+				enumeration
+			)}","type":"enumeration" }}#.#{{"key":"${GetJSCodeName(
+				enumeration
+			)}.${enumProp.value}","type":"enumerationvalue"}}#) {
+          return false;
+        }`;
+		}
+	}
+	return compare_enumeration;
 }

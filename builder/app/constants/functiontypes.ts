@@ -2079,6 +2079,31 @@ export function bindTemplate(templateString: any, data: any) {
 	return templateString;
 }
 
+export function bindReferenceJSONTemplates(templateString: string, data: any) {
+	const regex = /\#{[a-zA-Z0-9_@|\-\{\}\:\'\.\"\, ~]*}\#/gm;
+	try {
+		var hasTemplate;
+		try {
+			hasTemplate = regex.test(templateString);
+		} catch (e) {}
+
+		if (hasTemplate) {
+			for (var t in data) {
+				// var subregex = new RegExp('(#{)' + t + '(})', 'g');
+				var val = data[t];
+				let old = templateString;
+				do {
+          old = templateString;
+          templateString = templateString.replace(t, val === null || val === undefined ? '' : val);
+				} while (old !== templateString);
+			}
+		}
+	} catch (e) {
+		throw e;
+	}
+	return templateString;
+}
+
 export function bindReferenceTemplate(templateString: any, data: any) {
 	var singularSymbol = '@';
 	try {

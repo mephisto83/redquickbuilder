@@ -17,16 +17,16 @@ export default class TreeViewMenu extends Component<any, any> {
 	icon() {
 		return this.props.icon || (this.props.children ? 'fa fa-folder' : null) || 'fa fa-wrench';
 	}
-	error() {
+	error(): any {
 		return this.props.error ? { color: '#dd4b39', fontWeight: 'bold' } : {};
 	}
 	hide() {
 		return this.props.hide;
 	}
 	render() {
-    if(this.hide()){
-      return <li className={`treeview ${this.active()}`}/>
-    }
+		if (this.hide()) {
+			return <li className={`treeview ${this.active()}`} />;
+		}
 		return (
 			<li title={this.props.description} className={`treeview ${this.active()} ${this.open()}`}>
 				<a

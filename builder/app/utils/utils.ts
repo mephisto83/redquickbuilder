@@ -19,7 +19,7 @@ export function mapDispatchToProps(dispatch: any) {
 	return bindActionCreators(actionCreate, dispatch);
 }
 
-export function UIConnect(component: any) {
+export function UIConnect(component: any): any {
 	return connect(mapStateToProps, mapDispatchToProps)(component);
 }
 declare global {
