@@ -95,12 +95,12 @@ export default class AfterEffectBranchConfigComponent extends Component<any, any
 				</TreeViewItemContainer>
 				{branchConfig.enabled ? (
 					<AfterEffectDataChainOption
+						routes={this.props.routes}
 						previousMethodDescription={previousMethodDescription}
 						currentMethodDescription={currentMethodDescription}
 						dataChainOptions={branchConfig.dataChainOptions}
 					/>
 				) : null}
-				<TreeViewButtonGroup />
 			</TreeViewMenu>
 		);
 	}

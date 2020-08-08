@@ -3,7 +3,13 @@ import React, { Component } from 'react';
 import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
 import TreeViewMenu from './treeviewmenu';
-import { CheckAfterEffectDataChainConfiguration, DataChainConfiguration, RouteConfig, CreateRouteConfig } from '../interface/methodprops';
+import {
+	CheckAfterEffectDataChainConfiguration,
+	DataChainConfiguration,
+	RouteConfig,
+	CreateRouteConfig,
+  AfterEffect
+} from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import CheckBox from './checkbox';
@@ -56,8 +62,10 @@ export default class AfterEffectRouteConfigComponent extends Component<any, any>
 				</TreeViewItemContainer>
 				<TreeViewItemContainer>
 					<SelectInput
-						label={Titles.Property}
-						options={this.props.routes || []}
+						label={Titles.Route}
+						options={(this.props.routes || []).map((route: AfterEffect) => {
+							return { value: route.id, title: route.name, id: route.id };
+						})}
 						value={routeConfig.targetId}
 						onChange={(value: string) => {
 							routeConfig.targetId = value;

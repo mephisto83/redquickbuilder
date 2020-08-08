@@ -59,7 +59,8 @@ export default class AfterEffectDataChainOption extends Component<any, any> {
 				<AfterEffectCheckExistanceConfig
 					previousMethodDescription={previousMethodDescription}
 					currentMethodDescription={currentMethodDescription}
-					dataChainOptions={dataChainOptions}
+          dataChainOptions={dataChainOptions}
+          routes={this.props.routes}
 					onChange={onchange}
 				/>
 				<AfterEffectGetExistanceConfig
@@ -77,10 +78,10 @@ export default class AfterEffectDataChainOption extends Component<any, any> {
 				<AfterEffectRouteConfigComponent
 					previousMethodDescription={previousMethodDescription}
 					currentMethodDescription={currentMethodDescription}
-					dataChainOptions={dataChainOptions}
+          dataChainOptions={dataChainOptions}
+          routes={this.props.routes}
 					onChange={onchange}
 				/>
-				<TreeViewButtonGroup />
 			</TreeViewMenu>
 		);
 	}

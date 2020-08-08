@@ -7,7 +7,9 @@ import {
 	SetPropertyType,
 	ReturnSetting,
 	CompareEnumeration,
-	ReturnSettingConfig
+	ReturnSettingConfig,
+	CheckExistenceConfig,
+	BranchConfig
 } from '../../interface/methodprops';
 import { FunctionMethodTypes, MethodFunctions, bindTemplate } from '../../constants/functiontypes';
 import {
@@ -30,6 +32,9 @@ import {
 import { DataChainFunctionKeys } from '../../constants/datachain';
 import { updateNodeProperty, codeTypeWord, GetNodeProp } from '../../methods/graph_methods';
 import AfterEffectSetupProperty from '../../components/aftereffectsetproperty';
+import CheckExistanceConfig from '../../components/checkexistenceconfig';
+import AfterEffectCheckExistanceConfig from '../../components/aftereffectcheckexistanceconfig';
+import { BrowserRouter } from 'react-router-dom';
 
 export interface AfterEffectConvertArgs {
 	from: MethodDescription;
@@ -59,7 +64,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		name
 	} = args;
 	let checking_existence: string = '';
-	let get_existing: string = '#{{"key":"model"}}.Create()';
+	let get_existing: string = 'var value = #{{"key":"model"}}.Create()';
 	let set_properties: string = '';
 	let compare_enumeration: string = '';
 	let guts: string = '';
@@ -129,6 +134,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			}
 
 			checking_existence = checkExistenceFunction(
+				dataChainConfigOptions.checkExistence,
 				relationType,
 				skipSettings,
 				checking_existence,
@@ -140,7 +146,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		}
 		if (dataChainConfigOptions.getExisting && dataChainConfigOptions.getExisting.enabled) {
 			if (dataChainConfigOptions.checkExistence && dataChainConfigOptions.checkExistence.enabled) {
-				get_existing = 'checkModel.FirstOrDefault()';
+				get_existing = 'var value = checkModel.FirstOrDefault()';
 			} else {
 				let { relationType, modelProperty, agentProperty, targetProperty } = dataChainConfigOptions.getExisting;
 
@@ -299,21 +305,21 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				}
 			}
 			from_parameter_template = `
-      public static async Task<bool> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"agent"}}#ChangeBy#{{"key":"model"}}#)
+      public static async Task Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#)
       {
           Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# fromModel, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
           var arbiter#{{"key":"agent"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"agent"}}#>>();
           var arbiter#{{"key":"model"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"model"}}#>>();
           var toArbiter#{{"key":"tomodel"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"tomodel"}}#>>();
           {{checking_existence}}
-          var value = {{get_existing}};
+
           // build model value here.
           {{copy_config}}
           {{set_properties}}
-
-          var parameters = #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#.Create(agent, value, FunctionName.{{default_executor_function_name}});
-          #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#.UpdatePath(parameters, change, AfterEffectChains.{{after_effect_parent}}.{{after_effect_child}});
-          await StreamProcess.#{{"key":"model"}}#_#{{"key":"agent"}}#(parameters, false);
+          {{get_existing}}
+          // var parameters = #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#.Create(agent, value, FunctionName.{{default_executor_function_name}});
+          // #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#.UpdatePath(parameters, change, AfterEffectChains.{{after_effect_parent}}.{{after_effect_child}});
+          // await StreamProcess.#{{"key":"model"}}#_#{{"key":"agent"}}#(parameters, false);
        };
 
        await func(agent, fromModel, change);
@@ -377,7 +383,21 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		}
 	}
 }
+function GenerateCodePath(if_: BranchConfig, checkExistence: CheckExistenceConfig, relationType: RelationType) {
+	let ifTrueCodeName = codeTypeWord(if_.name);
+	return `await ${ifTrueCodeName}(model, agent, change, checkModel);`;
+}
+function GetCheckModelExistPart(relationType: RelationType, targetProperty: string) {
+	let rel = relationType == RelationType.Agent ? 'agent' : 'fromModel';
+	return ` var exists = false;
+  var checkModel = (await toArbiter#{{"key":"tomodel"}}#.GetBy(v => v.#{{"key":"tomodel.${GetJSCodeName(
+		targetProperty
+	)}","type":"property","model":"tomodel"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();
+  exists  = checkModel != null;`;
+}
+
 function checkExistenceFunction(
+	checkExistence: CheckExistenceConfig,
 	relationType: RelationType,
 	skipSettings: SkipSettings,
 	checking_existence: string,
@@ -386,14 +406,36 @@ function checkExistenceFunction(
 	returnSetting: ReturnSettingConfig,
 	type: DataChainType
 ) {
+	let { ifTrue, ifFalse } = checkExistence;
+
 	if (type === DataChainType.AfterEffect) {
-		switch (relationType) {
-			case RelationType.Agent:
-			case RelationType.Model:
-				let ifvalue = skipSettings === SkipSettings.SkipIfFlase ? '!' : '';
-				if (skipSettings !== SkipSettings.DontSkip) {
-					let rel = relationType == RelationType.Agent ? 'agent' : 'fromModel';
-					checking_existence = `
+		let trueCodeStatement = '';
+		if (ifTrue.enabled) {
+			trueCodeStatement = GenerateCodePath(ifTrue, checkExistence, relationType);
+		}
+		let falseCodeStatement = '';
+		if (ifFalse.enabled) {
+			falseCodeStatement = GenerateCodePath(ifFalse, checkExistence, relationType);
+		}
+		if (falseCodeStatement || trueCodeStatement) {
+			let checkModelExistsPart = GetCheckModelExistPart(relationType, targetProperty);
+			checking_existence = `
+      ${checkModelExistsPart}
+      if(exists){
+        ${trueCodeStatement}
+      }
+      else {
+        ${falseCodeStatement}
+      }
+      `;
+		} else {
+			switch (relationType) {
+				case RelationType.Agent:
+				case RelationType.Model:
+					let ifvalue = skipSettings === SkipSettings.SkipIfFlase ? '!' : '';
+					if (skipSettings !== SkipSettings.DontSkip) {
+						let rel = relationType == RelationType.Agent ? 'agent' : 'fromModel';
+						checking_existence = `
           var exists = false;
           var checkModel = (await toArbiter#{{"key":"tomodel"}}#.GetBy(v => v.#{{"key":"tomodel.${GetJSCodeName(
 				targetProperty
@@ -405,9 +447,9 @@ function checkExistenceFunction(
           }`
 				: ''}
         `;
-				} else if (returnSetting.enabled) {
-					let rel = relationType == RelationType.Agent ? 'agent' : 'model';
-					checking_existence = `
+					} else if (returnSetting.enabled) {
+						let rel = relationType == RelationType.Agent ? 'agent' : 'model';
+						checking_existence = `
           var exists = false;
           var checkModel = (await toArbiter#{{"key":"tomodel"}}#.GetBy(v => v.#{{"key":"tomodel.${GetJSCodeName(
 				targetProperty
@@ -419,8 +461,10 @@ function checkExistenceFunction(
               }`
 				: ''}
         `;
-				}
-				break;
+					}
+
+					break;
+			}
 		}
 	} else {
 		switch (relationType) {

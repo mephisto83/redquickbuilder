@@ -4431,6 +4431,7 @@ declare global {
 	}
 	export interface Array<T> {
 		toNodeSelect: any;
+		ddSort: any;
 	}
 }
 ((array) => {
@@ -4450,6 +4451,19 @@ declare global {
 					.sort((a: any, b: any) => {
 						return `${a.title}`.localeCompare(`${b.title}`);
 					});
+			}
+		});
+	}
+	if (!array.ddSort) {
+		Object.defineProperty(array, 'ddSort', {
+			enumerable: false,
+			writable: true,
+			configurable: true,
+			value() {
+				const collection = this;
+				return collection.sort((a: any, b: any) => {
+					return `${a.title}`.localeCompare(`${b.title}`);
+				});
 			}
 		});
 	}

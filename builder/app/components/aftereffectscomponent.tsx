@@ -15,9 +15,10 @@ export default class AfterEffectsComponent extends Component<any, any> {
 	}
 	render() {
 		let afterEffects: AfterEffect[] = this.props.afterEffects;
+
 		return (
 			<TreeViewMenu
-				open={this.state.open}
+        open={this.state.open}
 				active
 				onClick={() => {
 					this.setState({ open: !this.state.open });
@@ -77,6 +78,7 @@ export default class AfterEffectsComponent extends Component<any, any> {
 								}
 							}}
 							afterEffect={afterEffect}
+							routes={afterEffects}
 						/>
 					);
 				})}

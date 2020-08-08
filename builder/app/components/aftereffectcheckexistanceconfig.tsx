@@ -192,16 +192,17 @@ export default class AfterEffectCheckExistanceConfig extends Component<any, any>
 				<BranchConfigComponent
 					previousMethodDescription={previousMethodDescription}
 					currentMethodDescription={currentMethodDescription}
-					branchConfig={checkExistence.ifFalse}
+          branchConfig={checkExistence.ifFalse}
+          routes={this.props.routes}
 					title={Titles.IfFalse}
 				/>
 				<BranchConfigComponent
 					previousMethodDescription={previousMethodDescription}
 					currentMethodDescription={currentMethodDescription}
-					branchConfig={checkExistence.ifTrue}
+          branchConfig={checkExistence.ifTrue}
+          routes={this.props.routes}
 					title={Titles.IfTrue}
 				/>
-				<TreeViewButtonGroup />
 			</TreeViewMenu>
 		);
 	}

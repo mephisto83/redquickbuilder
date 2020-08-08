@@ -307,6 +307,7 @@ export const IncrementInteger = 'Increment Integer';
 export const SetBoolean = 'Set boolean';
 export const Routing = 'Routing';
 export const CompareEnumeration = 'Compare Enumeration';
+export const Route = 'Route';
 export const MatchPropertyToEnum = 'Match property to enumeration';
 export const PermissionAttributes = 'Permission Attributes';
 export const OwnedResourcesDescription = 'Check if permissions are for resources owned by source model.';

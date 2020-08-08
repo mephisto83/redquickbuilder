@@ -16,7 +16,7 @@ export default class SelectInput extends Component<any, any> {
 			if (typeof options === 'function') {
 				options = options();
 			}
-			return options.map((t: any, index: any) => (
+			return options.ddSort().map((t: any, index: any) => (
 				<option key={`option-${index}`} value={t.value}>
 					{t.title}
 				</option>

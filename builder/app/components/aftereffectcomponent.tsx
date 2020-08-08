@@ -124,7 +124,8 @@ export default class AfterEffectComponent extends Component<any, any> {
 						methods={this.props.methods}
 						methodDescription={this.props.methodDescription}
 						currentDescription={currentDescription}
-						previousEffect={this.props.previousEffect}
+            previousEffect={this.props.previousEffect}
+            routes={this.props.routes}
 						afterEffect={afterEffect}
 					/>
 				) : null}
