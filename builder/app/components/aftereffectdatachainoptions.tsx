@@ -17,7 +17,7 @@ import {
 	EffectDescription,
 	MountingDescription,
 	MethodDescription,
-  CheckAfterEffectDataChainConfiguration
+	CheckAfterEffectDataChainConfiguration
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
@@ -31,6 +31,7 @@ import { mount } from 'enzyme';
 import AfterEffectCheckExistanceConfig from './aftereffectcheckexistanceconfig';
 import AfterEffectGetExistanceConfig from './aftereffectgetexistanceconfig';
 import AfterEffectSetPropertiesConfig from './aftereffectsetpropertiesconfig';
+import AfterEffectDataChainOption from './aftereffectdatachainoption';
 
 export default class AfterEffectDataChainOptions extends Component<any, any> {
 	constructor(props: any) {
@@ -77,35 +78,48 @@ export default class AfterEffectDataChainOptions extends Component<any, any> {
 			}
 		};
 		return (
-			<TreeViewMenu
-				open={this.state.open}
-				icon={CheckAfterEffectDataChainConfiguration(afterEffect.dataChainOptions) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
-				onClick={() => {
-					this.setState({ open: !this.state.open });
-				}}
-				active
-				title={Titles.Configuration}
-			>
-				<AfterEffectCheckExistanceConfig
-					previousMethodDescription={previousMethodDescription}
-					currentMethodDescription={currentMethodDescription}
-					dataChainOptions={afterEffect.dataChainOptions}
-					onChange={onchange}
-				/>
-				<AfterEffectGetExistanceConfig
-					previousMethodDescription={previousMethodDescription}
-					currentMethodDescription={currentMethodDescription}
-					dataChainOptions={afterEffect.dataChainOptions}
-					onChange={onchange}
-				/>
-				<AfterEffectSetPropertiesConfig
-					previousMethodDescription={previousMethodDescription}
-					currentMethodDescription={currentMethodDescription}
-					dataChainOptions={afterEffect.dataChainOptions}
-					onChange={onchange}
-				/>
-				<TreeViewButtonGroup />
-			</TreeViewMenu>
+			<AfterEffectDataChainOption onChange={onchange}
+				previousMethodDescription={previousMethodDescription}
+				currentMethodDescription={currentMethodDescription}
+				dataChainOptions={afterEffect.dataChainOptions}
+			/>
 		);
+		// return (
+		// 	<TreeViewMenu
+		// 		open={this.state.open}
+		// 		icon={
+		// 			CheckAfterEffectDataChainConfiguration(afterEffect.dataChainOptions) ? (
+		// 				'fa fa-check-circle-o'
+		// 			) : (
+		// 				'fa fa-circle-o'
+		// 			)
+		// 		}
+		// 		onClick={() => {
+		// 			this.setState({ open: !this.state.open });
+		// 		}}
+		// 		active
+		// 		title={Titles.Configuration}
+		// 	>
+		// 		<AfterEffectCheckExistanceConfig
+		// 			previousMethodDescription={previousMethodDescription}
+		// 			currentMethodDescription={currentMethodDescription}
+		// 			dataChainOptions={afterEffect.dataChainOptions}
+		// 			onChange={onchange}
+		// 		/>
+		// 		<AfterEffectGetExistanceConfig
+		// 			previousMethodDescription={previousMethodDescription}
+		// 			currentMethodDescription={currentMethodDescription}
+		// 			dataChainOptions={afterEffect.dataChainOptions}
+		// 			onChange={onchange}
+		// 		/>
+		// 		<AfterEffectSetPropertiesConfig
+		// 			previousMethodDescription={previousMethodDescription}
+		// 			currentMethodDescription={currentMethodDescription}
+		// 			dataChainOptions={afterEffect.dataChainOptions}
+		// 			onChange={onchange}
+		// 		/>
+		// 		<TreeViewButtonGroup />
+		// 	</TreeViewMenu>
+		// );
 	}
 }

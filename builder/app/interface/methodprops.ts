@@ -87,10 +87,21 @@ export interface DataChainConfiguration {
 	incrementDouble?: IncrementDouble;
 	compareEnumeration?: CompareEnumeration;
 	compareEnumerations?: CompareEnumeration[];
+	routeConfig?: RouteConfig;
 	getExisting?: GetExistingConfig;
 	setProperties?: SetPropertiesConfig;
 }
 
+export interface RouteConfig extends ConfigItem {
+	targetId: string;
+}
+export function CreateRouteConfig(): RouteConfig {
+	return {
+		targetId: '',
+		enabled: false,
+		id: GUID()
+	};
+}
 export interface SetPropertiesConfig extends ConfigItem {
 	properties: SetProperty[];
 }
@@ -186,11 +197,20 @@ export function CreateCheckExistence(): CheckExistenceConfig {
 		enabled: false,
 		id: GUID(),
 		skipSettings: SkipSettings.DontSkip,
+		ifFalse: CreateBranch(),
+		ifTrue: CreateBranch(),
 		returnSetting: {
 			id: GUID(),
 			enabled: false,
 			setting: ReturnSetting.ReturnFalse
 		}
+	};
+}
+export function CreateBranch(): BranchConfig {
+	return {
+		dataChainOptions: {},
+		enabled: false,
+		name: ''
 	};
 }
 export function CheckCopyConfig(copyConfig: HalfRelation) {
@@ -367,6 +387,13 @@ export interface CompareEnumeration extends HalfRelation {
 export interface CheckExistenceConfig extends AfterEffectRelations {
 	skipSettings: SkipSettings;
 	returnSetting: ReturnSettingConfig;
+	ifTrue: BranchConfig;
+	ifFalse: BranchConfig;
+}
+export interface BranchConfig {
+	name: string;
+	enabled: boolean;
+	dataChainOptions: DataChainConfiguration;
 }
 export interface CopyConfig extends AfterEffectRelations {}
 export interface Setter extends HalfRelation {

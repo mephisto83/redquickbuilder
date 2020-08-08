@@ -175,11 +175,11 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 						modelProperty,
 						relationType
 					} = afterEffectSetupProperty;
-
-					let prop_string = `value.#{{"key":"model.${GetJSCodeName(
+					let model_to = type === DataChainType.AfterEffect ? 'tomodel' : 'model';
+					let prop_string = `value.#{{"key":"${model_to}.${GetJSCodeName(
 						targetProperty
-					)}","type":"property","model":"model"}}#`;
-					tempLambdaInsertArgumentValues[`model.${GetJSCodeName(targetProperty)}`] = {
+					)}","type":"property","model":"${model_to}"}}#`;
+					tempLambdaInsertArgumentValues[`${model_to}.${GetJSCodeName(targetProperty)}`] = {
 						property: targetProperty
 					};
 					switch (setPropertyType) {
@@ -414,10 +414,10 @@ function checkExistenceFunction(
 			)}","type":"property","model":"model"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();
           exists  = checkModel != null;
           ${onTrue && ifvalue
-            ? ` if(${ifvalue}exists) {
+				? ` if(${ifvalue}exists) {
                 ${onTrue || 'return'};
               }`
-            : ''}
+				: ''}
         `;
 				}
 				break;
