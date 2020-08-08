@@ -187,7 +187,7 @@ export function CreateCheckExistence(): CheckExistenceConfig {
 		id: GUID(),
 		skipSettings: SkipSettings.DontSkip,
 		returnSetting: {
-      id: GUID(),
+			id: GUID(),
 			enabled: false,
 			setting: ReturnSetting.ReturnFalse
 		}
@@ -222,7 +222,8 @@ export function CreateCopyConfig(): CopyConfig {
 		enabled: false,
 		modelProperty: '',
 		id: GUID(),
-		relationType: RelationType.Model
+		relationType: RelationType.Model,
+		targetProperty: ''
 	};
 }
 
@@ -264,24 +265,24 @@ export function CreateSimpleValidation(): SimpleValidationConfig {
 		targetProperty: '',
 		enabled: false,
 		alphaOnlyWithSpaces: {
-      id: GUID(),
+			id: GUID(),
 			enabled: false
 		},
 		isNotNull: {
-      id: GUID(),
+			id: GUID(),
 			enabled: false
 		},
 		isNull: {
-      id: GUID(),
+			id: GUID(),
 			enabled: false
 		},
 		maxLength: {
-      id: GUID(),
+			id: GUID(),
 			enabled: false,
 			value: '500'
 		},
 		minLength: {
-      id: GUID(),
+			id: GUID(),
 			enabled: false,
 			value: '1'
 		}
@@ -344,7 +345,7 @@ export function SetupConfigInstanceInformation(
 export function CreateGetExistence(): GetExistingConfig {
 	return {
 		relationType: RelationType.Agent,
-    id: GUID(),
+		id: GUID(),
 		agentProperty: '',
 		modelProperty: '',
 		targetProperty: '',
@@ -401,7 +402,7 @@ export interface ReturnSettingConfig extends ConfigItem {
 }
 export function createReturnSetting(): ReturnSettingConfig {
 	return {
-    id: GUID(),
+		id: GUID(),
 		setting: ReturnSetting.ReturnTrue,
 		enabled: false
 	};

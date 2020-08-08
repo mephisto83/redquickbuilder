@@ -6,7 +6,8 @@ import {
 	SetProperty,
 	SetPropertyType,
 	ReturnSetting,
-	CompareEnumeration
+	CompareEnumeration,
+	ReturnSettingConfig
 } from '../../interface/methodprops';
 import { FunctionMethodTypes, MethodFunctions, bindTemplate } from '../../constants/functiontypes';
 import {
@@ -38,7 +39,7 @@ export interface AfterEffectConvertArgs {
 	afterEffectChild?: string;
 	name: string;
 	afterEffectOptions: DataChainConfiguration;
-	type?: DataChainType;
+	type: DataChainType;
 }
 export enum DataChainType {
 	Validation = 'Validation',
@@ -58,7 +59,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		name
 	} = args;
 	let checking_existence: string = '';
-	let get_existing: string = '#{{"key":"tomodel"}}.Create()';
+	let get_existing: string = '#{{"key":"model"}}.Create()';
 	let set_properties: string = '';
 	let compare_enumeration: string = '';
 	let guts: string = '';
@@ -109,8 +110,8 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				returnSetting
 			} = dataChainConfigOptions.checkExistence;
 			tempLambdaInsertArgumentValues['agent.prop'] = { property: agentProperty };
-      tempLambdaInsertArgumentValues['model.prop'] = { property: modelProperty };
-      setLambdaProperties(tempLambdaInsertArgumentValues, agentProperty, modelProperty, targetProperty);
+			tempLambdaInsertArgumentValues['model.prop'] = { property: modelProperty };
+			setLambdaProperties(tempLambdaInsertArgumentValues, agentProperty, modelProperty, targetProperty);
 
 			let onTrue = '';
 			let onFalse = '';
@@ -127,39 +128,15 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				}
 			}
 
-			switch (relationType) {
-				case RelationType.Agent:
-				case RelationType.Model:
-					let ifvalue = skipSettings === SkipSettings.SkipIfFlase ? '!' : '';
-					if (skipSettings !== SkipSettings.DontSkip) {
-						let rel = relationType == RelationType.Agent ? 'agent' : 'fromModel';
-						checking_existence = `
-          var exists = false;
-          var checkModel = (await toArbiter#{{"key":"model"}}#.GetBy(v => v.#{{"key":"model.${GetJSCodeName(
-				targetProperty
-			)}","type":"property","model":"model"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();
-          exists  = checkModel.Any();
-          if(${ifvalue}exists) {
-            ${onTrue || 'return'};
-          }
-          ${onFalse}
-        `;
-					} else if (returnSetting.enabled) {
-						let rel = relationType == RelationType.Agent ? 'agent' : 'model';
-						checking_existence = `
-          var exists = false;
-          var checkModel = (await toArbiter#{{"key":"model"}}#.GetBy(v => v.#{{"key":"model.${GetJSCodeName(
-				targetProperty
-			)}","type":"property","model":"model"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();
-          exists  = checkModel.Any();
-          if(${ifvalue}exists) {
-            ${onTrue || 'return'};
-          }
-          ${onFalse}
-        `;
-					}
-					break;
-			}
+			checking_existence = checkExistenceFunction(
+				relationType,
+				skipSettings,
+				checking_existence,
+				targetProperty,
+				onTrue,
+				returnSetting,
+				type
+			);
 		}
 		if (dataChainConfigOptions.getExisting && dataChainConfigOptions.getExisting.enabled) {
 			if (dataChainConfigOptions.checkExistence && dataChainConfigOptions.checkExistence.enabled) {
@@ -172,9 +149,9 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				switch (relationType) {
 					case RelationType.Model:
 					case RelationType.Agent:
-						get_existing = `(await toArbiter#{{"key":"tomodel"}}#.GetBy(v => v.#{{"key":"tomodel.${GetJSCodeName(
+						get_existing = `(await toArbiter#{{"key":"model"}}#.GetBy(v => v.#{{"key":"model.${GetJSCodeName(
 							targetProperty
-						)}","type":"property","model":"tomodel"}}# == ${relationType == RelationType.Agent
+						)}","type":"property","model":"model"}}# == ${relationType == RelationType.Agent
 							? 'agent'
 							: 'fromModel'}.#{{"key":"${relationType}.prop","type":"property","model":"${relationType}"}}#)).FirstOrDefault()`;
 						break;
@@ -199,10 +176,10 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 						relationType
 					} = afterEffectSetupProperty;
 
-					let prop_string = `value.#{{"key":"tomodel.${GetJSCodeName(
+					let prop_string = `value.#{{"key":"model.${GetJSCodeName(
 						targetProperty
-					)}","type":"property","model":"tomodel"}}#`;
-					tempLambdaInsertArgumentValues[`tomodel.${GetJSCodeName(targetProperty)}`] = {
+					)}","type":"property","model":"model"}}#`;
+					tempLambdaInsertArgumentValues[`model.${GetJSCodeName(targetProperty)}`] = {
 						property: targetProperty
 					};
 					switch (setPropertyType) {
@@ -276,7 +253,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			let to_arbiter = '';
 			if (checking_existence) {
 				to_arbiter = `
-        var toArbiter#{{"key":"tomodel"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"tomodel"}}#>>();`;
+        var toArbiter#{{"key":"model"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"model"}}#>>();`;
 			}
 			from_parameter_template = `
       public static async Task<bool> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change_parameter)
@@ -295,7 +272,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
           return true;
        };
 
-       return await func(agent, model, change_parameter);
+       return await func(model, agent, change_parameter);
       }
   `;
 			break;
@@ -324,7 +301,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			from_parameter_template = `
       public static async Task<bool> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"agent"}}#ChangeBy#{{"key":"model"}}#)
       {
-          Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"agent"}}#ChangeBy#{{"key":"model"}}#, Task> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# fromModel, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
+          Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# fromModel, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
           var arbiter#{{"key":"agent"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"agent"}}#>>();
           var arbiter#{{"key":"model"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"model"}}#>>();
           var toArbiter#{{"key":"tomodel"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"tomodel"}}#>>();
@@ -334,9 +311,9 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
           {{copy_config}}
           {{set_properties}}
 
-          var parameters = #{{"key":"tomodel"}}#ChangeBy#{{"key":"agent"}}#.Create(agent, value, FunctionName.{{default_executor_function_name}});
-          #{{"key":"tomodel"}}#ChangeBy#{{"key":"agent"}}#.UpdatePath(parameters, change, AfterEffectChains.{{after_effect_parent}}.{{after_effect_child}});
-          await StreamProcess.#{{"key":"tomodel"}}#_#{{"key":"agent"}}#(parameters, false);
+          var parameters = #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#.Create(agent, value, FunctionName.{{default_executor_function_name}});
+          #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#.UpdatePath(parameters, change, AfterEffectChains.{{after_effect_parent}}.{{after_effect_child}});
+          await StreamProcess.#{{"key":"model"}}#_#{{"key":"agent"}}#(parameters, false);
        };
 
        await func(agent, fromModel, change);
@@ -400,6 +377,87 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		}
 	}
 }
+function checkExistenceFunction(
+	relationType: RelationType,
+	skipSettings: SkipSettings,
+	checking_existence: string,
+	targetProperty: string,
+	onTrue: string,
+	returnSetting: ReturnSettingConfig,
+	type: DataChainType
+) {
+	if (type === DataChainType.AfterEffect) {
+		switch (relationType) {
+			case RelationType.Agent:
+			case RelationType.Model:
+				let ifvalue = skipSettings === SkipSettings.SkipIfFlase ? '!' : '';
+				if (skipSettings !== SkipSettings.DontSkip) {
+					let rel = relationType == RelationType.Agent ? 'agent' : 'fromModel';
+					checking_existence = `
+          var exists = false;
+          var checkModel = (await toArbiter#{{"key":"tomodel"}}#.GetBy(v => v.#{{"key":"tomodel.${GetJSCodeName(
+				targetProperty
+			)}","type":"property","model":"tomodel"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();
+          exists  = checkModel != null;
+         ${onTrue && ifvalue
+				? ` if(${ifvalue}exists) {
+            ${onTrue || 'return'};
+          }`
+				: ''}
+        `;
+				} else if (returnSetting.enabled) {
+					let rel = relationType == RelationType.Agent ? 'agent' : 'model';
+					checking_existence = `
+          var exists = false;
+          var checkModel = (await toArbiter#{{"key":"tomodel"}}#.GetBy(v => v.#{{"key":"tomodel.${GetJSCodeName(
+				targetProperty
+			)}","type":"property","model":"model"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();
+          exists  = checkModel != null;
+          ${onTrue && ifvalue
+            ? ` if(${ifvalue}exists) {
+                ${onTrue || 'return'};
+              }`
+            : ''}
+        `;
+				}
+				break;
+		}
+	} else {
+		switch (relationType) {
+			case RelationType.Agent:
+			case RelationType.Model:
+				let ifvalue = skipSettings === SkipSettings.SkipIfFlase ? '!' : '';
+				if (skipSettings !== SkipSettings.DontSkip) {
+					let rel = relationType == RelationType.Agent ? 'agent' : 'fromModel';
+					checking_existence = `
+          var exists = false;
+          var checkModel = (await toArbiter#{{"key":"model"}}#.GetBy(v => v.#{{"key":"model.${GetJSCodeName(
+				targetProperty
+			)}","type":"property","model":"model"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();
+          exists  = checkModel != null;
+          if(${ifvalue}exists) {
+            ${onTrue || 'return'};
+          }
+        `;
+				} else if (returnSetting.enabled) {
+					let rel = relationType == RelationType.Agent ? 'agent' : 'model';
+					checking_existence = `
+          var exists = false;
+          var checkModel = (await toArbiter#{{"key":"model"}}#.GetBy(v => v.#{{"key":"model.${GetJSCodeName(
+				targetProperty
+			)}","type":"property","model":"model"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();
+          exists  = checkModel != null;
+          if(${ifvalue}exists) {
+            ${onTrue || 'return'};
+          }
+        `;
+				}
+				break;
+		}
+	}
+	return checking_existence;
+}
+
 function setLambdaProperties(
 	tempLambdaInsertArgumentValues: any,
 	agentProperty: string,
@@ -413,7 +471,7 @@ function setLambdaProperties(
 		property: modelProperty
 	};
 	if (targetProperty)
-		tempLambdaInsertArgumentValues[`tomodel.${GetJSCodeName(targetProperty)}`] = {
+		tempLambdaInsertArgumentValues[`model.${GetJSCodeName(targetProperty)}`] = {
 			property: targetProperty
 		};
 }

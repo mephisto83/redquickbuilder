@@ -25,7 +25,9 @@ import TreeViewGroupButton from './treeviewgroupbutton';
 import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachain';
 import { GetStateFunc, graphOperation } from '../actions/uiactions';
 import { Node } from '../methods/graph_types';
-import BuildDataChainAfterEffectConverter from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
+import BuildDataChainAfterEffectConverter, {
+	DataChainType
+} from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import { mount } from 'enzyme';
 import AfterEffectDataChainOptions from './aftereffectdatachainoptions';
 
@@ -166,6 +168,7 @@ export default class AfterEffectComponent extends Component<any, any> {
 													name: afterEffect.name,
 													from: methodDescription,
 													dataChain: afterEffect.dataChain,
+													type: DataChainType.AfterEffect,
 													to: currentDescription.methodDescription,
 													afterEffectChild: afterEffect.name,
 													afterEffectParent: this.props.mountingItem.name,
@@ -196,9 +199,10 @@ export default class AfterEffectComponent extends Component<any, any> {
 													{
 														name: afterEffect.name,
 														from: description.methodDescription,
-                            dataChain: afterEffect.dataChain,
+														dataChain: afterEffect.dataChain,
 														to: currentDescription.methodDescription,
 														afterEffectChild: afterEffect.name,
+														type: DataChainType.AfterEffect,
 														afterEffectParent: this.props.mountingItem.name,
 														afterEffectOptions: afterEffect.dataChainOptions
 													},
