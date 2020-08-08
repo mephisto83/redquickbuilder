@@ -19,7 +19,13 @@ import {
 	GetNodeById,
 	GetCodeName
 } from '../../actions/uiactions';
-import { NodeProperties, NodeTypes, NEW_LINE } from '../../constants/nodetypes';
+import {
+	NodeProperties,
+	NodeTypes,
+	NEW_LINE,
+	NodePropertyTypesByLanguage,
+	ProgrammingLanguages
+} from '../../constants/nodetypes';
 import { DataChainFunctionKeys } from '../../constants/datachain';
 import { updateNodeProperty, codeTypeWord, GetNodeProp } from '../../methods/graph_methods';
 import AfterEffectSetupProperty from '../../components/aftereffectsetproperty';
@@ -56,13 +62,16 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 	let set_properties: string = '';
 	let compare_enumeration: string = '';
 	let guts: string = '';
+	let copy_config: string = '';
+	let outputType: string = '';
 	let simplevalidation: string = '';
 	let can_complete = false;
+	let target_property = '';
 	let tempLambdaInsertArgumentValues: any = {};
 	tempLambdaInsertArgumentValues.model = { model: from.properties.model };
 	tempLambdaInsertArgumentValues.agent = { model: from.properties.agent };
 	if (dataChainConfigOptions) {
-		let { compareEnumeration, compareEnumerations } = dataChainConfigOptions;
+		let { compareEnumeration, compareEnumerations, copyConfig } = dataChainConfigOptions;
 		if (compareEnumeration) {
 			compare_enumeration = CompareEnumerationFunc(compareEnumeration, tempLambdaInsertArgumentValues);
 		}
@@ -73,6 +82,23 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				})
 				.join(NEW_LINE);
 		}
+		if (copyConfig) {
+			let { agentProperty, modelProperty, relationType, targetProperty } = copyConfig;
+			let props = agentProperty;
+			let relProp = 'agent';
+			if (relationType === RelationType.Model) {
+				props = modelProperty;
+				relProp = 'model';
+			}
+			target_property = targetProperty;
+			setLambdaProperties(tempLambdaInsertArgumentValues, agentProperty, modelProperty, targetProperty);
+			let attributeType = GetNodeProp(props, NodeProperties.UIAttributeType);
+			outputType = NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][attributeType];
+			copy_config = `return ${relProp}.#{{"key":"${relProp}.${GetJSCodeName(
+				props
+			)}","type":"property","model":"${relProp}"}}#;`;
+		}
+
 		if (dataChainConfigOptions.checkExistence && dataChainConfigOptions.checkExistence.enabled) {
 			let {
 				relationType,
@@ -83,7 +109,9 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				returnSetting
 			} = dataChainConfigOptions.checkExistence;
 			tempLambdaInsertArgumentValues['agent.prop'] = { property: agentProperty };
-			tempLambdaInsertArgumentValues['model.prop'] = { property: modelProperty };
+      tempLambdaInsertArgumentValues['model.prop'] = { property: modelProperty };
+      setLambdaProperties(tempLambdaInsertArgumentValues, agentProperty, modelProperty, targetProperty);
+
 			let onTrue = '';
 			let onFalse = '';
 			if (returnSetting && returnSetting.enabled) {
@@ -107,9 +135,9 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 						let rel = relationType == RelationType.Agent ? 'agent' : 'fromModel';
 						checking_existence = `
           var exists = false;
-          var checkModel = (await toArbiter#{{"key":"tomodel"}}#.GetBy(v => v.#{{"key":"tomodel.${GetJSCodeName(
+          var checkModel = (await toArbiter#{{"key":"model"}}#.GetBy(v => v.#{{"key":"model.${GetJSCodeName(
 				targetProperty
-			)}","type":"property","model":"tomodel"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();
+			)}","type":"property","model":"model"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();
           exists  = checkModel.Any();
           if(${ifvalue}exists) {
             ${onTrue || 'return'};
@@ -139,12 +167,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			} else {
 				let { relationType, modelProperty, agentProperty, targetProperty } = dataChainConfigOptions.getExisting;
 
-				tempLambdaInsertArgumentValues['agent.prop'] = tempLambdaInsertArgumentValues['agent.prop'] || {
-					property: agentProperty
-				};
-				tempLambdaInsertArgumentValues['model.prop'] = tempLambdaInsertArgumentValues['model.prop'] || {
-					property: modelProperty
-				};
+				setLambdaProperties(tempLambdaInsertArgumentValues, agentProperty, modelProperty, targetProperty);
 
 				switch (relationType) {
 					case RelationType.Model:
@@ -207,7 +230,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 							)}.${enumProp.value}","type":"enumerationvalue"}}#;`;
 						case SetPropertyType.String:
 							// TODO: Escape string value for C#;
-							return `${prop_string} = ${stringValue ? `"${stringValue}"` : 'strin.Empty'};`;
+							return `${prop_string} = ${stringValue ? `"${stringValue}"` : 'string.Empty'};`;
 						case SetPropertyType.Boolean:
 							return `${prop_string} = ${booleanValue};`;
 						case SetPropertyType.Property:
@@ -231,7 +254,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		case DataChainType.Permission:
 			can_complete = true;
 			from_parameter_template = `
-      public async Task<bool> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent)
+      public static async Task<bool> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent)
       {
 
         Func<#{{"key":"model"}}#, #{{"key":"agent"}}#, Task<bool>> func = async (#{{"key":"model"}}# model, #{{"key":"agent"}}# agent) => {
@@ -250,11 +273,18 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			if (from && from.functionType) {
 				can_complete = true;
 			}
+			let to_arbiter = '';
+			if (checking_existence) {
+				to_arbiter = `
+        var toArbiter#{{"key":"tomodel"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"tomodel"}}#>>();`;
+			}
 			from_parameter_template = `
-        Func<#{{"key":"model"}}#, #{{"key":"agent"}}#, #{{"key":"agent"}}#ChangeBy#{{"key":"model"}}#, Task<bool>> func = async (#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change_parameter) => {
+      public static async Task<bool> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change_parameter)
+      {
+        Func<#{{"key":"model"}}#, #{{"key":"agent"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task<bool>> func = async (#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change_parameter) => {
           var arbiter#{{"key":"agent"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"agent"}}#>>();
           var arbiter#{{"key":"model"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"model"}}#>>();
-
+          ${to_arbiter}
           {{checking_existence}}
           // build model value here.
 
@@ -266,7 +296,23 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
        };
 
        return await func(agent, model, change_parameter);
+      }
   `;
+			break;
+		case DataChainType.Execution:
+			can_complete = true;
+			from_parameter_template = `
+    public static async Task<${outputType ||
+		'bool'}> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change)
+    {
+        Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task<${outputType ||
+			'bool'}>> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# model, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
+            {{copy_config}}
+        };
+
+        return await func(model, agent, change);
+    }
+`;
 			break;
 		case DataChainType.AfterEffect:
 		default:
@@ -276,14 +322,16 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				}
 			}
 			from_parameter_template = `
-        Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"agent"}}#ChangeBy#{{"key":"model"}}#, Task> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# fromModel, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
+      public static async Task<bool> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"agent"}}#ChangeBy#{{"key":"model"}}#)
+      {
+          Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"agent"}}#ChangeBy#{{"key":"model"}}#, Task> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# fromModel, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
           var arbiter#{{"key":"agent"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"agent"}}#>>();
           var arbiter#{{"key":"model"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"model"}}#>>();
           var toArbiter#{{"key":"tomodel"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"tomodel"}}#>>();
           {{checking_existence}}
           var value = {{get_existing}};
           // build model value here.
-
+          {{copy_config}}
           {{set_properties}}
 
           var parameters = #{{"key":"tomodel"}}#ChangeBy#{{"key":"agent"}}#.Create(agent, value, FunctionName.{{default_executor_function_name}});
@@ -292,6 +340,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
        };
 
        await func(agent, fromModel, change);
+      }
   `;
 			break;
 	}
@@ -301,6 +350,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		get_existing,
 		compare_enumeration,
 		set_properties,
+		copy_config,
 		guts,
 		simplevalidation,
 		from_model: `${GetCodeName(from.properties.model_output || from.properties.model || from.properties.agent)}`,
@@ -326,6 +376,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			updateComponentProperty(dataChain, NodeProperties.DataChainTypeCategory, type);
 			updateComponentProperty(dataChain, NodeProperties.CompleteFunction, true);
 			updateComponentProperty(dataChain, NodeProperties.UIText, name);
+			updateComponentProperty(dataChain, NodeProperties.TargetProperty, target_property);
 		} else if (methodFunction) {
 			graphOperation(
 				CreateNewNode(
@@ -338,6 +389,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 						[NodeProperties.CompleteFunction]: true,
 						[NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Lambda,
 						[NodeProperties.LambdaInsertArguments]: lambdaInsertArgumentValues,
+						[NodeProperties.TargetProperty]: target_property,
 						[NodeProperties.Lambda]: from_parameter_template
 					},
 					(res: Node) => {
@@ -348,6 +400,24 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		}
 	}
 }
+function setLambdaProperties(
+	tempLambdaInsertArgumentValues: any,
+	agentProperty: string,
+	modelProperty: string,
+	targetProperty: string
+) {
+	tempLambdaInsertArgumentValues['agent.prop'] = tempLambdaInsertArgumentValues['agent.prop'] || {
+		property: agentProperty
+	};
+	tempLambdaInsertArgumentValues['model.prop'] = tempLambdaInsertArgumentValues['model.prop'] || {
+		property: modelProperty
+	};
+	if (targetProperty)
+		tempLambdaInsertArgumentValues[`tomodel.${GetJSCodeName(targetProperty)}`] = {
+			property: targetProperty
+		};
+}
+
 function CompareEnumerationFunc(compareEnumeration: CompareEnumeration, tempLambdaInsertArgumentValues: any) {
 	let compare_enumeration = '';
 	if (compareEnumeration) {

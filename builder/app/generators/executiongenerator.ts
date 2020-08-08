@@ -244,7 +244,7 @@ export default class ExecutorGenerator {
 				funct: GetCodeName(functNode)
 			});
 			const methodProps = GetMethodProps(functNode);
-			const propertyValidationStatements = Object.keys(executorProperties || {})
+			let propertyValidationStatements = Object.keys(executorProperties || {})
 				.map((property) => {
 					const propertyNode = GraphMethods.GetNode(graph, property);
 					const validatorPs = executorProperties[property];
@@ -374,13 +374,6 @@ export default class ExecutorGenerator {
 				default:
 					break;
 			}
-			var templateRes = bindTemplate(template, {
-				property_sets: propertyValidationStatements,
-				model: `${GetCodeName(modelNode)}`,
-				model_output: GetCodeName(modelOutputNode)
-			});
-
-			// var vectors = ExecutorGenerator.enumerateValidationTestVectors(validation_test_vectors);
 
 			let agent_parameter: any = GetCodeName(agentNode);
 			agent_parameter = agent_parameter ? `${agent_parameter} agent` : false;
@@ -397,6 +390,36 @@ export default class ExecutorGenerator {
 			change_parameter = change_parameter ? `${change_parameter} change` : false;
 
 			const parameters = [ data_parameter, agent_parameter, change_parameter ].filter((x) => x).join(', ');
+
+			let executionDataChains = GraphMethods.GetNodesLinkedTo(graph, {
+				id: executor_node.id,
+				componentType: NodeTypes.ExecutionDataChain
+			});
+
+			executionDataChains.forEach((executionDataChain: Node) => {
+				let dataChains = GraphMethods.GetNodesLinkedTo(graph, {
+					id: executionDataChain.id,
+					link: LinkType.DataChainLink
+				});
+				dataChains.map((dataChain: Node) => {
+					let targetProperty = GetNodeProp(dataChain, NodeProperties.TargetProperty);
+					if (targetProperty) {
+						propertyValidationStatements +=
+							`result.${GetCodeName(targetProperty)} = await ${GetCodeName(
+								dataChain
+							)}.Execute(data, agent, change);` + NEW_LINE;
+					}
+					return null;
+				});
+			});
+
+			var templateRes = bindTemplate(template, {
+				property_sets: propertyValidationStatements,
+				model: `${GetCodeName(modelNode)}`,
+				model_output: GetCodeName(modelOutputNode)
+			});
+
+			// var vectors = ExecutorGenerator.enumerateValidationTestVectors(validation_test_vectors);
 
 			var templateRes = bindTemplate(execution_method, {
 				model: GetCodeName(modelNode),
@@ -533,7 +556,8 @@ export default class ExecutorGenerator {
 						`${namespace}${NameSpace.Model}`,
 						`${namespace}${NameSpace.Parameters}`,
 						`${namespace}${NameSpace.Interface}`,
-						`${namespace}${NameSpace.Constants}`
+						`${namespace}${NameSpace.Constants}`,
+						`${namespace}${NameSpace.Controllers}`
 					],
 					namespace,
 					space: NameSpace.Executors

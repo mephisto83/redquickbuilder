@@ -43,7 +43,9 @@ import AddUserRequirements from './AddUserRequirements';
 import ModifyAgentMethods from './ModifyAgentMethods';
 import AddAgentAccessMethods from './AddAgentAccessMethods';
 import UpdateScreenParameters from '../screens/UpdateScreenParameters';
-import ApplyPremissionChains from './ApplyPremissionChains';
+import ApplyPermissionChains from './ApplyPermissionChains';
+import ApplyExecutionChains from './ApplyExecutionChains';
+import ApplyValidationChains from './ApplyValidationChains';
 
 interface BuildStep {
 	progress?: number;
@@ -194,6 +196,9 @@ export const CollectionComponentNodes = 'CollectionComponentNodes';
 export const CollectionScreenNodes = 'CollectionScreenNodes';
 export const CollectionConnectDataChainCollection = 'CollectionConnectDataChainCollection';
 export const APPLY_PERMISSION_CHAINS = 'Apply Permission Chains';
+export const APPLY_VALIDATION_CHAINS = 'Apply Validation Chains';
+export const APPLY_EXECUTION_CHAINS = 'Apply Execution Chains';
+
 const Collect_Into_Graph = 'Collect_Into_Graph';
 const COMPLETED_BUILD = 'COMPLETED_BUILD';
 
@@ -239,6 +244,8 @@ const buildAllProgress = [
 	...waiting(CollectionScreenNodes),
 	...waiting(CollectionConnectDataChainCollection),
 	{ name: APPLY_PERMISSION_CHAINS },
+	{ name: APPLY_EXECUTION_CHAINS },
+	{ name: APPLY_VALIDATION_CHAINS },
 	{ name: COMPLETED_BUILD }
 ];
 export const BuildAllInfo = {
@@ -330,10 +337,18 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 
 		await run(buildAllProgress, Collect_Into_Graph, async (progresFunc: (arg0: number) => any) => {
 			await JobService.CollectForJob(currentJobFile);
-    });
+		});
 
 		await run(buildAllProgress, APPLY_PERMISSION_CHAINS, async (progressFunc) => {
-      await ApplyPremissionChains();
+			await ApplyPermissionChains();
+    });
+
+		await run(buildAllProgress, APPLY_EXECUTION_CHAINS, async (progressFunc) => {
+			await ApplyExecutionChains();
+    });
+
+		await run(buildAllProgress, APPLY_VALIDATION_CHAINS, async (progressFunc) => {
+			await ApplyValidationChains();
     });
 
 		await run(buildAllProgress, Add_Filters_To_Get_All, async (progresFunc: any) => {

@@ -1,4 +1,4 @@
-import { NodesByType, getNodeLinks, SOURCE, GetNodeLinkedTo, GetNodeProp } from '../../methods/graph_methods';
+import { NodesByType, getNodeLinks, GetNodeLinkedTo, GetNodeProp } from '../../methods/graph_methods';
 import {
 	GetCurrentGraph,
 	NodeTypes,
@@ -15,15 +15,14 @@ import {
 	EffectProps,
 	Effect,
 	PermissionConfig,
-	DashboardEffect,
 	ViewMoutingProps,
 	MountingDescription,
 	ViewMounting,
-	DashboardViewMount,
-	EffectDescription
+	ValidationConfig,
+	ExecutionConfig
 } from '../../interface/methodprops';
 
-export default function ApplyPremissionChains() {
+export default function ApplyExecutionChains() {
 	let graph = GetCurrentGraph();
 	let agentAccessDescriptionNodes = NodesByType(graph, NodeTypes.AgentAccessDescription);
 
@@ -81,56 +80,62 @@ export default function ApplyPremissionChains() {
 
 function HandleViewMounting(viewMounting: ViewMounting) {
 	if (viewMounting && viewMounting.mountings) {
-		viewMounting.mountings.forEach(HandlDescription);
+		viewMounting.mountings.forEach(HandleDescription);
 	}
 }
 
 function HandleEffect(effect: Effect) {
 	if (effect && effect.effects) {
-		effect.effects.forEach(HandlDescription());
+		effect.effects.forEach(HandleDescription());
 	}
 }
 
-function HandlDescription(): (value: MountingDescription, index: number, array: MountingDescription[]) => void {
+function HandleDescription(): (value: MountingDescription, index: number, array: MountingDescription[]) => void {
 	return (effectDescription: MountingDescription) => {
 		if (
 			effectDescription &&
-			effectDescription.permissions &&
+			effectDescription.executions &&
 			effectDescription.methodDescription &&
 			effectDescription.methodDescription.methodId
 		) {
 			let { methodId } = effectDescription.methodDescription;
-			effectDescription.permissions.forEach((permission: PermissionConfig) => {
-				if (permission.dataChain) {
+			effectDescription.executions.forEach((execution: ExecutionConfig) => {
+				if (execution.dataChain) {
 					let graph = GetCurrentGraph();
-					let permissionNode = GetNodeLinkedTo(graph, {
+					let executorNode = GetNodeLinkedTo(graph, {
 						id: methodId,
-						componentType: NodeTypes.Permission
+						componentType: NodeTypes.Executor
 					});
-					let permDataChain: any;
+					let executionDatahain: any;
 					graphOperation(
 						CreateNewNode(
 							{
-								[NodeProperties.NODEType]: NodeTypes.PermissionDataChain,
-								[NodeProperties.UIText]: permission.name,
-								[NodeProperties.GroupParent]: GetNodeProp(permissionNode, NodeProperties.GroupParent)
+								[NodeProperties.NODEType]: NodeTypes.ExecutionDataChain,
+								[NodeProperties.UIText]: execution.name,
+								[NodeProperties.GroupParent]: GetNodeProp(executorNode, NodeProperties.GroupParent)
 							},
 							(node: Node) => {
-								permDataChain = node;
+								executionDatahain = node;
 							}
 						)
 					)(GetDispatchFunc(), GetStateFunc());
-					if (permDataChain) {
-
-            graphOperation(
-							AddLinkBetweenNodes(permissionNode.id, permDataChain.id, LinkProperties.PermissionDataChain)
-            )(GetDispatchFunc(), GetStateFunc());
-
-            graphOperation(
-							AddLinkBetweenNodes(permDataChain.id, permission.dataChain, LinkProperties.DataChainLink)
+					if (executionDatahain) {
+						graphOperation(
+							AddLinkBetweenNodes(
+								executorNode.id,
+								executionDatahain.id,
+								LinkProperties.ExecutionDataChain
+							)
 						)(GetDispatchFunc(), GetStateFunc());
 
-          }
+						graphOperation(
+							AddLinkBetweenNodes(
+								executionDatahain.id,
+								execution.dataChain,
+								LinkProperties.DataChainLink
+							)
+						)(GetDispatchFunc(), GetStateFunc());
+					}
 				}
 			});
 		}

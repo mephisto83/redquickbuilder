@@ -23,6 +23,8 @@ export const NodeTypes = {
 	Lists: 'Lists',
 	EventMethodInstance: 'EventMethodInstance',
 	PermissionDataChain: 'PermissionDataChain',
+	ValidationDataChain: 'ValidationDataChain',
+	ExecutionDataChain: 'ExecutionDataChain',
 	LifeCylceMethod: 'LifeCylceMethod',
 	EventArgument: 'EventArgument',
 	LifeCylceMethodInstance: 'LifeCylceMethodInstance',
@@ -591,6 +593,7 @@ export const NodeProperties = {
 	RouteSource: 'RouteSource',
 	ParameterName: 'ParameterName',
 	EventArgumentType: 'EventArgumentType',
+	TargetProperty: 'TargetProperty',
 	ModelKey: 'ModelKey',
 	DataChainReference: 'DataChainReference',
 	NumberParameter: 'NumberParameter',
@@ -693,6 +696,8 @@ export const LinkType = {
 	DataChainShouldShow: 'DataChainShouldShow',
 	ContextParameters: 'ContextParameters',
 	PermissionDataChain: 'PermissionDataChain',
+	ValidationDataChain: 'ValidationDataChain',
+	ExecutionDataChain: 'ExecutionDataChain',
 	DataChainIsDisabled: 'DataChainIsDisabled',
 	StateKey: 'StateKey',
 	DataChainScreenEffect: 'DataChainScreenEffect',
@@ -980,6 +985,12 @@ export const LinkProperties = {
 	},
 	PermissionDataChain: {
 		type: LinkType.PermissionDataChain
+	},
+	ValidationDataChain: {
+		type: LinkType.ValidationDataChain
+	},
+	ExecutionDataChain: {
+		type: LinkType.ExecutionDataChain
 	},
 	DataChainAfterEffectConverterTarget: {
 		type: LinkType.DataChainAfterEffectConverterTarget

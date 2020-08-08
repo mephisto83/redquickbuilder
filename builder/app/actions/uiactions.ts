@@ -2566,6 +2566,34 @@ export function GetCombinedCondition(id: any, language = NodeConstants.Programmi
 	});
 
 	switch (GetNodeProp(node, NodeProperties.NODEType)) {
+		case NodeTypes.Validator:
+			let validationDataChains = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+				id: id,
+				componentType: NodeTypes.ValidationDataChain
+			});
+
+			validationDataChains.forEach((validationDataChain: _.Node, index: number) => {
+				let dataChain = GraphMethods.GetNodeLinkedTo(GetCurrentGraph(), {
+					id: validationDataChain.id,
+					componentType: NodeTypes.DataChain
+				});
+				let validationParameters = GetMethodValidationParameters(id, false);
+				if (!validationParameters) {
+					throw new Error('missing permission parameters: GetCombinedCondition');
+				}
+				clauses.push(
+					`var {{result}} = await ${GetCodeName(dataChain)}.Execute(${validationParameters
+						.map((v: any) => {
+							// return `${v.paramName}: ${v.value}`;
+							if (v && v.value && v.value.key) {
+								return v.value.key;
+							}
+							return `${v.value}`;
+						})
+						.join()});`
+				);
+			});
+			break;
 		case NodeTypes.Permission:
 			let permissionDataChains = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
 				id: id,
@@ -2582,9 +2610,10 @@ export function GetCombinedCondition(id: any, language = NodeConstants.Programmi
 					throw new Error('missing permission parameters: GetCombinedCondition');
 				}
 				clauses.push(
-					`var {{result}} = await DC.${GetCodeName(dataChain)}.Execute(${permissionParameters
+					`var {{result}} = await ${GetCodeName(dataChain)}.Execute(${permissionParameters
 						.map((v: any) => {
-							return `${v.paramName}: ${v.value}`;
+							// return `${v.paramName}: ${v.value}`;
+							return `${v.value}`;
 						})
 						.join()});`
 				);

@@ -22,7 +22,6 @@ export default class ExecutionComponent extends Component<any, any> {
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				innerStyle={{ maxHeight: 300, overflowY: 'auto' }}
 				active
 				onClick={() => {
 					this.setState({ open: !this.state.open });

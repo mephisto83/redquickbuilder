@@ -57,7 +57,9 @@ import TreeViewItemContainer from './treeviewitemcontainer';
 import SelectInput from './selectinput';
 import { NodesByType, GetNodeProp } from '../methods/graph_methods';
 import CreateClaimService from '../nodepacks/batch/CreateClaimService';
-import ApplyPremissionChains from '../nodepacks/batch/ApplyPremissionChains';
+import ApplyPremissionChains from '../nodepacks/batch/ApplyPermissionChains';
+import ApplyExecutionChains from '../nodepacks/batch/ApplyExecutionChains';
+import ApplyValidationChains from '../nodepacks/batch/ApplyValidationChains';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -255,6 +257,19 @@ class QuickMethods extends Component<any, any, any> {
 										ApplyPremissionChains();
 									}}
 								/>
+								<TreeViewMenu
+									title="Apply Execution Chains"
+									onClick={() => {
+										ApplyExecutionChains();
+									}}
+								/>
+								<TreeViewMenu
+									title="Apply Validation Chains"
+									onClick={() => {
+										ApplyValidationChains();
+									}}
+								/>
+
 								<TreeViewMenu
 									title={StartJob.title}
 									icon="fa fa-play"

@@ -121,7 +121,7 @@ export default class ExecutionComponentItem extends Component<any, any> {
 												name: executionConfig.name,
 												from: methodDescription,
 												dataChain: executionConfig.dataChain,
-												type: DataChainType.Validation,
+												type: DataChainType.Execution,
 												afterEffectOptions: executionConfig.dataChainOptions
 											},
 											(dataChain: Node) => {

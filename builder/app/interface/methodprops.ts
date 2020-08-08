@@ -367,7 +367,7 @@ export interface CheckExistenceConfig extends AfterEffectRelations {
 	skipSettings: SkipSettings;
 	returnSetting: ReturnSettingConfig;
 }
-export interface CopyConfig extends HalfRelation {}
+export interface CopyConfig extends AfterEffectRelations {}
 export interface Setter extends HalfRelation {
 	value: string;
 }

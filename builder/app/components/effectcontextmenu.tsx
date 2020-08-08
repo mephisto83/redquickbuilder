@@ -289,6 +289,7 @@ class EffectContextMenu extends Component<any, any> {
 							<TreeViewMenu
 								key={routeKey}
 								open={this.state[routeKey]}
+                innerStyle={{ maxHeight: 500, overflowY: 'auto' }}
 								active
 								title={name}
 								toggle={() => {
