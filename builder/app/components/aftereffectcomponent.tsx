@@ -124,8 +124,8 @@ export default class AfterEffectComponent extends Component<any, any> {
 						methods={this.props.methods}
 						methodDescription={this.props.methodDescription}
 						currentDescription={currentDescription}
-            previousEffect={this.props.previousEffect}
-            routes={this.props.routes}
+						previousEffect={this.props.previousEffect}
+						routes={this.props.routes}
 						afterEffect={afterEffect}
 					/>
 				) : null}
@@ -171,6 +171,7 @@ export default class AfterEffectComponent extends Component<any, any> {
 													dataChain: afterEffect.dataChain,
 													type: DataChainType.AfterEffect,
 													to: currentDescription.methodDescription,
+													routes: this.props.routes || [],
 													afterEffectChild: afterEffect.name,
 													afterEffectParent: this.props.mountingItem.name,
 													afterEffectOptions: afterEffect.dataChainOptions
@@ -202,6 +203,7 @@ export default class AfterEffectComponent extends Component<any, any> {
 														from: description.methodDescription,
 														dataChain: afterEffect.dataChain,
 														to: currentDescription.methodDescription,
+														routes: this.props.routes || [],
 														afterEffectChild: afterEffect.name,
 														type: DataChainType.AfterEffect,
 														afterEffectParent: this.props.mountingItem.name,

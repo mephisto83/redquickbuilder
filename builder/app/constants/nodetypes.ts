@@ -355,6 +355,7 @@ export const NodeProperties = {
 	Themes: 'Themes',
 	SharedReferenceCollection: 'SharedReferenceCollection',
 	BeforeStyle: '::before',
+	AfterEffectKey: 'AfterEffectKey',
 	GridAreas: 'GridAreas',
 	AfterStyle: '::after',
 	LastViewPackage: 'LastViewPackage',
@@ -782,6 +783,7 @@ export const LinkType = {
 	TitleServiceLink: 'title-service-link',
 	ComponentProperty: 'component-link',
 	EnumerationReference: 'enumeration-reference',
+	DataChainAfterEffectSubsequentCall: 'DataChainAfterEffectSubsequentCall',
 	LogicalChildren: 'logical-children',
 	LogicalNieces: 'logical-nieces',
 	ManyToManyLink: 'ManyToManyLink',
@@ -1215,6 +1217,9 @@ export const LinkProperties = {
 	},
 	AfterMethod: {
 		type: LinkType.AfterMethod
+	},
+	DataChainAfterEffectSubsequentCall: {
+		type: LinkType.DataChainAfterEffectSubsequentCall
 	},
 	EnumerationReferenceLink: {
 		type: LinkType.EnumerationReference

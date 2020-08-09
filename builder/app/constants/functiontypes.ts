@@ -266,7 +266,7 @@ const COMMON_CONSTRAINTS_AGENT_OBJECT_MANY_TO_MANY_COMPOSITEINPUT_METHOD = {
 	}
 };
 
-const AfterEffectsTemplate = {
+export const AfterEffectsTemplate = {
 	DataChained: 'Data chained',
 	GenerateM2M_From_Result_and_Input: 'Generate Many 2 Many from result and input',
 	ExecuteStreamProcess: 'Execute stream process',

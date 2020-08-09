@@ -78,7 +78,7 @@ export default function ApplyValidationChains() {
 
 function HandleViewMounting(viewMounting: ViewMounting) {
 	if (viewMounting && viewMounting.mountings) {
-		viewMounting.mountings.forEach(HandleDescription);
+		viewMounting.mountings.forEach(HandleDescription());
 	}
 }
 

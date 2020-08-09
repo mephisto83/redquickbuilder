@@ -122,6 +122,9 @@ class DataChainActvityMenu extends Component<any, any> {
 						case ReferenceInsertType.Enumeration:
 							nodes = UIA.NodesByType(state, NodeTypes.Enumeration).toNodeSelect();
 							break;
+						case ReferenceInsertType.Method:
+							nodes = UIA.NodesByType(state, NodeTypes.Method).toNodeSelect();
+							break;
 						case ReferenceInsertType.EnumerationValue:
 							nodes = (GetNodeProp(
 								lambdaInsertArgumentValues[key]

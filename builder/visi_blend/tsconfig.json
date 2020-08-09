@@ -1,0 +1,50 @@
+{
+      "compilerOptions": {
+      "module": "CommonJS",
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+      "lib": ["dom", "esnext"],
+      "target": "ES2018",
+      "noImplicitAny": false,
+      "moduleResolution": "node",
+      "sourceMap": true,
+      "outDir": "dist",
+      "baseUrl": ".",
+      "paths": {
+          "*": [
+              "node_modules/*",
+              "src/types/*"
+          ]
+      },
+      "declaration": true,
+      "allowUnreachableCode":true,
+      "declarationMap": true,
+      "allowUnusedLabels":true,
+      "noEmit": false,
+      "jsx": "react",
+      "strict": false,
+      "pretty": false,
+      /* Additional Checks */
+      "noUnusedLocals": false,
+      "noUnusedParameters": false,
+      "noImplicitReturns": false,
+      "noFallthroughCasesInSwitch": false,
+      /* Module Resolution Options */
+      "resolveJsonModule": true,
+      "allowJs": true
+  },
+  "exclude": [
+    "../app/templates/**/*",
+    "../app/store/**/*",
+    "../app/templates/**/*",
+    "../app/main.prod.ts",
+    "../app/dist/renderer.prod.*",
+    "../app/**/*.tsx",
+    "build.js"
+  ],
+  "include": [
+      "src/**/*",
+      "../app/**/*",
+      "../app/**/*.tpl"
+  ]
+}

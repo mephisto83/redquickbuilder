@@ -231,7 +231,8 @@ function SetupAfterEffects(mounting: MountingDescription, collectedMountingDescr
 					newAfterEffect = createAfterEffect(
 						mounting.afterEffects[index - 1].afterEffectNode || '',
 						afterEffect.name
-					);
+          );
+
 					afterEffect.afterEffectNode = newAfterEffect.id;
 				} else {
 					newAfterEffect = createAfterEffect(methodDescription.methodId);

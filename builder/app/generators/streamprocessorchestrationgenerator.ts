@@ -26,12 +26,18 @@ import {
 	LinkProperties
 } from '../constants/nodetypes';
 import fs from 'fs';
-import { bindTemplate, FunctionTemplateKeys, MethodFunctions, AFTER_EFFECTS } from '../constants/functiontypes';
+import {
+	bindTemplate,
+	FunctionTemplateKeys,
+	MethodFunctions,
+	AFTER_EFFECTS,
+	AfterEffectsTemplate
+} from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
 import PermissionGenerator from './permissiongenerator';
 import ValidationRuleGenerator from './validationrulegenerator';
 import { enumerate } from '../utils/utils';
-import { Node } from '../methods/graph_types';
+import { Node, Graph } from '../methods/graph_types';
 
 const STREAM_PROCESS_ORCHESTRATION_TEMPLATE = './app/templates/stream_process/stream_process_orchestration.tpl';
 const STREAM_PROCESS_ORCHESTRATION_ROOT_TEMPLATE =
@@ -67,6 +73,78 @@ export default class StreamProcessOrchestrationGenerator {
 
 		return staticMethods;
 	}
+
+	static GenerateAfterEffectsMethods(state: any, agent: Node) {
+		let models = NodesByType(state, NodeTypes.Model);
+		let agents = [ agent ];
+		let executors = NodesByType(state, NodeTypes.Executor).filter(
+			(x: any) => GetNodeProp(x, NodeProperties.ExecutorAgent) === agent.id
+		);
+		let graph: Graph = GetCurrentGraph();
+		let results: string[] = [];
+		agents.map((agent) => {
+			models
+				.filter((model: { id: any }) => {
+					return executors.find(
+						(executor: any) => GetNodeProp(executor, NodeProperties.ExecutorModel) === model.id
+					);
+				})
+				.map((model: any) => {
+					let cases = '';
+					executors
+						.filter((executor: any) => GetNodeProp(executor, NodeProperties.ExecutorModel) === model.id)
+						.map((executor: any) => {
+							return GraphMethods.GetNodeLinkedTo(graph, {
+								id: executor.id,
+								componentType: NodeTypes.Method
+							});
+						})
+						.filter((v: any) => v)
+						.map((funcs: Node) => {
+							let temps = GraphMethods.GetNodesLinkedTo(graph, {
+								id: funcs.id,
+								link: LinkType.DataChainAfterEffectConverterTarget
+							});
+							temps.forEach((temp: Node) => {
+								let dataChains = GraphMethods.GetNodeLinkedTo(graph, {
+									id: temp.id,
+									link: LinkType.DataChainAfterEffectConverter
+								});
+								cases += dataChains
+									.map((chain: Node) => {
+										return `case ${GetNodeProp(chain, NodeProperties.AfterEffectKey)}:
+                    await ${GetCodeName(chain)}(data, agent, change);
+                  break;`;
+									})
+									.join(NEW_LINE);
+							});
+						})
+						.filter((v: any) => v);
+					results.push(
+						Tabs(4) +
+							`public static Task Execute(${GetNodeProp(
+								model,
+								NodeProperties.CodeName
+							)} data, ${GetNodeProp(agent.id, NodeProperties.CodeName)} agent, ${GetNodeProp(
+								model,
+								NodeProperties.CodeName
+							)}ChangesBy${GetCodeName(agent)} change, string nextPath = null) {
+                nextPath = nextPath ?? change.NextPath;
+                if(nextPath != null) {
+                  switch(nextPath) {
+                      ${cases}
+                  }
+                }
+              };` +
+							jNL
+					);
+				});
+		});
+		return `public class AfterEffects {
+      ${results.join(NEW_LINE)}
+    }`;
+	}
+
 	static GenerateAgentMethods(state: null, agent: { id: any }) {
 		let models = NodesByType(state, NodeTypes.Model);
 		let methods = NodesByType(state, NodeTypes.Method);
@@ -146,7 +224,20 @@ ${modelexecution.join('')}
 				afterEffectMethods.map((afterEffectMethod: any) => {
 					var ae_type = GetNodeProp(afterEffectMethod, NodeProperties.AfterMethod);
 					var ae_setup = GetNodeProp(afterEffectMethod, NodeProperties.AfterMethodSetup);
-					if (AFTER_EFFECTS[ae_type] && ae_setup && ae_setup[ae_type]) {
+					if (AfterEffectsTemplate.DataChained === ae_type) {
+						let dataChain = GraphMethods.GetNodeLinkedTo(GetCurrentGraph(), {
+							id: afterEffectMethod.id,
+							componentType: NodeTypes.DataChain
+						});
+						if (dataChain) {
+							ae_calls.push(
+								`await AfterEffects.Execute(data, agent, change, ${GetNodeProp(
+									dataChain,
+									NodeProperties.AfterEffectKey
+								)});`
+							);
+						}
+					} else if (AFTER_EFFECTS[ae_type] && ae_setup && ae_setup[ae_type]) {
 						let { templateKeys, template_call, template } = AFTER_EFFECTS[ae_type];
 						let templateString = fs.readFileSync(template, 'utf8');
 						Object.keys(templateKeys).map((key) => {
@@ -701,6 +792,7 @@ ${agents
 		let _streamProcessInterfaceTemplate = fs.readFileSync(STREAM_PROCESS_ORCHESTRATION_TEMPLATE_INTERFACE, 'utf8');
 		let _testClass = fs.readFileSync(TEST_CLASS, 'utf8');
 		let agent_methods = StreamProcessOrchestrationGenerator.GenerateAgentMethods(state, agent);
+		let after_methods = StreamProcessOrchestrationGenerator.GenerateAfterEffectsMethods(state, agent);
 		let agent_methods_interface = StreamProcessOrchestrationGenerator.GenerateAgentInterfaceMethods(state, agent);
 		let statics = StreamProcessOrchestrationGenerator.GenerateStaticMethods(models);
 		let strappers = StreamProcessOrchestrationGenerator.GenerateStrappers(models, agent);
@@ -736,6 +828,24 @@ ${agents
 			usings = [ ...usings, `${namespace}${NameSpace.Executors}` ];
 		}
 		return {
+			['After Effects Ex']: {
+				id: 'after effects ex',
+				name: `AfterEffects`,
+				template: NamespaceGenerator.Generate({
+					template: after_methods,
+					usings: [
+						...usings,
+						'System.Linq.Expressions',
+						`${namespace}${NameSpace.Model}`,
+						`${namespace}${NameSpace.Parameters}`,
+						`${namespace}${NameSpace.Interface}`,
+						`${namespace}${NameSpace.Constants}`,
+						`${namespace}${NameSpace.Controllers}`
+					],
+					namespace,
+					space: NameSpace.Controllers
+				})
+			},
 			[`${GetCodeName(agent) + StreamProcessOrchestration}`]: {
 				id: StreamProcessOrchestration,
 				name: `${GetCodeName(agent)}${StreamProcessOrchestration}`,
@@ -749,7 +859,8 @@ ${agents
 						`${namespace}${NameSpace.Model}`,
 						`${namespace}${NameSpace.Parameters}`,
 						`${namespace}${NameSpace.Interface}`,
-						`${namespace}${NameSpace.Constants}`
+						`${namespace}${NameSpace.Constants}`,
+						`${namespace}${NameSpace.Controllers}`
 					],
 					namespace,
 					space: NameSpace.StreamProcess

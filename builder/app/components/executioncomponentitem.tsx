@@ -18,7 +18,7 @@ import {
 	MountingDescription,
 	MethodDescription,
 	ValidationConfig,
-  ExecutionConfig
+	ExecutionConfig
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
@@ -90,8 +90,8 @@ export default class ExecutionComponentItem extends Component<any, any> {
 					<DataChainOptions
 						methods={this.props.methods}
 						methodDescription={this.props.methodDescription}
-            currentDescription={mountingItem}
-            dataChainType={DataChainType.Execution}
+						currentDescription={mountingItem}
+						dataChainType={DataChainType.Execution}
 						previousEffect={this.props.previousEffect}
 						dataChainOptions={executionConfig.dataChainOptions}
 					/>
@@ -119,6 +119,7 @@ export default class ExecutionComponentItem extends Component<any, any> {
 										BuildDataChainAfterEffectConverter(
 											{
 												name: executionConfig.name,
+												routes: [],
 												from: methodDescription,
 												dataChain: executionConfig.dataChain,
 												type: DataChainType.Execution,

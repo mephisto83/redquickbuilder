@@ -20,7 +20,8 @@ export enum ReferenceInsertType {
 	Property = 'property',
 	Type = 'type',
 	Enumeration = 'enumeration',
-	EnumerationValue = 'enumerationvalue'
+	EnumerationValue = 'enumerationvalue',
+	Method = 'method'
 }
 export function executorItemType(args: LambdaBuildArgs) {
 	return `
@@ -54,7 +55,7 @@ export function GetJSONReferenceInsertsMap(lambdaText: string) {
 			template: string;
 			insert: ReferenceInsert;
 		};
-  } = {};
+	} = {};
 
 	getJSONReferenceInserts(lambdaText || '').map((v) => v.substr(2, v.length - 4)).map((v: string) => {
 		let ri: ReferenceInsert = JSON.parse(v);

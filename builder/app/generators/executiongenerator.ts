@@ -34,6 +34,7 @@ import { NodeType } from '../components/titles';
 import NamespaceGenerator from './namespacegenerator';
 import { enumerate } from '../utils/utils';
 import { Node } from '../methods/graph_types';
+import AfterEffectsGenerator from './aftereffectsgenerator';
 
 const EXECUTOR_CLASS = './app/templates/executor/executor_class.tpl';
 const EXECUTOR_INTERFACE = './app/templates/executor/executor_class_interface.tpl';
@@ -651,7 +652,15 @@ export default class ExecutorGenerator {
 				};
 			}
 		});
-
+		result['AfterEffect Chains'] = {
+			id: 'After Effect Chains',
+			name: 'AfterEffectChains',
+			template: NamespaceGenerator.Generate({
+				template: AfterEffectsGenerator(),
+				namespace,
+				space: NameSpace.Controllers
+			})
+		};
 		return result;
 	}
 }

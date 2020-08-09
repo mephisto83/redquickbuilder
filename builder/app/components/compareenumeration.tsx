@@ -7,10 +7,7 @@ import {
 	MethodDescription,
 	SetupConfigInstanceInformation
 } from '../interface/methodprops';
-import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
-import SetterComponent from './settercomponent';
 import TreeViewItemContainer from './treeviewitemcontainer';
-import TextInput from './textinput';
 import { GUID, GetCurrentGraph, GetNodeProp } from '../actions/uiactions';
 import CompareComponent from './comparecomponent';
 import SelectInput from './selectinput';
