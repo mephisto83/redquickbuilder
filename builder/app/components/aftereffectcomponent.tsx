@@ -200,7 +200,7 @@ export default class AfterEffectComponent extends Component<any, any> {
 												BuildDataChainAfterEffectConverter(
 													{
 														name: afterEffect.name,
-														from: description.methodDescription,
+														from: currentDescription.methodDescription,
 														dataChain: afterEffect.dataChain,
 														to: currentDescription.methodDescription,
 														routes: this.props.routes || [],
