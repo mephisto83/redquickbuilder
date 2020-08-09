@@ -97,7 +97,8 @@ class DashboardEffectContextMenu extends Component<any, any> {
 				default:
 					effect.effects.forEach((effectItem: EffectDescription, index: number) => {
 						let routeKey = `routing-${index}`;
-						let { name, model, agent, viewType, methodDescription, source } = effectItem;
+            let { name, model, agent, viewType, methodDescription, source } = effectItem;
+            effectItem.viewType = mode.viewType || effectItem.viewType;
 						effectItem.afterEffects = effectItem.afterEffects || [];
 						let parameterConnections: any = null;
 						let bodyParameter: any = null;

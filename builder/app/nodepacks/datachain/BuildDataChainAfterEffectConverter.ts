@@ -10,7 +10,8 @@ import {
 	ReturnSettingConfig,
 	CheckExistenceConfig,
 	BranchConfig,
-	AfterEffect
+	AfterEffect,
+	MountingDescription
 } from '../../interface/methodprops';
 import { MethodFunctions, bindTemplate } from '../../constants/functiontypes';
 import {
@@ -41,6 +42,7 @@ export interface AfterEffectConvertArgs {
 	afterEffectChild?: string;
 	name: string;
 	routes: AfterEffect[];
+	methods: MountingDescription;
 	afterEffectOptions: DataChainConfiguration;
 	type: DataChainType;
 }
@@ -58,6 +60,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		dataChain,
 		afterEffectOptions: dataChainConfigOptions,
 		routes,
+		methods,
 		afterEffectParent,
 		afterEffectChild,
 		name
@@ -141,7 +144,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				type
 			);
 
-			branchMethods.push(...GenerateBranchMethods(dataChainConfigOptions, routes));
+			branchMethods.push(...GenerateBranchMethods(dataChainConfigOptions, routes, methods));
 		}
 		if (dataChainConfigOptions.getExisting && dataChainConfigOptions.getExisting.enabled) {
 			if (dataChainConfigOptions.checkExistence && dataChainConfigOptions.checkExistence.enabled) {
@@ -401,22 +404,31 @@ function GetCheckModelExistPart(relationType: RelationType, targetProperty: stri
 	)}","type":"property","model":"tomodel"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();
   exists  = checkModel != null;`;
 }
-function GenerateBranchMethods(dataChainConfigOptions: DataChainConfiguration, routes: AfterEffect[]): string[] {
+function GenerateBranchMethods(
+	dataChainConfigOptions: DataChainConfiguration,
+	routes: AfterEffect[],
+	methodDescriptions: MountingDescription[]
+): string[] {
 	let result: string[] = [];
 	let { checkExistence } = dataChainConfigOptions;
 	if (checkExistence) {
 		let { ifFalse, ifTrue } = checkExistence;
 		if (ifFalse.enabled) {
-			GenerateIfBranch(ifFalse, routes, result);
+			GenerateIfBranch(ifFalse, routes, result, methodDescriptions);
 		}
 		if (ifTrue.enabled) {
-			GenerateIfBranch(ifTrue, routes, result);
+			GenerateIfBranch(ifTrue, routes, result, methodDescriptions);
 		}
 	}
 	return result;
 }
 
-function GenerateIfBranch(ifBranch: BranchConfig, routes: AfterEffect[], result: string[]) {
+function GenerateIfBranch(
+	ifBranch: BranchConfig,
+	routes: AfterEffect[],
+	result: string[],
+	methods: MountingDescription[]
+) {
 	let { routeConfig } = ifBranch.dataChainOptions;
 	if (routeConfig) {
 		let funcName = codeTypeWord(ifBranch.name);
@@ -425,11 +437,15 @@ function GenerateIfBranch(ifBranch: BranchConfig, routes: AfterEffect[], result:
 			return routeConfig && route.id === routeConfig.targetId;
 		});
 		if (route) {
-			route.target;
+			let mountDescription = methods.find((v) => route && v.id === route.target);
+			let methodType = 'Create';
+			if (mountDescription) {
+				methodType = mountDescription.viewType;
+			}
 			let method = `
         public static async Task ${funcName}(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change${ifAfterEffect}) {
           var value = checkModel;
-          var parameters = #{{"key":"tomodel"}}#ChangeBy#{{"key":"agent"}}#.Create(agent, value, FunctionName.#{{"key":"${codeTypeWord(
+          var parameters = #{{"key":"tomodel"}}#ChangeBy#{{"key":"agent"}}#.${methodType}(agent, value, FunctionName.#{{"key":"${codeTypeWord(
 				route.name
 			)}","type":"method"}}#);
 

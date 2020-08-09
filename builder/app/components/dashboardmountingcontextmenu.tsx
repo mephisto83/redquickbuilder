@@ -127,7 +127,8 @@ class DashboardMountingContenxt extends Component<any, any> {
 					mounting.mountings.forEach((mountingItem: MountingDescription, index: number) => {
 						let routeKey = `routing-${index}`;
 						let { name, model, agent, viewType, methodDescription, screenEffect } = mountingItem;
-						if (!mountingItem.screenEffect) {
+            mountingItem.viewType = mode.viewType || mountingItem.viewType;
+            if (!mountingItem.screenEffect) {
 							mountingItem.screenEffect = [];
 						}
 						let parameterConnections: any = null;

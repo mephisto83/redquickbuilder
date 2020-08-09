@@ -71,7 +71,9 @@ class EffectContextMenu extends Component<any, any> {
 							viewType: ViewTypes.Get,
 							validations: [],
 							afterEffects: [],
-							excludeFromController: false
+							excludeFromController: false,
+							executions: [],
+							permissions: []
 						});
 						if (callback) {
 							callback(effect);
@@ -102,7 +104,8 @@ class EffectContextMenu extends Component<any, any> {
 					effect.effects.forEach((effectItem: EffectDescription, index: number) => {
 						let routeKey = `routing-${index}`;
 						let { name, model, agent, viewType, methodDescription, source } = effectItem;
-						effectItem.afterEffects = effectItem.afterEffects || [];
+            effectItem.viewType = mode.viewType || effectItem.viewType;
+            effectItem.afterEffects = effectItem.afterEffects || [];
 						effectItem.validations = effectItem.validations || [];
 						let parameterConnections: any = null;
 						let bodyParameter: any = null;
@@ -289,7 +292,7 @@ class EffectContextMenu extends Component<any, any> {
 							<TreeViewMenu
 								key={routeKey}
 								open={this.state[routeKey]}
-                innerStyle={{ maxHeight: `calc(100vh - 325px)`, overflowY: 'auto' }}
+								innerStyle={{ maxHeight: `calc(100vh - 325px)`, overflowY: 'auto' }}
 								active
 								title={name}
 								toggle={() => {
