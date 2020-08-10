@@ -42,7 +42,7 @@ export interface AfterEffectConvertArgs {
 	afterEffectChild?: string;
 	name: string;
 	routes: AfterEffect[];
-	methods: MountingDescription;
+	methods: MountingDescription[];
 	afterEffectOptions: DataChainConfiguration;
 	type: DataChainType;
 }
