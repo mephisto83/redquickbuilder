@@ -783,6 +783,7 @@ export const LinkType = {
 	TitleServiceLink: 'title-service-link',
 	ComponentProperty: 'component-link',
 	EnumerationReference: 'enumeration-reference',
+	GeneralLink: 'GeneralLink',
 	DataChainAfterEffectSubsequentCall: 'DataChainAfterEffectSubsequentCall',
 	LogicalChildren: 'logical-children',
 	LogicalNieces: 'logical-nieces',
@@ -1176,6 +1177,9 @@ export const LinkProperties = {
 	},
 	SelectorLink: {
 		type: LinkType.SelectorLink
+	},
+	GeneralLink: {
+		type: LinkType.GeneralLink
 	},
 	SelectorInputLink: {
 		type: LinkType.SelectorInputLink

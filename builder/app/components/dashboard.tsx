@@ -659,7 +659,9 @@ class Dashboard extends Component<any, any> {
 			}
 			result.push({
 				onClick: () => {
-					this.props.setVisual(CONNECTING_NODE, true);
+					this.props.setVisual(CONNECTING_NODE, {
+						...LinkProperties.GeneralLink
+					});
 				},
 				icon: 'fa fa-plug',
 				title: Titles.GenericLink
@@ -1623,7 +1625,7 @@ class Dashboard extends Component<any, any> {
 		return result;
 	}
 
-	getCost() {
+	getCost(adjusted = false) {
 		const { state } = this.props;
 		let cost = 0;
 		const graph: Graph = UIA.GetCurrentGraph(state);
@@ -1632,6 +1634,9 @@ class Dashboard extends Component<any, any> {
 
 		if (graph) {
 			cost = (graph.linkCount || 0) * node_connection_cost + (graph.nodeCount || 0) * node_cost;
+		}
+		if (adjusted) {
+			return Dashboard.formatMoney(cost * 1000);
 		}
 		return Dashboard.formatMoney(cost);
 	}
@@ -1643,6 +1648,7 @@ class Dashboard extends Component<any, any> {
 	render() {
 		const { state } = this.props;
 		const cost = this.getCost();
+		const adjusted_cost = this.getCost(true);
 		const selectedNodeBB = UIA.Visual(state, UIA.SELECTED_NODE_BB);
 		let menuLeft = 0;
 		let menuTop = 0;
@@ -2033,6 +2039,7 @@ class Dashboard extends Component<any, any> {
 									<SideBarHeader title={hoveredLink.properties.type} />
 								) : null}
 								<SideBarHeader title={<h4>{cost}</h4>} onClick={() => {}} />
+								<SideBarHeader title={<span>{adjusted_cost}</span>} onClick={() => {}} />
 
 								<TreeViewMenu
 									open={UIA.Visual(state, VC.ApplicationMenu)}
@@ -2377,6 +2384,7 @@ class Dashboard extends Component<any, any> {
 										this.props.setVisual(UIA.HOVERED_LINK, linkId);
 									}}
 									minimizeTypes={UIA.Minimized(state)}
+									typeWidths={{ [NodeTypes.Concept]: 450 }}
 									selectedColor={UIA.Colors.SelectedNode}
 									markedColor={UIA.Colors.MarkedNode}
 									selectedLinks={[ UIA.Visual(state, UIA.SELECTED_LINK) ].filter((x) => x)}
