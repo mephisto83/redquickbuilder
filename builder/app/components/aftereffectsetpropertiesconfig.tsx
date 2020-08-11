@@ -99,6 +99,7 @@ export default class AfterEffectSetPropertiesConfig extends Component<any, any> 
 					this.setState({ open: !this.state.open });
 				}}
 				active
+				greyed={!setProperties || !setProperties.enabled}
 				title={Titles.SetPropertiesConfig}
 			>
 				<TreeViewItemContainer>

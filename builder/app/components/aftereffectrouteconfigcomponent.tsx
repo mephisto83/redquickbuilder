@@ -43,6 +43,7 @@ export default class AfterEffectRouteConfigComponent extends Component<any, any>
 					this.setState({ open: !this.state.open });
 				}}
 				active
+				greyed={!routeConfig || !routeConfig.enabled}
 				title={Titles.Routing}
 			>
 				<TreeViewItemContainer>

@@ -6,7 +6,7 @@ export default class TreeViewMenu extends Component<any, any> {
 		return this.props.active ? 'active' : '';
 	}
 	greyed() {
-		return this.props.greyed ? { color: '#fffff' } : {};
+		return this.props.greyed ? { color: '#aaaaaa' } : {};
 	}
 	open() {
 		return this.props.open ? 'menu-open' : '';

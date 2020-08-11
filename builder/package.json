@@ -67,7 +67,12 @@
       "dist/",
       "node_modules/",
       "app.html",
+      "app.global.css",
+      "app.global.css.d.ts",
+      "ipc-handlers.ts",
+      "app.icns",
       "main.prod.js",
+      "main.prod.js.LICENSE.txt",
       "main.prod.js.map",
       "package.json"
     ],

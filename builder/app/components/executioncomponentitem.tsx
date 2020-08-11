@@ -123,7 +123,8 @@ export default class ExecutionComponentItem extends Component<any, any> {
 												from: methodDescription,
 												dataChain: executionConfig.dataChain,
 												type: DataChainType.Execution,
-												afterEffectOptions: executionConfig.dataChainOptions
+												afterEffectOptions: executionConfig.dataChainOptions,
+												methods: this.props.methods
 											},
 											(dataChain: Node) => {
 												executionConfig.dataChain = dataChain.id;

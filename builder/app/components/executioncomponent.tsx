@@ -8,6 +8,8 @@ import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import ExecutionComponentItem from './executioncomponentitem';
 import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
+import TreeViewItemContainer from './treeviewitemcontainer';
+import CheckBox from './checkbox';
 
 export default class ExecutionComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -44,6 +46,21 @@ export default class ExecutionComponent extends Component<any, any> {
 						icon="fa fa-plus"
 					/>
 				</TreeViewButtonGroup>
+				<TreeViewItemContainer>
+					<CheckBox
+						title={Titles.AutoCopy}
+						label={Titles.AutoCopy}
+						value={mountingItem.autoSetup && mountingItem.autoSetup.executionAutoCopy}
+						onChange={(value: boolean) => {
+							mountingItem.autoSetup = mountingItem.autoSetup || {};
+							mountingItem.autoSetup.executionAutoCopy = value;
+							this.setState({ turn: UIA.GUID() });
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
+						}}
+					/>
+				</TreeViewItemContainer>
 				{(executions || []).map((executionConfig: ExecutionConfig, index: number) => {
 					return (
 						<ExecutionComponentItem

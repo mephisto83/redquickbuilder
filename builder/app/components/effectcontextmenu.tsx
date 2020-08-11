@@ -73,7 +73,8 @@ class EffectContextMenu extends Component<any, any> {
 							afterEffects: [],
 							excludeFromController: false,
 							executions: [],
-							permissions: []
+							permissions: [],
+							autoSetup: { executionAutoCopy: true }
 						});
 						if (callback) {
 							callback(effect);
@@ -104,8 +105,9 @@ class EffectContextMenu extends Component<any, any> {
 					effect.effects.forEach((effectItem: EffectDescription, index: number) => {
 						let routeKey = `routing-${index}`;
 						let { name, model, agent, viewType, methodDescription, source } = effectItem;
-            effectItem.viewType = mode.viewType || effectItem.viewType;
-            effectItem.afterEffects = effectItem.afterEffects || [];
+						effectItem.viewType = mode.viewType || effectItem.viewType;
+						effectItem.afterEffects = effectItem.afterEffects || [];
+						effectItem.autoSetup = effectItem.autoSetup || { executionAutoCopy: true };
 						effectItem.validations = effectItem.validations || [];
 						let parameterConnections: any = null;
 						let bodyParameter: any = null;

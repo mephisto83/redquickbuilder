@@ -72,10 +72,14 @@ export interface MountingDescription {
 	source?: { [key: string]: RouteSource }; // This is what the button will use to populate the parameter for navigating to the next page.
 	screenEffect: ScreenEffect[]; // List of internal api nodes to add to the screen, connected to datachains that will supply the values.
 	afterEffects: AfterEffect[];
+	autoSetup: AutoSetupConfiguration;
 	validations: ValidationConfig[];
 	permissions: PermissionConfig[];
 	executions: ExecutionConfig[];
 	excludeFromController: boolean;
+}
+export interface AutoSetupConfiguration {
+	executionAutoCopy: boolean;
 }
 export interface DataChainConfiguration {
 	checkExistence?: CheckExistenceConfig;

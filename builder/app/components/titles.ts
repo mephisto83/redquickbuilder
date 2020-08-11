@@ -306,6 +306,7 @@ export const Delete = 'Delete';
 export const IncrementInteger = 'Increment Integer';
 export const SetBoolean = 'Set boolean';
 export const Routing = 'Routing';
+export const AutoCopy = 'Auto Copy';
 export const CompareEnumeration = 'Compare Enumeration';
 export const Route = 'Route';
 export const MatchPropertyToEnum = 'Match property to enumeration';

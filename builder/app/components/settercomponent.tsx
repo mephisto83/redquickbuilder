@@ -56,7 +56,7 @@ export default class SetterComponent extends Component<any, any> {
 					this.setState({ open: !this.state.open });
 				}}
 				active
-				greyed={setter.enabled}
+				greyed={!setter || !setter.enabled}
 				title={this.props.title}
 			>
 				<TreeViewItemContainer>

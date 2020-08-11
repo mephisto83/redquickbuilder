@@ -75,6 +75,7 @@ export default class AfterEffectCheckExistanceConfig extends Component<any, any>
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
+				greyed={!checkExistence || !checkExistence.enabled}
 				active
 				title={Titles.ChexkExistence}
 			>
@@ -192,15 +193,15 @@ export default class AfterEffectCheckExistanceConfig extends Component<any, any>
 				<BranchConfigComponent
 					previousMethodDescription={previousMethodDescription}
 					currentMethodDescription={currentMethodDescription}
-          branchConfig={checkExistence.ifFalse}
-          routes={this.props.routes}
+					branchConfig={checkExistence.ifFalse}
+					routes={this.props.routes}
 					title={Titles.IfFalse}
 				/>
 				<BranchConfigComponent
 					previousMethodDescription={previousMethodDescription}
 					currentMethodDescription={currentMethodDescription}
-          branchConfig={checkExistence.ifTrue}
-          routes={this.props.routes}
+					branchConfig={checkExistence.ifTrue}
+					routes={this.props.routes}
 					title={Titles.IfTrue}
 				/>
 			</TreeViewMenu>

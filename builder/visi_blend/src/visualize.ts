@@ -23,8 +23,8 @@ export default async function Visualize(file: string) {
 
 	let result = Anneal(cityLayoutGrid, graph, {
 		T: 2,
-		kMax: 100000000,
-		swap: graph.nodes.length
+		kMax: 100000,
+		swap: graph.nodes.length / 2
 	});
 	// console.log(Springy);
 

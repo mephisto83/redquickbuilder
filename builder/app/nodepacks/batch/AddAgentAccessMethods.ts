@@ -11,7 +11,8 @@ import {
 	GetLink,
 	NEW_AFTER_METHOD,
 	graphOperation,
-	AddLinkBetweenNodes
+	AddLinkBetweenNodes,
+	GetNodeProp
 } from '../../actions/uiactions';
 import {
 	NodeTypes,
@@ -23,7 +24,7 @@ import {
 } from '../../constants/nodetypes';
 import { MethodFunctions, HTTP_METHODS, FunctionTypes } from '../../constants/functiontypes';
 import { CreateAgentFunction } from '../../constants/nodepackages';
-import { findLink, SetPause, GetNodeLinkedTo } from '../../methods/graph_methods';
+import { findLink, SetPause, GetNodeLinkedTo, codeTypeWord } from '../../methods/graph_methods';
 import { Node } from '../../methods/graph_types';
 import MethodProps, {
 	MethodDescription,
@@ -33,8 +34,10 @@ import MethodProps, {
 	EffectProps,
 	Effect,
 	EffectDescription,
-	AfterEffect
+	AfterEffect,
+	BranchConfig
 } from '../../interface/methodprops';
+import { check } from 'prettier';
 
 export default async function AddAgentAccessMethods(progresFunc: any) {
 	SetPause(true);
@@ -220,6 +223,62 @@ function buildMethodDescriptionFunctions(
 		}
 	}
 }
+function UpdateLambdaInsertArguments(
+	afterEffect: AfterEffect,
+	collectedMountingDescriptions: MountingDescription[],
+	routes: AfterEffect[]
+) {
+	if (afterEffect && afterEffect.dataChainOptions && afterEffect.dataChainOptions.checkExistence) {
+		let { dataChain } = afterEffect;
+		let lambdaInsertArguments = GetNodeProp(dataChain, NodeProperties.LambdaInsertArguments);
+		if (lambdaInsertArguments) {
+			let { checkExistence } = afterEffect.dataChainOptions;
+			if (checkExistence && checkExistence.enabled) {
+				let { ifFalse, ifTrue } = checkExistence;
+				if (ifFalse && ifFalse.enabled) {
+					updateBranchMethodDescriptionArgument(
+						ifFalse,
+						routes,
+						collectedMountingDescriptions,
+						lambdaInsertArguments
+					);
+				}
+				if (ifTrue && ifTrue.enabled) {
+					updateBranchMethodDescriptionArgument(
+						ifTrue,
+						routes,
+						collectedMountingDescriptions,
+						lambdaInsertArguments
+					);
+				}
+				updateComponentProperty(dataChain, NodeProperties.LambdaInsertArguments, lambdaInsertArguments);
+			}
+		}
+	}
+}
+function updateBranchMethodDescriptionArgument(
+	branchConfig: BranchConfig,
+	routes: AfterEffect[],
+	collectedMountingDescriptions: MountingDescription[],
+	lambdaInsertArguments: any
+) {
+	let { routeConfig } = branchConfig.dataChainOptions;
+
+	if (routeConfig) {
+		let { targetId } = routeConfig;
+		let route = routes.find((route: AfterEffect) => {
+			return route.id === targetId;
+		});
+		if (route) {
+			let description = collectedMountingDescriptions.find((v) => route && v.id == route.target);
+			if (description && description.methodDescription) {
+				let lambdaKeyName = codeTypeWord(route.name);
+				lambdaInsertArguments[lambdaKeyName] = lambdaInsertArguments[lambdaKeyName] || {};
+				lambdaInsertArguments[lambdaKeyName].method = description.methodDescription.methodId;
+			}
+		}
+	}
+}
 
 function SetupAfterEffects(mounting: MountingDescription, collectedMountingDescriptions: MountingDescription[]) {
 	if (mounting && mounting.methodDescription && mounting.methodDescription.methodId) {
@@ -231,13 +290,14 @@ function SetupAfterEffects(mounting: MountingDescription, collectedMountingDescr
 					newAfterEffect = createAfterEffect(
 						mounting.afterEffects[index - 1].afterEffectNode || '',
 						afterEffect.name
-          );
+					);
 
 					afterEffect.afterEffectNode = newAfterEffect.id;
 				} else {
 					newAfterEffect = createAfterEffect(methodDescription.methodId);
 					afterEffect.afterEffectNode = newAfterEffect.id;
 				}
+				UpdateLambdaInsertArguments(afterEffect, collectedMountingDescriptions, mounting.afterEffects || []);
 				graphOperation(
 					AddLinkBetweenNodes(
 						newAfterEffect.id,

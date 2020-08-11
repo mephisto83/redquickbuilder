@@ -84,6 +84,7 @@ export default class AfterEffectGetExistanceConfig extends Component<any, any> {
 		return (
 			<TreeViewMenu
 				open={this.state.open}
+				greyed={!getExisting || !getExisting.enabled}
 				icon={CheckGetExisting(getExisting) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
