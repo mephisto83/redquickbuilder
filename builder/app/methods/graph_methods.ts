@@ -1652,7 +1652,7 @@ export function LinksByType(graph: Graph, linkType: string | string[]): GraphLin
 	let linkIds: string[] = [];
 	linkTypes.forEach((linkType: string) => {
 		linkIds.push(
-			...Object.keys(AppCache.Links[linkType])
+			...Object.keys(AppCache.Links[linkType] || {})
 				.filter((v) => {
 					let res = AppCache.Links[linkType][v];
 					if (!res) {

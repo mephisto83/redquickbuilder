@@ -445,6 +445,7 @@ class AgentAccessView extends Component<any, any> {
 		// 	},
 		// 	graph
 		// ).filter((x) => !GetNodeProp(x, NodeProperties.IsUser));
+		let table_height = '450px';
 		return (
 			<TopViewer active={active}>
 				<section className="content">
@@ -583,155 +584,72 @@ class AgentAccessView extends Component<any, any> {
 							<TabContent>
 								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agentaccessview')}>
 									<Box title={'Agent Access'} maxheight={500}>
-										<table style={{ width: '100%', display: 'table' }}>
-											<thead>
-												<tr>
-													<th />
-													{[].interpolate(0, this.state.agents.length, (index: number) => {
-														return (
-															<th
-																style={{ backgroundColor: '#FEFCAD' }}
-																key={`${index}-agent-access-th`}
-																colSpan={5}
-															>
-																{GetNodeTitle(this.state.agents[index])}
-															</th>
-														);
-													})}
-												</tr>
-												<tr>
-													<th />
-													{[]
-														.interpolate(
+										<div className="tableFixHead" style={{ ['--tableheight']: table_height }}>
+											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
+												<thead>
+													<tr>
+														<th />
+														{[].interpolate(
 															0,
 															this.state.agents.length,
-															(agentIndex: number) =>
-																Object.keys(ViewTypes).map((v) => (
+															(index: number) => {
+																return (
 																	<th
-																		onClick={() => {
-																			const istrue = this.state.models.some(
-																				(model: any, modelIndex: number) => {
-																					if (
-																						this.state.agentAccess[
-																							agentIndex
-																						] &&
-																						this.state.agentAccess[
-																							agentIndex
-																						][modelIndex]
-																					) {
-																						return this.state.agentAccess[
-																							agentIndex
-																						][modelIndex][v];
-																					}
-																					return false;
-																				}
-																			);
-																			this.state.models.forEach(
-																				(model: any, modelIndex: number) => {
-																					this.setAgentAccess(
-																						modelIndex,
-																						agentIndex,
-																						v,
-																						!istrue
-																					);
-																				}
-																			);
-																			this.setState({
-																				agentAccess: [
-																					...this.state.agentAccess
-																				]
-																			});
-																		}}
+																		style={{ backgroundColor: '#FEFCAD' }}
+																		key={`${index}-agent-access-th`}
+																		colSpan={4}
 																	>
-																		{v}
+																		{GetNodeTitle(this.state.agents[index])}
 																	</th>
-																))
-														)
-														.flatten()}
-												</tr>
-											</thead>
-											<tbody>
-												{this.state.models.map((model: any, modelIndex: number) => {
-													const result = [
-														<th
-															style={{ cursor: 'pointer' }}
-															key={`${model}`}
-															onClick={() => {
-																const istrue = this.state.agents.some(
-																	(agent: string, agentIndex: number) => {
-																		if (
-																			this.state.agentAccess[agentIndex] &&
-																			this.state.agentAccess[agentIndex][
-																				modelIndex
-																			]
-																		) {
-																			return Object.values(
-																				ViewTypes
-																			).some((v) => {
-																				return this.state.agentAccess[
-																					agentIndex
-																				][modelIndex][v];
-																			});
-																		}
-																		return false;
-																	}
 																);
-																this.state.agents.forEach(
-																	(_: any, agentIndex: number) => {
-																		return Object.values(ViewTypes).some((v) => {
-																			this.setAgentAccess(
-																				modelIndex,
-																				agentIndex,
-																				v,
-																				!istrue
-																			);
-																		});
-																	}
-																);
-																this.setState({
-																	agentAccess: [ ...this.state.agentAccess ]
-																});
-															}}
-														>
-															{GetNodeTitle(model)}
-														</th>
-													];
-
-													result.push(
-														...[].interpolate(
-															0,
-															this.state.agents.length,
-															(index: any, agentIndex: number) =>
-																Object.keys(ViewTypes).map((v) => {
-																	const accessIndex =
-																		modelIndex * this.state.agents.length +
-																		agentIndex;
-																	const agent = this.state.agents[index];
-																	return (
-																		<td
-																			key={`${model} ${modelIndex} ${this.state
-																				.agents[index]} ${agentIndex} ${v}`}
-																		>
-																			<CheckBox
-																				label={' '}
-																				title={`${GetNodeTitle(
-																					agent
-																				)} ${GetNodeTitle(model)}`}
-																				style={{ height: 30, width: 30 }}
-																				onChange={(value: any) => {
-																					this.setAgentAccess(
-																						modelIndex,
-																						agentIndex,
-																						v,
-																						value
+															}
+														)}
+													</tr>
+													<tr style={{ top: 50 }}>
+														<th />
+														{[]
+															.interpolate(
+																0,
+																this.state.agents.length,
+																(agentIndex: number) =>
+																	Object.keys(ViewTypes)
+																		.filter((v: string) => v !== ViewTypes.Delete)
+																		.map((v) => (
+																			<th
+																				onClick={() => {
+																					const istrue = this.state.models.some(
+																						(
+																							model: any,
+																							modelIndex: number
+																						) => {
+																							if (
+																								this.state.agentAccess[
+																									agentIndex
+																								] &&
+																								this.state.agentAccess[
+																									agentIndex
+																								][modelIndex]
+																							) {
+																								return this.state
+																									.agentAccess[
+																									agentIndex
+																								][modelIndex][v];
+																							}
+																							return false;
+																						}
 																					);
-																					this.setDefaultAgentMethod(
-																						value,
-																						v,
-																						modelIndex,
-																						agentIndex,
-																						agent.id,
-																						model
+																					this.state.models.forEach(
+																						(
+																							model: any,
+																							modelIndex: number
+																						) => {
+																							this.setAgentAccess(
+																								modelIndex,
+																								agentIndex,
+																								v,
+																								!istrue
+																							);
+																						}
 																					);
 																					this.setState({
 																						agentAccess: [
@@ -739,442 +657,638 @@ class AgentAccessView extends Component<any, any> {
 																						]
 																					});
 																				}}
-																				value={this.hasAgentAccess(
-																					agentIndex,
-																					modelIndex,
-																					v
-																				)}
-																			/>
-																		</td>
-																	);
-																})
-														)
-													);
-													return (
-														<tr
-															style={{
-																backgroundColor:
-																	modelIndex % 2 ? '#33333333' : '#eeeeeeee'
-															}}
-															key={`key${model}`}
-														>
-															{result.flatten()}
-														</tr>
-													);
-												})}
-											</tbody>
-										</table>
-									</Box>
-									<Box title={'Dashboard Access'} maxheight={500}>
-										<table style={{ width: '100%', display: 'table' }}>
-											<thead>
-												<tr>
-													<th />
-													{[].interpolate(0, this.state.agents.length, (index: number) => {
-														return (
+																			>
+																				{v}
+																			</th>
+																		))
+															)
+															.flatten()}
+													</tr>
+												</thead>
+												<tbody>
+													{this.state.models.map((model: any, modelIndex: number) => {
+														const result = [
 															<th
-																style={{ backgroundColor: '#FEFCAD' }}
-																key={`${index}-agent-access-th`}
+																style={{ cursor: 'pointer' }}
+																key={`${model}`}
+																onClick={() => {
+																	const istrue = this.state.agents.some(
+																		(agent: string, agentIndex: number) => {
+																			if (
+																				this.state.agentAccess[agentIndex] &&
+																				this.state.agentAccess[agentIndex][
+																					modelIndex
+																				]
+																			) {
+																				return Object.values(
+																					ViewTypes
+																				).some((v) => {
+																					return this.state.agentAccess[
+																						agentIndex
+																					][modelIndex][v];
+																				});
+																			}
+																			return false;
+																		}
+																	);
+																	this.state.agents.forEach(
+																		(_: any, agentIndex: number) => {
+																			return Object.values(
+																				ViewTypes
+																			).some((v) => {
+																				this.setAgentAccess(
+																					modelIndex,
+																					agentIndex,
+																					v,
+																					!istrue
+																				);
+																			});
+																		}
+																	);
+																	this.setState({
+																		agentAccess: [ ...this.state.agentAccess ]
+																	});
+																}}
 															>
-																{GetNodeTitle(this.state.agents[index])}
+																{GetNodeTitle(model)}
 															</th>
+														];
+
+														result.push(
+															...[].interpolate(
+																0,
+																this.state.agents.length,
+																(index: any, agentIndex: number) =>
+																	Object.keys(ViewTypes)
+																		.filter((v: string) => v !== ViewTypes.Delete)
+																		.map((v) => {
+																			const accessIndex =
+																				modelIndex * this.state.agents.length +
+																				agentIndex;
+																			const agent = this.state.agents[index];
+																			return (
+																				<td
+																					key={`${model} ${modelIndex} ${this
+																						.state.agents[
+																						index
+																					]} ${agentIndex} ${v}`}
+																				>
+																					<CheckBox
+																						label={' '}
+																						title={`${GetNodeTitle(
+																							agent
+																						)} ${GetNodeTitle(model)}`}
+																						style={{
+																							height: 30,
+																							width: 30
+																						}}
+																						onChange={(value: any) => {
+																							this.setAgentAccess(
+																								modelIndex,
+																								agentIndex,
+																								v,
+																								value
+																							);
+																							this.setDefaultAgentMethod(
+																								value,
+																								v,
+																								modelIndex,
+																								agentIndex,
+																								agent.id,
+																								model
+																							);
+																							this.setState({
+																								agentAccess: [
+																									...this.state
+																										.agentAccess
+																								]
+																							});
+																						}}
+																						value={this.hasAgentAccess(
+																							agentIndex,
+																							modelIndex,
+																							v
+																						)}
+																					/>
+																				</td>
+																			);
+																		})
+															)
+														);
+														return (
+															<tr
+																style={{
+																	backgroundColor:
+																		modelIndex % 2 ? '#33333333' : '#eeeeeeee'
+																}}
+																key={`key${model}`}
+															>
+																{result.flatten()}
+															</tr>
 														);
 													})}
-												</tr>
-											</thead>
-											<tbody>
-												{this.state.dashboards.map((dashboard: any, dashboardIndex: number) => {
-													const result = [
-														<th
-															style={{ cursor: 'pointer' }}
-															key={`${dashboard}`}
-															onClick={() => {}}
-														>
-															{GetNodeTitle(dashboard)}
-														</th>
-													];
+												</tbody>
+											</table>
+										</div>
+									</Box>
+									<Box title={'Dashboard Access'} maxheight={500}>
+										<div className="tableFixHead" style={{ ['--tableheight']: table_height }}>
+											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
+												<thead>
+													<tr>
+														<th />
+														{[].interpolate(
+															0,
+															this.state.agents.length,
+															(index: number) => {
+																return (
+																	<th
+																		style={{ backgroundColor: '#FEFCAD' }}
+																		key={`${index}-agent-access-th`}
+																	>
+																		{GetNodeTitle(this.state.agents[index])}
+																	</th>
+																);
+															}
+														)}
+													</tr>
+												</thead>
+												<tbody>
+													{this.state.dashboards.map(
+														(dashboard: any, dashboardIndex: number) => {
+															const result = [
+																<th
+																	style={{ cursor: 'pointer' }}
+																	key={`${dashboard}`}
+																	onClick={() => {}}
+																>
+																	{GetNodeTitle(dashboard)}
+																</th>
+															];
 
-													result.push(
-														...[].interpolate(0, this.state.agents.length, (index: any) => {
-															const agent = this.state.agents[index];
-															return (
-																<td key={`${dashboard} ${dashboardIndex} - ${agent} `}>
-																	<CheckBox
-																		label={' '}
-																		title={`${GetNodeTitle(agent)} ${GetNodeTitle(
-																			dashboard
-																		)}`}
-																		style={{ height: 30, width: 30 }}
-																		onChange={(value: any) => {
-																			this.setAgentDashboardAccess(
-																				dashboard,
-																				agent,
-																				value
-																			);
+															result.push(
+																...[].interpolate(
+																	0,
+																	this.state.agents.length,
+																	(index: any) => {
+																		const agent = this.state.agents[index];
+																		return (
+																			<td
+																				key={`${dashboard} ${dashboardIndex} - ${agent} `}
+																			>
+																				<CheckBox
+																					label={' '}
+																					title={`${GetNodeTitle(
+																						agent
+																					)} ${GetNodeTitle(dashboard)}`}
+																					style={{ height: 30, width: 30 }}
+																					onChange={(value: any) => {
+																						this.setAgentDashboardAccess(
+																							dashboard,
+																							agent,
+																							value
+																						);
 
-																			this.setState({
-																				dashboardAccess: {
-																					...this.state.dashboardAccess
-																				}
-																			});
-																		}}
-																		value={this.hasAgentDashboardAccess(
-																			agent,
-																			dashboard
-																		)}
-																	/>
-																</td>
+																						this.setState({
+																							dashboardAccess: {
+																								...this.state
+																									.dashboardAccess
+																							}
+																						});
+																					}}
+																					value={this.hasAgentDashboardAccess(
+																						agent,
+																						dashboard
+																					)}
+																				/>
+																			</td>
+																		);
+																	}
+																)
 															);
-														})
-													);
-													return (
-														<tr
-															style={{
-																backgroundColor:
-																	dashboardIndex % 2 ? '#33333333' : '#eeeeeeee'
-															}}
-															key={`dashboard - key${dashboard}`}
-														>
-															{result.flatten()}
-														</tr>
-													);
-												})}
-											</tbody>
-										</table>
+															return (
+																<tr
+																	style={{
+																		backgroundColor:
+																			dashboardIndex % 2
+																				? '#33333333'
+																				: '#eeeeeeee'
+																	}}
+																	key={`dashboard - key${dashboard}`}
+																>
+																	{result.flatten()}
+																</tr>
+															);
+														}
+													)}
+												</tbody>
+											</table>
+										</div>{' '}
 									</Box>
 								</TabPane>
 								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agentmethoduse')}>
 									<Box maxheight={500} title={'Agent Mounting Methods'}>
-										<table style={{ width: '100%', display: 'table' }}>
-											<thead>
-												<tr>
-													<th />
-													{[].interpolate(0, this.state.agents.length, (index: number) => {
-														return (
-															<th style={{ backgroundColor: '#FEFCAD' }} colSpan={5}>
-																{GetNodeTitle(this.state.agents[index])}
-															</th>
-														);
-													})}
-												</tr>
-												<tr>
-													<th />
-													{[]
-														.interpolate(0, this.state.agents.length, () =>
-															Object.keys(ViewTypes).map((v) => <th>{v}</th>)
-														)
-														.flatten()}
-												</tr>
-											</thead>
-											<tbody>
-												{this.state.models.map((model: string, modelIndex: number) => {
-													const result = [ <td>{GetNodeTitle(model)}</td> ];
-
-													result.push(
-														...[].interpolate(
+										<div className="tableFixHead" style={{ ['--tableheight']: table_height }}>
+											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
+												<thead>
+													<tr>
+														<th />
+														{[].interpolate(
 															0,
 															this.state.agents.length,
-															(index: number, agentIndex: number) =>
-																Object.keys(ViewTypes).map((v) => {
-																	const tdkey = `${model} ${modelIndex} ${this.state
-																		.agents[index]} ${agentIndex} ${v}`;
-																	if (
-																		!this.hasAgentAccess(agentIndex, modelIndex, v)
-																	) {
-																		return <td key={tdkey} />;
-																	}
-
-																	let mounting: ViewMounting = this.getMountingDescription(
-																		agentIndex,
-																		modelIndex,
-																		v
-																	);
-																	if (!mounting) {
-																		mounting = {
-																			mountings: []
-																		};
-																		this.setAgentMountingProperty(
-																			modelIndex,
-																			agentIndex,
-																			v,
-																			mounting
-																		);
-																	}
-																	mounting.mountings = mounting.mountings || [];
-
-																	let mountingDescriptionButton = this.createMountingDescriptionButton(
-																		agentIndex,
-																		onlyAgents,
-																		model,
-																		modelIndex,
-																		v,
-																		mounting
-																	);
-																	return (
-																		<td key={tdkey}>{mountingDescriptionButton}</td>
-																	);
-																})
-														)
-													);
-													return (
-														<tr
-															style={{
-																backgroundColor:
-																	modelIndex % 2 ? '#33333333' : '#eeeeeeee'
-															}}
-															key={`key${model}`}
-														>
-															{result.flatten()}
-														</tr>
-													);
-												})}
-											</tbody>
-										</table>
-									</Box>
-									<Box maxheight={500} title={'Dashboard Mounting Methods'}>
-										<table style={{ width: '100%', display: 'table' }}>
-											<thead>
-												<tr>
-													<th />
-													{[].interpolate(0, this.state.agents.length, (index: number) => {
-														return (
-															<th style={{ backgroundColor: '#FEFCAD' }}>
-																{GetNodeTitle(this.state.agents[index])}
-															</th>
-														);
-													})}
-												</tr>
-											</thead>
-											<tbody>
-												{this.state.dashboards.map(
-													(dashboard: string, dashboardIndex: number) => {
-														const result = [ <td>{GetNodeTitle(dashboard)}</td> ];
+															(index: number) => {
+																return (
+																	<th
+																		style={{ backgroundColor: '#FEFCAD' }}
+																		colSpan={4}
+																	>
+																		{GetNodeTitle(this.state.agents[index])}
+																	</th>
+																);
+															}
+														)}
+													</tr>
+													<tr>
+														<th />
+														{[]
+															.interpolate(0, this.state.agents.length, () =>
+																Object.keys(ViewTypes)
+																	.filter((v: string) => v !== ViewTypes.Delete)
+																	.map((v) => <th>{v}</th>)
+															)
+															.flatten()}
+													</tr>
+												</thead>
+												<tbody>
+													{this.state.models.map((model: string, modelIndex: number) => {
+														const result = [ <td>{GetNodeTitle(model)}</td> ];
 
 														result.push(
-															...this.state.agents.map(
-																(agent: string, agentIndex: number) => {
-																	const tdkey = `${dashboard} ${dashboard} ${agent} ${agentIndex} `;
-																	if (
-																		!this.hasAgentDashboardAccess(agent, dashboard)
-																	) {
-																		return <td key={tdkey} />;
-																	}
+															...[].interpolate(
+																0,
+																this.state.agents.length,
+																(index: number, agentIndex: number) =>
+																	Object.keys(ViewTypes)
+																		.filter((v: string) => v !== ViewTypes.Delete)
+																		.map((v) => {
+																			const tdkey = `${model} ${modelIndex} ${this
+																				.state.agents[
+																				index
+																			]} ${agentIndex} ${v}`;
+																			if (
+																				!this.hasAgentAccess(
+																					agentIndex,
+																					modelIndex,
+																					v
+																				)
+																			) {
+																				return <td key={tdkey} />;
+																			}
 
-																	let mounting: ViewMounting = this.getDashboardMountingDescription(
-																		agent,
-																		dashboard
-																	);
-																	if (!mounting) {
-																		mounting = {
-																			mountings: []
-																		};
-																		this.setDashboardAgentMountingProperty(
-																			dashboard,
-																			agent,
-																			mounting
-																		);
-																	}
-																	mounting.mountings = mounting.mountings || [];
+																			let mounting: ViewMounting = this.getMountingDescription(
+																				agentIndex,
+																				modelIndex,
+																				v
+																			);
+																			if (!mounting) {
+																				mounting = {
+																					mountings: []
+																				};
+																				this.setAgentMountingProperty(
+																					modelIndex,
+																					agentIndex,
+																					v,
+																					mounting
+																				);
+																			}
+																			mounting.mountings =
+																				mounting.mountings || [];
 
-																	let mountingDescriptionButton = this.createDashboardMountingDescriptionButton(
-																		agent,
-																		dashboard,
-																		mounting
-																	);
-																	return (
-																		<td key={tdkey}>{mountingDescriptionButton}</td>
-																	);
-																}
+																			let mountingDescriptionButton = this.createMountingDescriptionButton(
+																				agentIndex,
+																				onlyAgents,
+																				model,
+																				modelIndex,
+																				v,
+																				mounting
+																			);
+																			return (
+																				<td key={tdkey}>
+																					{mountingDescriptionButton}
+																				</td>
+																			);
+																		})
 															)
 														);
 														return (
 															<tr
 																style={{
 																	backgroundColor:
-																		dashboardIndex % 2 ? '#33333333' : '#eeeeeeee'
+																		modelIndex % 2 ? '#33333333' : '#eeeeeeee'
 																}}
-																key={`key${dashboardIndex}`}
+																key={`key${model}`}
 															>
 																{result.flatten()}
 															</tr>
 														);
-													}
-												)}
-											</tbody>
-										</table>
+													})}
+												</tbody>
+											</table>
+										</div>{' '}
+									</Box>
+									<Box maxheight={500} title={'Dashboard Mounting Methods'}>
+										<div className="tableFixHead" style={{ ['--tableheight']: table_height }}>
+											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
+												<thead>
+													<tr>
+														<th />
+														{[].interpolate(
+															0,
+															this.state.agents.length,
+															(index: number) => {
+																return (
+																	<th style={{ backgroundColor: '#FEFCAD' }}>
+																		{GetNodeTitle(this.state.agents[index])}
+																	</th>
+																);
+															}
+														)}
+													</tr>
+												</thead>
+												<tbody>
+													{this.state.dashboards.map(
+														(dashboard: string, dashboardIndex: number) => {
+															const result = [ <td>{GetNodeTitle(dashboard)}</td> ];
+
+															result.push(
+																...this.state.agents.map(
+																	(agent: string, agentIndex: number) => {
+																		const tdkey = `${dashboard} ${dashboard} ${agent} ${agentIndex} `;
+																		if (
+																			!this.hasAgentDashboardAccess(
+																				agent,
+																				dashboard
+																			)
+																		) {
+																			return <td key={tdkey} />;
+																		}
+
+																		let mounting: ViewMounting = this.getDashboardMountingDescription(
+																			agent,
+																			dashboard
+																		);
+																		if (!mounting) {
+																			mounting = {
+																				mountings: []
+																			};
+																			this.setDashboardAgentMountingProperty(
+																				dashboard,
+																				agent,
+																				mounting
+																			);
+																		}
+																		mounting.mountings = mounting.mountings || [];
+
+																		let mountingDescriptionButton = this.createDashboardMountingDescriptionButton(
+																			agent,
+																			dashboard,
+																			mounting
+																		);
+																		return (
+																			<td key={tdkey}>
+																				{mountingDescriptionButton}
+																			</td>
+																		);
+																	}
+																)
+															);
+															return (
+																<tr
+																	style={{
+																		backgroundColor:
+																			dashboardIndex % 2
+																				? '#33333333'
+																				: '#eeeeeeee'
+																	}}
+																	key={`key${dashboardIndex}`}
+																>
+																	{result.flatten()}
+																</tr>
+															);
+														}
+													)}
+												</tbody>
+											</table>
+										</div>{' '}
 									</Box>
 								</TabPane>
 								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agenteffects')}>
 									<Box maxheight={500} title={'Agent Effect Methods'}>
-										<table style={{ width: '100%', display: 'table' }}>
-											<thead>
-												<tr>
-													<th />
-													{[].interpolate(0, this.state.agents.length, (index: number) => {
-														return (
-															<th style={{ backgroundColor: '#FEFCAD' }} colSpan={5}>
-																{GetNodeTitle(this.state.agents[index])}
-															</th>
-														);
-													})}
-												</tr>
-												<tr>
-													<th />
-													{[]
-														.interpolate(0, this.state.agents.length, () =>
-															Object.keys(ViewTypes).map((v) => <th>{v}</th>)
-														)
-														.flatten()}
-												</tr>
-											</thead>
-											<tbody>
-												{this.state.models.map((model: string, modelIndex: number) => {
-													const result = [ <td>{GetNodeTitle(model)}</td> ];
-
-													result.push(
-														...[].interpolate(
+										<div className="tableFixHead" style={{ ['--tableheight']: table_height }}>
+											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
+												<thead>
+													<tr>
+														<th />
+														{[].interpolate(
 															0,
 															this.state.agents.length,
-															(index: number, agentIndex: number) =>
-																Object.keys(ViewTypes).map((v) => {
-																	const tdkey = `${model} ${modelIndex} ${this.state
-																		.agents[index]} ${agentIndex} -effects ${v}`;
-																	if (
-																		!this.hasAgentAccess(agentIndex, modelIndex, v)
-																	) {
-																		return <td key={tdkey} />;
-																	}
-
-																	let effect: Effect = this.getEffectDescription(
-																		agentIndex,
-																		modelIndex,
-																		v
-																	);
-																	if (!effect) {
-																		effect = {
-																			effects: []
-																		};
-																		this.setAgentEffectProperty(
-																			modelIndex,
-																			agentIndex,
-																			v,
-																			effect
-																		);
-																	}
-																	effect.effects = effect.effects || [];
-
-																	let effectDescriptionButton = this.createEffectDescriptionButton(
-																		agentIndex,
-																		onlyAgents,
-																		model,
-																		modelIndex,
-																		v,
-																		effect
-																	);
-																	return (
-																		<td key={tdkey}>{effectDescriptionButton}</td>
-																	);
-																})
-														)
-													);
-													return (
-														<tr
-															style={{
-																backgroundColor:
-																	modelIndex % 2 ? '#33333333' : '#eeeeeeee'
-															}}
-															key={`key${model}`}
-														>
-															{result.flatten()}
-														</tr>
-													);
-												})}
-											</tbody>
-										</table>
-									</Box>
-									<Box maxheight={500} title={'Dashboard Effect Methods'}>
-										<table style={{ width: '100%', display: 'table' }}>
-											<thead>
-												<tr>
-													<th />
-													{[].interpolate(0, this.state.agents.length, (index: number) => {
-														return (
-															<th style={{ backgroundColor: '#FEFCAD' }}>
-																{GetNodeTitle(this.state.agents[index])}
-															</th>
-														);
-													})}
-												</tr>
-											</thead>
-											<tbody>
-												{this.state.dashboards.map(
-													(dashboard: string, dashboardIndex: number) => {
-														const result = [ <td>{GetNodeTitle(dashboard)}</td> ];
+															(index: number) => {
+																return (
+																	<th
+																		style={{ backgroundColor: '#FEFCAD' }}
+																		colSpan={4}
+																	>
+																		{GetNodeTitle(this.state.agents[index])}
+																	</th>
+																);
+															}
+														)}
+													</tr>
+													<tr>
+														<th />
+														{[]
+															.interpolate(0, this.state.agents.length, () =>
+																Object.keys(ViewTypes)
+																	.filter((v: string) => v !== ViewTypes.Delete)
+																	.map((v) => <th>{v}</th>)
+															)
+															.flatten()}
+													</tr>
+												</thead>
+												<tbody>
+													{this.state.models.map((model: string, modelIndex: number) => {
+														const result = [ <td>{GetNodeTitle(model)}</td> ];
 
 														result.push(
-															...this.state.agents.map(
-																(agent: string, agentIndex: number) => {
-																	const tdkey = `${dashboard} ${dashboardIndex} ${this
-																		.state.agents[agent]} ${agentIndex} -effects `;
-																	if (
-																		!this.hasAgentDashboardAccess(agent, dashboard)
-																	) {
-																		return <td key={tdkey} />;
-																	}
+															...[].interpolate(
+																0,
+																this.state.agents.length,
+																(index: number, agentIndex: number) =>
+																	Object.keys(ViewTypes)
+																		.filter((v: string) => v !== ViewTypes.Delete)
+																		.map((v) => {
+																			const tdkey = `${model} ${modelIndex} ${this
+																				.state.agents[
+																				index
+																			]} ${agentIndex} -effects ${v}`;
+																			if (
+																				!this.hasAgentAccess(
+																					agentIndex,
+																					modelIndex,
+																					v
+																				)
+																			) {
+																				return <td key={tdkey} />;
+																			}
 
-																	let effect: Effect = this.getDashboardEffectDescription(
-																		agent,
-																		dashboard
-																	);
-																	if (!effect) {
-																		effect = {
-																			effects: []
-																		};
-																		this.setDashboardAgentEffectProperty(
-																			dashboard,
-																			agent,
-																			effect
-																		);
-																	}
-																	effect.effects = effect.effects || [];
+																			let effect: Effect = this.getEffectDescription(
+																				agentIndex,
+																				modelIndex,
+																				v
+																			);
+																			if (!effect) {
+																				effect = {
+																					effects: []
+																				};
+																				this.setAgentEffectProperty(
+																					modelIndex,
+																					agentIndex,
+																					v,
+																					effect
+																				);
+																			}
+																			effect.effects = effect.effects || [];
 
-																	let effectDescriptionButton = this.createDashboardEffectDescriptionButton(
-																		agent,
-																		dashboard,
-																		effect
-																	);
-																	return (
-																		<td key={tdkey}>{effectDescriptionButton}</td>
-																	);
-																}
+																			let effectDescriptionButton = this.createEffectDescriptionButton(
+																				agentIndex,
+																				onlyAgents,
+																				model,
+																				modelIndex,
+																				v,
+																				effect
+																			);
+																			return (
+																				<td key={tdkey}>
+																					{effectDescriptionButton}
+																				</td>
+																			);
+																		})
 															)
 														);
 														return (
 															<tr
 																style={{
 																	backgroundColor:
-																		dashboardIndex % 2 ? '#33333333' : '#eeeeeeee'
+																		modelIndex % 2 ? '#33333333' : '#eeeeeeee'
 																}}
-																key={`key - effect -${dashboard}`}
+																key={`key${model}`}
 															>
 																{result.flatten()}
 															</tr>
 														);
-													}
-												)}
-											</tbody>
-										</table>
+													})}
+												</tbody>
+											</table>
+										</div>{' '}
+									</Box>
+									<Box maxheight={500} title={'Dashboard Effect Methods'}>
+										<div className="tableFixHead" style={{ ['--tableheight']: table_height }}>
+											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
+												<thead>
+													<tr>
+														<th />
+														{[].interpolate(
+															0,
+															this.state.agents.length,
+															(index: number) => {
+																return (
+																	<th style={{ backgroundColor: '#FEFCAD' }}>
+																		{GetNodeTitle(this.state.agents[index])}
+																	</th>
+																);
+															}
+														)}
+													</tr>
+												</thead>
+												<tbody>
+													{this.state.dashboards.map(
+														(dashboard: string, dashboardIndex: number) => {
+															const result = [ <td>{GetNodeTitle(dashboard)}</td> ];
+
+															result.push(
+																...this.state.agents.map(
+																	(agent: string, agentIndex: number) => {
+																		const tdkey = `${dashboard} ${dashboardIndex} ${this
+																			.state.agents[
+																			agent
+																		]} ${agentIndex} -effects `;
+																		if (
+																			!this.hasAgentDashboardAccess(
+																				agent,
+																				dashboard
+																			)
+																		) {
+																			return <td key={tdkey} />;
+																		}
+
+																		let effect: Effect = this.getDashboardEffectDescription(
+																			agent,
+																			dashboard
+																		);
+																		if (!effect) {
+																			effect = {
+																				effects: []
+																			};
+																			this.setDashboardAgentEffectProperty(
+																				dashboard,
+																				agent,
+																				effect
+																			);
+																		}
+																		effect.effects = effect.effects || [];
+
+																		let effectDescriptionButton = this.createDashboardEffectDescriptionButton(
+																			agent,
+																			dashboard,
+																			effect
+																		);
+																		return (
+																			<td key={tdkey}>
+																				{effectDescriptionButton}
+																			</td>
+																		);
+																	}
+																)
+															);
+															return (
+																<tr
+																	style={{
+																		backgroundColor:
+																			dashboardIndex % 2
+																				? '#33333333'
+																				: '#eeeeeeee'
+																	}}
+																	key={`key - effect -${dashboard}`}
+																>
+																	{result.flatten()}
+																</tr>
+															);
+														}
+													)}
+												</tbody>
+											</table>
+										</div>{' '}
 									</Box>
 								</TabPane>
 								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'button_routes')}>
 									<Box title={'Agent Routing'} maxheight={700}>
-										<table style={{ width: '100%', display: 'table' }}>
+										<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 											<thead>
 												<tr>
 													<th />
 													{[].interpolate(0, this.state.agents.length, (index: number) => {
 														return (
-															<th style={{ backgroundColor: '#FEFCAD' }} colSpan={5}>
+															<th style={{ backgroundColor: '#FEFCAD' }} colSpan={4}>
 																{GetNodeTitle(this.state.agents[index])}
 															</th>
 														);
@@ -1187,9 +1301,9 @@ class AgentAccessView extends Component<any, any> {
 															0,
 															this.state.agents.length,
 															(agentIndex: number) =>
-																Object.keys(ViewTypes).map((v) => (
-																	<th onClick={() => {}}>{v}</th>
-																))
+																Object.keys(ViewTypes)
+																	.filter((v: string) => v !== ViewTypes.Delete)
+																	.map((v) => <th onClick={() => {}}>{v}</th>)
 														)
 														.flatten()}
 												</tr>
@@ -1203,64 +1317,74 @@ class AgentAccessView extends Component<any, any> {
 															0,
 															this.state.agents.length,
 															(index: number, agentIndex: number) =>
-																Object.keys(ViewTypes).map((v) => {
-																	const tdkey = `routing- ${model} ${modelIndex} ${this
-																		.state.agents[index]} ${agentIndex} ${v}`;
-																	if (
-																		!this.hasAgentAccess(agentIndex, modelIndex, v)
-																	) {
-																		return <td key={tdkey} />;
-																	}
-
-																	let routing: Routing = {
-																		routes: []
-																	};
-																	if (
-																		this.hasFunctionViewTypeValue(
-																			agentIndex,
-																			modelIndex,
-																			v
-																		)
-																	) {
-																		routing =
-																			this.getRoutingDescription(
+																Object.keys(ViewTypes)
+																	.filter((v: string) => v !== ViewTypes.Delete)
+																	.map((v) => {
+																		const tdkey = `routing- ${model} ${modelIndex} ${this
+																			.state.agents[index]} ${agentIndex} ${v}`;
+																		if (
+																			!this.hasAgentAccess(
 																				agentIndex,
 																				modelIndex,
 																				v
-																			) || routing;
-																	}
-																	let onComponentMountMethod = this.getMountingDescription(
-																		agentIndex,
-																		modelIndex,
-																		v
-																	);
-																	let addRoutingDescriptionBtn = this.createRoutingDescriptionButton(
-																		agentIndex,
-																		onlyAgents,
-																		onComponentMountMethod,
-																		model,
-																		modelIndex,
-																		v,
-																		routing
-																	);
-																	let routesDom: any = null;
-																	if (routing) {
-																		routesDom = routing.routes.map(
-																			(route: RouteDescription) => {
-																				return (
-																					<i
-																						title={route.name}
-																						className={'fa fa-genderless'}
-																						style={{ color: 'orange' }}
-																					/>
-																				);
-																			}
+																			)
+																		) {
+																			return <td key={tdkey} />;
+																		}
+
+																		let routing: Routing = {
+																			routes: []
+																		};
+																		if (
+																			this.hasFunctionViewTypeValue(
+																				agentIndex,
+																				modelIndex,
+																				v
+																			)
+																		) {
+																			routing =
+																				this.getRoutingDescription(
+																					agentIndex,
+																					modelIndex,
+																					v
+																				) || routing;
+																		}
+																		let onComponentMountMethod = this.getMountingDescription(
+																			agentIndex,
+																			modelIndex,
+																			v
 																		);
-																	}
-																	return (
-																		<td key={tdkey}>{addRoutingDescriptionBtn}</td>
-																	);
-																})
+																		let addRoutingDescriptionBtn = this.createRoutingDescriptionButton(
+																			agentIndex,
+																			onlyAgents,
+																			onComponentMountMethod,
+																			model,
+																			modelIndex,
+																			v,
+																			routing
+																		);
+																		let routesDom: any = null;
+																		if (routing) {
+																			routesDom = routing.routes.map(
+																				(route: RouteDescription) => {
+																					return (
+																						<i
+																							title={route.name}
+																							className={
+																								'fa fa-genderless'
+																							}
+																							style={{ color: 'orange' }}
+																						/>
+																					);
+																				}
+																			);
+																		}
+																		return (
+																			<td key={tdkey}>
+																				{addRoutingDescriptionBtn}
+																			</td>
+																		);
+																	})
 														)
 													);
 													return (
@@ -1279,7 +1403,7 @@ class AgentAccessView extends Component<any, any> {
 										</table>
 									</Box>
 									<Box title={'Dashboard Routing'} maxheight={700}>
-										<table style={{ width: '100%', display: 'table' }}>
+										<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 											<thead>
 												<tr>
 													<th />
@@ -1369,13 +1493,13 @@ class AgentAccessView extends Component<any, any> {
 								</TabPane>
 								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'screen_effects')}>
 									<Box title={'Agent Screen Effects'} maxheight={500}>
-										<table style={{ width: '100%', display: 'table' }}>
+										<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 											<thead>
 												<tr>
 													<th />
 													{this.state.agents.map((agent: string) => {
 														return (
-															<th style={{ backgroundColor: '#FEFCAD' }} colSpan={5}>
+															<th style={{ backgroundColor: '#FEFCAD' }} colSpan={4}>
 																{GetNodeTitle(agent)}
 															</th>
 														);
@@ -1385,9 +1509,9 @@ class AgentAccessView extends Component<any, any> {
 													<th />
 													{this.state.agents
 														.map((agent: string) =>
-															Object.keys(ViewTypes).map((v) => (
-																<th onClick={() => {}}>{v}</th>
-															))
+															Object.keys(ViewTypes)
+																.filter((v: string) => v !== ViewTypes.Delete)
+																.map((v) => <th onClick={() => {}}>{v}</th>)
 														)
 														.flatten()}
 												</tr>
@@ -1398,35 +1522,41 @@ class AgentAccessView extends Component<any, any> {
 
 													result.push(
 														...this.state.agents.map((agent: string, agentIndex: number) =>
-															Object.keys(ViewTypes).map((v) => {
-																const tdkey = `effects screen - ${model} ${model} ${agent} ${agentIndex} ${v}`;
-																if (!this.hasAgentAccess(agentIndex, modelIndex, v)) {
-																	return <td key={tdkey} />;
-																}
+															Object.keys(ViewTypes)
+																.filter((v: string) => v !== ViewTypes.Delete)
+																.map((v) => {
+																	const tdkey = `effects screen - ${model} ${model} ${agent} ${agentIndex} ${v}`;
+																	if (
+																		!this.hasAgentAccess(agentIndex, modelIndex, v)
+																	) {
+																		return <td key={tdkey} />;
+																	}
 
-																let screenEffectApis: ScreenEffectApi[] = [];
+																	let screenEffectApis: ScreenEffectApi[] = [];
 
-																if (this.hasScreenEffects(agent, model, v)) {
-																	screenEffectApis =
-																		this.getScreenEffects(agent, model, v) ||
-																		screenEffectApis;
-																} else {
-																	this.setScreenEffects(
+																	if (this.hasScreenEffects(agent, model, v)) {
+																		screenEffectApis =
+																			this.getScreenEffects(agent, model, v) ||
+																			screenEffectApis;
+																	} else {
+																		this.setScreenEffects(
+																			agent,
+																			model,
+																			v,
+																			screenEffectApis
+																		);
+																	}
+
+																	let addRoutingDescriptionBtn = this.createScreenEffectButton(
 																		agent,
 																		model,
 																		v,
 																		screenEffectApis
 																	);
-																}
-
-																let addRoutingDescriptionBtn = this.createScreenEffectButton(
-																	agent,
-																	model,
-																	v,
-																	screenEffectApis
-																);
-																return <td key={tdkey}>{addRoutingDescriptionBtn}</td>;
-															})
+																	return (
+																		<td key={tdkey}>{addRoutingDescriptionBtn}</td>
+																	);
+																})
 														)
 													);
 													return (
@@ -1445,7 +1575,7 @@ class AgentAccessView extends Component<any, any> {
 										</table>
 									</Box>
 									<Box title={'Dashboard Screen Effects'} maxheight={500}>
-										<table style={{ width: '100%', display: 'table' }}>
+										<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 											<thead>
 												<tr>
 													<th />
