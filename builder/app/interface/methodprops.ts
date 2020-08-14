@@ -84,6 +84,7 @@ export interface AutoSetupConfiguration {
 export interface DataChainConfiguration {
 	checkExistence?: CheckExistenceConfig;
 	simpleValidation?: SimpleValidationConfig;
+	simpleValidations?: SimpleValidationConfig[];
 	copyConfig?: CopyConfig;
 	setBoolean?: SetBoolean;
 	setInteger?: SetInteger;
@@ -309,15 +310,27 @@ export function CreateSimpleValidation(): SimpleValidationConfig {
 			id: GUID(),
 			enabled: false,
 			value: '1'
-		}
+		},
+		oneOf: CreateOneOf()
 	};
 }
+
+export function CreateOneOf(): EnumerationConfig {
+	return {
+		id: GUID(),
+		enabled: false,
+		enumerationType: '',
+		enumerations: []
+	};
+}
+
 export function SetupConfigInstanceInformation(
 	dataChainOptions: DataChainConfiguration,
 	methodDescription: MethodDescription
 ) {
 	dataChainOptions.checkExistence = dataChainOptions.checkExistence || CreateCheckExistence();
 	dataChainOptions.simpleValidation = dataChainOptions.simpleValidation || CreateSimpleValidation();
+	dataChainOptions.simpleValidations = dataChainOptions.simpleValidations || [];
 	dataChainOptions.copyConfig = dataChainOptions.copyConfig || CreateCopyConfig();
 	dataChainOptions.setInteger = dataChainOptions.setInteger || CreateSetInteger();
 	dataChainOptions.setBoolean = dataChainOptions.setBoolean || CreateSetBoolean();
@@ -325,6 +338,7 @@ export function SetupConfigInstanceInformation(
 	dataChainOptions.incrementInteger = dataChainOptions.incrementInteger || CreateIncrementInteger();
 	dataChainOptions.compareEnumeration = dataChainOptions.compareEnumeration || CreateCompareEnumeration();
 	dataChainOptions.compareEnumerations = dataChainOptions.compareEnumerations || [ CreateCompareEnumeration() ];
+
 	let checkExistence = dataChainOptions.checkExistence;
 	let properties: any[] = [];
 	let targetProperties: any[] = [];
@@ -360,6 +374,7 @@ export function SetupConfigInstanceInformation(
 		incrementDouble: dataChainOptions.incrementDouble,
 		incrementInteger: dataChainOptions.incrementInteger,
 		setBoolean: dataChainOptions.setBoolean,
+		simpleValidations: dataChainOptions.simpleValidations,
 		setInteger: dataChainOptions.setInteger,
 		compareEnumeration: dataChainOptions.compareEnumeration,
 		compareEnumerations: dataChainOptions.compareEnumerations
@@ -414,11 +429,16 @@ export interface SimpleValidationConfig extends AfterEffectRelations {
 	alphaOnlyWithSpaces: BooleanConfig;
 	isNotNull: BooleanConfig;
 	isNull: BooleanConfig;
+	oneOf: EnumerationConfig;
 }
-
+export interface EnumerationConfig extends ConfigItem {
+	enumerations: string[];
+	enumerationType: string;
+}
 export interface BooleanConfig extends ConfigItem {}
 export interface NumberConfig extends ConfigItem {
-	value: string;
+  value: string;
+  equal?: boolean;
 }
 export interface GetExistingConfig extends AfterEffectRelations {}
 /**

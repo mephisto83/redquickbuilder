@@ -921,7 +921,7 @@ class AgentAccessView extends Component<any, any> {
 												</thead>
 												<tbody>
 													{this.state.models.map((model: string, modelIndex: number) => {
-														const result = [ <td>{GetNodeTitle(model)}</td> ];
+														const result = [ <th>{GetNodeTitle(model)}</th> ];
 
 														result.push(
 															...[].interpolate(
@@ -1018,7 +1018,7 @@ class AgentAccessView extends Component<any, any> {
 												<tbody>
 													{this.state.dashboards.map(
 														(dashboard: string, dashboardIndex: number) => {
-															const result = [ <td>{GetNodeTitle(dashboard)}</td> ];
+															const result = [ <th>{GetNodeTitle(dashboard)}</th> ];
 
 															result.push(
 																...this.state.agents.map(
@@ -1117,7 +1117,7 @@ class AgentAccessView extends Component<any, any> {
 												</thead>
 												<tbody>
 													{this.state.models.map((model: string, modelIndex: number) => {
-														const result = [ <td>{GetNodeTitle(model)}</td> ];
+														const result = [ <th>{GetNodeTitle(model)}</th> ];
 
 														result.push(
 															...[].interpolate(
@@ -1213,7 +1213,7 @@ class AgentAccessView extends Component<any, any> {
 												<tbody>
 													{this.state.dashboards.map(
 														(dashboard: string, dashboardIndex: number) => {
-															const result = [ <td>{GetNodeTitle(dashboard)}</td> ];
+															const result = [ <th>{GetNodeTitle(dashboard)}</th> ];
 
 															result.push(
 																...this.state.agents.map(
@@ -1282,51 +1282,172 @@ class AgentAccessView extends Component<any, any> {
 								</TabPane>
 								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'button_routes')}>
 									<Box title={'Agent Routing'} maxheight={700}>
-										<table className="fixheader" style={{ width: '100%', display: 'table' }}>
-											<thead>
-												<tr>
-													<th />
-													{[].interpolate(0, this.state.agents.length, (index: number) => {
-														return (
-															<th style={{ backgroundColor: '#FEFCAD' }} colSpan={4}>
-																{GetNodeTitle(this.state.agents[index])}
-															</th>
-														);
-													})}
-												</tr>
-												<tr>
-													<th />
-													{[]
-														.interpolate(
+										<div className="tableFixHead" style={{ ['--tableheight']: table_height }}>
+											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
+												<thead>
+													<tr>
+														<th />
+														{[].interpolate(
 															0,
 															this.state.agents.length,
-															(agentIndex: number) =>
-																Object.keys(ViewTypes)
-																	.filter((v: string) => v !== ViewTypes.Delete)
-																	.map((v) => <th onClick={() => {}}>{v}</th>)
-														)
-														.flatten()}
-												</tr>
-											</thead>
-											<tbody>
-												{this.state.models.map((model: string, modelIndex: number) => {
-													const result = [ <td>{GetNodeTitle(model)}</td> ];
+															(index: number) => {
+																return (
+																	<th
+																		style={{ backgroundColor: '#FEFCAD' }}
+																		colSpan={4}
+																	>
+																		{GetNodeTitle(this.state.agents[index])}
+																	</th>
+																);
+															}
+														)}
+													</tr>
+													<tr>
+														<th />
+														{[]
+															.interpolate(
+																0,
+																this.state.agents.length,
+																(agentIndex: number) =>
+																	Object.keys(ViewTypes)
+																		.filter((v: string) => v !== ViewTypes.Delete)
+																		.map((v) => <th onClick={() => {}}>{v}</th>)
+															)
+															.flatten()}
+													</tr>
+												</thead>
+												<tbody>
+													{this.state.models.map((model: string, modelIndex: number) => {
+														const result = [ <th>{GetNodeTitle(model)}</th> ];
 
-													result.push(
-														...[].interpolate(
-															0,
-															this.state.agents.length,
-															(index: number, agentIndex: number) =>
-																Object.keys(ViewTypes)
-																	.filter((v: string) => v !== ViewTypes.Delete)
-																	.map((v) => {
-																		const tdkey = `routing- ${model} ${modelIndex} ${this
-																			.state.agents[index]} ${agentIndex} ${v}`;
-																		if (
-																			!this.hasAgentAccess(
+														result.push(
+															...[].interpolate(
+																0,
+																this.state.agents.length,
+																(index: number, agentIndex: number) =>
+																	Object.keys(ViewTypes)
+																		.filter((v: string) => v !== ViewTypes.Delete)
+																		.map((v) => {
+																			const tdkey = `routing- ${model} ${modelIndex} ${this
+																				.state.agents[
+																				index
+																			]} ${agentIndex} ${v}`;
+																			if (
+																				!this.hasAgentAccess(
+																					agentIndex,
+																					modelIndex,
+																					v
+																				)
+																			) {
+																				return <td key={tdkey} />;
+																			}
+
+																			let routing: Routing = {
+																				routes: []
+																			};
+																			if (
+																				this.hasFunctionViewTypeValue(
+																					agentIndex,
+																					modelIndex,
+																					v
+																				)
+																			) {
+																				routing =
+																					this.getRoutingDescription(
+																						agentIndex,
+																						modelIndex,
+																						v
+																					) || routing;
+																			}
+																			let onComponentMountMethod = this.getMountingDescription(
 																				agentIndex,
 																				modelIndex,
 																				v
+																			);
+																			let addRoutingDescriptionBtn = this.createRoutingDescriptionButton(
+																				agentIndex,
+																				onlyAgents,
+																				onComponentMountMethod,
+																				model,
+																				modelIndex,
+																				v,
+																				routing
+																			);
+																			let routesDom: any = null;
+																			if (routing) {
+																				routesDom = routing.routes.map(
+																					(route: RouteDescription) => {
+																						return (
+																							<i
+																								title={route.name}
+																								className={
+																									'fa fa-genderless'
+																								}
+																								style={{
+																									color: 'orange'
+																								}}
+																							/>
+																						);
+																					}
+																				);
+																			}
+																			return (
+																				<td key={tdkey}>
+																					{addRoutingDescriptionBtn}
+																				</td>
+																			);
+																		})
+															)
+														);
+														return (
+															<tr
+																style={{
+																	backgroundColor:
+																		modelIndex % 2 ? '#33333333' : '#eeeeeeee'
+																}}
+																key={`key${model}`}
+															>
+																{result.flatten()}
+															</tr>
+														);
+													})}
+												</tbody>
+											</table>
+										</div>
+									</Box>
+									<Box title={'Dashboard Routing'} maxheight={500}>
+										<div className="tableFixHead" style={{ ['--tableheight']: table_height }}>
+											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
+												<thead>
+													<tr>
+														<th />
+														{[].interpolate(
+															0,
+															this.state.agents.length,
+															(index: number) => {
+																return (
+																	<th style={{ backgroundColor: '#FEFCAD' }}>
+																		{GetNodeTitle(this.state.agents[index])}
+																	</th>
+																);
+															}
+														)}
+													</tr>
+												</thead>
+												<tbody>
+													{this.state.dashboards.map(
+														(dashboard: string, dashboardIndex: number) => {
+															const result = [ <th>{GetNodeTitle(dashboard)}</th> ];
+
+															result.push(
+																...this.state.agents.map(
+																	(agent: string, agentIndex: number) => {
+																		const tdkey = `routing- ${dashboard} ${dashboard} ${this
+																			.state.agents[agent]} ${agentIndex} s`;
+																		if (
+																			!this.hasAgentDashboardAccess(
+																				agent,
+																				dashboard
 																			)
 																		) {
 																			return <td key={tdkey} />;
@@ -1336,31 +1457,24 @@ class AgentAccessView extends Component<any, any> {
 																			routes: []
 																		};
 																		if (
-																			this.hasFunctionViewTypeValue(
-																				agentIndex,
-																				modelIndex,
-																				v
-																			)
+																			this.hasDashboardRouting(agent, dashboard)
 																		) {
 																			routing =
-																				this.getRoutingDescription(
-																					agentIndex,
-																					modelIndex,
-																					v
+																				this.getDashboardRoutingDescription(
+																					agent,
+																					dashboard
 																				) || routing;
 																		}
-																		let onComponentMountMethod = this.getMountingDescription(
-																			agentIndex,
-																			modelIndex,
-																			v
+																		let onComponentMountMethod = this.getDashboardMountingDescription(
+																			agent,
+																			dashboard
 																		);
-																		let addRoutingDescriptionBtn = this.createRoutingDescriptionButton(
-																			agentIndex,
-																			onlyAgents,
+																		routing.routes = routing.routes || [];
+
+																		let addRoutingDescriptionBtn = this.createDashboardRoutingDescriptionButton(
+																			agent,
 																			onComponentMountMethod,
-																			model,
-																			modelIndex,
-																			v,
+																			dashboard,
 																			routing
 																		);
 																		let routesDom: any = null;
@@ -1384,264 +1498,207 @@ class AgentAccessView extends Component<any, any> {
 																				{addRoutingDescriptionBtn}
 																			</td>
 																		);
-																	})
-														)
-													);
-													return (
-														<tr
-															style={{
-																backgroundColor:
-																	modelIndex % 2 ? '#33333333' : '#eeeeeeee'
-															}}
-															key={`key${model}`}
-														>
-															{result.flatten()}
-														</tr>
-													);
-												})}
-											</tbody>
-										</table>
-									</Box>
-									<Box title={'Dashboard Routing'} maxheight={700}>
-										<table className="fixheader" style={{ width: '100%', display: 'table' }}>
-											<thead>
-												<tr>
-													<th />
-													{[].interpolate(0, this.state.agents.length, (index: number) => {
-														return (
-															<th style={{ backgroundColor: '#FEFCAD' }}>
-																{GetNodeTitle(this.state.agents[index])}
-															</th>
-														);
-													})}
-												</tr>
-											</thead>
-											<tbody>
-												{this.state.dashboards.map(
-													(dashboard: string, dashboardIndex: number) => {
-														const result = [ <td>{GetNodeTitle(dashboard)}</td> ];
-
-														result.push(
-															...this.state.agents.map(
-																(agent: string, agentIndex: number) => {
-																	const tdkey = `routing- ${dashboard} ${dashboard} ${this
-																		.state.agents[agent]} ${agentIndex} s`;
-																	if (
-																		!this.hasAgentDashboardAccess(agent, dashboard)
-																	) {
-																		return <td key={tdkey} />;
 																	}
-
-																	let routing: Routing = {
-																		routes: []
-																	};
-																	if (this.hasDashboardRouting(agent, dashboard)) {
-																		routing =
-																			this.getDashboardRoutingDescription(
-																				agent,
-																				dashboard
-																			) || routing;
-																	}
-																	let onComponentMountMethod = this.getDashboardMountingDescription(
-																		agent,
-																		dashboard
-																	);
-																	routing.routes = routing.routes || [];
-
-																	let addRoutingDescriptionBtn = this.createDashboardRoutingDescriptionButton(
-																		agent,
-																		onComponentMountMethod,
-																		dashboard,
-																		routing
-																	);
-																	let routesDom: any = null;
-																	if (routing) {
-																		routesDom = routing.routes.map(
-																			(route: RouteDescription) => {
-																				return (
-																					<i
-																						title={route.name}
-																						className={'fa fa-genderless'}
-																						style={{ color: 'orange' }}
-																					/>
-																				);
-																			}
-																		);
-																	}
-																	return (
-																		<td key={tdkey}>{addRoutingDescriptionBtn}</td>
-																	);
-																}
-															)
-														);
-														return (
-															<tr
-																style={{
-																	backgroundColor:
-																		dashboardIndex % 2 ? '#33333333' : '#eeeeeeee'
-																}}
-																key={`key${dashboard}`}
-															>
-																{result.flatten()}
-															</tr>
-														);
-													}
-												)}
-											</tbody>
-										</table>
+																)
+															);
+															return (
+																<tr
+																	style={{
+																		backgroundColor:
+																			dashboardIndex % 2
+																				? '#33333333'
+																				: '#eeeeeeee'
+																	}}
+																	key={`key${dashboard}`}
+																>
+																	{result.flatten()}
+																</tr>
+															);
+														}
+													)}
+												</tbody>
+											</table>
+										</div>
 									</Box>
 								</TabPane>
 								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'screen_effects')}>
 									<Box title={'Agent Screen Effects'} maxheight={500}>
-										<table className="fixheader" style={{ width: '100%', display: 'table' }}>
-											<thead>
-												<tr>
-													<th />
-													{this.state.agents.map((agent: string) => {
-														return (
-															<th style={{ backgroundColor: '#FEFCAD' }} colSpan={4}>
-																{GetNodeTitle(agent)}
-															</th>
-														);
-													})}
-												</tr>
-												<tr>
-													<th />
-													{this.state.agents
-														.map((agent: string) =>
-															Object.keys(ViewTypes)
-																.filter((v: string) => v !== ViewTypes.Delete)
-																.map((v) => <th onClick={() => {}}>{v}</th>)
-														)
-														.flatten()}
-												</tr>
-											</thead>
-											<tbody>
-												{this.state.models.map((model: string, modelIndex: number) => {
-													const result = [ <td>{GetNodeTitle(model)}</td> ];
-
-													result.push(
-														...this.state.agents.map((agent: string, agentIndex: number) =>
-															Object.keys(ViewTypes)
-																.filter((v: string) => v !== ViewTypes.Delete)
-																.map((v) => {
-																	const tdkey = `effects screen - ${model} ${model} ${agent} ${agentIndex} ${v}`;
-																	if (
-																		!this.hasAgentAccess(agentIndex, modelIndex, v)
-																	) {
-																		return <td key={tdkey} />;
-																	}
-
-																	let screenEffectApis: ScreenEffectApi[] = [];
-
-																	if (this.hasScreenEffects(agent, model, v)) {
-																		screenEffectApis =
-																			this.getScreenEffects(agent, model, v) ||
-																			screenEffectApis;
-																	} else {
-																		this.setScreenEffects(
-																			agent,
-																			model,
-																			v,
-																			screenEffectApis
-																		);
-																	}
-
-																	let addRoutingDescriptionBtn = this.createScreenEffectButton(
-																		agent,
-																		model,
-																		v,
-																		screenEffectApis
-																	);
-																	return (
-																		<td key={tdkey}>{addRoutingDescriptionBtn}</td>
-																	);
-																})
-														)
-													);
-													return (
-														<tr
-															style={{
-																backgroundColor:
-																	modelIndex % 2 ? '#33333333' : '#eeeeeeee'
-															}}
-															key={`key${model}`}
-														>
-															{result.flatten()}
-														</tr>
-													);
-												})}
-											</tbody>
-										</table>
-									</Box>
-									<Box title={'Dashboard Screen Effects'} maxheight={500}>
-										<table className="fixheader" style={{ width: '100%', display: 'table' }}>
-											<thead>
-												<tr>
-													<th />
-													{[].interpolate(0, this.state.agents.length, (index: number) => {
-														return (
-															<th style={{ backgroundColor: '#FEFCAD' }}>
-																{GetNodeTitle(this.state.agents[index])}
-															</th>
-														);
-													})}
-												</tr>
-											</thead>
-											<tbody>
-												{this.state.dashboards.map(
-													(dashboard: string, dashboardIndex: number) => {
-														const result = [ <td>{GetNodeTitle(dashboard)}</td> ];
+										<div className="tableFixHead" style={{ ['--tableheight']: table_height }}>
+											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
+												<thead>
+													<tr>
+														<th />
+														{this.state.agents.map((agent: string) => {
+															return (
+																<th style={{ backgroundColor: '#FEFCAD' }} colSpan={4}>
+																	{GetNodeTitle(agent)}
+																</th>
+															);
+														})}
+													</tr>
+													<tr>
+														<th />
+														{this.state.agents
+															.map((agent: string) =>
+																Object.keys(ViewTypes)
+																	.filter((v: string) => v !== ViewTypes.Delete)
+																	.map((v) => <th onClick={() => {}}>{v}</th>)
+															)
+															.flatten()}
+													</tr>
+												</thead>
+												<tbody>
+													{this.state.models.map((model: string, modelIndex: number) => {
+														const result = [ <th>{GetNodeTitle(model)}</th> ];
 
 														result.push(
 															...this.state.agents.map(
-																(agent: string, agentIndex: number) => {
-																	const tdkey = `screen- defa dashboard- ${dashboard} ${dashboard} ${agent} ${agentIndex} s`;
-																	if (
-																		!this.hasDashboardScreenEffects(
-																			agent,
-																			dashboard
-																		)
-																	) {
-																		return <td key={tdkey} />;
-																	}
+																(agent: string, agentIndex: number) =>
+																	Object.keys(ViewTypes)
+																		.filter((v: string) => v !== ViewTypes.Delete)
+																		.map((v) => {
+																			const tdkey = `effects screen - ${model} ${model} ${agent} ${agentIndex} ${v}`;
+																			if (
+																				!this.hasAgentAccess(
+																					agentIndex,
+																					modelIndex,
+																					v
+																				)
+																			) {
+																				return <td key={tdkey} />;
+																			}
 
-																	let screenEffects: ScreenEffectApi[] = [];
-																	if (
-																		this.hasDashboardScreenEffects(agent, dashboard)
-																	) {
-																		screenEffects =
-																			this.getDashboardScreenEffects(
+																			let screenEffectApis: ScreenEffectApi[] = [];
+
+																			if (
+																				this.hasScreenEffects(agent, model, v)
+																			) {
+																				screenEffectApis =
+																					this.getScreenEffects(
+																						agent,
+																						model,
+																						v
+																					) || screenEffectApis;
+																			} else {
+																				this.setScreenEffects(
+																					agent,
+																					model,
+																					v,
+																					screenEffectApis
+																				);
+																			}
+
+																			let addRoutingDescriptionBtn = this.createScreenEffectButton(
 																				agent,
-																				dashboard
-																			) || screenEffects;
-																	}
-
-																	let addScreenEffectBtn = this.createDashboardScreenEffectDescriptionButton(
-																		agent,
-																		dashboard,
-																		screenEffects
-																	);
-
-																	return <td key={tdkey}>{addScreenEffectBtn}</td>;
-																}
+																				model,
+																				v,
+																				screenEffectApis
+																			);
+																			return (
+																				<td key={tdkey}>
+																					{addRoutingDescriptionBtn}
+																				</td>
+																			);
+																		})
 															)
 														);
 														return (
 															<tr
 																style={{
 																	backgroundColor:
-																		dashboardIndex % 2 ? '#33333333' : '#eeeeeeee'
+																		modelIndex % 2 ? '#33333333' : '#eeeeeeee'
 																}}
-																key={`key${dashboard}`}
+																key={`key${model}`}
 															>
 																{result.flatten()}
 															</tr>
 														);
-													}
-												)}
-											</tbody>
-										</table>
+													})}
+												</tbody>
+											</table>
+										</div>
+									</Box>
+									<Box title={'Dashboard Screen Effects'} maxheight={500}>
+										<div className="tableFixHead" style={{ ['--tableheight']: table_height }}>
+											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
+												<thead>
+													<tr>
+														<th />
+														{[].interpolate(
+															0,
+															this.state.agents.length,
+															(index: number) => {
+																return (
+																	<th style={{ backgroundColor: '#FEFCAD' }}>
+																		{GetNodeTitle(this.state.agents[index])}
+																	</th>
+																);
+															}
+														)}
+													</tr>
+												</thead>
+												<tbody>
+													{this.state.dashboards.map(
+														(dashboard: string, dashboardIndex: number) => {
+															const result = [ <th>{GetNodeTitle(dashboard)}</th> ];
+
+															result.push(
+																...this.state.agents.map(
+																	(agent: string, agentIndex: number) => {
+																		const tdkey = `screen- defa dashboard- ${dashboard} ${dashboard} ${agent} ${agentIndex} s`;
+																		if (
+																			!this.hasDashboardScreenEffects(
+																				agent,
+																				dashboard
+																			)
+																		) {
+																			return <td key={tdkey} />;
+																		}
+
+																		let screenEffects: ScreenEffectApi[] = [];
+																		if (
+																			this.hasDashboardScreenEffects(
+																				agent,
+																				dashboard
+																			)
+																		) {
+																			screenEffects =
+																				this.getDashboardScreenEffects(
+																					agent,
+																					dashboard
+																				) || screenEffects;
+																		}
+
+																		let addScreenEffectBtn = this.createDashboardScreenEffectDescriptionButton(
+																			agent,
+																			dashboard,
+																			screenEffects
+																		);
+
+																		return (
+																			<td key={tdkey}>{addScreenEffectBtn}</td>
+																		);
+																	}
+																)
+															);
+															return (
+																<tr
+																	style={{
+																		backgroundColor:
+																			dashboardIndex % 2
+																				? '#33333333'
+																				: '#eeeeeeee'
+																	}}
+																	key={`key${dashboard}`}
+																>
+																	{result.flatten()}
+																</tr>
+															);
+														}
+													)}
+												</tbody>
+											</table>
+										</div>
 									</Box>
 								</TabPane>
 							</TabContent>

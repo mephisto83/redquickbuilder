@@ -26,14 +26,15 @@ import {
 	SetupConfigInstanceInformation,
 	CheckSimpleValidation,
 	SimpleValidationConfig,
-	CreateSimpleValidation
+	CreateSimpleValidation,
+	CreateOneOf
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachain';
-import { GetStateFunc, graphOperation } from '../actions/uiactions';
+import { GetStateFunc, graphOperation, GetNodeCode } from '../actions/uiactions';
 import { Node } from '../methods/graph_types';
 import BuildDataChainAfterEffectConverter, {
 	DataChainType
@@ -44,6 +45,8 @@ import DataChainOptions from './datachainoptions';
 import RelativeTypeComponent from './relativetypecomponent';
 import BooleanConfigComponent from './booleanconfigcomponent';
 import NumberConfigComponent from './numberconfigcomponent';
+import OneOfEnumerationComponent from './oneofenumeration';
+import { GetCodeName } from '../../visi_blend/dist/app/actions/uiactions';
 
 export default class SimpleValidationComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -52,30 +55,40 @@ export default class SimpleValidationComponent extends Component<any, any> {
 	}
 
 	render() {
-		let dataChainOptions: DataChainConfiguration = this.props.dataChainOptions;
 		let ok = false;
 		let isValidation = false;
 		switch (this.props.dataChainType) {
 			case DataChainType.Validation:
+			case DataChainType.Permission:
 				isValidation = true;
 				ok = true;
 				break;
 		}
-		if (!dataChainOptions || !ok) {
+		if (!ok) {
 			return <span />;
 		}
 
-		let {
-			methodDescription,
-			simpleValidation,
-			properties,
-			targetProperties
-		}: {
-			methodDescription: MethodDescription;
-			simpleValidation: SimpleValidationConfig;
-			properties: any[];
-			targetProperties: any[];
-		} = this.setupInstanceInfo(dataChainOptions);
+		let { methodDescription, simpleValidation, properties, targetProperties } = this.props;
+		simpleValidation.oneOf = simpleValidation.oneOf || CreateOneOf();
+		let valid =
+			simpleValidation &&
+			simpleValidation.enabled &&
+			((simpleValidation.relationType === RelationType.Agent && simpleValidation.agentProperty) ||
+				(simpleValidation.relationType === RelationType.Model && simpleValidation.modelProperty));
+
+		let name = '';
+		if (valid) {
+			switch (simpleValidation.relationType) {
+				case RelationType.Agent:
+					let prop = properties.find((v: any) => v.id === simpleValidation.agentProperty);
+					name = `agent.${prop.title}`;
+					break;
+				case RelationType.Model:
+					let prop2 = properties.find((v: any) => v.id === simpleValidation.modelProperty);
+					name = `model.${prop2.title}`;
+					break;
+			}
+		}
 
 		return (
 			<TreeViewMenu
@@ -85,8 +98,8 @@ export default class SimpleValidationComponent extends Component<any, any> {
 					this.setState({ open: !this.state.open });
 				}}
 				active
-				greyed={simpleValidation.enabled}
-				title={Titles.SimpleValidation}
+				greyed={!simpleValidation.enabled}
+				title={name || Titles.SimpleValidation}
 			>
 				<TreeViewItemContainer>
 					<CheckBox
@@ -106,16 +119,7 @@ export default class SimpleValidationComponent extends Component<any, any> {
 				<RelativeTypeComponent
 					methodDescription={methodDescription}
 					relations={simpleValidation}
-					valid={
-						dataChainOptions &&
-						dataChainOptions.simpleValidation &&
-						dataChainOptions.simpleValidation.enabled &&
-						((dataChainOptions.simpleValidation.relationType === RelationType.Agent &&
-							dataChainOptions.simpleValidation.agentProperty) ||
-							(dataChainOptions.simpleValidation.relationType === RelationType.Model &&
-								dataChainOptions.simpleValidation.modelProperty))
-					}
-					dataChainOptions={dataChainOptions}
+					valid={valid}
 					enabled={simpleValidation.enabled}
 					properties={properties}
 					dataChainType={this.props.dataChainType}
@@ -137,6 +141,11 @@ export default class SimpleValidationComponent extends Component<any, any> {
 					booleanConfig={simpleValidation.isNotNull}
 					title={Titles.IsNotNull}
 				/>
+				<OneOfEnumerationComponent
+					enabled={simpleValidation.enabled}
+					enumerationConfig={simpleValidation.oneOf}
+					title={Titles.IsOneOf}
+				/>
 				<BooleanConfigComponent
 					enabled={simpleValidation.enabled}
 					booleanConfig={simpleValidation.isNull}
@@ -149,11 +158,5 @@ export default class SimpleValidationComponent extends Component<any, any> {
 				/>
 			</TreeViewMenu>
 		);
-	}
-
-	private setupInstanceInfo(dataChainOptions: DataChainConfiguration) {
-		dataChainOptions.simpleValidation = dataChainOptions.simpleValidation || CreateSimpleValidation();
-		let methodDescription: MethodDescription = this.props.methodDescription;
-		return SetupConfigInstanceInformation(dataChainOptions, methodDescription);
 	}
 }

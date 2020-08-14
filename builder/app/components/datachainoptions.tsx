@@ -21,6 +21,7 @@ import IncrementIntegerComponent from './incrementinteger';
 import IncrementDoubleComponent from './incrementdouble';
 import CompareEnumeration from './compareenumeration';
 import CompareEnumerations from './compareenumerations';
+import SimpleValidationsComponent from './simplevalidationsconfig';
 
 export default class DataChainOptions extends Component<any, any> {
 	constructor(props: any) {
@@ -107,7 +108,7 @@ export default class DataChainOptions extends Component<any, any> {
 					dataChainOptions={dataChainOptions}
 					onChange={onchange}
 				/>
-				<SimpleValidationComponent
+				<SimpleValidationsComponent
 					dataChainType={this.props.dataChainType}
 					methodDescription={methodDescription}
 					dataChainOptions={dataChainOptions}

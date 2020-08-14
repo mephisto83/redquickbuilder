@@ -16,6 +16,7 @@ export default class ValidationComponent extends Component<any, any> {
 	}
 	render() {
 		let mountingItem: MountingDescription = this.props.mountingItem;
+		mountingItem.validations = mountingItem.validations || [];
 		let { validations } = mountingItem;
 
 		return (

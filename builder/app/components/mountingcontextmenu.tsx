@@ -314,6 +314,7 @@ class ContextMenu extends Component<any, any> {
 						result.push(
 							<TreeViewMenu
 								key={routeKey}
+								innerStyle={{ maxHeight: `calc(100vh - 325px)`, overflowY: 'auto' }}
 								open={this.state[routeKey]}
 								active
 								title={name}

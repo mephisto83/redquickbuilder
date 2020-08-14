@@ -60,6 +60,21 @@ export default class NumberConfigComponent extends Component<any, any> {
 						}}
 					/>
 				</TreeViewItemContainer>
+				<TreeViewItemContainer>
+					<CheckBox
+						label={Titles.UseEqual}
+						value={numberConfig.equal}
+						onChange={(value: boolean) => {
+							numberConfig.equal = value;
+							this.setState({
+								turn: UIA.GUID()
+							});
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
+						}}
+					/>
+				</TreeViewItemContainer>
 			</TreeViewMenu>
 		);
 	}

@@ -66,9 +66,11 @@ export default class Generator {
 				const enumerations = NodesByType(state, NodeTypes.Enumeration).map((node: any) => {
 					const enums = GetNodeProp(node, NodeProperties.Enumeration);
 					const larg: any = {};
-					enums.forEach((t: { value: any }) => {
-						larg[MakeConstant(t.value || t)] = t.value;
-					});
+					if (enums) {
+						enums.forEach((t: { value: any }) => {
+							larg[MakeConstant(t.value || t)] = t.value;
+						});
+					}
 					return {
 						name: GetNodeProp(node, NodeProperties.CodeName),
 						model: larg

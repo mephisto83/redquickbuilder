@@ -11,7 +11,8 @@ import {
 	CheckExistenceConfig,
 	BranchConfig,
 	AfterEffect,
-	MountingDescription
+	MountingDescription,
+	EnumerationConfig
 } from '../../interface/methodprops';
 import { MethodFunctions, bindTemplate } from '../../constants/functiontypes';
 import {
@@ -22,7 +23,8 @@ import {
 	updateComponentProperty,
 	GetJSCodeName,
 	GetNodeById,
-	GetCodeName
+	GetCodeName,
+	GetNodeTitle
 } from '../../actions/uiactions';
 import {
 	NodeProperties,
@@ -232,6 +234,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				.join(NEW_LINE);
 		}
 		if (dataChainConfigOptions.simpleValidation) {
+			simplevalidation = GenerateSimpleValidations(dataChainConfigOptions, tempLambdaInsertArgumentValues);
 		}
 	}
 	let from_parameter_template = '';
@@ -246,7 +249,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
           // build model value here.
 
           {{compare_enumeration}}
-
+          {{simplevalidation}}
           return true;
         };
 
@@ -267,8 +270,8 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
       public static async Task<bool> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change_parameter)
       {
         Func<#{{"key":"model"}}#, #{{"key":"agent"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task<bool>> func = async (#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change_parameter) => {
-          var arbiter#{{"key":"agent"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"agent"}}#>>();
-          var arbiter#{{"key":"model"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"model"}}#>>();
+          var agentArbiter#{{"key":"agent"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"agent"}}#>>();
+          var modelArbiter#{{"key":"model"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"model"}}#>>();
           ${to_arbiter}
           {{checking_existence}}
           // build model value here.
@@ -310,8 +313,8 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
       public static async Task Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change)
       {
           Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# fromModel, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
-          var arbiter#{{"key":"agent"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"agent"}}#>>();
-          var arbiter#{{"key":"model"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"model"}}#>>();
+          var agentArbiter#{{"key":"agent"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"agent"}}#>>();
+          var modelArbiter#{{"key":"model"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"model"}}#>>();
           var toArbiter#{{"key":"tomodel"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"tomodel"}}#>>();
           {{checking_existence}}
 
@@ -391,6 +394,116 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			)(GetDispatchFunc(), GetStateFunc());
 		}
 	}
+}
+function GenerateSimpleValidations(
+	dataChainConfigOptions: DataChainConfiguration,
+	tempLambdaInsertArgumentValues: any
+): string {
+	let result: string = '';
+	let valuePropString = '';
+
+	let { simpleValidations } = dataChainConfigOptions;
+	let checks: string[] = [];
+	if (simpleValidations) {
+		simpleValidations.forEach((simpleValidation) => {
+			let { relationType } = simpleValidation;
+			let temp = '';
+			switch (relationType) {
+				case RelationType.Agent:
+					temp = 'agent';
+					valuePropString = `agent.#{{"key":"agent.${GetCodeName(
+						simpleValidation.agentProperty
+					)}","type":"property","model":"agent"}}#`;
+					tempLambdaInsertArgumentValues[`agent.${GetCodeName(simpleValidation.agentProperty)}`] = {
+						property: simpleValidation.agentProperty
+					};
+					break;
+				case RelationType.Model:
+					temp = 'model';
+					tempLambdaInsertArgumentValues[`model.${GetCodeName(simpleValidation.modelProperty)}`] = {
+						property: simpleValidation.modelProperty
+					};
+					valuePropString = `model.#{{"key":"model.${GetCodeName(
+						simpleValidation.modelProperty
+					)}","type":"property","model":"model"}}#`;
+					break;
+			}
+			if (simpleValidation.oneOf && simpleValidation.oneOf.enabled) {
+				let oneOf = GenerateOneOf(valuePropString, simpleValidation.oneOf, tempLambdaInsertArgumentValues);
+				checks.push(oneOf);
+			}
+			if (simpleValidation.alphaOnlyWithSpaces && simpleValidation.alphaOnlyWithSpaces.enabled) {
+				let oneOf = `await new AlphaOnlyWithSpacesAttribute().IsOk(${valuePropString});`;
+				checks.push(oneOf);
+			}
+			if (simpleValidation.isNotNull && simpleValidation.isNotNull.enabled) {
+				let oneOf = `await new IsNotNullAttribute().IsOk(${valuePropString});`;
+				checks.push(oneOf);
+			}
+			if (simpleValidation.isNull && simpleValidation.isNull.enabled) {
+				let oneOf = `await new IsNullAttribute().IsOk(${valuePropString});`;
+				checks.push(oneOf);
+			}
+			if (simpleValidation.maxLength && simpleValidation.maxLength.enabled) {
+				let oneOf = `await new MaxLengthAttribute(${simpleValidation.maxLength.value},${simpleValidation
+					.maxLength.equal
+					? 'true'
+					: 'false'}).IsOk(${valuePropString});`;
+				checks.push(oneOf);
+			}
+			if (simpleValidation.minLength && simpleValidation.minLength.enabled) {
+				let oneOf = `await new MinLengthAttribute(${simpleValidation.minLength.value},${simpleValidation
+					.maxLength.equal
+					? 'true'
+					: 'false'}).IsOk(${valuePropString});`;
+				checks.push(oneOf);
+			}
+			// if (simpleValidation.) {
+			// 	let oneOf = `await new MinLengthAttribute(${simpleValidation.minLength.value}).IsOk(${valuePropString});`;
+			// 	checks.push(oneOf);
+			// }
+		});
+	}
+	result = checks
+		.map((check: string, index: number) => {
+			if (!index) return `var test_${index} = ${check};`;
+			return `var test_${index} = test_${index - 1} && ${check};`;
+		})
+		.join(NEW_LINE);
+
+	if (checks.length)
+		return `${result}
+    if(!test_${checks.length - 1}) {
+      return false;
+    }
+  `;
+	return '';
+}
+function GenerateOneOf(valuePropString: string, oneOf: EnumerationConfig, tempLambdaInsertArgumentValues: any): string {
+	let result: string = '';
+	if (oneOf.enabled) {
+		oneOf.enumerationType;
+		let enumeration = oneOf.enumerationType;
+		tempLambdaInsertArgumentValues[GetJSCodeName(enumeration)] = { enumeration: enumeration };
+		let enumertions: { id: string; value: string }[] = GetNodeProp(enumeration, NodeProperties.Enumeration) || [];
+		let enum_set: string[] = [];
+		oneOf.enumerations.forEach((eni: string) => {
+			let enumProp = enumertions.find((e) => e.id == eni);
+			if (enumProp) {
+				tempLambdaInsertArgumentValues[`${GetJSCodeName(enumeration)}.${enumProp.value}`] = {
+					enumeration,
+					enumerationvalue: eni
+				};
+				enum_set.push(` #{{"key":"${GetJSCodeName(
+					enumeration
+				)}","type":"enumeration" }}#.#{{"key":"${GetJSCodeName(
+					enumeration
+				)}.${enumProp.value}","type":"enumerationvalue"}}#`);
+			}
+		});
+		result = `(new List<string> { ${enum_set.join()} }).Contains(${valuePropString})`;
+	}
+	return result;
 }
 function GenerateCodePath(if_: BranchConfig) {
 	let ifTrueCodeName = codeTypeWord(if_.name);

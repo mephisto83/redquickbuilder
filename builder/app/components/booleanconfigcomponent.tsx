@@ -26,7 +26,7 @@ export default class BooleanConfigComponent extends Component<any, any> {
 				}}
 				active
 				hide={!this.props.enabled}
-				greyed={booleanConfig.enabled}
+				greyed={!booleanConfig.enabled}
 				title={this.props.title}
 			>
 				<TreeViewItemContainer>

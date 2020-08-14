@@ -104,7 +104,9 @@ export default class ValidationComponentItem extends Component<any, any> {
 												from: methodDescription,
 												dataChain: validationConfig.dataChain,
 												type: this.props.dataChainType || DataChainType.Validation,
-												afterEffectOptions: validationConfig.dataChainOptions
+												afterEffectOptions: validationConfig.dataChainOptions,
+												methods: this.props.methods,
+                        routes: this.props.routes
 											},
 											(dataChain: Node) => {
 												validationConfig.dataChain = dataChain.id;

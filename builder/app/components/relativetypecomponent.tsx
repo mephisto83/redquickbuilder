@@ -49,7 +49,6 @@ export default class RelativeTypeComponent extends Component<any, any> {
 	}
 
 	render() {
-		let dataChainOptions: DataChainConfiguration = this.props.dataChainOptions;
 		let ok = false;
 		let isValidation = false;
 		switch (this.props.dataChainType) {
@@ -60,7 +59,7 @@ export default class RelativeTypeComponent extends Component<any, any> {
 				ok = true;
 				break;
 		}
-		if (!dataChainOptions || !ok) {
+		if (!ok) {
 			return <span />;
 		}
 		let props: any = this.props;
