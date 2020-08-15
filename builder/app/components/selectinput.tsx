@@ -40,7 +40,7 @@ export default class SelectInput extends Component<any, any> {
 		}
 		return (
 			<div className="form-group">
-				<label {...extra}>{this.label()}</label>
+				<label title={this.label()} {...extra}>{this.label()}</label>
 				<select
           className="form-control"
           {...selectExtra}

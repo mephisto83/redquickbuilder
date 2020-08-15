@@ -105,6 +105,7 @@ class DataChainActvityMenu extends Component<any, any> {
 					lambdaInsertArgumentValues[key] = lambdaInsertArgumentValues[key] || {};
 					let nodes: any[] = [];
 					switch (type) {
+            case ReferenceInsertType.PropertyType:
 						case ReferenceInsertType.Property:
 							nodes = GetNodesLinkedTo(null, {
 								id:

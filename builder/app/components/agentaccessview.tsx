@@ -1873,7 +1873,9 @@ class AgentAccessView extends Component<any, any> {
 			// 	}
 			// });
 			hasMountings = !!mounting.mountings.length;
-			this.collectMethods(agentIndex, methods);
+			this.state.agents.map((_: any, index: number) => {
+				this.collectMethods(index, methods);
+			});
 		}
 
 		return (
@@ -1984,7 +1986,9 @@ class AgentAccessView extends Component<any, any> {
 		let hasEffects = false;
 		if (effect && effect.effects) {
 			hasEffects = !!effect.effects.length;
-			this.collectMethods(agentIndex, methods);
+			this.state.agents.map((_: any, index: number) => {
+				this.collectMethods(index, methods);
+			});
 		}
 		return (
 			<div className="btn-group">
@@ -2020,7 +2024,9 @@ class AgentAccessView extends Component<any, any> {
 		let methods: any[] = [];
 		if (effect && effect.effects) {
 			hasEffects = !!effect.effects.length;
-			this.collectMethods(this.state.agents.indexOf(agent), methods);
+			this.state.agents.map((_: any, index: number) => {
+				this.collectMethods(index, methods);
+			});
 		}
 		return (
 			<div className="btn-group">
@@ -2530,7 +2536,7 @@ function GetAgentsOnly() {
 			[NodeProperties.IsAgent]: true
 		},
 		GetCurrentGraph()
-	).filter((x: Node) => !GetNodeProp(x, NodeProperties.IsUser));
+	).filter((x: Node) => true || !GetNodeProp(x, NodeProperties.IsUser));
 }
 
 function loadAgentDashboardEffect(onlyAgents: any[], accessDescriptions: any[], graph: any) {

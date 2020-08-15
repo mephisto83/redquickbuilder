@@ -12,7 +12,9 @@ import {
 	BranchConfig,
 	AfterEffect,
 	MountingDescription,
-	EnumerationConfig
+	EnumerationConfig,
+	AfterEffectRelations,
+	StretchPathItem
 } from '../../interface/methodprops';
 import { MethodFunctions, bindTemplate } from '../../constants/functiontypes';
 import {
@@ -35,6 +37,7 @@ import {
 } from '../../constants/nodetypes';
 import { DataChainFunctionKeys } from '../../constants/datachain';
 import { codeTypeWord, GetNodeProp } from '../../methods/graph_methods';
+import { ReferenceInsertType } from '../../../visi_blend/dist/app/components/lambda/BuildLambda';
 
 export interface AfterEffectConvertArgs {
 	from: MethodDescription;
@@ -71,7 +74,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 	let get_existing: string = ''; //var value = #{{"key":"model"}}.Create()
 	let set_properties: string = '';
 	let compare_enumeration: string = '';
-	let branchMethods: string[] = [];
+	let staticMethods: string[] = [];
 	let guts: string = '';
 	let copy_config: string = '';
 	let outputType: string = '';
@@ -145,8 +148,10 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				returnSetting,
 				type
 			);
-
-			branchMethods.push(...GenerateBranchMethods(dataChainConfigOptions, routes, methods));
+			staticMethods.push(
+				...GenerateStretchMethods(dataChainConfigOptions.checkExistence, tempLambdaInsertArgumentValues)
+			);
+			staticMethods.push(...GenerateBranchMethods(dataChainConfigOptions, routes, methods));
 		}
 		if (dataChainConfigOptions.getExisting && dataChainConfigOptions.getExisting.enabled) {
 			if (dataChainConfigOptions.checkExistence && dataChainConfigOptions.checkExistence.enabled) {
@@ -327,7 +332,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 
        await func(agent, model, change);
       }
-      ${branchMethods.join(NEW_LINE)}
+      ${staticMethods.join(NEW_LINE)}
   `;
 			break;
 	}
@@ -494,11 +499,11 @@ function GenerateOneOf(valuePropString: string, oneOf: EnumerationConfig, tempLa
 					enumeration,
 					enumerationvalue: eni
 				};
-				enum_set.push(` #{{"key":"${GetJSCodeName(
-					enumeration
-				)}","type":"enumeration" }}#.#{{"key":"${GetJSCodeName(
-					enumeration
-				)}.${enumProp.value}","type":"enumerationvalue"}}#`);
+				enum_set.push(
+					` #{{"key":"${GetJSCodeName(enumeration)}","type":"enumeration" }}#.#{{"key":"${GetJSCodeName(
+						enumeration
+					)}.${enumProp.value}","type":"enumerationvalue"}}#`
+				);
 			}
 		});
 		result = `(new List<string> { ${enum_set.join()} }).Contains(${valuePropString})`;
@@ -509,13 +514,95 @@ function GenerateCodePath(if_: BranchConfig) {
 	let ifTrueCodeName = codeTypeWord(if_.name);
 	return `await ${ifTrueCodeName}(model, agent, change, checkModel);`;
 }
-function GetCheckModelExistPart(relationType: RelationType, targetProperty: string) {
+function GetCheckModelExistPart(relationType: RelationType, targetProperty: string, stretchClause: string) {
 	let rel = relationType == RelationType.Agent ? 'agent' : 'fromModel';
-	return ` var exists = false;
-  var checkModel = (await toArbiter#{{"key":"tomodel"}}#.GetBy(v => v.#{{"key":"tomodel.${GetJSCodeName(
+	let getClause = ` (await toArbiter#{{"key":"tomodel"}}#.GetBy(v => v.#{{"key":"tomodel.${GetJSCodeName(
 		targetProperty
-	)}","type":"property","model":"tomodel"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();
+	)}","type":"property","model":"tomodel"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault()`;
+	return ` var exists = false;
+  var checkModel = ${stretchClause || getClause};
   exists  = checkModel != null;`;
+}
+
+function GenerateStretchMethods(config: AfterEffectRelations, tempLambdaInsertArgumentValues: any) {
+	let result: string[] = [];
+
+	if (config && config.isStrech && config.stretchPath) {
+		let { name } = config.stretchPath;
+		name = codeTypeWord(name);
+		let steps = config.stretchPath.path
+			.map((item: StretchPathItem, index: number) => {
+				tempLambdaInsertArgumentValues[`stretch.${name}.${GetCodeName(item.model)}`] = {
+					[ReferenceInsertType.Model]: item.model
+				};
+				tempLambdaInsertArgumentValues[
+					`stretch.${name}.${GetCodeName(item.model)}.${GetCodeName(item.property)}`
+				] = {
+					[ReferenceInsertType.Property]: item.property,
+					[ReferenceInsertType.Model]: item.model
+				};
+				if (!index) {
+					return `var item_0 = await  arbiter#{{"key":"stretch.${name}.${GetCodeName(
+						item.model
+					)}"}}#.GetBy(v => v.#{{"key":"stretch.${name}.${GetCodeName(item.model)}.${GetCodeName(
+						item.property
+					)}","model":"stretch.${name}.${GetCodeName(item.model)}"}}# == value).FirstOrDefault() : null`;
+				} else {
+					if (config.stretchPath) {
+						let previousModel = config.stretchPath.path[index - 1].model;
+						let fromProperty = item.fromProperty;
+						tempLambdaInsertArgumentValues[`stretch.${name}.${GetCodeName(previousModel)}`] = {
+							[ReferenceInsertType.Model]: previousModel
+						};
+						tempLambdaInsertArgumentValues[
+							`stretch.${name}.${GetCodeName(previousModel)}.${GetCodeName(fromProperty)}`
+						] = {
+							[ReferenceInsertType.Model]: previousModel,
+							[ReferenceInsertType.Property]: fromProperty
+						};
+
+						return `var item_${index} = item_${index -
+							1} != null ? await arbiter#{{"key":"stretch.${name}.${GetCodeName(
+							item.model
+						)}"}}#.GetBy(v => v.#{{"key":"stretch.${name}.${GetCodeName(item.model)}.${GetCodeName(
+							item.property
+						)}","model":"stretch.${name}.${GetCodeName(item.model)}"}}# == item_${index -
+							1}.#{{"key":"stretch.${name}.${GetCodeName(previousModel)}.${GetCodeName(
+							fromProperty
+						)}","model":"stretch.${name}.${GetCodeName(previousModel)}"}}#).FirstOrDefault() : null;`;
+					}
+				}
+				return false;
+			})
+			.filter((v: any) => v);
+
+		tempLambdaInsertArgumentValues[
+			`stretch.${name}.${GetCodeName(config.stretchPath.path[config.stretchPath.path.length - 1].model)}"}}`
+		] = {
+			property: config.stretchPath.path[config.stretchPath.path.length - 1].model
+		};
+		tempLambdaInsertArgumentValues[`stretch.type.${name}.${GetCodeName(config.stretchPath.path[0].property)}`] = {
+			[ReferenceInsertType.PropertyType]: config.stretchPath.path[0].property,
+			[ReferenceInsertType.Model]: config.stretchPath.path[0].model
+		};
+
+		let output = `#{{"model": "stretch.${name}.${GetCodeName(
+			config.stretchPath.path[config.stretchPath.path.length - 1].model
+		)}"}}#`;
+
+		let fromPropertyType = `#{{"type":"propertyType","key":"stretch.type.${name}.${GetCodeName(
+			config.stretchPath.path[0].property
+		)}"}}#`;
+		let func = `public static async Task<${output}> ${codeTypeWord(
+			config.stretchPath.name
+		)}(${fromPropertyType} value) {
+      ${steps.join(NEW_LINE)}
+      return item_${config.stretchPath.path.length - 1}
+    }`;
+		result.push(func);
+	}
+
+	return result;
 }
 function GenerateBranchMethods(
 	dataChainConfigOptions: DataChainConfiguration,
@@ -584,8 +671,15 @@ function checkExistenceFunction(
 	returnSetting: ReturnSettingConfig,
 	type: DataChainType
 ) {
-	let { ifTrue, ifFalse } = checkExistence;
+	let { ifTrue, ifFalse, isStrech, stretchPath } = checkExistence;
+	let stretchClause = '';
+	let rel = relationType == RelationType.Agent ? 'agent' : 'model';
 
+	if (isStrech && stretchPath) {
+		stretchClause = `await ${codeTypeWord(
+			stretchPath.name
+		)}(${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#);`;
+	}
 	if (type === DataChainType.AfterEffect) {
 		let trueCodeStatement = '';
 		if (ifTrue.enabled) {
@@ -596,7 +690,7 @@ function checkExistenceFunction(
 			falseCodeStatement = GenerateCodePath(ifFalse);
 		}
 		if (falseCodeStatement || trueCodeStatement) {
-			let checkModelExistsPart = GetCheckModelExistPart(relationType, targetProperty);
+			let checkModelExistsPart = GetCheckModelExistPart(relationType, targetProperty, stretchClause);
 			checking_existence = `
       ${checkModelExistsPart}
       if(exists){
@@ -613,25 +707,26 @@ function checkExistenceFunction(
 					let ifvalue = skipSettings === SkipSettings.SkipIfFlase ? '!' : '';
 					if (skipSettings !== SkipSettings.DontSkip) {
 						let rel = relationType == RelationType.Agent ? 'agent' : 'fromModel';
+						let getClause = ` (await toArbiter#{{"key":"tomodel"}}#.GetBy(v => v.#{{"key":"tomodel.${GetJSCodeName(
+							targetProperty
+						)}","type":"property","model":"tomodel"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault()`;
 						checking_existence = `
           var exists = false;
-          var checkModel = (await toArbiter#{{"key":"tomodel"}}#.GetBy(v => v.#{{"key":"tomodel.${GetJSCodeName(
-				targetProperty
-			)}","type":"property","model":"tomodel"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();
+          var checkModel = ${stretchClause || getClause};
           exists  = checkModel != null;
-         ${onTrue && ifvalue
+         ${(onTrue && ifvalue) || skipSettings === SkipSettings.SkipIfFlase
 				? ` if(${ifvalue}exists) {
             ${onTrue || 'return'};
           }`
 				: ''}
         `;
 					} else if (returnSetting.enabled) {
-						let rel = relationType == RelationType.Agent ? 'agent' : 'model';
+						let getModelClause = `(await toArbiter#{{"key":"tomodel"}}#.GetBy(v => v.#{{"key":"tomodel.${GetJSCodeName(
+							targetProperty
+						)}","type":"property","model":"model"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();`;
 						checking_existence = `
           var exists = false;
-          var checkModel = (await toArbiter#{{"key":"tomodel"}}#.GetBy(v => v.#{{"key":"tomodel.${GetJSCodeName(
-				targetProperty
-			)}","type":"property","model":"model"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();
+          var checkModel = ${stretchClause || getModelClause}
           exists  = checkModel != null;
           ${onTrue && ifvalue
 				? ` if(${ifvalue}exists) {

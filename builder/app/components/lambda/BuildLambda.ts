@@ -18,6 +18,7 @@ export interface ReferenceInsert {
 export enum ReferenceInsertType {
 	Model = 'model',
 	Property = 'property',
+	PropertyType = 'propertyType',
 	Type = 'type',
 	Enumeration = 'enumeration',
 	EnumerationValue = 'enumerationvalue',

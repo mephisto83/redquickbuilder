@@ -26,7 +26,8 @@ import {
 	SetupConfigInstanceInformation,
 	CheckSimpleValidation,
 	SimpleValidationConfig,
-	AfterEffectRelations
+	AfterEffectRelations,
+	CreateStretchPath
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
@@ -41,6 +42,7 @@ import BuildDataChainAfterEffectConverter, {
 import { mount } from 'enzyme';
 import ReturnSettings from './returnsettings';
 import DataChainOptions from './datachainoptions';
+import StretchPathComponent from './stretchpathcomponent';
 
 export default class RelativeTypeComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -74,6 +76,10 @@ export default class RelativeTypeComponent extends Component<any, any> {
 			properties: any[];
 			targetProperties: any[];
 		} = props;
+		let startModel =
+			relations.relationType === RelationType.Agent
+				? methodDescription.properties.agent
+				: methodDescription.properties.model_output || methodDescription.properties.model;
 
 		return (
 			<TreeViewMenu
@@ -156,6 +162,19 @@ export default class RelativeTypeComponent extends Component<any, any> {
 						}}
 					/>
 				</TreeViewItemContainer>
+				<TreeViewItemContainer hide={this.props.hideTargetProperty}>
+					<CheckBox
+						label={Titles.Stretch}
+						value={relations && relations.isStrech}
+						onChange={(val: boolean) => {
+							relations.isStrech = val;
+							if (val) {
+								relations.stretchPath = relations.stretchPath || CreateStretchPath();
+							}
+						}}
+					/>
+				</TreeViewItemContainer>
+				<StretchPathComponent stretch={relations.stretchPath} show={relations && relations.isStrech} />
 			</TreeViewMenu>
 		);
 	}

@@ -6,6 +6,9 @@ export default class TreeViewGroupButton extends Component<any, any> {
 		return this.props.icon || 'fa fa-circle-o';
 	}
 	render() {
+		if (this.props.hide) {
+			return <span />;
+		}
 		return (
 			<button
 				title={this.props.title}

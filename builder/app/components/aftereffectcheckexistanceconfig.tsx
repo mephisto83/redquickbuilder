@@ -12,10 +12,12 @@ import {
 	RelationType,
 	SkipSettings,
 	CheckIsExisting,
-	CreateBranch
+	CreateBranch,
+	CreateStretchPath
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import TreeViewButtonGroup from './treeviewbuttongroup';
+import StretchPathComponent from './stretchpathcomponent';
 import BranchConfigComponent from './aftereffectbranchconfigcomponent';
 
 export default class AfterEffectCheckExistanceConfig extends Component<any, any> {
@@ -68,6 +70,14 @@ export default class AfterEffectCheckExistanceConfig extends Component<any, any>
 		) {
 			targetProperties = UIA.GetModelPropertyChildren(currentMethodDescription.properties.model).toNodeSelect();
 		}
+		let model =
+			checkExistence.relationType === RelationType.Agent
+				? previousMethodDescription.properties.agent
+				: previousMethodDescription.properties.model_output || previousMethodDescription.properties.model;
+		let property =
+			checkExistence.relationType === RelationType.Agent
+				? checkExistence.agentProperty
+				: checkExistence.modelProperty;
 		return (
 			<TreeViewMenu
 				open={this.state.open}
@@ -157,6 +167,23 @@ export default class AfterEffectCheckExistanceConfig extends Component<any, any>
 							}}
 						/>
 					</TreeViewItemContainer>
+					<TreeViewItemContainer hide={this.props.hideTargetProperty}>
+						<CheckBox
+							label={Titles.Stretch}
+							value={checkExistence && checkExistence.isStrech}
+							onChange={(val: boolean) => {
+								checkExistence.isStrech = val;
+								checkExistence.stretchPath = checkExistence.stretchPath || CreateStretchPath();
+								this.setState({
+									turn: UIA.GUID()
+								});
+							}}
+						/>
+					</TreeViewItemContainer>
+					<StretchPathComponent
+						stretch={checkExistence.stretchPath}
+						show={checkExistence && checkExistence.isStrech}
+					/>
 					<TreeViewItemContainer>
 						<SelectInput
 							label={UIA.GetNodeTitle(currentMethodDescription.properties.model)}

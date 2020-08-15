@@ -398,6 +398,32 @@ export interface HalfRelation extends ConfigItem {
 }
 export interface AfterEffectRelations extends HalfRelation {
 	targetProperty: string;
+	isStrech?: boolean;
+	stretchPath?: StretchPath; // The properties+models that will be traversed to get to the final model instance.
+}
+export interface StretchPath {
+	path: StretchPathItem[];
+	name: string;
+}
+export interface StretchPathItem {
+	fromProperty: string;
+	property: string;
+	id: string;
+	model: string;
+}
+export function CreateStretchPath(): StretchPath {
+	return {
+		name: '',
+		path: []
+	};
+}
+export function CreateStretchPathItem(model: string, property: string, fromProperty?: string): StretchPathItem {
+	return {
+		fromProperty: fromProperty || '',
+		property,
+		model,
+		id: GUID()
+	};
 }
 export interface CompareEnumeration extends HalfRelation {
 	enumeration: string;
@@ -437,8 +463,8 @@ export interface EnumerationConfig extends ConfigItem {
 }
 export interface BooleanConfig extends ConfigItem {}
 export interface NumberConfig extends ConfigItem {
-  value: string;
-  equal?: boolean;
+	value: string;
+	equal?: boolean;
 }
 export interface GetExistingConfig extends AfterEffectRelations {}
 /**
