@@ -17,6 +17,8 @@ import AfterEffectCheckExistanceConfig from './aftereffectcheckexistanceconfig';
 import AfterEffectGetExistanceConfig from './aftereffectgetexistanceconfig';
 import AfterEffectSetPropertiesConfig from './aftereffectsetpropertiesconfig';
 import AfterEffectRouteConfigComponent from './aftereffectrouteconfigcomponent';
+import TreeViewItemContainer from './treeviewitemcontainer';
+import CheckBox from './checkbox';
 
 export default class AfterEffectDataChainOption extends Component<any, any> {
 	constructor(props: any) {
@@ -56,11 +58,27 @@ export default class AfterEffectDataChainOption extends Component<any, any> {
 				active
 				title={Titles.Configuration}
 			>
+				{' '}
+				<TreeViewItemContainer>
+					<CheckBox
+						label={Titles.DirectExecute}
+						value={dataChainOptions.directExecute}
+						onChange={(value: boolean) => {
+							dataChainOptions.directExecute = value;
+							this.setState({
+								turn: UIA.GUID()
+							});
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
+						}}
+					/>
+				</TreeViewItemContainer>
 				<AfterEffectCheckExistanceConfig
 					previousMethodDescription={previousMethodDescription}
 					currentMethodDescription={currentMethodDescription}
-          dataChainOptions={dataChainOptions}
-          routes={this.props.routes}
+					dataChainOptions={dataChainOptions}
+					routes={this.props.routes}
 					onChange={onchange}
 				/>
 				<AfterEffectGetExistanceConfig
@@ -78,8 +96,8 @@ export default class AfterEffectDataChainOption extends Component<any, any> {
 				<AfterEffectRouteConfigComponent
 					previousMethodDescription={previousMethodDescription}
 					currentMethodDescription={currentMethodDescription}
-          dataChainOptions={dataChainOptions}
-          routes={this.props.routes}
+					dataChainOptions={dataChainOptions}
+					routes={this.props.routes}
 					onChange={onchange}
 				/>
 			</TreeViewMenu>

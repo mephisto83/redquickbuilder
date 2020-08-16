@@ -641,7 +641,7 @@ function GenerateStretchMethods(
 				};
 				if (!index) {
 					arbiterModels.push(item.model);
-					return `var item_0 = (await arbiter#{{"key":"stretch.${name}.${GetCodeName(
+					return `#{{"key":"stretch.${name}.${GetCodeName(item.model)}"}}# item_0 = (await arbiter#{{"key":"stretch.${name}.${GetCodeName(
 						item.model
 					)}"}}#Static.GetBy(v => v.#{{"key":"stretch.${name}.${GetCodeName(item.model)}.${GetCodeName(
 						item.property
@@ -664,7 +664,7 @@ function GenerateStretchMethods(
 							[ReferenceInsertType.Property]: fromProperty
 						};
 						arbiterModels.push(item.model);
-						return `var item_${index} = item_${index -
+						return `#{{"key":"stretch.${name}.${GetCodeName(item.model)}"}}# item_${index} = item_${index -
 							1} != null ? (await arbiter#{{"key":"stretch.${name}.${GetCodeName(
 							item.model
 						)}"}}#Static.GetBy(v => v.#{{"key":"stretch.${name}.${GetCodeName(item.model)}.${GetCodeName(

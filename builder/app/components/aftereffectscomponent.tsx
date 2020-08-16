@@ -47,8 +47,8 @@ export default class AfterEffectsComponent extends Component<any, any> {
 					return (
 						<AfterEffectComponent
 							key={afterEffect.id}
-							methodDescription={index ? null : this.props.methodDescription}
-							previousEffect={index ? afterEffects[index - 1] : null}
+							methodDescription={false ? null : this.props.methodDescription}
+							previousEffect={false ? afterEffects[index - 1] : null}
 							api={this.props.api}
 							mountingItem={this.props.mountingItem}
 							methods={this.props.methods}

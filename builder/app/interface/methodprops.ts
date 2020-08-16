@@ -95,6 +95,7 @@ export interface DataChainConfiguration {
 	routeConfig?: RouteConfig;
 	getExisting?: GetExistingConfig;
 	setProperties?: SetPropertiesConfig;
+	directExecute?: boolean;
 }
 
 export interface RouteConfig extends ConfigItem {

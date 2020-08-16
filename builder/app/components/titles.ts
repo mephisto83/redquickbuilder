@@ -54,6 +54,7 @@ export const ComponentTag = 'Component Tag';
 export const Font = 'Font';
 export const FontCss = 'Font Css Specification';
 export const FontCssVar = 'Font Css Variable name';
+export const DirectExecute = 'Direct execute';
 export const Variable = 'Variable';
 export const MediaSizes = 'Media Sizes';
 export const Variables = 'Variables';
