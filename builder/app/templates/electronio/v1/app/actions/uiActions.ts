@@ -7,6 +7,7 @@ export const UISP_UPDATE = 'UISP_UPDATE';
 export const UIMI_UPDATE = 'UIMI_UPDATE';
 export const UI_MODELS = 'UI_MODELS';
 export const RESET_ALL = 'RESET_ALL';
+export const SITE = 'SITE';
 
 export const SCREEN_PROPERTIES = 'SCREEN_PROPERTIES';
 

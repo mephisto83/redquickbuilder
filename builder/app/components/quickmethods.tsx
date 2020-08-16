@@ -6,7 +6,7 @@ import * as Titles from './titles';
 import CheckBox from './checkbox';
 import ButtonList from './buttonlist';
 import TextBox from './textinput';
-import { UITypes, NodeTypes } from '../constants/nodetypes';
+import { UITypes, NodeTypes, NodeProperties } from '../constants/nodetypes';
 import {
 	GetSpecificModels,
 	GetAllModels,
@@ -42,7 +42,6 @@ import {
 import ApplyTemplates from '../nodepacks/permission/ApplyTemplates';
 import ApplyValidationFromProperties from '../nodepacks/permission/ApplyValidationFromProperties';
 import AddAgentMethods from '../nodepacks/batch/AddAgentMethods';
-import CreateSmartDashboard from '../nodepacks/screens/dashboard/CreateSmartDashboard';
 import BuildDashboards from '../nodepacks/screens/dashboard/BuildDashboards';
 import ConnectDashboards from '../nodepacks/screens/dashboard/ConnectDashboards';
 import CreateComponentAll from '../nodepacks/batch/CreateComponentAll';
@@ -51,6 +50,16 @@ import AddUserRequirements from '../nodepacks/batch/AddUserRequirements';
 import ChangeInputToSelect from '../nodepacks/screens/ChangeInputToSelect';
 import { Node } from '../methods/graph_types';
 import RedressProperties from '../nodepacks/batch/RedressProperties';
+import AddAgentAccessMethods from '../nodepacks/batch/AddAgentAccessMethods';
+import UpdateScreenParameters from '../nodepacks/screens/UpdateScreenParameters';
+import ConnectScreens from '../nodepacks/batch/ConnectScreens';
+import TreeViewItemContainer from './treeviewitemcontainer';
+import SelectInput from './selectinput';
+import { NodesByType, GetNodeProp } from '../methods/graph_methods';
+import CreateClaimService from '../nodepacks/batch/CreateClaimService';
+import ApplyPremissionChains from '../nodepacks/batch/ApplyPermissionChains';
+import ApplyExecutionChains from '../nodepacks/batch/ApplyExecutionChains';
+import ApplyValidationChains from '../nodepacks/batch/ApplyValidationChains';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -99,6 +108,177 @@ class QuickMethods extends Component<any, any, any> {
 							}}
 							icon="fa fa-tag"
 						>
+							<TreeViewMenu
+								title="Check Shared Nodes"
+								open={UIA.Visual(state, 'Check Shared Nodes')}
+								active
+								toggle={() => {
+									this.props.toggleVisual('Check Shared Nodes');
+								}}
+							>
+								<TreeViewItemContainer>
+									<SelectInput
+										label={Titles.ViewTypes}
+										value={this.state.selectedViewType}
+										onChange={(val: string) => {
+											this.setState({ selectedViewType: val });
+										}}
+										options={Object.keys(ViewTypes).map((v) => ({ title: v, value: ViewTypes[v] }))}
+									/>
+								</TreeViewItemContainer>
+								<TreeViewItemContainer>
+									<SelectInput
+										label={Titles.Model}
+										value={this.state.selectedModel}
+										onChange={(val: string) => {
+											this.setState({ selectedModel: val });
+										}}
+										options={NodesByType(UIA.GetCurrentGraph(), NodeTypes.Model).toNodeSelect()}
+									/>
+								</TreeViewItemContainer>
+								<TreeViewItemContainer>
+									<SelectInput
+										label={Titles.Property}
+										value={this.state.selectedProperty}
+										onChange={(val: string) => {
+											this.setState({ selectedProperty: val });
+										}}
+										options={UIA.GetModelPropertyChildren(this.state.selectedModel).toNodeSelect()}
+									/>
+								</TreeViewItemContainer>
+								<TreeViewItemContainer>
+									<SelectInput
+										label="Target Model"
+										value={this.state.targetModel}
+										onChange={(val: string) => {
+											this.setState({ targetModel: val });
+										}}
+										options={NodesByType(UIA.GetCurrentGraph(), NodeTypes.Model).toNodeSelect()}
+									/>
+								</TreeViewItemContainer>
+								<TreeViewItemContainer>
+									<SelectInput
+										label={Titles.Agents}
+										value={this.state.selectedAgent}
+										onChange={(val: string) => {
+											this.setState({ selectedAgent: val });
+										}}
+										options={NodesByType(UIA.GetCurrentGraph(), NodeTypes.Model)
+											.filter((x: Node) => GetNodeProp(x, NodeProperties.IsAgent))
+											.toNodeSelect()}
+									/>
+								</TreeViewItemContainer>
+								<TreeViewItemContainer>
+									<CheckBox
+										label={Titles.SharedControl}
+										value={this.state.isSharedComponent}
+										onChange={(val: string) => {
+											this.setState({ isSharedComponent: val });
+										}}
+										options={NodesByType(UIA.GetCurrentGraph(), NodeTypes.Model)
+											.filter((x: Node) => GetNodeProp(x, NodeProperties.IsAgent))
+											.toNodeSelect()}
+									/>
+								</TreeViewItemContainer>
+								<TreeViewMenu title={UIA.GetNodeTitle(this.state.sharedComponentFor)} />
+								<TreeViewMenu
+									title="Check"
+									toggle={() => {
+										if (
+											this.state.selectedViewType &&
+											this.state.selectedProperty &&
+											this.state.targetModel &&
+											this.state.selectedAgent
+										) {
+											let res = UIA.GetSharedComponentFor(
+												this.state.selectedViewType,
+												UIA.GetNodeById(this.state.selectedProperty),
+												this.state.targetModel,
+												this.state.isSharedComponent || false,
+												this.state.selectedAgent
+											);
+											console.log(res);
+											this.setState({ sharedComponentFor: res });
+										}
+									}}
+								/>
+							</TreeViewMenu>
+							<TreeViewMenu
+								title={Titles.BuildCommands}
+								open={UIA.Visual(state, Titles.BuildCommands)}
+								active
+								toggle={() => {
+									this.props.toggleVisual(Titles.BuildCommands);
+								}}
+								icon="fa fa-tag"
+							>
+								<TreeViewMenu
+									title="Add Agent Access Methods"
+									onClick={() => {
+										AddAgentAccessMethods(() => {});
+									}}
+								/>
+								<TreeViewMenu
+									title="Create Claim Service"
+									onClick={() => {
+										CreateClaimService();
+									}}
+								/>
+								<TreeViewMenu
+									title="Build Dashboards"
+									onClick={() => {
+										BuildDashboards(() => true);
+									}}
+								/>
+								<TreeViewMenu
+									title="Connect Dashboards"
+									onClick={() => {
+										ConnectDashboards(() => true, () => {});
+									}}
+								/>
+								<TreeViewMenu
+									title="Connect Screens"
+									onClick={() => {
+										ConnectScreens(() => {}, () => true);
+									}}
+								/>
+								<TreeViewMenu
+									title="Connect Dashes only"
+									onClick={() => {
+										ConnectScreens(
+											() => {},
+											(v: Node) => GetNodeProp(v, NodeProperties.IsDashboard)
+										);
+									}}
+								/>
+								<TreeViewMenu
+									title="Apply Permission Chains"
+									onClick={() => {
+										ApplyPremissionChains();
+									}}
+								/>
+								<TreeViewMenu
+									title="Apply Execution Chains"
+									onClick={() => {
+										ApplyExecutionChains();
+									}}
+								/>
+								<TreeViewMenu
+									title="Apply Validation Chains"
+									onClick={() => {
+										ApplyValidationChains();
+									}}
+								/>
+
+								<TreeViewMenu
+									title={StartJob.title}
+									icon="fa fa-play"
+									onClick={() => {
+										this.props.setState();
+										StartJob();
+									}}
+								/>
+							</TreeViewMenu>
 							<TreeViewMenu
 								title={Titles.UIParameters}
 								open={UIA.Visual(state, Titles.UIParameters)}
@@ -161,7 +341,7 @@ class QuickMethods extends Component<any, any, any> {
 									icon="fa fa-tag"
 								>
 									<TreeViewMenu
-										title={'Distribute Build All Jobs'}
+										title="Distribute Build All Jobs"
 										icon="fa fa-plus"
 										onClick={() => {
 											this.props.setState();
@@ -169,14 +349,26 @@ class QuickMethods extends Component<any, any, any> {
 										}}
 									/>
 									<TreeViewMenu
-										title={'Redress Properties'}
+										title="Check Access"
+										icon="fa fa-plus"
+										onClick={() => {
+											let aa = UIA.GetNodeById('1f2f965e-205f-45ed-b12e-aac517cd3ed8');
+											let viewType = ViewTypes.Create;
+											let agent = UIA.GetNodeById('34c87cff-b102-4d38-b605-f9bf57469eee');
+											let model = UIA.GetNodeById('2f913160-4f5b-45c2-8cad-e54833dbbc8c');
+											let hasAccess = UIA.hasAccessNode(agent, model, aa, viewType);
+											console.log(`hasAccess: ${hasAccess}`);
+										}}
+									/>
+									<TreeViewMenu
+										title="Redress Properties"
 										description={RedressProperties.description}
 										toggle={() => {
 											RedressProperties();
 										}}
 									/>
 									<TreeViewMenu
-										title={'Add user requirements'}
+										title="Add user requirements"
 										icon="fa fa-plus"
 										onClick={() => {
 											this.props.setState();
@@ -184,7 +376,7 @@ class QuickMethods extends Component<any, any, any> {
 										}}
 									/>
 									<TreeViewMenu
-										title={'Change Input To Select'}
+										title="Change Input To Select"
 										icon="fa fa-plane"
 										onClick={() => {
 											ChangeInputToSelect();
@@ -192,7 +384,7 @@ class QuickMethods extends Component<any, any, any> {
 									/>
 
 									<TreeViewMenu
-										title={'Generate Menu Source'}
+										title="Generate Menu Source"
 										icon="fa fa-plus"
 										onClick={() => {
 											MenuGenerator.Generate({ state: this.props.state });
@@ -235,21 +427,21 @@ class QuickMethods extends Component<any, any, any> {
 									}}
 								/>
 								<TreeViewMenu
-									title={'Create Smart Dashes'}
-									icon={'fa fa-plus'}
+									title="Create Smart Dashes"
+									icon="fa fa-plus"
 									onClick={() => {
 										BuildDashboards(() => true);
 									}}
 								/>
 								<TreeViewMenu
-									title={'Connect Dashboards'}
-									icon={'fa fa-plus'}
+									title="Connect Dashboards"
+									icon="fa fa-plus"
 									onClick={() => {
 										ConnectDashboards(() => true, () => {});
 									}}
 								/>
 								<TreeViewMenu
-									title={'CreateComponentAll'}
+									title="CreateComponentAll"
 									onClick={() => {
 										CreateComponentAll(() => true);
 									}}
@@ -307,15 +499,7 @@ class QuickMethods extends Component<any, any, any> {
 									}}
 								/>
 								<TreeViewMenu
-									title={StartJob.title}
-									icon="fa fa-plus"
-									onClick={() => {
-										this.props.setState();
-										StartJob();
-									}}
-								/>
-								<TreeViewMenu
-									title={'Create Job'}
+									title="Create Job"
 									icon="fa fa-plus"
 									onClick={() => {
 										this.props.setState();
@@ -324,14 +508,14 @@ class QuickMethods extends Component<any, any, any> {
 									}}
 								/>
 								<TreeViewMenu
-									title={'Update Screen Urls'}
+									title="Update Screen Urls"
 									icon="fa fa-plus"
 									onClick={() => {
 										UpdateScreenUrls(() => {});
 									}}
 								/>
 								<TreeViewMenu
-									title={'CollectionConnectDataChainCollection'}
+									title="CollectionConnectDataChainCollection"
 									onClick={() => {
 										CollectionConnectDataChainCollection(() => {
 											return true;
@@ -339,30 +523,44 @@ class QuickMethods extends Component<any, any, any> {
 									}}
 								/>
 								<TreeViewMenu
-									title={'Add Title Service'}
+									title="Add Title Service"
 									onClick={() => {
 										this.props.graphOperation([ addTitleService({ newItems: {} }) ]);
 									}}
 								/>
 								<TreeViewMenu
-									title={'Apply Templates'}
+									title="Apply Templates"
 									icon="fa fa-plus"
 									onClick={() => {
 										ApplyTemplates(null);
 									}}
 								/>
 								<TreeViewMenu
-									title={'Apply Validation From Properties'}
+									title="Apply Validation From Properties"
 									icon="fa fa-plus"
 									onClick={() => {
 										ApplyValidationFromProperties(null);
 									}}
 								/>
 								<TreeViewMenu
-									title={'Add Agent Methods'}
+									title="Add Agent Methods"
 									icon="fa fa-plus"
 									onClick={() => {
 										AddAgentMethods(() => {});
+									}}
+								/>
+								<TreeViewMenu
+									title="Add Agent Access Methods"
+									icon="fa fa-plus"
+									onClick={() => {
+										AddAgentAccessMethods(() => {});
+									}}
+								/>
+								<TreeViewMenu
+									title="Update Screen Parameters"
+									icon="fa fa-plus"
+									onClick={() => {
+										UpdateScreenParameters(() => {});
 									}}
 								/>
 							</TreeViewMenu>

@@ -6,9 +6,21 @@ import { GetNodeTitle } from '../actions/uiactions';
 
 export default function AddAgentAccess(args: any = {}) {
 	// node1,node2
-	args.model = GetNodeTitle(args.modelId);
+	args.model = GetNodeTitle(args.dashboardId || args.modelId);
 	args.agent = GetNodeTitle(args.agentId);
-	const { linkProps } = args;
+	const {
+		linkProps,
+		methodProps,
+		routingProps,
+		mountingProps,
+		effectProps,
+		screenEffectApiProps,
+		dashboardAccessProps,
+		dashboardViewMountProps,
+		dashboardEffectProps,
+		dashboardRoutingProps,
+		dashboardScreenEffectApiProps
+	} = args;
 	// model, agent
 	if (!args.model) {
 		throw new Error('missing model argument');
@@ -18,7 +30,7 @@ export default function AddAgentAccess(args: any = {}) {
 	}
 	const context = {
 		...args,
-		node1: args.modelId,
+		node1: args.dashboardId || args.modelId,
 		node2: args.agentId
 	};
 	let { viewPackages } = args;
@@ -32,7 +44,7 @@ export default function AddAgentAccess(args: any = {}) {
 				{
 					operation: 'NEW_NODE',
 					options: {
-						callback: function(node: { id: any; }) {
+						callback: function(node: { id: any }) {
 							context.node0 = node.id;
 						}
 					}
@@ -99,7 +111,7 @@ export default function AddAgentAccess(args: any = {}) {
 						target: context.node1,
 						source: context.node0,
 						properties: {
-							type: 'ModelAccess',
+							type: args.dashboardId ? 'DashboardAccess' : 'ModelAccess',
 							ModelAccess: {},
 							nodeTypes: [ 'model' ]
 						}
@@ -120,6 +132,16 @@ export default function AddAgentAccess(args: any = {}) {
 							AgentAccess: {},
 							nodeTypes: [ 'model' ],
 							...linkProps,
+							methodProps,
+							routingProps,
+              mountingProps,
+              screenEffectApiProps,
+							effectProps,
+							dashboardScreenEffectApiProps,
+							dashboardEffectProps,
+							dashboardAccessProps,
+							dashboardViewMountProps,
+							dashboardRoutingProps,
 							properties: {
 								isAgent: true
 							}

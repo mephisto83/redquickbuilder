@@ -1,10 +1,12 @@
 import { UITypes, NEW_LINE, NodeTypes } from '../constants/nodetypes';
-import { GetNodeById, NodeProperties, GetNodeProp, GetCodeName } from '../actions/uiactions';
+import { GetNodeById, NodeProperties, GetNodeProp, GetCodeName, GetJSCodeName, GetCssName } from '../actions/uiactions';
 import { GenerateMarkupTag, ConvertViewTypeToComponentNode, GetStylesFor } from './screenservice';
 import { GetCellProperties, getComponentProperty } from '../methods/graph_methods';
 import { InstanceTypes } from '../constants/componenttypes';
 import { addNewLine } from '../utils/array';
 import * as GraphMethods from '../methods/graph_methods';
+import { ComponentLayoutContainer } from '../methods/graph_types';
+import { constructCellStyles } from './sharedservice';
 
 export function GetPropertyConsts(id: string, language = UITypes.ReactNative) {
 	const node = GetNodeById(id);
@@ -185,7 +187,7 @@ export function buildLayoutTree(args: {
 	return result;
 }
 export function createSection(args: {
-	layoutObj: any;
+	layoutObj: ComponentLayoutContainer;
 	item: any;
 	currentRoot: any;
 	index: any;
@@ -203,6 +205,8 @@ export function createSection(args: {
 	const cellRoot: any = (properties[item].cellRoot = {});
 	const layoutProperties: any = properties[item].properties || {};
 	const cellModelProperty: any = properties[item].cellModelProperty || {};
+	const cellStyleArray: any = properties[item].cellStyleArray || [];
+	let root = GraphMethods.GetFirstCell(layoutObj);
 	let tree = Object.keys(currentRoot).length
 		? buildLayoutTree({
 				layoutObj,
@@ -221,7 +225,8 @@ export function createSection(args: {
 				GenerateMarkupTag(
 					GetNodeById(children[item]),
 					language,
-					node
+					node,
+					cellStyleArray
 					// , {
 					// 	children,
 					// 	cellModel,
@@ -256,6 +261,10 @@ export function createSection(args: {
 	css[section] = { style: { ..._style } };
 	let control = 'View';
 	let className = '';
+	let toplevelCls = '';
+	if (root === item) {
+		toplevelCls = GetCssName(node) || GetCodeName(node);
+	}
 	let tagclasses = '';
 	let tagBasedStyles = '';
 	switch (language) {
@@ -280,6 +289,15 @@ export function createSection(args: {
 			if (layoutProperties && layoutProperties.componentType) {
 				control = layoutProperties.componentType;
 			}
+
+			let {
+				cellStyles,
+				cellStylesReact
+			}: { cellStyles: string; cellStylesReact: string[] } = constructCellStyles(cellStyleArray);
+			let stylization = '';
+			if (cellStyleArray && cellStylesReact.length) {
+				stylization = `style={{${cellStylesReact.join()}}}`;
+			}
 			if (UITypes.ReactNative !== language) {
 				if (layoutProperties && layoutProperties.tags && Object.keys(layoutProperties.tags).length) {
 					tagclasses = layoutProperties.tags.join(' ');
@@ -289,13 +307,15 @@ export function createSection(args: {
 						.join(' ');
 				}
 				if (UITypes.ReactWeb === language) {
-					className = `className={\`${tagBasedStyles} ${tagclasses} \`}`;
+					className = `${stylization} className={\`${toplevelCls} ${tagBasedStyles} ${tagclasses} ${cellStyles} \`}`;
 				} else {
-					className = `className={\`$\{styles.${section}} ${tagBasedStyles} ${tagclasses} \`}`;
+					className = `${stylization} className={\`${toplevelCls} $\{styles.${section}} ${tagBasedStyles} ${tagclasses} ${cellStyles} \`}`;
 				}
 			} else {
-				className = `style={${JSON.stringify({ ..._style }, null, 4)}}`;
+				cellStylesReact.push(JSON.stringify({ ..._style }, null, 4));
+				className = `${stylization}`;
 			}
+
 			return `
 <${control} ${className} >
 ${addNewLine(tree.tightenPs())}

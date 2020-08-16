@@ -1,1 +1,1 @@
-<Text>{{{value}}}</Text>
+<Text  style={props.style || {}}>{{{label}}}{{{value}}}</Text>

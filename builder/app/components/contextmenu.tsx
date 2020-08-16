@@ -124,6 +124,12 @@ import BuildNavigationScreen from '../nodepacks/BuildNavigationScreen';
 import BuildLowerMenus from '../nodepacks/screens/menus/BuildLowerMenus';
 import CreateMirrorMenu from '../nodepacks/screens/menus/CreateMirrorMenu';
 import EnumerationLinkMenu from './enumerationlinkmenu';
+import AddFiltersToMethod from '../nodepacks/method/AddFilterToMethod';
+import AddMethodFilterToMethod from '../nodepacks/method/AddFilterToModelFilter';
+import ClearScreenConnection from '../nodepacks/screens/ClearScreenConnections';
+import { ClearApiBetweenComponents } from '../nodepacks/ClearApiBetweenComponents';
+import ConnectScreens from '../nodepacks/batch/ConnectScreens';
+import AddComponentsToScreenOptions from '../nodepacks/batch/AddComponentsToScreenOptions';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -1460,22 +1466,22 @@ class ContextMenu extends Component<any, any> {
 								value={GetNodeProp(currentNode, NodeProperties.Agent)}
 							/>
 						</TreeViewItemContainer>
-            <TreeViewItemContainer>
+						<TreeViewItemContainer>
 							<TextInput
-									label={Titles.DefaultValue}
-									onChange={(value: any) => {
-										this.props.graphOperation([
-											{
-												operation: UIA.CHANGE_NODE_PROPERTY,
-												options: {
-													prop: UIA.NodeProperties.DefaultValue,
-													id: currentNode.id,
-													value: value
-												}
+								label={Titles.DefaultValue}
+								onChange={(value: any) => {
+									this.props.graphOperation([
+										{
+											operation: UIA.CHANGE_NODE_PROPERTY,
+											options: {
+												prop: UIA.NodeProperties.DefaultValue,
+												id: currentNode.id,
+												value: value
 											}
-										]);
-									}}
-									value={GetNodeProp(currentNode, NodeProperties.DefaultValue)}
+										}
+									]);
+								}}
+								value={GetNodeProp(currentNode, NodeProperties.DefaultValue)}
 							/>
 						</TreeViewItemContainer>
 					</TreeViewMenu>
@@ -1509,6 +1515,61 @@ class ContextMenu extends Component<any, any> {
 								/>
 							);
 						})}
+					</TreeViewMenu>
+				];
+			case NodeTypes.AgentAccessDescription:
+				let graph = UIA.GetCurrentGraph();
+				return [
+					<TreeViewMenu
+						open={UIA.Visual(state, 'OPERATIONS')}
+						active
+						title={Titles.Operations}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
+						toggle={() => {
+							this.props.toggleVisual('OPERATIONS');
+						}}
+					>
+						<TreeViewMenu
+							title={'Connect Screens'}
+							description={'Connects to screens that are allowed by its definition'}
+							onClick={() => {
+								let model = GetNodeLinkedTo(graph, {
+									id: currentNode.id,
+									link: LinkType.ModelAccess
+								});
+								let agent = GetNodeLinkedTo(graph, {
+									id: currentNode.id,
+									link: LinkType.AgentAccess
+								});
+
+								let link = findLink(graph, {
+									source: agent.id,
+									target: currentNode.id
+								});
+								let commands: any[] = [];
+								Object.values(ViewTypes).forEach((viewType: string) => {
+									let screen = UIA.GetNodeByProperties({
+										[NodeProperties.Model]: model.id,
+										[NodeProperties.Agent]: agent.id,
+										[NodeProperties.ViewType]: viewType,
+										[NodeProperties.NODEType]: NodeTypes.Screen
+									});
+									if (screen) {
+										commands.push({
+											operation: UIA.ADD_LINK_BETWEEN_NODES,
+											options() {
+												return {
+													target: screen.id,
+													source: currentNode.id,
+													properties: { ...LinkProperties.AccessScreen }
+												};
+											}
+										});
+									}
+								});
+								UIA.graphOperation(commands)(UIA.GetDispatchFunc(), UIA.GetStateFunc());
+							}}
+						/>
 					</TreeViewMenu>
 				];
 			case NodeTypes.NavigationScreen:
@@ -1943,6 +2004,38 @@ class ContextMenu extends Component<any, any> {
 									this.props.toggleVisual('OPERATIONS');
 								}}
 							>
+								<TreeViewMenu
+									title={'Clear Screen Connection'}
+									onClick={() => {
+										ClearScreenConnection({ node: currentNode.id });
+									}}
+								/>
+								<TreeViewMenu
+									title="Clear Api"
+									open={UIA.Visual(state, `Clear Api`)}
+									active
+									onClick={() => {
+										this.props.toggleVisual(`Clear Api`);
+									}}
+								>
+									<TreeViewItemContainer>
+										<TextInput
+											label={Titles.ComponentApi}
+											onChange={(value: any) => {
+												this.setState({
+													api: value
+												});
+											}}
+											value={this.state.api}
+										/>
+									</TreeViewItemContainer>
+									<TreeViewMenu
+										title={'Clear Api'}
+										onClick={() => {
+											ClearApiBetweenComponents({ id: currentNode.id, api: this.state.api });
+										}}
+									/>
+								</TreeViewMenu>
 								<TreeViewMenu
 									title="Connect"
 									open={UIA.Visual(state, `Connect`)}
@@ -2619,6 +2712,31 @@ class ContextMenu extends Component<any, any> {
 								}}
 							/>
 						</TreeViewMenu>
+					</TreeViewMenu>
+				];
+			case NodeTypes.Method:
+				return [
+					<TreeViewMenu
+						open={UIA.Visual(state, 'OPERATIONS')}
+						active
+						title={Titles.Operations}
+						innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
+						toggle={() => {
+							this.props.toggleVisual('OPERATIONS');
+						}}
+					>
+						<TreeViewMenu
+							title={`${Titles.Add} Item Filter`}
+							onClick={() => {
+								AddFiltersToMethod({ method: currentNode.id });
+							}}
+						/>
+						<TreeViewMenu
+							title={`${Titles.Add} Model Filter`}
+							onClick={() => {
+								AddMethodFilterToMethod({ method: currentNode.id });
+							}}
+						/>
 					</TreeViewMenu>
 				];
 			case NodeTypes.Model:
@@ -3651,19 +3769,47 @@ class ContextMenu extends Component<any, any> {
 		const { state } = this.props;
 		const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 		const currentNodeType = UIA.GetNodeProp(currentNode, NodeProperties.NODEType);
+		let result: any[] = [];
 		switch (currentNodeType) {
-			case NodeTypes.ComponentNode:
 			case NodeTypes.Screen:
+				result.push(...this.getScreenFunctions());
+			case NodeTypes.ComponentNode:
 			case NodeTypes.ScreenOption:
 			case NodeTypes.EventMethodInstance:
 			default:
-				return this.getGenericLinks(currentNode);
+				result.push(...this.getGenericLinks(currentNode));
 		}
-		return [];
+		return result;
 	}
 
 	getViewTypes() {
 		return <ViewTypeMenu />;
+	}
+
+	getScreenFunctions() {
+		const { state } = this.props;
+		return [
+			<TreeViewMenu
+				title={'Connect Screen'}
+				active
+				toggle={() => {
+					const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+					ConnectScreens(() => {}, (v: any) => v.id === currentNode.id);
+				}}
+			/>,
+			<TreeViewMenu
+				title={'Add Title and Menu'}
+				toggle={() => {
+					const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+					AddComponentsToScreenOptions(
+						() => {},
+						(screen: Node) => {
+							return screen.id === currentNode.id;
+						}
+					);
+				}}
+			/>
+		];
 	}
 
 	getButtonApiMenu(currentNode) {

@@ -5,8 +5,8 @@ import { NEW_LINE, NodeTypes, NodeProperties, UITypes } from '../constants/nodet
 import { GraphKeys } from '../methods/graph_methods';
 import { Node } from '../methods/graph_types';
 
-export function GenerateModelKeys(options) {
-	const { state, key, language } = options;
+export function GenerateModelKeys(options: any) {
+	const { state, key, language, codeGenerator } = options;
 	const models = GetModelNodes();
 
 	const template = `{{name}}: '{{name}}'`;
@@ -28,7 +28,7 @@ export function GenerateModelKeys(options) {
 	}
 
 	const viewModelKeys = NodesByType(state, NodeTypes.ComponentApi)
-		.filter((x) => GetNodeProp(x, NodeProperties.DefaultComponentApiValue))
+		.filter((x: Node) => GetNodeProp(x, NodeProperties.DefaultComponentApiValue))
 		.map((model: Node) =>
 			bindTemplate(template, {
 				name: GetNodeProp(model, NodeProperties.DefaultComponentApiValue)
@@ -46,33 +46,44 @@ export function GenerateModelKeys(options) {
 
 	return [
 		{
-			template: `export default <{ [index: string]: string }>{ ${templates.join(`,${NEW_LINE}`)}
+			template: codeGenerator
+				? `const ModekKeys = { ${templates.join(`,${NEW_LINE}`)}
+    }`
+				: `export default <{ [index: string]: string }>{ ${templates.join(`,${NEW_LINE}`)}
   }`,
 			relative: './src',
 			relativeFilePath: `./model_keys${fileEnding}`,
 			name: 'model_keys'
 		},
 		{
-			template: `export default <{ [index: string]: string }>{ ${stateKeyTemplates.join(`,${NEW_LINE}`)}
+			template: codeGenerator
+				? `const StateKeys = { ${stateKeyTemplates.join(`,${NEW_LINE}`)}
+    }`
+				: `export default <{ [index: string]: string }>{ ${stateKeyTemplates.join(`,${NEW_LINE}`)}
   }`,
 			relative: './src',
 			relativeFilePath: `./state_keys${fileEnding}`,
 			name: 'state_keys'
 		},
 		{
-			template: `export default <{ [index: string]: string }>{ ${viewModelKeys.join(`,${NEW_LINE}`)}
+			template: codeGenerator
+				? `const ViewModelKeys = { ${viewModelKeys.join(`,${NEW_LINE}`)}
+    }`
+				: `export default <{ [index: string]: string }>{ ${viewModelKeys.join(`,${NEW_LINE}`)}
   }`,
 			relative: './src',
 			relativeFilePath: `./viewmodel_keys${fileEnding}`,
 			name: 'viewmodel_keys'
 		},
 		{
-			template: bindTemplate(
-				`{
+			template: codeGenerator
+				? null
+				: bindTemplate(
+						`{
         "appName": "{{appName}}"
     }`,
-				{ appName: GetRootGraph(state)[GraphKeys.PROJECTNAME] }
-			),
+						{ appName: GetRootGraph(state)[GraphKeys.PROJECTNAME] }
+					),
 			relative: './',
 			relativeFilePath: `./app.json`,
 			name: 'app_json'

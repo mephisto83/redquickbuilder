@@ -202,22 +202,25 @@ export function scaffoldProject(options: any = {}) {
 			)
 			.then(() => {
 				console.log('Finished Scaffolding.');
-				generateFiles(path.join(workspace, root.title, 'netcore'), solutionName, state);
+				return generateFiles(path.join(workspace, root.title, 'netcore'), solutionName, state);
 			})
 			.then(() => {
 				console.log('generate react-native files');
-				generateReactNative(
+				return generateReactNative(
 					path.join(workspace, root.title, 'reactnative', root[GraphKeys.PROJECTNAME]),
 					state
 				);
 			})
 			.then(() => {
 				console.log('generate electron io files');
-				generateElectronIO(path.join(workspace, root.title, 'electronio', root[GraphKeys.PROJECTNAME]), state);
+				return generateElectronIO(
+					path.join(workspace, root.title, 'electronio', root[GraphKeys.PROJECTNAME]),
+					state
+				);
 			})
 			.then(() => {
 				console.log('generate react web files');
-				generateReactWeb(path.join(workspace, root.title, REACTWEB, root[GraphKeys.PROJECTNAME]), state);
+				return generateReactWeb(path.join(workspace, root.title, REACTWEB, root[GraphKeys.PROJECTNAME]), state);
 			})
 			.then(() => {
 				const namespace = root ? root[GraphKeys.NAMESPACE] : null;
@@ -333,7 +336,10 @@ export function scaffoldProject(options: any = {}) {
 										const model = GetCodeName(parameters[FunctionTemplateKeys.Model]);
 										const user = GetCodeName(parameters[FunctionTemplateKeys.User]);
 										const maestro = GetMaestroNode(method.id);
-										const modelPropertyDefaults = ModelGenerator.GenerateModelPropertyDefaults(parameters[FunctionTemplateKeys.Model], model.toLowerCase());
+										const modelPropertyDefaults = ModelGenerator.GenerateModelPropertyDefaults(
+											parameters[FunctionTemplateKeys.Model],
+											model.toLowerCase()
+										);
 										if (maestro) {
 											const controller = GetControllerNode(maestro.id);
 											if (controller) {

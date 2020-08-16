@@ -6,6 +6,7 @@ export const UISMI_UPDATE_OBJECT = 'UISMI_UPDATE_OBJECT';
 export const UISP_UPDATE = 'UISP_UPDATE';
 export const UIMI_UPDATE = 'UIMI_UPDATE';
 export const UI_MODELS = 'UI_MODELS';
+export const SITE = 'SITE';
 export const RESET_ALL = 'RESET_ALL';
 
 export const SCREEN_PROPERTIES = 'SCREEN_PROPERTIES';
@@ -209,7 +210,7 @@ export function Get(state: any, key: any) {
 	return null;
 }
 
-let _navigation : any= null;
+let _navigation: any = null;
 export function setNavigate(navigation: any) {
 	_navigation = navigation;
 }
@@ -679,8 +680,8 @@ export function updateModelInstance(model: any, instance: any, id: any, value: a
 	return (dispatch: any, getState: any) => {
 		dispatch(
 			Batch(
-				UISI(MODEL_INSTANCE, model, instance, id/*, value*/),
-				UISI(MODEL_INSTANCE_DIRTY, model, instance, id/*, true*/)
+				UISI(MODEL_INSTANCE, model, instance, id /*, value*/),
+				UISI(MODEL_INSTANCE_DIRTY, model, instance, id /*, true*/)
 			)
 		);
 	};
@@ -690,11 +691,11 @@ export function clearModelInstance(model: any, instance: any, id: any) {
 	return (dispatch: any, getState: any) => {
 		dispatch(
 			Batch(
-				UISI(MODEL_INSTANCE_ON_BLUR, model, instance, id/*, false*/),
-				UISI(MODEL_INSTANCE_ON_FOCUS, model, instance, id/*, false*/),
-				UISI(MODEL_INSTANCE_DIRTY, model, instance, id/*, false*/),
-				UISI(MODEL_INSTANCE_FOCUSED, model, instance, id/*, false*/),
-				UISI(MODEL_INSTANCE_FOCUSED, model, instance, id/*, false*/)
+				UISI(MODEL_INSTANCE_ON_BLUR, model, instance, id /*, false*/),
+				UISI(MODEL_INSTANCE_ON_FOCUS, model, instance, id /*, false*/),
+				UISI(MODEL_INSTANCE_DIRTY, model, instance, id /*, false*/),
+				UISI(MODEL_INSTANCE_FOCUSED, model, instance, id /*, false*/),
+				UISI(MODEL_INSTANCE_FOCUSED, model, instance, id /*, false*/)
 			)
 		);
 	};
@@ -704,8 +705,8 @@ export function updateModelInstanceBlur(model: any, instance: any, id: any) {
 	return (dispatch: any, getState: any) => {
 		dispatch(
 			Batch(
-				UISI(MODEL_INSTANCE_ON_BLUR, model, instance, id/*, true*/),
-				UISI(MODEL_INSTANCE_FOCUSED, model, instance, id/*, false*/)
+				UISI(MODEL_INSTANCE_ON_BLUR, model, instance, id /*, true*/),
+				UISI(MODEL_INSTANCE_FOCUSED, model, instance, id /*, false*/)
 			)
 		);
 	};
@@ -715,8 +716,8 @@ export function updateModelInstanceFocus(model: any, instance: any, id: any) {
 	return (dispatch: any, getState: any) => {
 		dispatch(
 			Batch(
-				UISI(MODEL_INSTANCE_ON_FOCUS, model, instance, id/*, true*/),
-				UISI(MODEL_INSTANCE_FOCUSED, model, instance, id/*, true*/)
+				UISI(MODEL_INSTANCE_ON_FOCUS, model, instance, id /*, true*/),
+				UISI(MODEL_INSTANCE_FOCUSED, model, instance, id /*, true*/)
 			)
 		);
 	};

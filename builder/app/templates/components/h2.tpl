@@ -1,1 +1,1 @@
-<H2>{{{value}}}</H2>
+<H2  style={props.style || {}}>{{{value}}}</H2>

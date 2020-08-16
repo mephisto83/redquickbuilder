@@ -862,19 +862,23 @@ export function CollectionComponentNodes(filter: any) {
 					}
 					return [
 						...steps,
-						...[ ...externalApiDataChains, ...internalApiDataChains, ...eventApiDataChains ].map((dc) => {
-							return {
-								operation: ADD_LINK_BETWEEN_NODES,
-								options(graph: any) {
-									reference = reference || getCollectionReference(graph, component);
-									return {
-										target: reference.id,
-										source: dc.id,
-										properties: { ...LinkProperties.DataChainCollection }
-									};
-								}
-							};
-						})
+						...[ ...externalApiDataChains, ...internalApiDataChains, ...eventApiDataChains ]
+							.filter((node: Node) => {
+								return !GetNodeProp(node, NodeProperties.UIAgnostic);
+							})
+							.map((dc) => {
+								return {
+									operation: ADD_LINK_BETWEEN_NODES,
+									options(graph: any) {
+										reference = reference || getCollectionReference(graph, component);
+										return {
+											target: reference.id,
+											source: dc.id,
+											properties: { ...LinkProperties.DataChainCollection }
+										};
+									}
+								};
+							})
 					];
 				});
 			});
@@ -896,19 +900,23 @@ export function CollectionScreenNodes(filter: any) {
 		screen_data_chains.push(...externalApiDataChains, ...internalApiDataChains, ...eventApiDataChains);
 		let reference: any = null;
 		result.push(
-			...[ ...screen_data_chains ].map((dc) => {
-				return {
-					operation: ADD_LINK_BETWEEN_NODES,
-					options(graph: any) {
-						reference = reference || getCollectionReference(graph, screen);
-						return {
-							target: reference.id,
-							source: dc.id,
-							properties: { ...LinkProperties.DataChainCollection }
-						};
-					}
-				};
-			})
+			...[ ...screen_data_chains ]
+				.filter((node: Node) => {
+					return !GetNodeProp(node, NodeProperties.UIAgnostic);
+				})
+				.map((dc) => {
+					return {
+						operation: ADD_LINK_BETWEEN_NODES,
+						options(graph: any) {
+							reference = reference || getCollectionReference(graph, screen);
+							return {
+								target: reference.id,
+								source: dc.id,
+								properties: { ...LinkProperties.DataChainCollection }
+							};
+						}
+					};
+				})
 		);
 	});
 

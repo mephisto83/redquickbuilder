@@ -59,7 +59,9 @@ export default class ModelReturnGenerator {
 					var methodProps = GetMethodsProperties(filterNode.id);
 					let model: any = GraphMethods.GetNode(
 						graphRoot,
-						methodProps[FunctionTemplateKeys.ModelOutput] || methodProps[FunctionTemplateKeys.Model]
+						methodProps[FunctionTemplateKeys.ModelOutput] ||
+							methodProps[FunctionTemplateKeys.Model] ||
+							methodProps[FunctionTemplateKeys.Agent]
 					);
 					let properties = GraphMethods.getNodesByLinkType(graph, {
 						id: model.id,

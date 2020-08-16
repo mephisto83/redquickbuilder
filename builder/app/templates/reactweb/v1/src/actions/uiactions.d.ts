@@ -1,6 +1,7 @@
 export declare const BATCH = "BATCH";
 export declare const UI_UPDATE = "UI_UPDATE";
 export declare const UISI_UPDATE = "UISI_UPDATE";
+export declare const SITE = 'SITE';
 export declare const UISMI_UPDATE = "UISMI_UPDATE";
 export declare const UISMI_UPDATE_OBJECT = "UISMI_UPDATE_OBJECT";
 export declare const UISP_UPDATE = "UISP_UPDATE";

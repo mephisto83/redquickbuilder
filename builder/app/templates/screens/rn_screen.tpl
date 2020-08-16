@@ -3,8 +3,9 @@ import { Platform, StyleSheet, TouchableOpacity } from "react-native";
 import { redConnect, titleService } from '../actions/util';
 import * as DC from '../actions/data-chain';
 import * as S from '../actions/selector';
-import { GetItems, navigate, GetScreenParam, setNavigate  } from '../actions/uiactions';
-import getTheme from '../../native-base-theme/components'
+import { GetItems, navigate, GetScreenParam, setNavigate, GetItem, SITE, GetC  } from '../actions/uiactions';
+import getTheme from '../../native-base-theme/components';
+import Models from '../model_keys';
 import * as ScreenInstance from '../actions/screenInstances';
 import material from '../../native-base-theme/variables/variables';
 import { DrawerActions } from 'react-navigation-drawer';

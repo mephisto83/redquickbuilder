@@ -1,6 +1,15 @@
 /* eslint-disable func-names */
 import { uuidv4 } from '../utils/array';
-import { UPDATE_NODE_PROPERTY, GetNodeCode, GetCodeName } from '../actions/uiactions';
+import {
+	UPDATE_NODE_PROPERTY,
+	GetNodeCode,
+	GetCodeName,
+	GetComponentExternalApiNodes,
+	GetNodeTitle
+} from '../actions/uiactions';
+import { GetNodeProp } from '../methods/graph_methods';
+import { NodeProperties } from '../constants/nodetypes';
+import { Node } from '../methods/graph_types';
 export default function LoadModel(args: any = {}) {
 	//
 	if (!args.model_view_name) {
@@ -258,6 +267,13 @@ export default function LoadModel(args: any = {}) {
 		},
 
 		function(_graph: any) {
+			let apiNodes = GetComponentExternalApiNodes(context.screen)
+				.filter((x: Node) => GetNodeProp(x, NodeProperties.IsUrlParameter))
+				.map((x: Node) => {
+					return GetNodeTitle(x);
+				})
+				.filter((x: string) => x !== 'value')
+				.join(', ');
 			return [
 				{
 					operation: 'CHANGE_NODE_PROPERTY',
@@ -265,7 +281,9 @@ export default function LoadModel(args: any = {}) {
 						prop: 'Lambda',
 						id: context.node2,
 						value:
-							'(params: any) => {\n   let { value, viewModel ' +
+							'(params: any) => {\n   let { ' +
+							(apiNodes ? `${apiNodes},` : '') +
+							' value, viewModel ' +
 							(context.screen ? `= ViewModelKeys.${GetCodeName(context.screen)}` : '') +
 							' } = params;\n   let dispatch = GetDispatch();\n   let getState = GetState();\n   let currentItem = GetK(getState(), UI_MODELS, ' +
 							args.model_item +

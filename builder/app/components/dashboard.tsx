@@ -92,7 +92,15 @@ import ModelFilterItemActivityMenu from './modelfilteritemactivitymenu';
 import ModelRelationshipMenu from './modelrelationshipmenu';
 import DepthChoice from './depthchoice';
 import MaestroActivityMenu from './maestroactivitymenu';
+import MountingContextMenu from './mountingcontextmenu';
 import ContextMenu from './contextmenu';
+import DashboardEffectContextMenu from './dashboardeffectcontextmenu';
+import RoutingContextMenu from './routingcontextmenu';
+import EffectContextMenu from './effectcontextmenu';
+import DashboardRoutingContextMenu from './dashboardroutingcontextmenu';
+import DashboardMountingContenxt from './dashboardmountingcontextmenu';
+import ScreenEffectContextMenu from './screeneffectcontextmenu';
+import DashboardScreenEffectContextMenu from './dashboardscreeneffectcontextmenu';
 import SidebarButton from './sidebarbutton';
 import ControllerDetailsMenu from './controllerdetailsmenu';
 import ControllerActivityMenu from './controlleractivitymenu';
@@ -217,6 +225,9 @@ class Dashboard extends Component<any, any> {
 						result.push(...this.getAgentContext());
 					}
 					return result;
+				case NodeTypes.AfterEffect:
+					result.push(...this.getAfterEffectsContext());
+					break;
 				case NodeTypes.PermissionTemplate:
 					result.push(...this.getPermissionTemplateContent());
 					break;
@@ -648,7 +659,9 @@ class Dashboard extends Component<any, any> {
 			}
 			result.push({
 				onClick: () => {
-					this.props.setVisual(CONNECTING_NODE, true);
+					this.props.setVisual(CONNECTING_NODE, {
+						...LinkProperties.GeneralLink
+					});
 				},
 				icon: 'fa fa-plug',
 				title: Titles.GenericLink
@@ -1342,6 +1355,35 @@ class Dashboard extends Component<any, any> {
 		}
 		return result;
 	}
+	getAfterEffectsContext() {
+		const result = [];
+		const { state } = this.props;
+		const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+		result.push({
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.DataChainAfterEffectConverter,
+					nodeTypes: [ NodeTypes.DataChain ]
+				});
+			},
+			icon: 'fa fa-chain',
+			title: `${Titles.DataChainAfterEffectConverter}`
+		});
+
+		result.push({
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.DataChainAfterEffectConverterTarget,
+					nodeTypes: [ NodeTypes.Method ]
+				});
+			},
+			icon: 'fa fa-chain',
+			title: `After Effect Target`
+		});
+
+		return result;
+	}
+
 	getAgentContext() {
 		const result = [];
 		const { state } = this.props;
@@ -1583,7 +1625,7 @@ class Dashboard extends Component<any, any> {
 		return result;
 	}
 
-	getCost() {
+	getCost(adjusted = false) {
 		const { state } = this.props;
 		let cost = 0;
 		const graph: Graph = UIA.GetCurrentGraph(state);
@@ -1592,6 +1634,9 @@ class Dashboard extends Component<any, any> {
 
 		if (graph) {
 			cost = (graph.linkCount || 0) * node_connection_cost + (graph.nodeCount || 0) * node_cost;
+		}
+		if (adjusted) {
+			return Dashboard.formatMoney(cost * 1000);
 		}
 		return Dashboard.formatMoney(cost);
 	}
@@ -1603,6 +1648,7 @@ class Dashboard extends Component<any, any> {
 	render() {
 		const { state } = this.props;
 		const cost = this.getCost();
+		const adjusted_cost = this.getCost(true);
 		const selectedNodeBB = UIA.Visual(state, UIA.SELECTED_NODE_BB);
 		let menuLeft = 0;
 		let menuTop = 0;
@@ -1993,6 +2039,7 @@ class Dashboard extends Component<any, any> {
 									<SideBarHeader title={hoveredLink.properties.type} />
 								) : null}
 								<SideBarHeader title={<h4>{cost}</h4>} onClick={() => {}} />
+								<SideBarHeader title={<span>{adjusted_cost}</span>} onClick={() => {}} />
 
 								<TreeViewMenu
 									open={UIA.Visual(state, VC.ApplicationMenu)}
@@ -2151,7 +2198,7 @@ class Dashboard extends Component<any, any> {
 								active={UIA.Visual(state, MAIN_CONTENT) === CODE_EDITOR}
 								value={UIA.Visual(state, UIA.CODE_EDITOR_INIT_VALUE)}
 							/>
-							{mainContent === MIND_MAP || true ? (
+							{mainContent === MIND_MAP ? (
 								<MindMap
 									linkDistance={UIA.Visual(state, LINK_DISTANCE)}
 									onNodeClick={(nodeId, boundingBox) => {
@@ -2337,6 +2384,7 @@ class Dashboard extends Component<any, any> {
 										this.props.setVisual(UIA.HOVERED_LINK, linkId);
 									}}
 									minimizeTypes={UIA.Minimized(state)}
+									typeWidths={{ [NodeTypes.Concept]: 450 }}
 									selectedColor={UIA.Colors.SelectedNode}
 									markedColor={UIA.Colors.MarkedNode}
 									selectedLinks={[ UIA.Visual(state, UIA.SELECTED_LINK) ].filter((x) => x)}
@@ -2600,6 +2648,14 @@ class Dashboard extends Component<any, any> {
 					</div>
 				</div>
 				<ContextMenu />
+				<RoutingContextMenu />
+				<MountingContextMenu />
+				<EffectContextMenu />
+				<DashboardEffectContextMenu />
+				<DashboardRoutingContextMenu />
+				<DashboardMountingContenxt />
+				<DashboardScreenEffectContextMenu />
+				<ScreenEffectContextMenu />
 			</div>
 		);
 	}

@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import * as Titles from './titles';
-import * as style from './selectinput.css';
 export default class SelectInput extends Component<any, any> {
 	label() {
 		return this.props.label || '{label}';
@@ -17,7 +16,7 @@ export default class SelectInput extends Component<any, any> {
 			if (typeof options === 'function') {
 				options = options();
 			}
-			return options.map((t, index) => (
+			return options.ddSort().map((t: any, index: any) => (
 				<option key={`option-${index}`} value={t.value}>
 					{t.title}
 				</option>
@@ -26,23 +25,26 @@ export default class SelectInput extends Component<any, any> {
 		return [];
 	}
 
-	disabled() {
+	disabled(): string {
 		return this.props.disabled ? 'disabled' : '';
 	}
 
 	render() {
-		let extra = {};
+		let extra: any = {};
+		let selectExtra: any = {};
+
+		selectExtra.disabled = this.disabled() || false;
 		if (this.props.color) {
 			extra.color = this.props.color;
 			extra.style = { '--color': this.props.color };
 		}
 		return (
 			<div className="form-group">
-				<label {...extra}>{this.label()}</label>
+				<label title={this.label()} {...extra}>{this.label()}</label>
 				<select
-					className="form-control"
-					disabled={this.disabled()}
-					onSelect={(evt) => {
+          className="form-control"
+          {...selectExtra}
+					onSelect={(evt: any) => {
 						if (this.props.onChange) {
 							this.props.onChange(evt.target.value);
 						}

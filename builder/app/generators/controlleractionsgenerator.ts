@@ -104,6 +104,7 @@ export default class ControllerActionGenerator {
 						if (GetNodeProp(method, NodeProperties.AsText)) {
 							asText = ` asText: true`;
 						}
+						let templateKeys: string[] = [];
 						const options = [ asForm, collectCookies, asText ].filter((x) => x).join();
 						if (
 							functionType &&
@@ -113,6 +114,7 @@ export default class ControllerActionGenerator {
 							MethodFunctions[functionType].parameters.parameters.template
 						) {
 							const { modelId, parentId } = MethodFunctions[functionType].parameters.parameters.template;
+							templateKeys = Object.keys(MethodFunctions[functionType].parameters.parameters.template);
 							let idKey = null;
 							if (modelId) {
 								template_params = '/${modelId}';
@@ -120,7 +122,12 @@ export default class ControllerActionGenerator {
 							} else if (parentId) {
 								template_params = '/${parentId}';
 								idKey = 'parentId';
+							} else if (templateKeys && templateKeys.length) {
+								template_params = templateKeys.map((t: string) => '/${' + t + '}').join('');
 							}
+
+							// THhis need to be flushed out to work with templateKeys.
+							// This only handles a single parameter
 							if (idKey) {
 								serviceRequirements.push(`
               (serviceImpl.${methodName} ${useAny ? 'as any' : ''}).requirements = function(params${useAny
@@ -142,6 +149,11 @@ export default class ControllerActionGenerator {
 						}
 						if (template_params) {
 							template_params_def = 'let { parentId, modelId } = (template || {});';
+							if (templateKeys && templateKeys.length) {
+								template_params_def = `let { ${templateKeys
+									.map((t: string) => t)
+									.join(',')} } = (template||{});`;
+							}
 						}
 						return bindTemplate(methodType === HTTP_METHODS.POST ? postMethodTemplate : methodTemplate, {
 							methodName: GetJSCodeName(method),
@@ -263,14 +275,20 @@ import * as Util from './util';
 				)}, { ...parameters }, {
     loading: ${loadingTypeModel ? `Models.${loadingTypeModel}` : '"Nothing"'},
     objectType: ${loadingTypeModel ? `Models.${loadingTypeModel}` : '"Nothing"'}
-}, (result${anytypes}) => {
-    var { dataChain } = (parameters || {});
+}, (res${anytypes}) => {
+    var { dataChain, screenEffects, screenContext } = (parameters || {});
+    let result: any = null;
     if (dataChain) {
-        return dataChain(result);
+        result = dataChain(res);
     }
-    else {
-        console.log('missing data chain');
+
+    if(screenEffects && Array.isArray(screenEffects)) {
+      screenEffects.forEach((screenEffects${anytypes}) => {
+        screenEffects(res, screenContext)
+      })
     }
+
+    return result;
 }, null, (result${anytypes}) => {
   var { preChain } = (parameters || {});
   if (preChain) {

@@ -1,5 +1,9 @@
-        public async Task<IList<{{model}}>> {{function_name}}({{user}} user, {{model}} value) 
+        public async Task<IList<{{model}}>> {{function_name}}({{user}} user, {{model}} value)
         {
+
+            if(user.{{agent_type}} == null) {
+              throw new InvalidAgentException();
+            }
 
             var agent = await {{agent_type#lower}}Arbiter.GetOwnedBy<{{agent_type}}>(user.{{agent_type}});
             if(await {{agent_type#lower}}Permissions.{{permission_function}}(value, agent).ConfigureAwait(false))) {

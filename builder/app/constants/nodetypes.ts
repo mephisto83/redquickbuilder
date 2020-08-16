@@ -5,6 +5,7 @@ export const NodeTypes = {
 	Model: 'model',
 	DataSource: 'data-source',
 	Property: 'model-property',
+	UserOfAgentType: 'UserOfAgentType',
 	StateKey: 'StateKey',
 	ModelFilter: 'model-filter',
 	Struct: 'struct',
@@ -12,13 +13,20 @@ export const NodeTypes = {
 	EventHandler: 'EventHandler',
 	ComponentApiConnector: 'component-api-connector',
 	ScreenContainer: 'screen-container',
+	ScreenEffect: 'ScreenEffect',
+	ScreenEffectApi: 'ScreenEffectApi',
+	ContextualParameters: 'ContextualParameters',
 	Screen: 'screen',
 	EventMethod: 'EventMethod',
 	NavigationAction: 'NavigationAction',
 	NavigationScreen: 'NavigationScreen',
 	Lists: 'Lists',
 	EventMethodInstance: 'EventMethodInstance',
+	PermissionDataChain: 'PermissionDataChain',
+	ValidationDataChain: 'ValidationDataChain',
+	ExecutionDataChain: 'ExecutionDataChain',
 	LifeCylceMethod: 'LifeCylceMethod',
+	EventArgument: 'EventArgument',
 	LifeCylceMethodInstance: 'LifeCylceMethodInstance',
 	Selector: 'selector',
 	ComponentApi: 'ComponentApi',
@@ -313,24 +321,34 @@ export const DefaultPropertyValueType = {
 	Enumeration: 'Enumeration'
 };
 
+export const EventArgumentTypes = {
+	RouteSource: 'RouteSource'
+};
+
 export const NodeProperties = {
 	ViewPackage: 'view-package',
 	IsFetchOutput: 'IsFetchOutput',
+	HideStyle: 'HideStyle',
 	IsFetchParameter: 'IsFetchParameter',
 	ViewModelKey: 'ViewModelKey',
+	UserOfAgent: 'UserOfAgent',
 	StateKey: 'StateKey',
 	DefaultPropertyValueType: 'DefaultPropertyValueType',
 	DefaultPropertyValue: 'DefaultPropertyValue',
 	GridPlacement: 'GridPlacement',
+	CompleteFunction: 'CompleteFunction',
+	ArbiterModels: 'ArbiterModels',
 	IsFetchDataChainStorage: 'IsFetchDataChainStorage',
 	IsDashboard: 'IsDashboard',
 	GridRowCount: 'GridRowCount',
 	MergeNode: 'MergeNode',
 	DataChainTypeName: 'DataChainTypeName',
+	DataChainTypeCategory: 'DataChainTypeCategory',
 	IsHomeLaunchView: 'IsHomeLaunchView',
 	UseDefaultValue: 'UseDefaultValue',
 	DefaultValue: 'DefaultValue',
 	HoverStyle: ':hover',
+	AfterEffectMethodChain: 'AfterEffectMethodChain',
 	IsHomeView: 'IsHomeView',
 	AsLocalContext: 'AsLocalContext',
 	DataChainName: 'DataChainName',
@@ -338,6 +356,7 @@ export const NodeProperties = {
 	Themes: 'Themes',
 	SharedReferenceCollection: 'SharedReferenceCollection',
 	BeforeStyle: '::before',
+	AfterEffectKey: 'AfterEffectKey',
 	GridAreas: 'GridAreas',
 	AfterStyle: '::after',
 	LastViewPackage: 'LastViewPackage',
@@ -376,11 +395,15 @@ export const NodeProperties = {
 	SelectedLayoutCell: 'SelectedLayoutCell',
 	ChainParent: 'ChainParent',
 	Navigation: 'Navigation',
+	ValidationMethodTarget: 'ValidationMethodTarget',
 	ClientMethodParameters: 'ClientMethodParameters',
+	DashboardViewComponent: 'DashboardViewComponent',
 	AsOutput: 'AsOutput',
+	UIAgnostic: 'UIAgnostic',
 	EntryPoint: 'EntryPoint',
 	CSEntryPoint: 'CSEntryPoint',
 	CS: 'CS',
+	IsUserOfAgentType: 'IsUserOfAgentType',
 	Property: 'Property',
 	DataChainEntry: 'DataChainEntry',
 	MergeChain: 'MergeChain',
@@ -394,6 +417,7 @@ export const NodeProperties = {
 	ScreenOption: 'ScreenOption',
 	SelectorProperty: 'SelectorProperty',
 	Value: 'Value',
+	ContextParams: 'ContextParams',
 	value: 'value',
 	Number: 'Number',
 	OnFocus: 'onFocus',
@@ -568,6 +592,10 @@ export const NodeProperties = {
 	DataChainReferences: 'DataChainReferences',
 	Lambda: 'Lambda',
 	LambdaInsertArguments: 'LambdaInsertArguments',
+	RouteSource: 'RouteSource',
+	ParameterName: 'ParameterName',
+	EventArgumentType: 'EventArgumentType',
+	TargetProperty: 'TargetProperty',
 	ModelKey: 'ModelKey',
 	DataChainReference: 'DataChainReference',
 	NumberParameter: 'NumberParameter',
@@ -587,6 +615,7 @@ export const NodeProperties = {
 	Groups: 'groups',
 	GroupParent: 'groupParent',
 	CodeName: 'codeName',
+	CssName: 'cssName',
 	ValueName: 'valueName', //The name of the instance variable to be used
 	AgentName: 'agentName', //The name of the instance variable to be used
 	CodePropertyType: 'codeProperty',
@@ -655,21 +684,39 @@ export const LinkType = {
 	MethodApiParameters: 'MethodApiParameters',
 	DefaultViewType: 'DefaultViewType',
 	SharedComponent: 'SharedComponent',
+	ScreenEffect: 'ScreenEffect', // Screen effects link to datachains, that can be used for defining $internalComponentState
 	// Connections to arguments used inside a lambda
+	ScreenEffectApi: 'ScreenEffectApi', // Screen effects api link to a datachain ,with the assumption that they will be an
+	// internal component api
 	LambdaInsertArguments: 'LambdaInsertArguments',
 	ClaimServiceAuthorizationMethod: 'ClaimServiceAuthorizationMethod',
 	ClaimServiceUpdateUserMethod: 'ClaimServiceUpdateUserMethod',
 	ExecutorServiceMethod: 'ExecutorServiceMethod',
+	DataChainAfterEffectConverter: 'DataChainAfterEffectConverter',
+	DataChainAfterEffectConverterTarget: 'DataChainAfterEffectConverterTarget',
+	UserOfAgentType: 'UserOfAgentType',
 	DataChainShouldShow: 'DataChainShouldShow',
+	ContextParameters: 'ContextParameters',
+	PermissionDataChain: 'PermissionDataChain',
+	ValidationDataChain: 'ValidationDataChain',
+	ExecutionDataChain: 'ExecutionDataChain',
 	DataChainIsDisabled: 'DataChainIsDisabled',
 	StateKey: 'StateKey',
+	DataChainScreenEffect: 'DataChainScreenEffect',
+	DataChainScreenEffectImpl: 'DataChainScreenEffectImpl',
 	DefaultValue: 'DefaultValue',
+	ComponentNodeLink: 'ComponentNodeLink',
+	EventArgument: 'EventArgument',
+	MethodArgumentSoure: 'MethodArgumentSoure',
 	LifeCylceMethodInstance: 'LifeCylceMethodInstance',
 	ModelKey: 'ModelKey',
 	AgentAccess: 'AgentAccess',
 	ModelAccess: 'ModelAccess',
+	DashboardAccess: 'DashboardAccess',
 	MenuLink: 'MenuLink',
+	AccessScreen: 'AccessScreen',
 	NavigationScreen: 'NavigationScreen',
+	NavigationScreenImplementation: 'NavigationScreenImplementation',
 	ViewModelKey: 'ViewModelKey',
 	LifeCylceMethod: 'LifeCylceMethod',
 	ConditionTemplate: 'ConditionTemplate',
@@ -737,6 +784,8 @@ export const LinkType = {
 	TitleServiceLink: 'title-service-link',
 	ComponentProperty: 'component-link',
 	EnumerationReference: 'enumeration-reference',
+	GeneralLink: 'GeneralLink',
+	DataChainAfterEffectSubsequentCall: 'DataChainAfterEffectSubsequentCall',
 	LogicalChildren: 'logical-children',
 	LogicalNieces: 'logical-nieces',
 	ManyToManyLink: 'ManyToManyLink',
@@ -782,6 +831,9 @@ export const LinkStyles = {
 	[LinkType.FunctionLink]: {
 		type: LinkType.FunctionLink,
 		stroke: NodeTypeColors[NodeTypes.Function]
+	},
+	[LinkType.ScreenEffect]: {
+		type: LinkType.ScreenEffect
 	},
 	[LinkType.ComponentInternalConnection]: {
 		stroke: NodeTypeColors[NodeTypes.ComponentApi],
@@ -906,16 +958,73 @@ export const LinkPropertyKeys = {
 	InstanceUpdate: 'InstanceUpdate',
 	ComponentTag: 'ComponentTag',
 	ComponentStyle: 'ComponentStyle',
+	MethodProps: 'methodProps',
+	MountingProps: 'mountingProps',
+	ScreenEffectApiProps: 'screenEffectApiProps',
+	DashboardScreenEffectApiProps: 'dashboardScreenEffectApiProps',
+	RoutingProps: 'routingProps',
+	EffectProps: 'effectProps',
 	ComponentProperty: 'ComponentProperty',
 	ViewType: 'viewType',
+	DashboardAccessProps: 'dashboardAccessProps',
+	DashboardViewMountProps: 'dashboardViewMountProps',
+	DashboardRoutingProps: 'dashboardRoutingProps',
+	DashboardEffectProps: 'dashboardEffectProps',
+	AgentAccess: 'AgentAccess',
+	RoutingDescriptionId: 'RoutingDescriptionId',
 	Enumeration: 'Enumeration',
 	AsForm: 'AsForm',
 	DefaultValue: 'DefaultValue'
 };
 
-export const LinkProperties: any = {
+export const LinkProperties = {
 	SharedComponent: {
 		type: LinkType.SharedComponent
+	},
+	UserOfAgentType: {
+		type: LinkType.UserOfAgentType
+	},
+	DataChainAfterEffectConverter: {
+		type: LinkType.DataChainAfterEffectConverter
+	},
+	PermissionDataChain: {
+		type: LinkType.PermissionDataChain
+	},
+	ValidationDataChain: {
+		type: LinkType.ValidationDataChain
+	},
+	ExecutionDataChain: {
+		type: LinkType.ExecutionDataChain
+	},
+	DataChainAfterEffectConverterTarget: {
+		type: LinkType.DataChainAfterEffectConverterTarget
+	},
+	ScreenEffect: {
+		type: LinkType.ScreenEffect
+	},
+	ScreenEffectApi: {
+		type: LinkType.ScreenEffectApi
+	},
+	DataChainScreenEffect: {
+		type: LinkType.DataChainScreenEffect
+	},
+	DataChainScreenEffectImpl: {
+		type: LinkType.DataChainScreenEffectImpl
+	},
+	ContextualParameters: {
+		type: LinkType.ContextParameters
+	},
+	ComponentNodeLink: {
+		type: LinkType.ComponentNodeLink
+	},
+	MethodArgumentSoure: {
+		type: LinkType.MethodArgumentSoure
+	},
+	EventArgument: {
+		type: LinkType.EventArgument
+	},
+	AccessScreen: {
+		type: LinkType.AccessScreen
 	},
 	AgentAccess: {
 		type: LinkType.AgentAccess
@@ -928,6 +1037,9 @@ export const LinkProperties: any = {
 	},
 	NavigationScreen: {
 		type: LinkType.NavigationScreen
+	},
+	NavigationScreenImplementation: {
+		type: LinkType.NavigationScreenImplementation
 	},
 	DefaultValue: {
 		type: LinkType.DefaultValue
@@ -1067,6 +1179,9 @@ export const LinkProperties: any = {
 	SelectorLink: {
 		type: LinkType.SelectorLink
 	},
+	GeneralLink: {
+		type: LinkType.GeneralLink
+	},
 	SelectorInputLink: {
 		type: LinkType.SelectorInputLink
 	},
@@ -1107,6 +1222,9 @@ export const LinkProperties: any = {
 	},
 	AfterMethod: {
 		type: LinkType.AfterMethod
+	},
+	DataChainAfterEffectSubsequentCall: {
+		type: LinkType.DataChainAfterEffectSubsequentCall
 	},
 	EnumerationReferenceLink: {
 		type: LinkType.EnumerationReference
@@ -2090,9 +2208,27 @@ export const ExecutorRules = {
 	AgentReference: 'agent-reference',
 	ParentReference: 'parent-reference',
 	AddModelReference: 'add-model-reference',
-	SetToDeleted: 'set-to-deleted'
+	SetToDeleted: 'set-to-deleted',
+	DataChain: 'data-chain'
 };
 export const ExecutorUI: any = {
+	[ExecutorRules.DataChain]: {
+		code: {
+			[ProgrammingLanguages.CSHARP]: 'DataChain'
+		},
+		arguments: {
+			nodeType: NodeTypes.DataChain,
+			reference: {
+				types: [ NodeTypes.DataChain ],
+				title: NodeTypes.DataChain,
+				properties: {
+					[NodeProperties.CS]: true,
+					[NodeProperties.NODEType]: NodeTypes.DataChain,
+					[NodeProperties.CSEntryPoint]: true
+				}
+			}
+		}
+	},
 	[ExecutorRules.ModelReference]: {
 		code: {
 			[ProgrammingLanguages.CSHARP]: 'ModelReference'

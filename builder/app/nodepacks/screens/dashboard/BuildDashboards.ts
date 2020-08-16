@@ -1,4 +1,5 @@
-import { NodeTypes, NodeProperties, UITypes } from '../../../constants/nodetypes';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { NodeTypes, NodeProperties, UITypes, LinkType, LinkProperties } from '../../../constants/nodetypes';
 import {
 	NodesByType,
 	GetNodeProp,
@@ -7,43 +8,62 @@ import {
 	graphOperation,
 	UPDATE_NODE_PROPERTY,
 	GetDispatchFunc,
-	GetStateFunc
+	GetStateFunc,
+	AddLinkBetweenNodes
 } from '../../../actions/uiactions';
-import { Node } from '../../../methods/graph_types';
-import CreateSmartDashboard from './CreateSmartDashboard';
+import { Node, Graph } from '../../../methods/graph_types';
+import CreateSmartDashboard, { ButtonDescription } from './CreateSmartDashboard';
 import { GetNodesLinkedTo, SOURCE, SetPause } from '../../../methods/graph_methods';
+import { AddComponentAutoStyles } from '../../batch/ConnectScreen/Shared';
 
 export default function BuildDashboards(filter: Function) {
-	let navigationScreens = NodesByType(null, NodeTypes.NavigationScreen)
+	const navigationScreens: Node[] = NodesByType(null, NodeTypes.NavigationScreen)
 		.filter((x: Node) => GetNodeProp(x, NodeProperties.IsDashboard))
 		.filter(filter);
-	let graph = GetCurrentGraph();
+	const graph: Graph = GetCurrentGraph();
 	SetPause(true);
 	navigationScreens.forEach((navigationScreen: Node) => {
-		let buttons = GetNodesLinkedTo(graph, {
-			id: navigationScreen.id,
-			direction: SOURCE
-		}).map((targetNode: Node) => {
-			return { title: GetNodeTitle(targetNode), target: targetNode.id };
-		});
-		let types = {
+		const types: any = {
 			[UITypes.ElectronIO]: true,
 			[UITypes.ReactNative]: true,
 			[UITypes.ReactWeb]: true
 		};
-		let screenContext: { entry: string };
+		let screenContext: { entry: string } | any = null;
 		Object.keys(types).forEach((uiType: string) => {
+			let viewComponent: string = '';
 			CreateSmartDashboard({
 				dashboardName: GetNodeTitle(navigationScreen),
 				uiType,
 				componentName: `${GetNodeTitle(navigationScreen)} Component`,
-				buttons,
+				//buttons: [],
+				buttons: GetNodesLinkedTo(graph, {
+					id: navigationScreen.id,
+					direction: SOURCE,
+					link: LinkType.NavigationScreen
+				}).map((targetNode: Node) => {
+					return {
+						title: GetNodeTitle(targetNode),
+						target: targetNode.id,
+						isDashboard: GetNodeProp(targetNode, NodeProperties.IsDashboard)
+					};
+				}),
 				isHome: !!GetNodeProp(navigationScreen, NodeProperties.IsHomeLaunchView),
-				callback: (sdcontext: { entry: string }) => {
+				callback: (sdcontext: { viewComponent: string; entry: string; buttons: ButtonDescription[] }) => {
 					screenContext = sdcontext;
+					viewComponent = sdcontext.viewComponent;
 				}
 			});
+
 		});
+		if (screenContext) {
+			graphOperation(
+				AddLinkBetweenNodes(
+					navigationScreen.id,
+					screenContext ? screenContext.entry : '',
+					LinkProperties.NavigationScreenImplementation
+				)
+			)(GetDispatchFunc(), GetStateFunc());
+		}
 		graphOperation(function() {
 			return {
 				operation: UPDATE_NODE_PROPERTY,

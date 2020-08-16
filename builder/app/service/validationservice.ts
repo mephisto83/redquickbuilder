@@ -13,12 +13,20 @@ import {
 	GetMethodFunctionValidation,
 	GetValidationNode,
 	safeFormatTemplateProperty,
-	GetCurrentGraph
+	GetCurrentGraph,
+	GetNodeProp
 } from '../actions/uiactions';
 import * as GraphMethods from '../methods/graph_methods';
 import { bindTemplate, FunctionTemplateKeys } from '../constants/functiontypes';
 import fs from 'fs';
-import { ProgrammingLanguages, STANDARD_CONTROLLER_USING, NameSpace, NEW_LINE, LinkType } from '../constants/nodetypes';
+import {
+	ProgrammingLanguages,
+	STANDARD_CONTROLLER_USING,
+	NameSpace,
+	NEW_LINE,
+	LinkType,
+	NodeProperties
+} from '../constants/nodetypes';
 import NamespaceGenerator from '../generators/namespacegenerator';
 import { Node } from '../methods/graph_types';
 function GetMethodDefinitionValidationSection(id: any) {
@@ -96,7 +104,8 @@ export function GetValidationEntries(
 				conditions: conditions.join(NEW_LINE)
 			});
 		});
-	}
+  }
+  return [];
 }
 
 export function GetValidationMethodImplementation(id: any, language = ProgrammingLanguages.CSHARP) {
@@ -134,9 +143,22 @@ export function GetValidationMethodInterface(id: any, language = ProgrammingLang
 
 export function GetAgentValidationInterface(agentId: string | number) {
 	let dictionary = GetValidationsSortedByAgent();
+	let namespace = GetNameSpace();
 	if (dictionary && dictionary[agentId]) {
-		let namespace = GetNameSpace();
 		let interface_ = BuildAgentValidationInterface(agentId, dictionary[agentId].map((t: { id: any }) => t.id));
+		return NamespaceGenerator.Generate({
+			template: interface_,
+			usings: [
+				...STANDARD_CONTROLLER_USING,
+				`${namespace}${NameSpace.Interface}`,
+				`${namespace}${NameSpace.Model}`,
+				`${namespace}${NameSpace.Parameters}`
+			],
+			namespace,
+			space: NameSpace.Interface
+		});
+	} else if (!GetNodeProp(agentId, NodeProperties.IsUser)) {
+		let interface_ = BuildAgentValidationInterface(agentId, []);
 		return NamespaceGenerator.Generate({
 			template: interface_,
 			usings: [
@@ -176,12 +198,28 @@ export function GenerateAgentValidationInterfacesAndImplementations() {
 
 export function GetAgentValidationImplementation(agentId: string | number) {
 	let dictionary = GetValidationsSortedByAgent();
+	let namespace = GetNameSpace();
 	if (dictionary && dictionary[agentId]) {
-		let namespace = GetNameSpace();
 		let implementation = BuildAgentValidationImplementation(
 			agentId,
 			dictionary[agentId].map((t: { id: any }) => t.id)
 		);
+		return NamespaceGenerator.Generate({
+			template: implementation,
+			usings: [
+				...STANDARD_CONTROLLER_USING,
+				`${namespace}${NameSpace.Extensions}`,
+				`${namespace}${NameSpace.Model}`,
+				`${namespace}${NameSpace.Interface}`,
+				`${namespace}${NameSpace.Parameters}`,
+				`${namespace}${NameSpace.Controllers}`,
+				`${namespace}${NameSpace.Constants}`
+			].filter((x) => x),
+			namespace,
+			space: NameSpace.Validations
+		});
+	} else if (!GetNodeProp(agentId, NodeProperties.IsUser)) {
+		let implementation = BuildAgentValidationImplementation(agentId, []);
 		return NamespaceGenerator.Generate({
 			template: implementation,
 			usings: [
@@ -233,7 +271,7 @@ export function BuildAgentValidationImplementation(
 		})
 		.filter((x: any) => x)
 		.join(NEW_LINE);
-	let validation_entries: any = GetValidationEntries(agentId, false, language);
+	let validation_entries: any = GetValidationEntries(agentId, false, language) || [];
 	let template = fs.readFileSync('./app/templates/validation/validations_impl.tpl', 'utf8');
 	let _constructTemplate = fs.readFileSync('./app/templates/validation/constructor.tpl', 'utf8');
 	let constructor = bindTemplate(_constructTemplate, {

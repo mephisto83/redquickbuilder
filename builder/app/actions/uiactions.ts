@@ -1,20 +1,41 @@
 /* eslint-disable default-case */
 /* eslint-disable func-names */
 import * as GraphMethods from '../methods/graph_methods';
+import * as GraphTypes from '../methods/graph_types';
 import * as NodeConstants from '../constants/nodetypes';
 import * as Titles from '../components/titles';
 import { NavigateTypes } from '../constants/nodetypes';
-import { MethodFunctions, bindTemplate, bindReferenceTemplate, FunctionTemplateKeys } from '../constants/functiontypes';
+import {
+	MethodFunctions,
+	bindTemplate,
+	bindReferenceTemplate,
+	FunctionTemplateKeys,
+	bindReferenceJSONTemplates
+} from '../constants/functiontypes';
 import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachain';
 import { uuidv4, addNewLine } from '../utils/array';
-import { getReferenceInserts } from '../utils/utilservice';
+import { getReferenceInserts, getJSONReferenceInserts } from '../utils/utilservice';
 import { buildValidation } from '../service/validation_js_service';
 import UpdateMethodParameters from '../nodepacks/method/UpdateMethodParameters';
 import ConnectLifecycleMethod from '../components/ConnectLifecycleMethod';
 import { ViewTypes } from '../constants/viewtypes';
 import { GraphLink, Graph } from '../methods/graph_types';
+import * as _ from '../methods/graph_types';
 import JobService, { Job, JobAssignment, JobFile, JobServiceConstants } from '../jobs/jobservice';
 import { AgentProject } from '../jobs/interfaces';
+import { RouteSourceType, RouteSource } from '../interface/methodprops';
+import {
+	ReferenceInsert,
+	GetJSONReferenceInserts,
+	GetJSONReferenceInsertsMap,
+	ReferenceInsertType
+} from '../components/lambda/BuildLambda';
+import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
+import {
+	ProgrammingLanguages,
+	NodePropertyTypesByLanguage,
+	NEW_LINE
+} from '../constants/nodetypes';
 const fs = require('fs');
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';
@@ -50,6 +71,7 @@ export const GetItem = (a: any, b: any) => {
 export const BATCH_FUNCTION_NAME = 'BATCH_FUNCTION_NAME';
 export const RECORDING = 'RECORDING';
 export const BATCH_FUNCTION_TYPE = 'BATCH_FUNCTION_TYPE';
+export const SITE = 'SITE';
 
 export const ValidationPropName = {
 	Email: 'email',
@@ -178,7 +200,7 @@ export function CopyKey(key: any) {
 	return `Copy ${key}`;
 }
 export function IsCurrentNodeA(state: any, type: any) {
-	const currentNode = Node(state, Visual(state, SELECTED_NODE));
+	const currentNode: _.Node = Node(state, Visual(state, SELECTED_NODE));
 	if (!Array.isArray(type)) {
 		type = [ type ];
 	}
@@ -222,9 +244,17 @@ export function GetSharedComponentFor(
 ) {
 	const graph = GetCurrentGraph(GetState());
 	let viewTypeNodes = GraphMethods.GetNodesLinkedTo(graph, {
-		id: modelProperty.id
+		id: typeof modelProperty === 'string' ? modelProperty : modelProperty.id
 	});
-	viewTypeNodes = viewTypeNodes.filter((x: any) => GetNodeProp(x, NodeProperties.Agent) === agentId);
+	// viewTypeNodes = viewTypeNodes.filter((x: any) => {
+	// 	let componentNodes = GraphMethods.GetNodesLinkedTo(graph, {
+	// 		id: x.id,
+	// 		componentType: NodeTypes.ComponentNode,
+	// 		link: NodeConstants.LinkType.DefaultViewType
+	// 	});
+
+	// 	return componentNodes.find((v: Node) => GetNodeProp(v, NodeProperties.Agent) === agentId);
+	// });
 
 	let isPluralComponent: any;
 	const propertyNode = GetNodeById(modelProperty.id);
@@ -344,7 +374,57 @@ export function setSharedComponent(args: any) {
 		}
 	};
 }
+export function AddLinkBetweenNodes(source: string, target: string, properties: any): any[] {
+	return [
+		{
+			operation: ADD_LINK_BETWEEN_NODES,
+			options: {
+				source,
+				target,
+				properties: { ...properties }
+			}
+		}
+	];
+}
+export function UpdateLinkProperty(id: string, prop: string, value: any) {
+	return [
+		{
+			operation: UPDATE_LINK_PROPERTY,
+			options: { id, value, prop }
+		}
+	];
+}
+export function CreateNewNode(props: any, callback?: Function) {
+	return [
+		{
+			operation: ADD_NEW_NODE,
+			options: {
+				callback,
+				nodeType: props.nodeType,
+				properties: {
+					...props
+				}
+			}
+		}
+	];
+}
 
+export function AddInsertArgumentsForDataChain(id: string) {
+	let lambdaText = GetNodeProp(id, NodeProperties.Lambda);
+	const value: GraphTypes.LambdaInserts = GetNodeProp(id, NodeProperties.LambdaInsertArguments) || {};
+	GetJSONReferenceInserts(lambdaText || '').map((_insert: ReferenceInsert) => {
+		if (_insert.model) {
+			if (_insert.property) {
+				value[_insert.key] = _insert.property;
+			} else {
+				value[_insert.key] = _insert.model;
+			}
+		} else {
+			value[_insert.key] = '';
+		}
+	});
+	updateComponentProperty(id, NodeProperties.LambdaInsertArguments, value);
+}
 export function SetSharedComponent(args: any) {
 	const { properties, target, source, viewType, uiType, isPluralComponent, graph } = args;
 	if (
@@ -688,6 +768,13 @@ export function GetLambdaVariableTitle(node: any, escape?: boolean, shortKey?: b
 	}
 	return `#{${title.split(' ').filter((x) => x).map((f: string) => f.toLocaleLowerCase()).join('-')}}`;
 }
+export function GetCssName(node: any): string {
+	const graph = GetCurrentGraph(GetState());
+	if (typeof node === 'string') {
+		node = GraphMethods.GetNode(graph, node);
+	}
+	return GetNodeProp(node, NodeProperties.CssName) || GetJSCodeName(node);
+}
 export function GetCodeName(node: any, options?: any): string {
 	const graph = GetCurrentGraph(GetState());
 	if (typeof node === 'string') {
@@ -764,6 +851,28 @@ export function GetModelPropertyChildren(id: string, options: any = {}) {
 		userModels = GetUserReferenceNodes(id);
 	}
 	return [ ...userModels, ...propertyNodes, ...logicalChildren ]
+		.filter((x) => x.id !== id)
+		.unique((v: { id: any }) => v.id);
+}
+
+/**
+ * Gets the models properties, that will appear on the model.
+ * @param id node id
+ */
+export function GetModelCodeProperties(id: string) {
+	const propertyNodes = GetModelPropertyNodes(id);
+	let graph = GetCurrentGraph();
+	// const logicalChildren = skipLogicalChildren ? [] : GetLogicalChildren(id);
+	const logicalParents = GraphMethods.GetNodesLinkedTo(graph, {
+		id,
+		direction: GraphMethods.TARGET,
+		link: NodeConstants.LinkType.LogicalChildren
+	});
+	let userModels = [];
+	if (GetNodeProp(id, NodeProperties.NODEType) === NodeTypes.Model || GetNodeProp(id, NodeProperties.IsUser)) {
+		userModels = GetUserReferenceNodes(id);
+	}
+	return [ ...userModels, ...propertyNodes, ...logicalParents ]
 		.filter((x) => x.id !== id)
 		.unique((v: { id: any }) => v.id);
 }
@@ -1027,6 +1136,20 @@ export function GetConditionSetup(condition: any) {
 export function GetDataChainEntryNodes(cs?: any) {
 	return GraphMethods.GetDataChainEntryNodes(_getState(), cs);
 }
+export function GetPropertyModel(propId: string): _.Node | null {
+	let nodes = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+		id: propId,
+		link: NodeConstants.LinkType.ModelTypeLink
+	});
+	nodes.push(
+		...GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+			id: propId,
+			link: NodeConstants.LinkType.PropertyLink
+		})
+	);
+
+	return nodes && nodes.length ? nodes[0] : null;
+}
 export function GetLambdaDefinition(method: any | null) {
 	const functionType = GetNodeProp(method, NodeProperties.FunctionType);
 	const { lambda } = MethodFunctions[functionType];
@@ -1058,16 +1181,40 @@ export function GenerateDataChainArguments(id: string) {
 export function GenerateCSChainFunction(id: string) {
 	const lastNodeName = GenerateCDDataChainMethod(id);
 	const arbiters = GetArbitersInCSDataChainMethod(id);
-	const outputType = GetOutputTypeInCSDataChainMethod(id);
-	const arbiterInterfaces = arbiters
-		.map((arb) => `IRedArbiter<${GetCodeName(arb)}> _arbiter${GetCodeName(arb)}`)
+	const staticArbiters = GetStaticArbitersInCSDataChainMethod(id);
+	let alternateOutputType = null;
+	const outputType = GetOutputTypeInCSDataChainMethod(id, (v: string) => {
+		alternateOutputType = v;
+	});
+	let arbiterInterfaces = arbiters
+		.map((arb: string | Node) => `IRedArbiter<${GetCodeName(arb)}> _arbiter${GetCodeName(arb)}`)
 		.join(', ');
-	const arbiterSets = addNewLine(
-		arbiters.map((arb) => `arbiter${GetCodeName(arb)} = _arbiter${GetCodeName(arb)};`).join(NodeConstants.NEW_LINE)
+	let arbiterInterfacesStatic = staticArbiters
+		.map((arb: string | Node) => `static IRedArbiter<${GetCodeName(arb)}> _arbiter${GetCodeName(arb)}Static;`)
+		.join(NEW_LINE);
+	let arbiterSets = addNewLine(
+		arbiters
+			.map((arb: string | Node) => `arbiter${GetCodeName(arb)} = _arbiter${GetCodeName(arb)};`)
+			.join(NodeConstants.NEW_LINE)
 	);
-	const arbiterProperties = arbiters
-		.map((arb) => `IRedArbiter<${GetCodeName(arb)}> arbiter${GetCodeName(arb)};`)
+
+	let arbiterProperties = arbiters
+		.map((arb: string | Node) => `IRedArbiter<${GetCodeName(arb)}> arbiter${GetCodeName(arb)};`)
 		.join(NodeConstants.NEW_LINE);
+
+	let arbiterPropertiesStatic = staticArbiters
+		.map(
+			(arb: string | Node) => `static IRedArbiter<${GetCodeName(arb)}> arbiter${GetCodeName(arb)}Static {
+      get {
+        if(arbiter${GetCodeName(arb)}Static == null) {
+          _arbiter${GetCodeName(arb)}Static = RedStrapper.Resolve<IRedArbiter<${GetCodeName(arb)}>>();
+        }
+        return _arbiter${GetCodeName(arb)}Static;
+      }
+    }`
+		)
+		.join(NodeConstants.NEW_LINE);
+
 	const currentNode: any = GetNodeById(id);
 	let _arguments = '';
 	if (GetNodeProp(currentNode, NodeProperties.CS)) {
@@ -1093,34 +1240,58 @@ export function GenerateCSChainFunction(id: string) {
 			}
 		}
 	}
-	const method = `public class ${GetCodeName(id)}
-{
-${arbiterProperties}
-    public ${GetCodeName(id)}(${arbiterInterfaces}) {
-${arbiterSets}
-    }
-    public async Task<${GetCodeName(outputType)}> Execute(${_arguments}) {
-      ${lastNodeName}
-    }
-}`;
+	let method = '';
+	if (GetNodeProp(id, NodeProperties.CompleteFunction)) {
+		method = `public class ${GetCodeName(id)}
+              {
+              ${arbiterProperties}
+              ${arbiterPropertiesStatic}
+              ${arbiterInterfacesStatic}
 
+                  public ${GetCodeName(id)}(${arbiterInterfaces}) {
+              ${arbiterSets}
+                  }
+                  ${lastNodeName}
+              }`;
+	} else {
+		method = `public class ${GetCodeName(id)}
+            {
+            ${arbiterProperties}
+                public ${GetCodeName(id)}(${arbiterInterfaces}) {
+            ${arbiterSets}
+                }
+                public async Task<${alternateOutputType || GetCodeName(outputType)}> Execute(${_arguments}) {
+                  ${lastNodeName}
+                }
+            }`;
+	}
 	return method;
 }
 export function GenerateChainFunction(id: any, options: { language: any }) {
 	const chain = GetDataChainParts(id);
 	let args: any = null;
+	let overridArg: any = null;
+	let extraArgs: string[] = [];
 	const observables: string[] = [];
 	const { language } = options;
 	let anyType = ': any';
 	if (language === NodeConstants.UITypes.ReactNative) {
 		anyType = '';
+	} else {
+		let interface_type: string = generateContextInterfaces(GetNodeById(id), anyType);
+		if (interface_type) {
+			anyType = `: ${interface_type}`;
+			overridArg = [ '$internalComponentState' ];
+		}
 	}
+
 	const setArgs: string[] = [];
 	const subscribes: string[] = [];
 	const setProcess: string[] = [];
 	chain.forEach((c: any, index: number) => {
 		if (index === 0) {
-			args = GetDataChainArgs(c);
+			args = overridArg || GetDataChainArgs(c);
+			extraArgs = GetExtraArgs(c);
 		}
 		const temp = GenerateDataChainMethod(c, options);
 		observables.push(GenerateObservable(c));
@@ -1134,18 +1305,142 @@ export function GenerateChainFunction(id: any, options: { language: any }) {
 	const lastLink = GetLastChainLink(chain);
 	const lastLinkindex = chain.indexOf(lastLink);
 	const lastNodeName = (GetJSCodeName(lastLink) || 'node' + lastLinkindex).toJavascriptName();
-	const method = `export function  ${GetCodeName(id)}(${args.map((v: any) => `${v}${anyType}`).join()}) {
+	const method = `export function  ${GetCodeName(id)}(${args
+		.map((v: any) => `${v}${anyType}`)
+		.join()}${extraArgs.join()}) {
 ${observables.join(NodeConstants.NEW_LINE)}
 ${setArgs.join(NodeConstants.NEW_LINE)}
 ${setProcess.join(NodeConstants.NEW_LINE)}
 ${subscribes.join(NodeConstants.NEW_LINE)}
-${nodeName}.update($id , '$id');
+${nodeName}.update( ${(overridArg ? overridArg[0] : '') || '$id'}  , '$id');
 
 return ${lastNodeName}.value;
 }`;
 
 	return method;
 }
+export function GetEventArguments(buttonId: string): _.Node[] {
+	let eventArguments = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+		id: buttonId,
+		link: NodeConstants.LinkType.EventArgument
+	});
+
+	return eventArguments;
+}
+function GetExtraArgs(id: string) {
+	let argumentSource = GraphMethods.GetNodeLinkedTo(GetCurrentGraph(), {
+		id,
+		link: NodeConstants.LinkType.MethodArgumentSoure
+	});
+	if (argumentSource) {
+		let apiInternalNodes = GetComponentInternalApiNodes(argumentSource.id);
+
+		let calculateEventArguments = GetEventArguments(argumentSource.id);
+		// let internalApiArgs = createInternalApiArgumentsCode(apiInternalNodes, calculateEventArguments);
+
+		return [ createInternalApiArguments(apiInternalNodes, calculateEventArguments) ];
+	}
+	return [];
+}
+
+function generateContextInterfaces(currentNode: GraphTypes.Node, anyType?: string) {
+	let result = '';
+	if (!currentNode) {
+		return '';
+	}
+	let graph = GetCurrentGraph();
+	let screenEffectApis = GraphMethods.GetNodesLinkedTo(graph, {
+		id: currentNode.id,
+		link: NodeConstants.LinkType.ScreenEffectApi
+	}).map((node: Node) => {
+		return GetJSCodeName(node);
+	});
+	let possibleDataChainParams: string[] = [];
+	let dataScreenEffects = GraphMethods.GetNodesLinkedTo(graph, {
+		id: currentNode.id,
+		link: NodeConstants.LinkType.DataChainScreenEffect
+	});
+	dataScreenEffects.forEach((temp: _.Node) => {
+		let componentOrScreenOption = GraphMethods.GetNodeLinkedTo(graph, {
+			id: temp.id,
+			link: NodeConstants.LinkType.ComponentInternalApi
+		});
+		let internalNodes = GetComponentInternalApiNodes(componentOrScreenOption.id, graph);
+		possibleDataChainParams.push(...internalNodes.map((v: _.Node) => GetJSCodeName(v)));
+	});
+	let contextParameters: string[] = [];
+	GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+		id: currentNode.id,
+		link: NodeConstants.LinkType.ContextParameters
+	}).forEach((node: Node) => {
+		let nodeParams = GetNodeProp(node, NodeProperties.ContextParams) || [];
+		contextParameters.push(...nodeParams);
+	});
+	let argumentSource = GraphMethods.GetNodeLinkedTo(GetCurrentGraph(), {
+		id: currentNode.id,
+		link: NodeConstants.LinkType.MethodArgumentSoure
+	});
+	let eventArgNames: string[] = [];
+	if (argumentSource) {
+		let calculateEventArguments = GetEventArguments(argumentSource.id);
+		eventArgNames = getEventArgumentNames(calculateEventArguments);
+	}
+	if (currentNode && (screenEffectApis.length || contextParameters.length)) {
+		result = `{
+${[ ...screenEffectApis, ...contextParameters, ...eventArgNames, ...possibleDataChainParams, 'viewModel', 'value' ]
+			.filter((x: string) => x)
+			.unique()
+			.map((param: string) => {
+				return `${param}?: string | number | null`;
+			})
+			.join(`,${NodeConstants.NEW_LINE}`)}
+}
+    `;
+	}
+
+	return result;
+}
+
+function createInternalApiArguments(apiInternalNodes: _.Node[], eventArguments: _.Node[]) {
+	let result = '';
+	let argNames = getEventArgumentNames(eventArguments);
+	result = `, $internalComponentState?: { [str:string]: any, ${[
+		...apiInternalNodes.map((node: _.Node) => {
+			return GetNodeTitle(node);
+		}),
+		...argNames
+	]
+		.unique()
+		.map((name: string) => {
+			return `${name}: string | number | null`;
+		})
+		.join(', ' + NodeConstants.NEW_LINE)} }`;
+	return result;
+}
+
+function getEventArgumentNames(calculateEventArguments: _.Node[]): string[] {
+	let methodParamNames: string[] = [];
+	(calculateEventArguments || []).forEach((node: _.Node) => {
+		switch (GetNodeProp(node, NodeProperties.EventArgumentType)) {
+			case NodeConstants.EventArgumentTypes.RouteSource:
+				let routeSource: RouteSource = GetNodeProp(node, NodeProperties.RouteSource);
+				let screen = GetNodeProp(node, NodeProperties.Screen);
+				let viewType = GetNodeProp(screen, NodeProperties.ViewType);
+				let paramName = GetNodeProp(node, NodeProperties.ParameterName).toJavascriptName();
+				switch (routeSource.type) {
+					case RouteSourceType.Agent:
+					case RouteSourceType.Model:
+					case RouteSourceType.UrlParameter:
+					case RouteSourceType.Body:
+						methodParamNames.push(paramName);
+						break;
+				}
+				break;
+		}
+	});
+	return methodParamNames.unique();
+}
+
 export function GenerateSetProcess(id: any, parts: string | any[], options: any) {
 	const index = parts.indexOf(id);
 	const nodeName = (GetJSCodeName(id) || 'node' + index).toJavascriptName();
@@ -1236,7 +1531,12 @@ export function GenerateChainFunctions(options: { cs?: any; language: any; colle
 	const { cs, language, collection } = options;
 	const graph = GetCurrentGraph();
 	const entryNodes = GetDataChainEntryNodes(cs)
+		.unique((x: { id: string }) => x.id)
 		.filter((x: any) => {
+			const languageAgnostic = GetNodeProp(x, NodeProperties.UIAgnostic);
+			if (languageAgnostic) {
+				return true;
+			}
 			const uiType = GetNodeProp(x, NodeProperties.UIType);
 			if (uiType) {
 				return language === uiType;
@@ -1380,12 +1680,20 @@ export function GetComponentExternalApiNode(api: any, parent: any, graph?: any) 
 		link: NodeConstants.LinkType.ComponentExternalApi
 	}).find((v: any) => GetNodeTitle(v) === api);
 }
+
 export function GetComponentApiNode(api: any, parent: any, graph?: any) {
 	graph = graph || GetCurrentGraph();
 	return GraphMethods.GetNodesLinkedTo(graph, {
 		id: parent,
 		link: NodeConstants.LinkType.ComponentInternalApi
 	}).find((v: any) => GetNodeTitle(v) === api);
+}
+export function GetComponentApiNodes(parent: any, graph?: any) {
+	graph = graph || GetCurrentGraph();
+	return GraphMethods.GetNodesLinkedTo(graph, {
+		id: parent,
+		link: NodeConstants.LinkType.ComponentInternalApi
+	});
 }
 
 export function GetComponentExternalApiNodes(parent: any, graph?: any) {
@@ -1410,6 +1718,13 @@ export function GetComponentInternalApiNode(api: any, parent: any, graph?: any) 
 		id: parent,
 		link: NodeConstants.LinkType.ComponentInternalApi
 	}).find((v: any) => GetNodeTitle(v) === api);
+}
+export function GetComponentInternalApiNodes(parent: string, graph?: any) {
+	graph = graph || GetCurrentGraph();
+	return GraphMethods.GetNodesLinkedTo(graph, {
+		id: parent,
+		link: NodeConstants.LinkType.ComponentInternalApi
+	});
 }
 
 export function GenerateChainFunctionSpecs(options: { language: any; collection: any }) {
@@ -1633,11 +1948,27 @@ export function GetArbitersInCSDataChainMethod(id: string) {
 					}
 				}
 			});
+			result.push(...(GetNodeProp(node, NodeProperties.ArbiterModels) || []));
+			break;
 	}
-	return result;
+	return result.unique();
 }
 
-export function GetOutputTypeInCSDataChainMethod(id: string) {
+export function GetStaticArbitersInCSDataChainMethod(id: string) {
+	const node = GetNodeById(id);
+	const functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
+	const lambda = GetNodeProp(node, NodeProperties.Lambda);
+
+	const result: any[] = [];
+	switch (functionType) {
+		case DataChainFunctionKeys.Lambda:
+			result.push(...(GetNodeProp(node, NodeProperties.ArbiterModels) || []));
+			break;
+	}
+	return result.unique();
+}
+
+export function GetOutputTypeInCSDataChainMethod(id: string, callback?: any) {
 	const node = GetNodeById(id);
 	const functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
 	const lambda = GetNodeProp(node, NodeProperties.Lambda);
@@ -1650,11 +1981,38 @@ export function GetOutputTypeInCSDataChainMethod(id: string) {
 				if (temp.length > 1) {
 					if (temp[0].indexOf('return') === 0) {
 						const vari = temp[0].split(' ').filter((x: any) => x);
+						if (temp[1].indexOf('|') !== -1) {
+							//   #{return@sm|ChangeBy|agent }
+							//   #{return@sm|}
+							//   #{return@agent|}
+							let res = '';
+							temp.subset(1).join('').split('|').map((v: string) => v.trim()).forEach((v: string) => {
+								let temp = GetNodeProp(id, NodeProperties.LambdaInsertArguments);
+								if (temp && temp[v]) {
+									res += `${GetCodeName(temp[v])}`;
+								} else {
+									res += v;
+								}
+							});
+							if (res && callback) {
+								callback(res);
+							}
+						}
 						const lambdaNode = GetLambdaVariableNode(id, vari[vari.length - 1]);
 						if (lambdaNode) result = lambdaNode;
+						else {
+						}
 					}
 				}
 			});
+	}
+	let category = GetNodeProp(id, NodeProperties.DataChainTypeCategory);
+	switch (category) {
+		case DataChainType.Permission:
+			if (callback) {
+				callback('bool');
+			}
+			break;
 	}
 	return result;
 }
@@ -1665,6 +2023,61 @@ export function GenerateCDDataChainMethod(id: string) {
 	const lambdaInsertArguments = GetNodeProp(node, NodeProperties.LambdaInsertArguments);
 	switch (functionType) {
 		case DataChainFunctionKeys.Lambda:
+			let lambdaText = GetNodeProp(id, functionType);
+			let temp = GetJSONReferenceInsertsMap(lambdaText);
+			if (temp) {
+				Object.values(temp).map((v: { template: string; insert: ReferenceInsert }) => {
+					let { key, type = ReferenceInsertType.Model } = v.insert;
+					let valueKey = key;
+					if (
+						lambdaInsertArguments &&
+						lambdaInsertArguments[valueKey] &&
+						lambdaInsertArguments[valueKey][type]
+					) {
+						let codeName = GetCodeName(lambdaInsertArguments[valueKey][type]);
+						if (type == ReferenceInsertType.EnumerationValue) {
+							let enumerationValues =
+								GetNodeProp(
+									lambdaInsertArguments[key]
+										? lambdaInsertArguments[key][ReferenceInsertType.Enumeration]
+										: null,
+									NodeProperties.Enumeration
+								) || [];
+							let temp: any = enumerationValues.find(
+								(v: { id: string }) => v.id === lambdaInsertArguments[valueKey][type]
+							);
+							if (temp) {
+								codeName = `${temp.value}`.toUpperCase();
+							}
+						} else if (type === ReferenceInsertType.PropertyType) {
+							let uiType = GetNodeProp(
+								lambdaInsertArguments[key]
+									? lambdaInsertArguments[key][ReferenceInsertType.PropertyType]
+									: null,
+								NodeProperties.UIAttributeType
+							);
+							if (
+								!uiType &&
+								GetNodeProp(
+									lambdaInsertArguments[key]
+										? lambdaInsertArguments[key][ReferenceInsertType.PropertyType]
+										: null,
+									NodeProperties.NODEType
+								) === NodeTypes.Model
+							) {
+								uiType = 'STRING';
+							}
+							if (uiType) {
+								codeName = NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][uiType];
+							}
+						}
+						lambda = bindReferenceJSONTemplates(lambda, {
+							[v.template]: codeName
+						});
+					}
+				});
+			}
+
 			getReferenceInserts(lambda).map((v) => v.substr(2, v.length - 3)).unique().map((_insert: string) => {
 				const temp = _insert.split('@');
 				const insert = temp.length > 1 ? temp[1] : temp[0];
@@ -1739,6 +2152,9 @@ export function GenerateDataChainMethod(id: string, options: { language: any }) 
 			}
 			return `(id${anyType}) => {
     let item = typeof(id) ==='object' ? id : GetItem(Models.${GetCodeName(model)}, id);
+    if(!item && id && typeof(id) === 'string') {
+      fetchModel(Models.${GetCodeName(model)}, id);
+    }
     ${lastpart}
 }`;
 		case DataChainFunctionKeys.Model:
@@ -1756,11 +2172,6 @@ export function GenerateDataChainMethod(id: string, options: { language: any }) 
 		case DataChainFunctionKeys.NewRedGraph:
 			return `() => {
         let menuData = new RedGraph();
-        // for (var i = 0; i < 12; i++) {
-        //   RedGraph.addNode(menuData, { title: "Menu Node " + i, id: i + 1 }, i + 1);
-        //   if (i > 2) RedGraph.addLink(menuData, 2, i + 1);
-        //   else RedGraph.addLink(menuData, null, i + 1);
-        // }
         return menuData;
       }`;
 		case DataChainFunctionKeys.AddUrlsToGraph:
@@ -1808,6 +2219,7 @@ export function GenerateDataChainMethod(id: string, options: { language: any }) 
 		case DataChainFunctionKeys.Map:
 			return `($a${anyType}) => ($a || []).map(${lambda})`;
 		case DataChainFunctionKeys.Lambda:
+			lambda = untransformLambda(lambda, node);
 			getReferenceInserts(lambda).map((v) => v.substr(2, v.length - 3)).unique().map((insert: string) => {
 				const args = insert.split('~');
 				const property = args.length > 1 ? args[1] : args[0];
@@ -1852,10 +2264,18 @@ export function GenerateDataChainMethod(id: string, options: { language: any }) 
 		case DataChainFunctionKeys.Navigate:
 			let insert = '';
 			if (useNavigationParams) {
-				insert = `Object.keys(a).map((v${anyType})=>{
+				insert = `
+        if($internalComponentState) {
+          Object.keys($internalComponentState).forEach((v${anyType})=>{
+            let regex =  new RegExp(\`\\:$\{v}\`, 'gm');
+            route = route.replace(regex, $internalComponentState[v]);
+          });
+        }
+
+        Object.keys(a).forEach((v${anyType})=>{
           let regex =  new RegExp(\`\\:$\{v}\`, 'gm');
           route = route.replace(regex, a[v]);
-        })`;
+        });`;
 			}
 			return `(a${anyType}) => {
         if(a && typeof a === 'object' && !a.success && a.hasOwnProperty('success')) {
@@ -2004,6 +2424,18 @@ function buildModelMethodMenu(options: { language: any }) {
     let underpages = [${subscreens.join()}].filter((v${anyType}) =>v && routes[v.name] && routes[v.name].indexOf(':') === -1).map(v => ({ id: \`\${v.name}\` , title: titleService.get(v.title || v.name), parent: v.parent }));
     return [...toppages, ...underpages]
 }`;
+}
+export function untransformLambda(value: string, currentNode: any): string {
+	if (currentNode) {
+		const models: _.Node[] = NodesByType(null, [ NodeTypes.Model, NodeTypes.Enumeration ])
+			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromController))
+			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration));
+		models.sort((a, b) => GetCodeName(a).length - GetCodeName(b).length).forEach((item) => {
+			var regex = new RegExp(`${GetLambdaVariableTitle(item, true)}`, 'g');
+			value = value.replace(regex, GetCodeName(item));
+		});
+	}
+	return value;
 }
 export function GetPermissionsSortedByAgent() {
 	return GetNodesSortedByAgent(NodeTypes.Permission);
@@ -2211,6 +2643,62 @@ export function GetCombinedCondition(id: any, language = NodeConstants.Programmi
 		const res = GetCustomMethodClauses(customMethod, methodNodeParameters, language);
 		clauses = [ ...clauses, ...res.map((t) => t.clause) ];
 	});
+
+	switch (GetNodeProp(node, NodeProperties.NODEType)) {
+		case NodeTypes.Validator:
+			let validationDataChains = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+				id: id,
+				componentType: NodeTypes.ValidationDataChain
+			});
+
+			validationDataChains.forEach((validationDataChain: _.Node, index: number) => {
+				let dataChain = GraphMethods.GetNodeLinkedTo(GetCurrentGraph(), {
+					id: validationDataChain.id,
+					componentType: NodeTypes.DataChain
+				});
+				let validationParameters = GetMethodValidationParameters(id, false);
+				if (!validationParameters) {
+					throw new Error('missing permission parameters: GetCombinedCondition');
+				}
+				clauses.push(
+					`var {{result}} = await ${GetCodeName(dataChain)}.Execute(${validationParameters
+						.map((v: any) => {
+							// return `${v.paramName}: ${v.value}`;
+							if (v && v.value && v.value.key) {
+								return v.value.key;
+							}
+							return `${v.value}`;
+						})
+						.join()});`
+				);
+			});
+			break;
+		case NodeTypes.Permission:
+			let permissionDataChains = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+				id: id,
+				componentType: NodeTypes.PermissionDataChain
+			});
+
+			permissionDataChains.forEach((permissionDataChain: _.Node, index: number) => {
+				let dataChain = GraphMethods.GetNodeLinkedTo(GetCurrentGraph(), {
+					id: permissionDataChain.id,
+					componentType: NodeTypes.DataChain
+				});
+				let permissionParameters = GetMethodPermissionParameters(id, false);
+				if (!permissionParameters) {
+					throw new Error('missing permission parameters: GetCombinedCondition');
+				}
+				clauses.push(
+					`var {{result}} = await ${GetCodeName(dataChain)}.Execute(${permissionParameters
+						.map((v: any) => {
+							// return `${v.paramName}: ${v.value}`;
+							return `${v.value}`;
+						})
+						.join()});`
+				);
+			});
+			break;
+	}
 	const finalClause = clauses.map((_, index) => `res_` + index).join(' && ') || 'true';
 	if (options.finalResult) {
 		finalResult = options.finalResult;
@@ -2678,7 +3166,7 @@ export function GetConnectedScreen(id: any) {
 		id
 	}).find((x: any) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Screen);
 }
-export function GetModelPropertyNodes(refId: any): Node[] {
+export function GetModelPropertyNodes(refId: any): _.Node[] {
 	const state = _getState();
 	return GraphMethods.GetLinkChain(state, {
 		id: refId,
@@ -2790,7 +3278,6 @@ export function GetMethodOptions(methodProps: { [x: string]: string }) {
 export function GetLinkProperty(link: GraphLink, prop: any) {
 	return link && link.properties && link.properties[prop];
 }
-
 export function GetLink(linkId: any) {
 	const graph = GetCurrentGraph();
 
@@ -2980,6 +3467,14 @@ export const HOVERED_LINK = 'HOVERED_LINK';
 export const SELECTED_NODE = 'SELECTED_NODE';
 export const CONTEXT_MENU_VISIBLE = 'CONTEXT_MENU_VISIBLE';
 export const CONTEXT_MENU_MODE = 'CONTEXT_MENU_MODE';
+export const ROUTING_CONTEXT_MENU = 'ROUTING_CONTEXT_MENU';
+export const DASHBOARD_ROUTING_CONTEXT_MENU = 'DASHBOARD_ROUTING_CONTEXT_MENU';
+export const DASHBOARD_SCREENEFFECT_CONTEXT_MENU = 'DASHBOARD_SCREENEFFECT_CONTEXT_MENU';
+export const AGENT_SCREENEFFECT_CONTEXT_MENU = 'AGENT_SCREENEFFECT_CONTEXT_MENU';
+export const MOUNTING_CONTEXT_MENU = 'MOUNTING_CONTEXT_MENU';
+export const DASHBOARD_MOUNTING_CONTEXT_MENU = 'DASHBOARD_MOUNTING_CONTEXT_MENU';
+export const EFFECT_CONTEXT_MENU = 'EFFECT_CONTEXT_MENU';
+export const DASHBOARD_EFFECT_CONTEXT_MENU = 'DASHBOARD_EFFECT_CONTEXT_MENU';
 export function SelectedNode(nodeId: any) {
 	return (dispatch: Function) => {
 		if (!GraphMethods.Paused()) {
@@ -3240,7 +3735,7 @@ export function loadGitRuns() {
 // }
 export const JOB_INFO = 'JOB_INFO';
 export function updateJobs(info: { currentJobInformation: { jobFile?: JobFile }; agents: AgentProject[] }) {
-	let state = GetStateFunc()();
+	let state = GetStateFunc() ? GetStateFunc()() : null;
 	if (VisualEq(state, 'PROGRESS_VIEW_TAB', 'Git Run')) {
 		setVisual(JOB_INFO, info)(GetDispatchFunc(), GetStateFunc());
 	}
@@ -3322,7 +3817,7 @@ export function togglePinnedConnectedNodesByLinkType(model: any, linkType: any) 
 }
 export function toggleNodeMark() {
 	const state = _getState();
-	const currentNode: any = Node(state, Visual(state, SELECTED_NODE));
+	const currentNode: _.Node = Node(state, Visual(state, SELECTED_NODE));
 	_dispatch(
 		graphOperation(CHANGE_NODE_PROPERTY, {
 			prop: NodeProperties.Selected,
@@ -3341,14 +3836,16 @@ export function removeCurrentNode() {
 }
 export function togglePinned() {
 	const state = _getState();
-	const currentNode: any = Node(state, Visual(state, SELECTED_NODE));
-	_dispatch(
-		graphOperation(CHANGE_NODE_PROPERTY, {
-			prop: NodeProperties.Pinned,
-			id: currentNode.id,
-			value: !GetNodeProp(currentNode, NodeProperties.Pinned)
-		})
-	);
+	const currentNode: _.Node = Node(state, Visual(state, SELECTED_NODE));
+	if (currentNode) {
+		_dispatch(
+			graphOperation(CHANGE_NODE_PROPERTY, {
+				prop: NodeProperties.Pinned,
+				id: currentNode.id,
+				value: !GetNodeProp(currentNode, NodeProperties.Pinned)
+			})
+		);
+	}
 }
 export function GetGraphNode(id: string) {
 	const state = _getState();
@@ -3773,6 +4270,20 @@ export function executeGraphOperations(operations: any[]) {
 		});
 	};
 }
+export function updateComponentProperty(nodeId: string, prop: string, value: any) {
+	graphOperation([
+		{
+			operation: CHANGE_NODE_PROPERTY,
+			options() {
+				return {
+					prop: prop,
+					value: JSON.parse(JSON.stringify(value)),
+					id: nodeId
+				};
+			}
+		}
+	])(GetDispatchFunc(), GetStateFunc());
+}
 export function selectAllConnected(id: string) {
 	return (dispatch: any, getState: Function) => {
 		const nodes = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(getState()), {
@@ -3881,9 +4392,9 @@ export function deleteAllSelected() {
 	};
 }
 
-export function isAccessNode(agent: any, model: any, aa: { id: any }, graph?: any): any {
+export function isAccessNode(agent: any, model: any, aa: { id: any }, viewType?: string | null, graph?: any): any {
 	graph = graph || GetCurrentGraph();
-	return (
+	if (
 		GraphMethods.existsLinkBetween(graph, {
 			source: agent.id,
 			target: aa.id,
@@ -3894,479 +4405,82 @@ export function isAccessNode(agent: any, model: any, aa: { id: any }, graph?: an
 			target: model.id,
 			type: NodeConstants.LinkType.ModelAccess
 		})
-	);
+	) {
+		let link = GraphMethods.findLink(graph, {
+			source: agent.id,
+			target: aa.id
+		});
+		let methodProps = GetLinkProperty(link, NodeConstants.LinkPropertyKeys.MethodProps);
+		if (methodProps) {
+			if (!viewType) {
+				return methodProps;
+			}
+			return methodProps[viewType];
+		}
+	}
+	return false;
+}
+
+export function isAccessNodeForDashboard(agent: any, dashboard: any, aa: { id: any }, graph?: any): any {
+	graph = graph || GetCurrentGraph();
+	if (
+		GraphMethods.existsLinkBetween(graph, {
+			source: agent.id,
+			target: aa.id,
+			type: NodeConstants.LinkType.AgentAccess
+		}) &&
+		GraphMethods.existsLinkBetween(graph, {
+			source: aa.id,
+			target: dashboard.id,
+			type: NodeConstants.LinkType.DashboardAccess
+		})
+	) {
+		let link = GraphMethods.findLink(graph, {
+			source: agent.id,
+			target: aa.id
+		});
+		let methodProps = GetLinkProperty(link, NodeConstants.LinkPropertyKeys.DashboardAccessProps);
+		if (methodProps && methodProps.access) {
+			return methodProps;
+		}
+	}
+	return false;
+}
+
+export function getAccessScreen(screen: { id: string }) {
+	return (access: { id: string }) => {
+		let agent = GetNodeById(GetNodeProp(screen, NodeProperties.Agent));
+		let model = GetNodeById(GetNodeProp(screen, NodeProperties.Model));
+		let viewType = GetNodeProp(screen, NodeProperties.ViewType);
+		if (agent && model) return hasAccessNode(agent, model, access, viewType);
+		return false;
+	};
+}
+export function hasAccessNode(agent: any, model: any, aa: { id: any }, viewType?: string | null, graph?: any): any {
+	graph = graph || GetCurrentGraph();
+	if (
+		GraphMethods.existsLinkBetween(graph, {
+			source: agent.id,
+			target: aa.id,
+			type: NodeConstants.LinkType.AgentAccess
+		}) &&
+		GraphMethods.existsLinkBetween(graph, {
+			source: aa.id,
+			target: model.id,
+			type: NodeConstants.LinkType.ModelAccess
+		})
+	) {
+		let link = GraphMethods.findLink(graph, {
+			source: agent.id,
+			target: aa.id
+		});
+		return viewType ? GetLinkProperty(link, viewType) : false;
+	}
+	return false;
 }
 
 export function setViewPackageStamp(viewPackage: any, stamp: any) {
 	GraphMethods.setViewPackageStamp(viewPackage, stamp);
-}
-
-export function graphOperation(operation: any, options?: any, stamp?: any) {
-	return (dispatch: Function, getState: Function) => {
-		if (stamp) {
-			const viewPackage = {
-				[NodeProperties.ViewPackage]: uuidv4()
-			};
-			setViewPackageStamp(viewPackage, stamp);
-		}
-		const state = getState();
-		let rootGraph: any = null;
-		let graphOperationOccurences: GraphMethods.VisualOperation[] = [];
-		let currentGraph = Application(state, CURRENT_GRAPH);
-		const scope = Application(state, GRAPH_SCOPE) || [];
-		if (!currentGraph) {
-			currentGraph = GraphMethods.createGraph();
-			SaveApplication(currentGraph.id, CURRENT_GRAPH, dispatch);
-			rootGraph = currentGraph;
-		} else {
-			currentGraph = Graphs(state, currentGraph);
-			rootGraph = currentGraph;
-			if (scope.length) {
-				currentGraph = GraphMethods.getScopedGraph(currentGraph, { scope });
-			}
-		}
-		let operations = operation;
-		if (!Array.isArray(operation)) {
-			operations = [ { operation, options } ];
-		}
-		operations.forEach((_op: any) => {
-			if (!_op) {
-				return;
-			}
-			if (typeof _op === 'function') {
-				_op = _op(currentGraph);
-			}
-			if (!Array.isArray(_op) && _op) {
-				_op = [ _op ];
-			}
-			if (_op)
-				_op.forEach((opSecondLevel: any) => {
-					if (!opSecondLevel) {
-						return;
-					}
-					if (typeof opSecondLevel === 'function') {
-						opSecondLevel = opSecondLevel(currentGraph) || {};
-					}
-					let deepOp: any = opSecondLevel;
-					if (!Array.isArray(opSecondLevel)) {
-						deepOp = [ opSecondLevel ];
-					}
-					deepOp.forEach((op: any) => {
-						if (!op) {
-							return;
-						}
-						let { operation, options } = op;
-						if (typeof options === 'function') {
-							options = options(currentGraph);
-						}
-						if (options) {
-							const currentLastNode =
-								currentGraph.nodes && currentGraph.nodes.length
-									? currentGraph.nodes[currentGraph.nodes.length - 1]
-									: null;
-							const currentLastGroup =
-								currentGraph.groups && currentGraph.groups.length
-									? currentGraph.groups[currentGraph.groups.length - 1]
-									: null;
-							switch (operation) {
-								case NO_OP:
-									break;
-								case SET_DEPTH:
-									currentGraph = GraphMethods.setDepth(currentGraph, options);
-									break;
-								case NEW_NODE:
-									currentGraph = GraphMethods.newNode(currentGraph, options);
-									break;
-								case REMOVE_NODE:
-									currentGraph = GraphMethods.removeNode(currentGraph, options);
-									graphOperationOccurences.push({
-										command: GraphMethods.VisualCommand.REMOVE_NODE,
-										nodeId: options.id
-									});
-									break;
-								case UPDATE_GRAPH_TITLE:
-									currentGraph = GraphMethods.updateGraphTitle(currentGraph, options);
-									break;
-								case UPDATE_NODE_DIRTY:
-									currentGraph = GraphMethods.updateNodePropertyDirty(currentGraph, options);
-									break;
-								case NEW_LINK:
-									currentGraph = GraphMethods.newLink(currentGraph, options, (link: GraphLink) => {
-										if (link) {
-											graphOperationOccurences.push({
-												command: GraphMethods.VisualCommand.ADD_CONNECTION,
-												linkId: link.id
-											});
-										}
-									});
-									break;
-								case ADD_LINK_BETWEEN_NODES:
-									currentGraph = GraphMethods.addLinkBetweenNodes(
-										currentGraph,
-										options,
-										(link: GraphLink) => {
-											if (link) {
-												graphOperationOccurences.push({
-													command: GraphMethods.VisualCommand.ADD_CONNECTION,
-													linkId: link.id
-												});
-											}
-										}
-									);
-									break;
-								case ADD_TO_GROUP:
-									currentGraph = GraphMethods.updateNodeGroup(currentGraph, options);
-									break;
-								case ADD_LINKS_BETWEEN_NODES:
-									currentGraph = GraphMethods.addLinksBetweenNodes(
-										currentGraph,
-										options,
-										(link: GraphLink) => {
-											if (link) {
-												graphOperationOccurences.push({
-													command: GraphMethods.VisualCommand.ADD_CONNECTION,
-													linkId: link.id
-												});
-											}
-										}
-									);
-									break;
-								case CONNECT_TO_TITLE_SERVICE:
-									const titleService = GetTitleService();
-									if (titleService) {
-										currentGraph = GraphMethods.addLinkBetweenNodes(
-											currentGraph,
-											{
-												source: options.id,
-												target: titleService.id,
-												properties: {
-													...LinkProperties.TitleServiceLink,
-													singleLink: true,
-													nodeTypes: [ NodeTypes.TitleService ]
-												}
-											},
-											(link: GraphLink) => {
-												if (link) {
-													graphOperationOccurences.push({
-														command: GraphMethods.VisualCommand.ADD_CONNECTION,
-														linkId: link.id
-													});
-												}
-											}
-										);
-									}
-									break;
-								case REMOVE_LINK_BETWEEN_NODES:
-									let removedLink: any = null;
-									currentGraph = GraphMethods.removeLinkBetweenNodes(
-										currentGraph,
-										options,
-										(link: GraphLink) => {
-											removedLink = link;
-										}
-									);
-									if (removedLink) {
-										graphOperationOccurences.push({
-											command: GraphMethods.VisualCommand.REMOVE_LINK,
-											linkId: removedLink
-										});
-									}
-									break;
-								case REMOVE_LINK:
-									currentGraph = GraphMethods.removeLinkById(currentGraph, options);
-									if (options && options.id) {
-										graphOperationOccurences.push({
-											command: GraphMethods.VisualCommand.REMOVE_LINK,
-											linkId: options.id
-										});
-									}
-									break;
-								case UPDATE_GROUP_PROPERTY:
-									currentGraph = GraphMethods.updateGroupProperty(currentGraph, options);
-									break;
-								case CHANGE_NODE_TEXT:
-									currentGraph = GraphMethods.updateNodeProperty(currentGraph, {
-										...options,
-										prop: 'text'
-									});
-									break;
-								case CHANGE_NODE_PROPERTY:
-									currentGraph = GraphMethods.updateNodeProperty(currentGraph, options);
-									if (options && options.prop && options.prop === NodeProperties.Pinned) {
-										if (options.value) {
-											graphOperationOccurences.push({
-												command: GraphMethods.VisualCommand.ADD_NODE,
-												nodeId: options.id
-											});
-										} else {
-											graphOperationOccurences.push({
-												command: GraphMethods.VisualCommand.REMOVE_NODE,
-												nodeId: options.id
-											});
-										}
-									}
-									break;
-								case CHANGE_APP_SETTINGS:
-									currentGraph = GraphMethods.updateAppSettings(currentGraph, options);
-									break;
-								case NEW_PROPERTY_NODE:
-									currentGraph = GraphMethods.addNewPropertyNode(currentGraph, options);
-
-									break;
-								case ADD_DEFAULT_PROPERTIES:
-									currentGraph = GraphMethods.addDefaultProperties(currentGraph, options);
-									break;
-								case NEW_ATTRIBUTE_NODE:
-									currentGraph = GraphMethods.addNewNodeOfType(
-										currentGraph,
-										options,
-										NodeTypes.Attribute
-									);
-
-									break;
-								case UPDATE_NODE_PROPERTY:
-									currentGraph = GraphMethods.updateNodeProperties(currentGraph, options);
-									if (
-										options &&
-										options.properties &&
-										options.properties.hasOwnProperty(NodeProperties.Pinned)
-									) {
-										if (options.properties[NodeProperties.Pinned]) {
-											graphOperationOccurences.push({
-												command: GraphMethods.VisualCommand.ADD_NODE,
-												nodeId: options.id
-											});
-										} else {
-											graphOperationOccurences.push({
-												command: GraphMethods.VisualCommand.REMOVE_NODE,
-												nodeId: options.id
-											});
-										}
-									}
-									break;
-								case NEW_CONDITION_NODE:
-									currentGraph = GraphMethods.addNewNodeOfType(
-										currentGraph,
-										options,
-										NodeTypes.Condition
-									);
-
-									break;
-								case ADD_NEW_NODE:
-									if (options && options.nodeType) {
-										currentGraph = GraphMethods.addNewNodeOfType(
-											currentGraph,
-											options,
-											options.nodeType,
-											options.callback
-										);
-										setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(
-											dispatch,
-											getState
-										);
-									}
-									break;
-								case NEW_MODEL_ITEM_FILTER:
-									currentGraph = GraphMethods.addNewNodeOfType(
-										currentGraph,
-										options,
-										NodeTypes.ModelItemFilter
-									);
-
-									break;
-								case NEW_AFTER_METHOD:
-									currentGraph = GraphMethods.addNewNodeOfType(
-										currentGraph,
-										options,
-										NodeTypes.AfterEffect
-									);
-
-									break;
-								case NEW_COMPONENT_NODE:
-									currentGraph = GraphMethods.addNewNodeOfType(
-										currentGraph,
-										options,
-										NodeTypes.ComponentNode
-									);
-
-									break;
-								case NEW_DATA_SOURCE:
-									currentGraph = GraphMethods.addNewNodeOfType(
-										currentGraph,
-										options,
-										NodeTypes.DataSource
-									);
-
-									break;
-								case NEW_VALIDATION_TYPE:
-									currentGraph = GraphMethods.addNewNodeOfType(
-										currentGraph,
-										options,
-										NodeTypes.ValidationList
-									);
-
-									break;
-								case NEW_PERMISSION_PROPERTY_DEPENDENCY_NODE:
-									currentGraph = GraphMethods.addNewNodeOfType(
-										currentGraph,
-										options,
-										NodeTypes.PermissionDependency
-									);
-
-									break;
-								case UPDATE_LINK_PROPERTY:
-									currentGraph = GraphMethods.updateLinkProperty(currentGraph, options);
-									break;
-								case NEW_CHOICE_TYPE:
-									currentGraph = GraphMethods.addNewNodeOfType(
-										currentGraph,
-										options,
-										NodeTypes.ChoiceList
-									);
-
-									break;
-								case NEW_PARAMETER_NODE:
-									currentGraph = GraphMethods.addNewNodeOfType(
-										currentGraph,
-										options,
-										NodeTypes.Parameter
-									);
-
-									break;
-								case NEW_FUNCTION_OUTPUT_NODE:
-									currentGraph = GraphMethods.addNewNodeOfType(
-										currentGraph,
-										options,
-										NodeTypes.FunctionOutput
-									);
-
-									break;
-								case NEW_PERMISSION_NODE:
-									currentGraph = GraphMethods.addNewNodeOfType(
-										currentGraph,
-										options,
-										NodeTypes.Permission
-									);
-
-									break;
-								case NEW_OPTION_NODE:
-									currentGraph = GraphMethods.addNewNodeOfType(
-										currentGraph,
-										options,
-										NodeTypes.OptionList
-									);
-
-									break;
-								case NEW_CUSTOM_OPTION:
-									currentGraph = GraphMethods.addNewNodeOfType(
-										currentGraph,
-										options,
-										NodeTypes.OptionCustom
-									);
-
-									break;
-								case NEW_SCREEN_OPTIONS:
-									currentGraph = GraphMethods.addNewNodeOfType(
-										currentGraph,
-										options,
-										NodeTypes.ScreenOption
-									);
-
-									break;
-								case ADD_NEW_REFERENCE_NODE:
-									currentGraph = GraphMethods.addNewNodeOfType(
-										currentGraph,
-										options,
-										NodeTypes.ReferenceNode
-									);
-
-									break;
-								case NEW_EXTENSION_LIST_NODE:
-									currentGraph = GraphMethods.addNewNodeOfType(
-										currentGraph,
-										options,
-										NodeTypes.ExtensionTypeList
-									);
-
-									break;
-								case NEW_VALIDATION_ITEM_NODE:
-									currentGraph = GraphMethods.addNewNodeOfType(
-										currentGraph,
-										options,
-										NodeTypes.ValidationListItem
-									);
-
-									break;
-								case NEW_EXTENTION_NODE:
-									currentGraph = GraphMethods.addNewNodeOfType(
-										currentGraph,
-										options,
-										NodeTypes.ExtensionType
-									);
-
-									break;
-								case NEW_OPTION_ITEM_NODE:
-									currentGraph = GraphMethods.addNewNodeOfType(
-										currentGraph,
-										options,
-										NodeTypes.OptionListItem
-									);
-
-									break;
-								case APPLY_FUNCTION_CONSTRAINTS:
-									currentGraph = GraphMethods.applyFunctionConstraints(currentGraph, options);
-									break;
-								case ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY:
-									break;
-								default:
-									break;
-							}
-
-							let nodeAdded = currentLastNode !== currentGraph.nodes[currentGraph.nodes.length - 1];
-							if (recording && Visual(state, RECORDING)) {
-								recording.push({
-									operation,
-									options,
-									callbackGroup: `group-${currentLastGroup !==
-									currentGraph.groups[currentGraph.groups.length - 1]
-										? currentGraph.groups[currentGraph.groups.length - 1]
-										: null}`,
-									callback: nodeAdded ? currentGraph.nodes[currentGraph.nodes.length - 1] : null
-								});
-							}
-							if (nodeAdded) {
-								graphOperationOccurences.push({
-									command: GraphMethods.VisualCommand.ADD_NODE,
-									nodeId: currentGraph.nodes[currentGraph.nodes.length - 1]
-								});
-							}
-						}
-					});
-				});
-		});
-
-		if (scope.length) {
-			rootGraph = GraphMethods.setScopedGraph(rootGraph, {
-				scope,
-				graph: currentGraph
-			});
-		} else {
-			rootGraph = currentGraph;
-		}
-		// rootGraph = GraphMethods.updateReferenceNodes(rootGraph);
-		if (stamp) setViewPackageStamp(null, stamp);
-
-		if (!GraphMethods.Paused()) {
-			let visualGraph = GetC(state, VISUAL_GRAPH, rootGraph.id);
-			graphOperationOccurences.forEach((op: GraphMethods.VisualOperation) => {
-				visualGraph = GraphMethods.UpdateVisualGrpah(visualGraph, rootGraph, op);
-			});
-		}
-		// if (visualGraph) dispatch(UIC(VISUAL_GRAPH, visualGraph.id, visualGraph));
-		rootGraph.nodeCount = (<Graph>rootGraph).nodes.length;
-		rootGraph.linkCount = (<Graph>rootGraph).links.length;
-		SaveGraph(rootGraph, dispatch);
-	};
 }
 
 export function updateGraph(property: any, value: any) {
@@ -4396,6 +4510,7 @@ declare global {
 	}
 	export interface Array<T> {
 		toNodeSelect: any;
+		ddSort: any;
 	}
 }
 ((array) => {
@@ -4418,6 +4533,19 @@ declare global {
 			}
 		});
 	}
+	if (!array.ddSort) {
+		Object.defineProperty(array, 'ddSort', {
+			enumerable: false,
+			writable: true,
+			configurable: true,
+			value() {
+				const collection = this;
+				return collection.sort((a: any, b: any) => {
+					return `${a.title}`.localeCompare(`${b.title}`);
+				});
+			}
+		});
+	}
 })(Array.prototype);
 
 ((str) => {
@@ -4436,3 +4564,412 @@ declare global {
 		});
 	}
 })(String.prototype);
+export function ensureRouteSource(mountingItem: any, urlParameter: string, key: string = 'model') {
+	return mountingItem.source && mountingItem.source[urlParameter] ? mountingItem.source[urlParameter][key] : null;
+}
+export function setRouteSource(
+	mountingItem: any,
+	urlParameter: string,
+	k: string,
+	type: string,
+	property: string | null = null
+) {
+	mountingItem.source = mountingItem.source || {};
+	mountingItem.source[urlParameter] = {
+		model: k,
+		property,
+		type
+	};
+}
+export function graphOperation(operation: any, options?: any, stamp?: any) {
+	return (dispatch: Function, getState: Function) => {
+		if (stamp) {
+			const viewPackage = {
+				[NodeProperties.ViewPackage]: uuidv4()
+			};
+			setViewPackageStamp(viewPackage, stamp);
+		}
+		const state = getState();
+		let rootGraph: any = null;
+		let graphOperationOccurences: GraphMethods.VisualOperation[] = [];
+		let currentGraph = Application(state, CURRENT_GRAPH);
+		const scope = Application(state, GRAPH_SCOPE) || [];
+		if (!currentGraph) {
+			currentGraph = GraphMethods.createGraph();
+			SaveApplication(currentGraph.id, CURRENT_GRAPH, dispatch);
+			rootGraph = currentGraph;
+		} else {
+			currentGraph = Graphs(state, currentGraph);
+			rootGraph = currentGraph;
+			if (scope.length) {
+				currentGraph = GraphMethods.getScopedGraph(currentGraph, { scope });
+			}
+		}
+		let operations = operation;
+		if (!Array.isArray(operation)) {
+			operations = [ { operation, options } ];
+		}
+
+		currentGraph = handleArrayOperations(
+			operations,
+			currentGraph,
+			graphOperationOccurences,
+			dispatch,
+			getState,
+			state
+		);
+
+		if (scope.length) {
+			rootGraph = GraphMethods.setScopedGraph(rootGraph, {
+				scope,
+				graph: currentGraph
+			});
+		} else {
+			rootGraph = currentGraph;
+		}
+		// rootGraph = GraphMethods.updateReferenceNodes(rootGraph);
+		if (stamp) setViewPackageStamp(null, stamp);
+
+		if (!GraphMethods.Paused()) {
+			let visualGraph = GetC(state, VISUAL_GRAPH, rootGraph.id);
+			graphOperationOccurences.forEach((op: GraphMethods.VisualOperation) => {
+				visualGraph = GraphMethods.UpdateVisualGrpah(visualGraph, rootGraph, op);
+			});
+		}
+		// if (visualGraph) dispatch(UIC(VISUAL_GRAPH, visualGraph.id, visualGraph));
+		rootGraph.nodeCount = (<Graph>rootGraph).nodes.length;
+		rootGraph.linkCount = (<Graph>rootGraph).links.length;
+		SaveGraph(rootGraph, dispatch);
+	};
+}
+
+function handleArrayOperations(
+	operations: any,
+	currentGraph: any,
+	graphOperationOccurences: GraphMethods.VisualOperation[],
+	dispatch: Function,
+	getState: Function,
+	state: any
+) {
+	operations.forEach((op: any) => {
+		currentGraph = handleOperation(op, currentGraph, graphOperationOccurences, dispatch, getState, state);
+	});
+	return currentGraph;
+}
+
+function handleFunctionOperations(
+	op: any,
+	currentGraph: any,
+	graphOperationOccurences: GraphMethods.VisualOperation[],
+	dispatch: Function,
+	getState: Function,
+	state: any
+) {
+	if (typeof op === 'function') {
+		op = op(currentGraph);
+	}
+	currentGraph = handleOperation(op, currentGraph, graphOperationOccurences, dispatch, getState, state);
+	return currentGraph;
+}
+
+function handleOperation(
+	op: any,
+	currentGraph: any,
+	graphOperationOccurences: GraphMethods.VisualOperation[],
+	dispatch: Function,
+	getState: Function,
+	state: any
+) {
+	if (typeof op === 'function') {
+		return handleFunctionOperations(op, currentGraph, graphOperationOccurences, dispatch, getState, state);
+	} else if (Array.isArray(op)) {
+		return handleArrayOperations(op, currentGraph, graphOperationOccurences, dispatch, getState, state);
+	} else if (!op) {
+		return currentGraph;
+	}
+	let { operation, options } = op;
+	if (typeof options === 'function') {
+		options = options(currentGraph);
+	}
+	if (options) {
+		const currentLastNode =
+			currentGraph.nodes && currentGraph.nodes.length ? currentGraph.nodes[currentGraph.nodes.length - 1] : null;
+		const currentLastGroup =
+			currentGraph.groups && currentGraph.groups.length
+				? currentGraph.groups[currentGraph.groups.length - 1]
+				: null;
+		switch (operation) {
+			case NO_OP:
+				break;
+			case SET_DEPTH:
+				currentGraph = GraphMethods.setDepth(currentGraph, options);
+				break;
+			case NEW_NODE:
+				currentGraph = GraphMethods.newNode(currentGraph, options);
+				break;
+			case REMOVE_NODE:
+				currentGraph = GraphMethods.removeNode(currentGraph, options);
+				graphOperationOccurences.push({
+					command: GraphMethods.VisualCommand.REMOVE_NODE,
+					nodeId: options.id
+				});
+				break;
+			case UPDATE_GRAPH_TITLE:
+				currentGraph = GraphMethods.updateGraphTitle(currentGraph, options);
+				break;
+			case UPDATE_NODE_DIRTY:
+				currentGraph = GraphMethods.updateNodePropertyDirty(currentGraph, options);
+				break;
+			case NEW_LINK:
+				currentGraph = GraphMethods.newLink(currentGraph, options, (link: GraphLink) => {
+					if (link) {
+						graphOperationOccurences.push({
+							command: GraphMethods.VisualCommand.ADD_CONNECTION,
+							linkId: link.id
+						});
+					}
+				});
+				break;
+			case ADD_LINK_BETWEEN_NODES:
+				currentGraph = GraphMethods.addLinkBetweenNodes(currentGraph, options, (link: GraphLink) => {
+					if (link) {
+						graphOperationOccurences.push({
+							command: GraphMethods.VisualCommand.ADD_CONNECTION,
+							linkId: link.id
+						});
+					}
+				});
+				break;
+			case ADD_TO_GROUP:
+				currentGraph = GraphMethods.updateNodeGroup(currentGraph, options);
+				break;
+			case ADD_LINKS_BETWEEN_NODES:
+				currentGraph = GraphMethods.addLinksBetweenNodes(currentGraph, options, (link: GraphLink) => {
+					if (link) {
+						graphOperationOccurences.push({
+							command: GraphMethods.VisualCommand.ADD_CONNECTION,
+							linkId: link.id
+						});
+					}
+				});
+				break;
+			case CONNECT_TO_TITLE_SERVICE:
+				const titleService = GetTitleService();
+				if (titleService) {
+					currentGraph = GraphMethods.addLinkBetweenNodes(
+						currentGraph,
+						{
+							source: options.id,
+							target: titleService.id,
+							properties: {
+								...LinkProperties.TitleServiceLink,
+								singleLink: true,
+								nodeTypes: [ NodeTypes.TitleService ]
+							}
+						},
+						(link: GraphLink) => {
+							if (link) {
+								graphOperationOccurences.push({
+									command: GraphMethods.VisualCommand.ADD_CONNECTION,
+									linkId: link.id
+								});
+							}
+						}
+					);
+				}
+				break;
+			case REMOVE_LINK_BETWEEN_NODES:
+				let removedLink: any = null;
+				currentGraph = GraphMethods.removeLinkBetweenNodes(currentGraph, options, (link: GraphLink) => {
+					removedLink = link;
+				});
+				if (removedLink) {
+					graphOperationOccurences.push({
+						command: GraphMethods.VisualCommand.REMOVE_LINK,
+						linkId: removedLink
+					});
+				}
+				break;
+			case REMOVE_LINK:
+				currentGraph = GraphMethods.removeLinkById(currentGraph, options);
+				if (options && options.id) {
+					graphOperationOccurences.push({
+						command: GraphMethods.VisualCommand.REMOVE_LINK,
+						linkId: options.id
+					});
+				}
+				break;
+			case UPDATE_GROUP_PROPERTY:
+				currentGraph = GraphMethods.updateGroupProperty(currentGraph, options);
+				break;
+			case CHANGE_NODE_TEXT:
+				currentGraph = GraphMethods.updateNodeProperty(currentGraph, {
+					...options,
+					prop: 'text'
+				});
+				break;
+			case CHANGE_NODE_PROPERTY:
+				currentGraph = GraphMethods.updateNodeProperty(currentGraph, options);
+				if (options && options.prop && options.prop === NodeProperties.Pinned) {
+					if (options.value) {
+						graphOperationOccurences.push({
+							command: GraphMethods.VisualCommand.ADD_NODE,
+							nodeId: options.id
+						});
+					} else {
+						graphOperationOccurences.push({
+							command: GraphMethods.VisualCommand.REMOVE_NODE,
+							nodeId: options.id
+						});
+					}
+				}
+				break;
+			case CHANGE_APP_SETTINGS:
+				currentGraph = GraphMethods.updateAppSettings(currentGraph, options);
+				break;
+			case NEW_PROPERTY_NODE:
+				currentGraph = GraphMethods.addNewPropertyNode(currentGraph, options);
+
+				break;
+			case ADD_DEFAULT_PROPERTIES:
+				currentGraph = GraphMethods.addDefaultProperties(currentGraph, options);
+				break;
+			case NEW_ATTRIBUTE_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Attribute);
+
+				break;
+			case UPDATE_NODE_PROPERTY:
+				currentGraph = GraphMethods.updateNodeProperties(currentGraph, options);
+				if (options && options.properties && options.properties.hasOwnProperty(NodeProperties.Pinned)) {
+					if (options.properties[NodeProperties.Pinned]) {
+						graphOperationOccurences.push({
+							command: GraphMethods.VisualCommand.ADD_NODE,
+							nodeId: options.id
+						});
+					} else {
+						graphOperationOccurences.push({
+							command: GraphMethods.VisualCommand.REMOVE_NODE,
+							nodeId: options.id
+						});
+					}
+				}
+				break;
+			case NEW_CONDITION_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Condition);
+
+				break;
+			case ADD_NEW_NODE:
+				if (options && options.nodeType) {
+					currentGraph = GraphMethods.addNewNodeOfType(
+						currentGraph,
+						options,
+						options.nodeType,
+						options.callback
+					);
+					setVisual(SELECTED_NODE, currentGraph.nodes[currentGraph.nodes.length - 1])(dispatch, getState);
+				}
+				break;
+			case NEW_MODEL_ITEM_FILTER:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ModelItemFilter);
+
+				break;
+			case NEW_AFTER_METHOD:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.AfterEffect);
+
+				break;
+			case NEW_COMPONENT_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ComponentNode);
+
+				break;
+			case NEW_DATA_SOURCE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.DataSource);
+
+				break;
+			case NEW_VALIDATION_TYPE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ValidationList);
+
+				break;
+			case NEW_PERMISSION_PROPERTY_DEPENDENCY_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.PermissionDependency);
+
+				break;
+			case UPDATE_LINK_PROPERTY:
+				currentGraph = GraphMethods.updateLinkProperty(currentGraph, options);
+				break;
+			case NEW_CHOICE_TYPE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ChoiceList);
+
+				break;
+			case NEW_PARAMETER_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Parameter);
+
+				break;
+			case NEW_FUNCTION_OUTPUT_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.FunctionOutput);
+
+				break;
+			case NEW_PERMISSION_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.Permission);
+
+				break;
+			case NEW_OPTION_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.OptionList);
+
+				break;
+			case NEW_CUSTOM_OPTION:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.OptionCustom);
+
+				break;
+			case NEW_SCREEN_OPTIONS:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ScreenOption);
+
+				break;
+			case ADD_NEW_REFERENCE_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ReferenceNode);
+
+				break;
+			case NEW_EXTENSION_LIST_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ExtensionTypeList);
+
+				break;
+			case NEW_VALIDATION_ITEM_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ValidationListItem);
+
+				break;
+			case NEW_EXTENTION_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.ExtensionType);
+
+				break;
+			case NEW_OPTION_ITEM_NODE:
+				currentGraph = GraphMethods.addNewNodeOfType(currentGraph, options, NodeTypes.OptionListItem);
+
+				break;
+			case APPLY_FUNCTION_CONSTRAINTS:
+				currentGraph = GraphMethods.applyFunctionConstraints(currentGraph, options);
+				break;
+			case ADD_EXTENSION_DEFINITION_CONFIG_PROPERTY:
+				break;
+			default:
+				break;
+		}
+
+		let nodeAdded = currentLastNode !== currentGraph.nodes[currentGraph.nodes.length - 1];
+		if (recording && Visual(state, RECORDING)) {
+			recording.push({
+				operation,
+				options,
+				callbackGroup: `group-${currentLastGroup !== currentGraph.groups[currentGraph.groups.length - 1]
+					? currentGraph.groups[currentGraph.groups.length - 1]
+					: null}`,
+				callback: nodeAdded ? currentGraph.nodes[currentGraph.nodes.length - 1] : null
+			});
+		}
+		if (nodeAdded) {
+			graphOperationOccurences.push({
+				command: GraphMethods.VisualCommand.ADD_NODE,
+				nodeId: currentGraph.nodes[currentGraph.nodes.length - 1]
+			});
+		}
+	}
+	return currentGraph;
+}

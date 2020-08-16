@@ -9,6 +9,7 @@ import * as Titles from './titles';
 import JobService, { JobFile, CurrentJobInformation, JobItem } from '../jobs/jobservice';
 import { GetStepIndex, GetStepCount, BuildAllInfo } from '../nodepacks/batch/BuildAllDistributed';
 import { AgentProject } from '../jobs/interfaces';
+import BuildAll from '../nodepacks/batch/BuildAll';
 
 const PROGRESS_VIEW_TAB = 'PROGRESS_VIEW_TAB';
 class CurrentJobProgressView extends Component<any, any> {
@@ -63,8 +64,19 @@ class CurrentJobProgressView extends Component<any, any> {
 			});
 		}
 		return (
-			<TabPane active={VisualEq(state, PROGRESS_VIEW_TAB, 'Git Run')}>
+			<TabPane active={true}>
 				<h1>Current Job Information</h1>
+				<div className="row">
+					<div className="col-md-12">
+						<progress
+							style={{ width: '100%' }}
+							title={`${Math.floor(indexOfCompletion / (BuildAllInfo.Commands.length - 1) * 1000) / 10}`}
+							value={indexOfCompletion / (BuildAllInfo.Commands.length - 1)}
+							min={0}
+							max={1}
+						/>
+					</div>
+				</div>
 				<div className="row">
 					<div className="col-md-9">
 						<Box maxheight={600} title={'Agents'}>
@@ -101,11 +113,11 @@ class CurrentJobProgressView extends Component<any, any> {
 											let updated = 'Unknown';
 											if (agentProject.updated) {
 												updated = this.timeDifference(Date.now(), agentProject.updated);
-                      }
-                      let progress = 0;
-                      if(agentProject.progress){
-                        progress = agentProject.progress;
-                      }
+											}
+											let progress = 0;
+											if (agentProject.progress) {
+												progress = agentProject.progress;
+											}
 											let modelsWorkedOn = null;
 											let temp: any =
 												currentJobInformation &&

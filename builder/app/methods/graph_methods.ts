@@ -26,10 +26,19 @@ import {
 	GetRootGraph,
 	GetNodeById,
 	GetCodeName,
-	GetNodeByProperties
+	GetNodeByProperties,
+	GetLink
 } from '../actions/uiactions';
 import { uuidv4 } from '../utils/array';
-import { Graph, Node, GraphLink } from './graph_types';
+import {
+	Graph,
+	Node,
+	GraphLink,
+	ComponentLayoutContainer,
+	ComponentLayout,
+	Validator,
+	ValidatorItem
+} from './graph_types';
 
 const os = require('os');
 
@@ -141,17 +150,17 @@ export function updateWorkSpace(graph: any, options: any) {
 	return graph;
 }
 
-export function CreateLayout() {
+export function CreateLayout(): ComponentLayoutContainer {
 	return {
 		layout: {},
 		properties: {}
 	};
 }
-export function FindLayoutRoot(id: any, root: any) {
+export function FindLayoutRoot(id: any, root: ComponentLayout): ComponentLayout | null {
 	if (root && root[id]) {
 		return root[id];
 	}
-	let res;
+	let res: ComponentLayout | null = null;
 	Object.keys(root).find((t) => {
 		if (root[t]) res = FindLayoutRoot(id, root[t]);
 		else {
@@ -193,7 +202,7 @@ export function GetCellProperties(setup: any, id: any) {
 	const { properties } = setup;
 	return properties[id];
 }
-export function RemoveCellLayout(setup: any, id: any) {
+export function RemoveCellLayout(setup: ComponentLayoutContainer, id: any) {
 	if (setup && setup.layout) {
 		const parent = FindLayoutRootParent(id, setup.layout);
 		if (parent) {
@@ -237,7 +246,7 @@ export function ReorderCellLayout(setup: any, id: any, dir = -1) {
 	return setup;
 }
 
-export function GetChildren(setup: any, parentId: any) {
+export function GetChildren(setup: ComponentLayoutContainer, parentId: any) {
 	const parent = FindLayoutRootParent(parentId, setup.layout);
 
 	return Object.keys(parent[parentId]);
@@ -248,12 +257,34 @@ export function GetChild(setup: any, parentId: any) {
 	}
 	return null;
 }
-export function GetFirstCell(setup: any) {
+export function GetFirstCell(setup: any): string | null {
 	const keys = setup ? Object.keys(setup.layout) : [];
 
 	return keys[0] || null;
 }
-export function SetCellsLayout(setup: any, count: any, id?: any, properties = DefaultCellProperties) {
+
+export function GetLastCell(setup: ComponentLayoutContainer, cellId: string | null): string | null {
+	let { layout } = setup;
+	if (layout && cellId && layout[cellId]) {
+		let temp = Object.keys(layout[cellId]);
+		return temp[temp.length - 1];
+	}
+	return null;
+}
+
+export function GetCellCount(layoutRoot: any, cell: string) {
+	return GetChildren(layoutRoot, cell).length;
+}
+export function SetLayoutCell(layout: any, cellId: string, componentId: string) {
+	const cellProperties = GetCellProperties(layout, cellId);
+	cellProperties.children[cellId] = componentId;
+}
+export function SetCellsLayout(
+	setup: ComponentLayoutContainer,
+	count: any,
+	id?: any,
+	properties = DefaultCellProperties
+) {
 	let keys: any = [];
 	let root: any = null;
 	count = parseInt(count);
@@ -283,16 +314,18 @@ export function SetCellsLayout(setup: any, count: any, id?: any, properties = De
 
 	return setup;
 }
-export function SortCells(setup: any, parentId: any, sortFunction: any) {
+export function SortCells(setup: ComponentLayoutContainer, parentId: any, sortFunction: any) {
 	const layout = FindLayoutRoot(parentId, setup.layout);
-	const keys = Object.keys(layout);
-	const temp_layout = { ...layout };
-	keys.forEach((k) => delete layout[k]);
+	const keys = layout ? Object.keys(layout) : [];
+	const temp_layout: any = { ...layout };
+	keys.forEach((k) => {
+		if (layout && layout[k]) delete layout[k];
+	});
 	keys.sort(sortFunction).forEach((k) => {
-		layout[k] = temp_layout[k];
+		if (layout && layout[k]) layout[k] = temp_layout[k];
 	});
 }
-export function GetCellIdByTag(setup: any, tag: any) {
+export function GetCellIdByTag(setup: ComponentLayoutContainer, tag: any) {
 	if (setup && setup.properties) {
 		return Object.keys(setup.properties).find((v) => {
 			const { properties } = setup.properties[v];
@@ -568,7 +601,7 @@ export function clearGroup(graph: any, ops: any) {
 
 	return graph;
 }
-export function createValidator() {
+export function createValidator(): Validator {
 	return {
 		properties: {}
 	};
@@ -672,7 +705,10 @@ export function hasValidator(validator: any, options: any) {
 
 	return false;
 }
-export function addValidatator(validator: any, options: any) {
+export function addValidatator(
+	validator: Validator,
+	options: { id: string; validator: string; validatorArgs: ValidatorItem }
+): Validator {
 	validator.properties[options.id] = validator.properties[options.id] || createValidatorProperty();
 	if (options.validator) validator.properties[options.id].validators[options.validator] = options.validatorArgs;
 
@@ -689,7 +725,7 @@ export function removeValidator(validator: any, options: any) {
 	return validator;
 }
 
-export function getValidatorItem(item: any, options: any) {
+export function getValidatorItem(item: Validator, options: { property: string; validator: string }): ValidatorItem {
 	const { property, validator } = options;
 	return item.properties[property].validators[validator];
 }
@@ -994,7 +1030,7 @@ export function setupCache(graph: any) {
 		Object.keys(graph.linkLib).forEach((key) => {
 			const linkType = GetLinkProperty(getLink(graph, { id: key }), LinkPropertyKeys.TYPE);
 			if (linkType) {
-				Links[linkType] = Nodes[linkType] || {};
+				Links[linkType] = Links[linkType] || {};
 				Links[linkType][key] = true;
 				AppCache.Version++;
 			}
@@ -1228,6 +1264,7 @@ function updateNode(node: Node, options: { node: { properties: any } }) {
 		Object.keys(options.node.properties).forEach((propKey) => {
 			if (node.properties[propKey] !== options.node.properties[propKey]) {
 				node.properties[propKey] = options.node.properties[propKey];
+				node.propertyVersions = node.propertyVersions || {};
 				node.propertyVersions[propKey] = (node.propertyVersions[propKey] || 0) + 1;
 			}
 		});
@@ -1603,6 +1640,35 @@ export function NodesByViewPackage(graph: any, viewPackage: any) {
 	}
 
 	return [];
+}
+export function LinksByType(graph: Graph, linkType: string | string[]): GraphLink[] {
+	graph = graph || GetCurrentGraph();
+	let linkTypes: string[] = [];
+	if (!Array.isArray(linkType)) {
+		linkTypes = [ linkType ];
+	} else {
+		linkTypes = linkType;
+	}
+	let linkIds: string[] = [];
+	linkTypes.forEach((linkType: string) => {
+		linkIds.push(
+			...Object.keys(AppCache.Links[linkType] || {})
+				.filter((v) => {
+					let res = AppCache.Links[linkType][v];
+					if (!res) {
+						delete AppCache.Links[linkType][v];
+					}
+					return res;
+				})
+				.map((v) => v)
+		);
+	});
+
+	return linkIds
+		.map((id: string) => {
+			return GetLink(id);
+		})
+		.filter((x) => x);
 }
 
 export function NodesByType(graph: any, nodeType: any, options: any = {}) {
@@ -2721,7 +2787,7 @@ export function removeLinkBetweenNodes(graph: any, options: any, callback?: any)
 }
 export function removeLinkById(graph: any, options: any) {
 	const link = graph.linkLib[options.id];
-	return removeLink(graph, link);
+	return link ? removeLink(graph, link.id) : graph;
 }
 export function executeEvents(graph: any, link: any, evt: any) {
 	switch (evt) {
@@ -2748,7 +2814,7 @@ export function executeRemoveEvents(graph: any, link: { properties: { on: { [x: 
 	}
 	return graph;
 }
-export function isUIExtensionEnumerable(node: any) {
+export function isUIExtensionEnumerable(node: string) {
 	const _node = GetNodeProp(node, NodeProperties.UIExtensionDefinition);
 	if (_node && _node.config) {
 		return _node.config.isEnumeration;
@@ -2880,7 +2946,7 @@ export function removeLink(graph: any, link: any, options: any = {}) {
 	if (link) {
 		graph.links = graph.links.filter((x: any) => x !== link);
 		const del_link = graph.linkLib[link];
-		if (del_link.properties) {
+		if (del_link && del_link.properties) {
 			if (del_link.properties.on && del_link.properties.on[LinkEvents.Remove]) {
 				graph = executeEvents(graph, del_link, LinkEvents.Remove);
 			}
@@ -2894,52 +2960,53 @@ export function removeLink(graph: any, link: any, options: any = {}) {
 				delete graph.nodeLinkIds[source][target];
 			}
 		}
-		delete graph.linkLib[link];
+		if (graph.linkLib[link]) delete graph.linkLib[link];
 
-		graph.linkLib = { ...graph.linkLib };
-		graph.nodeLinks[del_link.source] = {
-			...graph.nodeLinks[del_link.source],
-			...{
-				[del_link.target]: graph.nodeLinks[del_link.source]
-					? (graph.nodeLinks[del_link.source][del_link.target] || 0) - 1
-					: 0
+		if (!fast) graph.linkLib = { ...graph.linkLib };
+		if (del_link) {
+			graph.nodeLinks[del_link.source] = {
+				...graph.nodeLinks[del_link.source],
+				...{
+					[del_link.target]: graph.nodeLinks[del_link.source]
+						? (graph.nodeLinks[del_link.source][del_link.target] || 0) - 1
+						: 0
+				}
+			};
+			if (graph.nodeLinks[del_link.source] && !graph.nodeLinks[del_link.source][del_link.target]) {
+				delete graph.nodeLinks[del_link.source][del_link.target];
+				if (Object.keys(graph.nodeLinks[del_link.source]).length === 0) {
+					delete graph.nodeLinks[del_link.source];
+				}
 			}
-		};
-		if (graph.nodeLinks[del_link.source] && !graph.nodeLinks[del_link.source][del_link.target]) {
-			delete graph.nodeLinks[del_link.source][del_link.target];
-			if (Object.keys(graph.nodeLinks[del_link.source]).length === 0) {
-				delete graph.nodeLinks[del_link.source];
+			graph.nodeLinks[del_link.target] = {
+				...graph.nodeLinks[del_link.target],
+				...{
+					[del_link.source]: graph.nodeLinks[del_link.target]
+						? (graph.nodeLinks[del_link.target][del_link.source] || 0) - 1
+						: 0
+				}
+			};
+			if (graph.nodeLinks[del_link.target] && !graph.nodeLinks[del_link.target][del_link.source]) {
+				delete graph.nodeLinks[del_link.target][del_link.source];
+				if (Object.keys(graph.nodeLinks[del_link.target]).length === 0) {
+					delete graph.nodeLinks[del_link.target];
+				}
 			}
-		}
-		graph.nodeLinks[del_link.target] = {
-			...graph.nodeLinks[del_link.target],
-			...{
-				[del_link.source]: graph.nodeLinks[del_link.target]
-					? (graph.nodeLinks[del_link.target][del_link.source] || 0) - 1
-					: 0
+			// Keeps track of the links for each node.
+			if (graph.nodeConnections[del_link.source] && graph.nodeConnections[del_link.source][del_link.id]) {
+				delete graph.nodeConnections[del_link.source][del_link.id];
 			}
-		};
-		if (graph.nodeLinks[del_link.target] && !graph.nodeLinks[del_link.target][del_link.source]) {
-			delete graph.nodeLinks[del_link.target][del_link.source];
-			if (Object.keys(graph.nodeLinks[del_link.target]).length === 0) {
-				delete graph.nodeLinks[del_link.target];
+			if (Object.keys(graph.nodeConnections[del_link.source]).length === 0) {
+				delete graph.nodeConnections[del_link.source];
 			}
-		}
 
-		// Keeps track of the links for each node.
-		if (graph.nodeConnections[del_link.source] && graph.nodeConnections[del_link.source][del_link.id]) {
-			delete graph.nodeConnections[del_link.source][del_link.id];
-		}
-		if (Object.keys(graph.nodeConnections[del_link.source]).length === 0) {
-			delete graph.nodeConnections[del_link.source];
-		}
-
-		// Keeps track of the links for each node.
-		if (graph.nodeConnections[del_link.target] && graph.nodeConnections[del_link.target][del_link.id]) {
-			delete graph.nodeConnections[del_link.target][del_link.id];
-		}
-		if (Object.keys(graph.nodeConnections[del_link.target]).length === 0) {
-			delete graph.nodeConnections[del_link.target];
+			// Keeps track of the links for each node.
+			if (graph.nodeConnections[del_link.target] && graph.nodeConnections[del_link.target][del_link.id]) {
+				delete graph.nodeConnections[del_link.target][del_link.id];
+			}
+			if (Object.keys(graph.nodeConnections[del_link.target]).length === 0) {
+				delete graph.nodeConnections[del_link.target];
+			}
 		}
 		graph = incrementMinor(graph);
 	}
@@ -3005,12 +3072,24 @@ export function updateNodePropertyDirty(graph: any, options: any) {
 	}
 	return graph;
 }
-function codeTypeWord(x: any) {
+export function codeTypeWord(x: any) {
 	if (typeof x === 'string') {
 		return x
 			.split('')
 			.filter((y) => 'abcdefghijklmnopqrstuvwxyzzz1234567890_'.indexOf(y.toLowerCase()) !== -1)
 			.join('');
+	}
+	return x;
+}
+function cssTypeWord(x: any) {
+	if (typeof x === 'string') {
+		return x
+			.split('')
+			.filter((y) => 'abcdefghijklmnopqrstuvwxyzzz1234567890_ '.indexOf(y.toLowerCase()) !== -1)
+			.join('')
+			.split(' ')
+			.join('-')
+			.toLowerCase();
 	}
 	return x;
 }
@@ -3070,6 +3149,10 @@ export const NodePropertiesDirtyChain = {
 		{
 			chainProp: NodeProperties.ValueName,
 			chainFunc: codeTypeWord
+		},
+		{
+			chainProp: NodeProperties.CssName,
+			chainFunc: cssTypeWord
 		},
 		{
 			chainProp: NodeProperties.HttpRoute,

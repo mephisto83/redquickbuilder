@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable camelcase */
 /* eslint-disable compat/compat */
 /* eslint-disable promise/param-names */
@@ -27,7 +28,6 @@ import { UITypes, MAIN_CONTENT, PROGRESS_VIEW } from '../../constants/nodetypes'
 import AddChainToNavigateNextScreens from './AddChainToNavigateNextScreens';
 import CreateConfiguration from '../CreateConfiguration';
 import CreateFetchServiceIdempotently from '../CreateFetchServiceIdempotently';
-import ConnectScreens from './ConnectScreens';
 import CreateClaimService from './CreateClaimService';
 import SetupViewTypes from './SetupViewTypes';
 import AddComponentsToScreenOptions from './AddComponentsToScreenOptions';
@@ -40,6 +40,12 @@ import CollectionDataChainsIntoCollections, {
 import JobService, { Job, JobFile } from '../../jobs/jobservice';
 import ModifyUpdateLinks from '../ModifyUpdateLinks';
 import AddUserRequirements from './AddUserRequirements';
+import ModifyAgentMethods from './ModifyAgentMethods';
+import AddAgentAccessMethods from './AddAgentAccessMethods';
+import UpdateScreenParameters from '../screens/UpdateScreenParameters';
+import ApplyPermissionChains from './ApplyPermissionChains';
+import ApplyExecutionChains from './ApplyExecutionChains';
+import ApplyValidationChains from './ApplyValidationChains';
 
 interface BuildStep {
 	progress?: number;
@@ -152,6 +158,9 @@ async function run(array: BuildStep[], name: string, func: Function) {
 
 const Create_View_Types = 'Create View Types';
 const Add_Agent_Methods = 'Add Agent Methods';
+const Update_Screen_Parameters = 'Update Screen Paramters';
+const Modify_Agent_Methods = 'Modify Agent Methods';
+const Add_Agent_Access_Methods = 'Add Agent Access Methods';
 export const Create_Component_All = 'Create Component All';
 const Wait_For_Create_Component_All_Completion = 'Wait_For_Create_Component_All_Completion';
 const Select_All_On_Model_Filters = 'Select All On Model Filters';
@@ -186,6 +195,10 @@ export const ApplyValidationFromProperties = 'ApplyValidationFromProperties';
 export const CollectionComponentNodes = 'CollectionComponentNodes';
 export const CollectionScreenNodes = 'CollectionScreenNodes';
 export const CollectionConnectDataChainCollection = 'CollectionConnectDataChainCollection';
+export const APPLY_PERMISSION_CHAINS = 'Apply Permission Chains';
+export const APPLY_VALIDATION_CHAINS = 'Apply Validation Chains';
+export const APPLY_EXECUTION_CHAINS = 'Apply Execution Chains';
+
 const Collect_Into_Graph = 'Collect_Into_Graph';
 const COMPLETED_BUILD = 'COMPLETED_BUILD';
 
@@ -193,10 +206,13 @@ const buildAllProgress = [
 	{ name: Create_View_Types },
 	{ name: AddTitleService },
 	{ name: Add_Agent_Methods },
+	{ name: Modify_Agent_Methods },
+	{ name: Add_Agent_Access_Methods },
 	{ name: ListRequiredModelTitles },
 	{ name: Create_Component_All },
 	{ name: Wait_For_Create_Component_All_Completion },
 	{ name: Collect_Into_Graph },
+	{ name: Update_Screen_Parameters },
 	{ name: Select_All_On_Model_Filters },
 	{ name: Add_Filters_To_Get_All },
 	{ name: Create_Dashboard },
@@ -205,11 +221,11 @@ const buildAllProgress = [
 	{ name: Create_Configuration },
 	{ name: Create_Fetch_Service },
 	{ name: Create_Claim_Service },
+	...waiting(Build_Dashboards),
 	{ name: Connect_Screens },
 	{ name: Wait_For_Screen_Connect },
 	{ name: Collect_Screen_Connect_Into_Graph },
 	{ name: Modify_Update_Links },
-	...waiting(Build_Dashboards),
 	{ name: Add_Chain_To_Navigate_Next_Screens },
 	...waiting(Connect_Dashboards),
 	...waiting(Setup_View_Types),
@@ -227,6 +243,9 @@ const buildAllProgress = [
 	...waiting(CollectionComponentNodes),
 	...waiting(CollectionScreenNodes),
 	...waiting(CollectionConnectDataChainCollection),
+	{ name: APPLY_PERMISSION_CHAINS },
+	{ name: APPLY_EXECUTION_CHAINS },
+	{ name: APPLY_VALIDATION_CHAINS },
 	{ name: COMPLETED_BUILD }
 ];
 export const BuildAllInfo = {
@@ -263,6 +282,12 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 
 		await run(buildAllProgress, Add_Agent_Methods, async (progresFunc: any) => {
 			await AddAgentMethods(progresFunc);
+		});
+		await run(buildAllProgress, Modify_Agent_Methods, async (progressFunc: any) => {
+			await ModifyAgentMethods(progressFunc);
+		});
+		await run(buildAllProgress, Add_Agent_Access_Methods, async (progressFunc: any) => {
+			await AddAgentAccessMethods(progressFunc);
 		});
 
 		await run(buildAllProgress, Create_Dashboard, async (progresFunc: (arg0: number) => any) => {
@@ -303,7 +328,9 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 				await JobService.WaitForJob(Create_Component_All, currentJobFile);
 			}
 		);
-
+		await run(buildAllProgress, Update_Screen_Parameters, async (progressFunc: any) => {
+			await UpdateScreenParameters(progressFunc);
+		});
 		await run(buildAllProgress, Update_Screen_Urls, async (progressFunc: any) => {
 			await UpdateScreenUrls(progressFunc);
 		});
@@ -311,6 +338,18 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		await run(buildAllProgress, Collect_Into_Graph, async (progresFunc: (arg0: number) => any) => {
 			await JobService.CollectForJob(currentJobFile);
 		});
+
+		await run(buildAllProgress, APPLY_PERMISSION_CHAINS, async (progressFunc) => {
+			await ApplyPermissionChains();
+    });
+
+		await run(buildAllProgress, APPLY_EXECUTION_CHAINS, async (progressFunc) => {
+			await ApplyExecutionChains();
+    });
+
+		await run(buildAllProgress, APPLY_VALIDATION_CHAINS, async (progressFunc) => {
+			await ApplyValidationChains();
+    });
 
 		await run(buildAllProgress, Add_Filters_To_Get_All, async (progresFunc: any) => {
 			await AddFiltersToGetAll(progresFunc);

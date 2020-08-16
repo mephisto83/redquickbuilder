@@ -16,7 +16,9 @@ export default class SelectorGenerator {
 		let funcs = GenerateSelectorFunctions();
 		let temps = [
 			{
-				template: `import * as UIA from './uiactions';
+        template: `import * as UIA from './uiactions';
+
+    import { $UpdateModels, $CreateModels } from './screenInfo';
 ${funcs.join(NEW_LINE)}`,
 				relative: './src/actions',
 				relativeFilePath: `./selector.js`,
@@ -63,14 +65,25 @@ export function GenerateSelectorFunction(node: any) {
 export function ${GetJSCodeName(node)}(value, viewModel = '${GetNodeProp(node, NodeProperties.DefaultViewModel) ||
 		GetCodeName(node) ||
 		''}', options = {}) {
-    if(options){
-      if(options.update){
+    if($UpdateModels){
+      if($UpdateModels[viewModel]){
         return  {
           dirty:UIA.GetScreenModelDirtyInstance(value, viewModel),
           focus:UIA.GetScreenModelFocusInstance(value, viewModel),
           blur: UIA.GetScreenModelBlurInstance(value, viewModel),
           focused:UIA.GetScreenModelFocusedInstance(value, viewModel),
           object:UIA.GetScreenModelInstance(value, viewModel)
+        }
+      }
+    }
+    if($CreateModels){
+      if($CreateModels[viewModel]){
+        return  {
+          dirty: UIA.GetScreenInstanceDirtyObject(viewModel),
+          focus: UIA.GetScreenInstanceFocusObject(viewModel),
+          blur: UIA.GetScreenInstanceBlurObject(viewModel),
+          focused: UIA.GetScreenInstanceFocusedObject(viewModel),
+          object: UIA.GetScreenInstanceObject(viewModel)
         }
       }
     }

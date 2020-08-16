@@ -139,7 +139,7 @@ export default class ModelGenerator {
 				graph: graphRoot,
 				nodeId: model.id,
 				state,
-				includeImports
+				includeImports: includeImports || false
 			});
 			result[res.id] = res;
 		});
@@ -412,7 +412,13 @@ export default class ModelGenerator {
 						return `if(a.${GetCodeName(v)} == null) {
               model.${GetCodeName(v)} = b.${GetCodeName(v)};
             }`;
-					}
+          }
+          switch(propType){
+            case NodePropertyTypes.STRING:
+              return `if(string.IsNullOrEmpty(a.${GetCodeName(v)})){
+              model.${GetCodeName(v)} = b.${GetCodeName(v)};
+            }`;
+          }
 					return `if(a.${GetCodeName(v)} == null || a.${GetCodeName(v)}.Count == 0) {
             model.${GetCodeName(v)} = b.${GetCodeName(v)};
           }`;

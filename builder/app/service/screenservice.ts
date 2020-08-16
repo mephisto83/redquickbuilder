@@ -24,7 +24,12 @@ import {
 	GetNodeByProperties,
 	GetNodes,
 	GetLinkProperty,
-	GetDataChainArgs
+	GetDataChainArgs,
+	GetComponentInternalApiNode,
+	GetComponentInternalApiNodes,
+	GetComponentApiNodes,
+	GetEventArguments,
+	GetCssName
 } from '../actions/uiactions';
 import * as GraphMethods from '../methods/graph_types';
 import { bindTemplate } from '../constants/functiontypes';
@@ -38,7 +43,8 @@ import {
 	LinkPropertyKeys,
 	MediaQueries,
 	StyleNodeProperties,
-	LinkProperties
+	LinkProperties,
+	EventArgumentTypes
 } from '../constants/nodetypes';
 import {
 	buildLayoutTree,
@@ -82,6 +88,8 @@ import { HandlerType } from '../components/titles';
 import { addNewLine } from '../utils/array';
 import { StyleLib } from '../constants/styles';
 import { ViewTypes } from '../constants/viewtypes';
+import { RouteSource, RouteSourceType } from '../interface/methodprops';
+import { constructCellStyles } from './sharedservice';
 
 export function GenerateScreens(options: { language: any }) {
 	const { language } = options;
@@ -100,6 +108,7 @@ export function GenerateScreenMarkup(id: string, language: string) {
 	const screenOption = GetScreenOption(id, language);
 	if (screenOption) {
 		const imports: any = GetScreenImports(id, language);
+
 		const elements: any = [ GenerateMarkupTag(screenOption, language, screen) ];
 		let template = null;
 		switch (language) {
@@ -270,6 +279,7 @@ export function buildStyle(node: any) {
 	if (typeof node === 'string') {
 		node = GetNodeById(node, graph);
 	}
+	let topCssStyle = GetCssName(node) || GetCodeName(node);
 	const styleNodes = GetNodesLinkedTo(graph, {
 		id: node.id,
 		link: LinkType.Style
@@ -306,9 +316,62 @@ export function buildStyle(node: any) {
 			return stylesheet;
 		})
 		.join(NEW_LINE);
-	return styleSheetRules;
+	return `.${topCssStyle} {
+    ${styleSheetRules}
+  }`;
 }
 
+export function buildStyleJS(node: any) {
+	const graph = GetCurrentGraph();
+	if (typeof node === 'string') {
+		node = GetNodeById(node, graph);
+	}
+	let topCssStyle = GetCssName(node) || GetCodeName(node);
+	const styleNodes = GetNodesLinkedTo(graph, {
+		id: node.id,
+		link: LinkType.Style
+	});
+
+	const styleSheetRules = styleNodes
+		.map((styleNode: GraphMethods.Node) => {
+			const style = GetNodeProp(styleNode, NodeProperties.Style);
+			const styleSelectors = StyleNodeProperties.filter((x) => GetNodeProp(styleNode, x)).map(
+				(styleProp) => styleProp
+			);
+			const areas = GetNodeProp(styleNode, NodeProperties.GridAreas);
+			const gridRowCount = parseInt(GetNodeProp(styleNode, NodeProperties.GridRowCount) || 1, 10);
+			const gridplacement = GetNodeProp(styleNode, NodeProperties.GridPlacement);
+			const styleObj = GetNodeProp(styleNode, NodeProperties.Style);
+			const useMediaQuery = GetNodeProp(style, NodeProperties.UseMediaQuery);
+			let mediaquery_start = '';
+			let mediaquery_end = '';
+			if (useMediaQuery) {
+				mediaquery_start = MediaQueries[GetNodeProp(styleNode, NodeProperties.MediaQuery)];
+				if (mediaquery_start) {
+					mediaquery_start = `${mediaquery_start} {`;
+					mediaquery_end = `}`;
+				}
+			}
+			const styleName = GetJSCodeName(styleNode);
+			const stylesSelectorsName = styleSelectors.map((styleSelector) => `${styleName}${styleSelector}`).join();
+			const stylesheet = `
+    ${stylesSelectorsName || styleName}: ()=> {
+
+      ${mediaquery_start}
+        return {    ${Object.keys(styleObj).map((s) => `${s}: '${styleObj[s]}',`).join(NEW_LINE)}
+      };
+       ${mediaquery_end}
+    }
+    `;
+
+			return stylesheet;
+		})
+		.unique()
+		.join(`,${NEW_LINE}`);
+	return `export default {
+    ${styleSheetRules}
+  }`;
+}
 export function GetItemData(node: any) {
 	const dataSourceNode = GetDataSourceNode(node.id);
 	const connectedNode = GetNodeProp(dataSourceNode, NodeProperties.DataChain);
@@ -337,7 +400,7 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 		: {};
 
 	let imports: any[] = [];
-	const extraimports = [];
+	const extraimports: any[] = [];
 	const css = {};
 	let layoutSrc;
 	if (!specialLayout) {
@@ -353,7 +416,7 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 				}).join(NEW_LINE)
 			: GetDefaultElement();
 	} else {
-		extraimports.push(`import * as Models from '${getRelativePathPrefix(relativePath)}model_keys.js';`);
+		// extraimports.push(`import * as Models from '${getRelativePathPrefix(relativePath)}model_keys.js';`);
 		if (layoutObj) {
 			buildLayoutTree({
 				layoutObj,
@@ -393,6 +456,7 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 	}
 
 	let cssFile = null;
+	let cssJsFile = null;
 	let cssImport = null;
 	let templateStr = null;
 	let ending = '.js';
@@ -411,10 +475,13 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 			ending = '.tsx';
 			templateStr = fs.readFileSync('./app/templates/screens/el_screenoption.tpl', 'utf8');
 			styleRules = buildStyle(node);
-			cssFile = constructCssFile(css, `.${(GetCodeName(node) || '').toJavascriptName()}`);
+			cssFile = ''; // constructCssFile(css, `.${(GetCodeName(node) || '').toJavascriptName()}`);
 			cssFile += styleRules;
 
-			cssImport = `import './${(GetCodeName(node) || '').toJavascriptName()}.scss'`;
+			cssJsFile = buildStyleJS(node);
+
+      cssImport = `import './${(GetCodeName(node) || '').toJavascriptName()}.scss'
+      import styles from './${(GetCodeName(node) || '').toJavascriptName()}_css'`;
 			break;
 		case UITypes.ReactNative:
 		default:
@@ -452,6 +519,14 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 			relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}${ending}`,
 			name: `${relativePath || './src/components/'}${(GetCodeName(node) || '').toJavascriptName()}${ending}`
 		},
+		cssJsFile
+			? {
+					template: cssJsFile,
+					relative: relativePath || './src/components',
+					relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}_css.ts`,
+					name: `${relativePath || './src/components/'}${(GetCodeName(node) || '').toJavascriptName()}_css.ts`
+				}
+			: null,
 		cssFile
 			? {
 					template: cssFile,
@@ -763,6 +838,7 @@ export function GenerateRNComponents(
 				}
 				const css = {};
 				let cssFile = '';
+				let cssJsFile = '';
 				let cssImport = '';
 				let styleRules = null;
 				const component_did_update = GetComponentDidUpdate(node);
@@ -776,10 +852,11 @@ export function GenerateRNComponents(
 						break;
 					case UITypes.ReactWeb:
 						styleRules = buildStyle(node);
-						cssFile = constructCssFile(css, `.${(GetCodeName(node) || '').toJavascriptName()}`);
+						cssFile = ''; // constructCssFile(css, `.${(GetCodeName(node) || '').toJavascriptName()}`);
 						cssFile += styleRules;
-
-						cssImport = `import './${(GetCodeName(node) || '').toJavascriptName()}.scss'`;
+						cssJsFile = buildStyleJS(node);
+						cssImport = `import './${(GetCodeName(node) || '').toJavascriptName()}.scss'
+            import styles from './${(GetCodeName(node) || '').toJavascriptName()}_css'`;
 						break;
 					default:
 						break;
@@ -804,6 +881,15 @@ export function GenerateRNComponents(
 								relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}.scss`,
 								name: `${relative || './src/components/'}${(GetCodeName(node) || '')
 									.toJavascriptName()}.scss`
+							}
+						: null,
+					cssJsFile
+						? {
+								template: cssJsFile,
+								relative: relative || './src/components',
+								relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}_css.ts`,
+								name: `${relative || './src/components/'}${(GetCodeName(node) || '')
+									.toJavascriptName()}_css.ts`
 							}
 						: null,
 					{
@@ -897,7 +983,8 @@ export function ConvertViewTypeToComponentNode(node: any, language: string) {
 	}
 	return node;
 }
-export function GenerateMarkupTag(node: any, language: any, parent: any) {
+
+export function GenerateMarkupTag(node: any, language: any, parent: any, cellStyleArray: any[] = []) {
 	let viewTypeNode = null;
 	if (GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.ViewType) {
 		viewTypeNode = node;
@@ -921,8 +1008,41 @@ export function GenerateMarkupTag(node: any, language: any, parent: any) {
 					});
 				}
 			}
-			return `<${GetCodeName(node)} ${describedApi} />`;
+			let {
+				cellStyles,
+				cellStylesReact
+			}: { cellStyles: string; cellStylesReact: string[] } = constructCellStyles(cellStyleArray, true);
+			let styleOrCss: string = '';
+			let stylization = '';
+			if (cellStyleArray && cellStylesReact.length) {
+				stylization = `style={{${cellStylesReact.join()}}}`;
+			}
+
+			switch (language) {
+				case UITypes.ReactNative:
+					if (cellStylesReact.length) styleOrCss = stylization;
+					break;
+				default:
+					if (cellStyles) styleOrCss = `${stylization}`;
+					break;
+			}
+			return `<${GetCodeName(node)} ${styleOrCss} ${describedApi} />`;
 	}
+}
+
+function computeScreenEffectInputs(parent: any) {
+	const graph = GetCurrentGraph(GetState());
+	const componentInternalApis = GetNodesLinkedTo(graph, {
+		id: parent.id,
+		link: LinkType.ComponentInternalApi
+	});
+
+	return `{${componentInternalApis
+		.unique((x: GraphMethods.Node) => GetJSCodeName(x))
+		.map((node: GraphMethods.Node) => {
+			return `${GetJSCodeName(node)}: this.state.${GetJSCodeName(node)}`;
+		})
+		.join(`,${NEW_LINE}`)}}`;
 }
 function WriteDescribedStateUpdates(parent: any) {
 	let result = ``;
@@ -941,7 +1061,10 @@ function WriteDescribedStateUpdates(parent: any) {
 				id: componentInternalApi.id,
 				link: LinkType.ComponentInternalConnection
 			}).find((x: any) => x);
-
+			const dataChainScreenEffect = GetNodeLinkedTo(graph, {
+				id: componentInternalApi.id,
+				link: LinkType.DataChainScreenEffect
+			});
 			const dataChain = GetNodesLinkedTo(graph, {
 				id: componentInternalApi.id,
 				link: LinkType.DataChainLink
@@ -957,11 +1080,7 @@ function WriteDescribedStateUpdates(parent: any) {
 			innerValue = externalKey;
 			if (innerValue) {
 				if (selector) {
-					const addiontionalParams = getUpdateFunctionOption(
-						selector.id,
-						externalApiNode.id,
-						`, { update: true }/*s => e*/`
-					);
+					const addiontionalParams = getUpdateFunctionOption(selector.id, externalApiNode.id, `/*s => e*/`);
 					innerValue = `S.${GetJSCodeName(
 						selector
 					)}({{temp}}, this.state.viewModel${addiontionalParams} /* state update */)`;
@@ -974,10 +1093,12 @@ function WriteDescribedStateUpdates(parent: any) {
 					})}(${innerValue})`;
 				}
 				const temp_prop = GetJSCodeName(componentInternalApi);
-				result = `
-            var new_${externalKey} = ${bindTemplate(innerValue, {
+
+				let temp_prop_source_value: string = bindTemplate(innerValue, {
 					temp: `this.props.${externalKey}`
-				})};
+				});
+				result = `
+            var new_${externalKey} = ${temp_prop_source_value};
             if ( new_${externalKey} !== this.state.${temp_prop}) {
           {{step}}
         }`;
@@ -986,6 +1107,21 @@ function WriteDescribedStateUpdates(parent: any) {
 					temp: innerValue,
 					step: `updated = true;
             updates = {...updates, ${GetJSCodeName(componentInternalApi)}:  new_${externalKey} };`
+				});
+			} else if (dataChainScreenEffect) {
+				//Screen Effects
+				let internalKey = GetJSCodeName(componentInternalApi);
+				result = `
+        var new_${internalKey} = DC.${GetCodeName(dataChainScreenEffect, {
+					includeNameSpace: true
+				})}(${computeScreenEffectInputs(parent)});
+        if ( new_${internalKey} !== this.state.${internalKey}) {
+      {{step}}
+    }`;
+				return bindTemplate(result, {
+					temp: innerValue,
+					step: `updated = true;
+        updates = {...updates, ${GetJSCodeName(componentInternalApi)}:  new_${internalKey} };`
 				});
 			}
 		})
@@ -1131,7 +1267,8 @@ function WriteDescribedApiProperties(node: GraphMethods.Node | null, options: an
 						break;
 					case 'error':
 					default:
-						stateKey = 'value';
+						stateKey = GetNodeTitle(externalConnection);
+						// stateKey = 'value';
 						break;
 				}
 			}
@@ -1183,16 +1320,12 @@ function WriteDescribedApiProperties(node: GraphMethods.Node | null, options: an
 			if (!noSelector && selector) {
 				addiontionalParams =
 					componentExternalApi && externalConnection
-						? getUpdateFunctionOption(
-								componentExternalApi.id,
-								externalConnection.id,
-								`, { update: true }/*c => e*/`
-							)
+						? getUpdateFunctionOption(componentExternalApi.id, externalConnection.id, ``)
 						: '';
 				if (isViewType) {
 					addiontionalParams =
 						componentExternalApi && node
-							? getUpdateFunctionOption(node.id, componentExternalApi.id, `, { update: true }/*n => c*/`)
+							? getUpdateFunctionOption(node.id, componentExternalApi.id, ``)
 							: '';
 
 					innerValue = `S.${GetJSCodeName(
@@ -1528,6 +1661,10 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 			link: LinkType.DataChainLink,
 			componentType: NodeTypes.DataChain
 		});
+		const screenEffects = GetNodesLinkedTo(graph, {
+			id: methodInstanceCall.id,
+			link: LinkType.DataChainScreenEffectImpl
+		});
 
 		const preDataChain = GetNodeLinkedTo(graph, {
 			id: methodInstanceCall.id,
@@ -1557,7 +1694,7 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 					const addiontionalParams = getUpdateFunctionOption(
 						methodInstanceSource ? methodInstanceSource.id : null,
 						methodInstanceCall ? methodInstanceCall.id : null,
-						`, { update: true }/*m => mi*/`
+						``
 					);
 
 					innervalue = `S.${GetJSCodeName(
@@ -1637,8 +1774,30 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 				includeNameSpace: true
 			})}`;
 		}
+		let screenEffectsInput = '';
+		let screenEffectContext = '';
+		if (screenEffects && screenEffects.length) {
+			screenEffectsInput = `${parts.length || dataChainInput || preDataChainInput
+				? ','
+				: ''}screenEffects: [${screenEffects
+				.map((se: GraphMethods.Node) => {
+					return `DC.${GetCodeName(se, { includeNameSpace: true })}`;
+				})
+				.join(',' + NEW_LINE)}]`;
+			let screenEffect = screenEffects[0];
+			let componentConnectedToScreenEffect = GetNodeLinkedTo(graph, {
+				id: screenEffect.id,
+				link: LinkType.ComponentNodeLink
+			});
+			screenEffectContext = `${parts.length || dataChainInput || preDataChainInput || screenEffectsInput
+				? ','
+				: ''}screenContext:{ ${GetComponentContextScript(componentConnectedToScreenEffect)} }`;
+		}
+
 		const query = parts.join();
-		return `this.props.${GetJSCodeName(method)}({${query}${dataChainInput}${preDataChainInput}});`;
+		return `this.props.${GetJSCodeName(
+			method
+		)}({${query}${dataChainInput}${preDataChainInput}${screenEffectsInput}${screenEffectContext}});`;
 	}
 	if (navigationMethod) {
 		return `this.props.${GetNodeProp(navigationMethod, NodeProperties.NavigationAction)}();`;
@@ -1650,10 +1809,111 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 				includeNameSpace: true
 			})}(this.state.${GetJSCodeName(internalApiConnection)});`;
 		}
+		let argumentSource: GraphMethods.Node = GetNodeLinkedTo(GetCurrentGraph(), {
+			id: dataChain.id,
+			link: LinkType.MethodArgumentSoure
+		});
+		if (argumentSource) {
+			let apiInternalNodes = GetComponentInternalApiNodes(argumentSource.id);
+			let calculateEventArguments = GetEventArguments(argumentSource.id);
+			let internalApiArgs = createInternalApiArgumentsCode(apiInternalNodes, calculateEventArguments);
+			return `DC.${GetCodeName(dataChain, {
+				includeNameSpace: true
+			})}(value, ${internalApiArgs});`;
+		}
 		return `DC.${GetCodeName(dataChain, {
 			includeNameSpace: true
-		})}(value);`;
+		})}(value/*hi*/);`;
 	}
+}
+
+function GetComponentContextScript(component: GraphMethods.Node) {
+	let internalNodes = GetComponentApiNodes(component.id);
+
+	let res = `${internalNodes
+		.unique((v: GraphMethods.Node) => GetJSCodeName(v))
+		.map((internalNode: GraphMethods.Node) => {
+			return `${GetJSCodeName(internalNode)}: this.state.${GetJSCodeName(internalNode)}`;
+		})
+		.join(`,${NEW_LINE}`)}`;
+
+	return res;
+}
+function createInternalApiArgumentsCode(
+	apiInternalNodes: GraphMethods.Node[],
+	calculateEventArguments: GraphMethods.Node[]
+) {
+	let methodParamNames: string[] = [];
+	let methodParams = (calculateEventArguments || [])
+		.map((node: GraphMethods.Node) => {
+			switch (GetNodeProp(node, NodeProperties.EventArgumentType)) {
+				case EventArgumentTypes.RouteSource:
+					let routeSource: RouteSource = GetNodeProp(node, NodeProperties.RouteSource);
+					let screen = GetNodeProp(node, NodeProperties.Screen);
+					let viewType = GetNodeProp(screen, NodeProperties.ViewType);
+					let paramName = GetNodeProp(node, NodeProperties.ParameterName).toJavascriptName();
+					switch (routeSource.type) {
+						case RouteSourceType.Agent:
+						case RouteSourceType.Model:
+							methodParamNames.push(paramName);
+							return `${paramName}: (() => {
+              let model = GetC(this.props.state, SITE, Models.${GetCodeName(routeSource.model)});
+              if(model) {
+                return model.${GetJSCodeName(routeSource.property)};
+              }
+              return null;
+            })()`;
+							break;
+						case RouteSourceType.UrlParameter:
+							methodParamNames.push(paramName);
+							return `${paramName}: this.state.${`${routeSource.model}`.toJavascriptName()}`;
+						case RouteSourceType.Body:
+							switch (viewType) {
+								case ViewTypes.Update:
+									methodParamNames.push(paramName);
+									return `${paramName}: (()=>{
+                let model = UIA.GetScreenModelInstance(this.state.value, this.state.viewModel);
+              return model;
+              })()`;
+								case ViewTypes.Create:
+									methodParamNames.push(paramName);
+									return `${GetNodeProp(
+										node,
+										NodeProperties.ParameterName
+									).toJavascriptName()}: (()=>{
+                    let model = UIA.GetScreenInstanceObject(this.state.viewModel);
+                    return model;
+                  })()`;
+								case ViewTypes.Get:
+								case ViewTypes.GetAll:
+									methodParamNames.push(paramName);
+									return `${GetNodeProp(
+										node,
+										NodeProperties.ParameterName
+									).toJavascriptName()}: (()=>{
+                    let model = UIA.GetModelInstanceObject(this.state.value, this.state.viewModel);
+                    return model;
+                  })()`;
+							}
+					}
+					break;
+			}
+			return null;
+		})
+		.filter((x) => x);
+
+	let result = '';
+	result = `{ ${[
+		...apiInternalNodes
+			.filter((node: GraphMethods.Node) => {
+				return methodParamNames.indexOf(GetNodeTitle(node)) === -1;
+			})
+			.map((node: GraphMethods.Node) => {
+				return `${GetNodeTitle(node)}: this.state.${GetNodeTitle(node)}`;
+			}),
+		...methodParams
+	].join(', ' + NEW_LINE)} }`;
+	return result;
 }
 
 export function getUpdateFunctionOption(methodId: any, methodInstanceCallId: any, addParams: string) {
@@ -1663,7 +1923,7 @@ export function getUpdateFunctionOption(methodId: any, methodInstanceCallId: any
 		if (linkBetweenNodes) {
 			const instanceUpdate = GetLinkProperty(linkBetweenNodes, LinkPropertyKeys.InstanceUpdate);
 			if (instanceUpdate) {
-				addiontionalParams = addParams || `, { update: true }/*getUpdateFunctionOption*/`;
+				addiontionalParams = addParams || ``;
 			}
 		}
 	}
@@ -1747,10 +2007,8 @@ export function GetComponentDidMount(screenOption: any, options: any = {}) {
         ${options.skipSetGetState ? '' : `this.props.setGetState();`}
         this.captureValues({});
         ${options.skipOutOfBand ? '' : outOfBandCall}
-        // ${screenOption.id}
-
         ${invocations}
-        ${chainInvocations}//asdf
+        ${chainInvocations}
 {{handles}}
 }
 `;
@@ -1963,15 +2221,58 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
 	});
 
 	moreresults.push({
-		template: bindTemplate(`{{source}}`, {
-			source: NodesByType(GetState(), [ NodeTypes.Screen, NodeTypes.ScreenOption, NodeTypes.ComponentNode ])
-				.map((t: any) => `export const ${GetCodeName(t)} = '${GetCodeName(t)}';`)
-				.unique()
-				.join(NEW_LINE)
-		}),
+		template: bindTemplate(
+			`{{source}}
+  `,
+			{
+				source: NodesByType(GetState(), [ NodeTypes.Screen, NodeTypes.ScreenOption, NodeTypes.ComponentNode ])
+					.filter((node: GraphMethods.Node) => {
+						switch (GetNodeProp(node, NodeProperties.NODEType)) {
+							case NodeTypes.ComponentNode:
+								return GetNodeProp(node, NodeProperties.IsShared);
+						}
+						return true;
+					})
+					.map((t: any) => `export const ${GetCodeName(t)} = '${GetCodeName(t)}';`)
+					.unique()
+					.join(NEW_LINE)
+			}
+		),
 		relative: './src/actions',
-		relativeFilePath: `./screenInstances.js`,
-		name: ``
+		relativeFilePath: `./screenInstances.ts`,
+		name: `screenInstances.ts`
+	});
+	moreresults.push({
+		template: bindTemplate(
+			`
+    export const $CreateModels = {
+      {{create_viewmodels}}
+    };
+    export const $UpdateModels = {
+        {{update_viewmodels}}
+    };`,
+			{
+				update_viewmodels: NodesByType(GetState(), [ NodeTypes.Screen ])
+					.filter((a: GraphMethods.Node) => {
+						return GetNodeProp(a, NodeProperties.ViewType) === ViewTypes.Update;
+					})
+					.map((t: GraphMethods.Graph) => {
+						return `${GetCodeName(t)}: '${GetCodeName(t)}'`;
+					})
+					.join(',' + NEW_LINE),
+				create_viewmodels: NodesByType(GetState(), [ NodeTypes.Screen ])
+					.filter((a: GraphMethods.Node) => {
+						return GetNodeProp(a, NodeProperties.ViewType) === ViewTypes.Create;
+					})
+					.map((t: GraphMethods.Graph) => {
+						return `${GetCodeName(t)}: '${GetCodeName(t)}'`;
+					})
+					.join(',' + NEW_LINE)
+			}
+		),
+		relative: './src/actions',
+		relativeFilePath: `./screenInfo.ts`,
+		name: `screenInfo.ts`
 	});
 
 	return [ ...result, ...moreresults ];

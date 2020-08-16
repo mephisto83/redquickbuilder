@@ -17,32 +17,30 @@ import { CreateAgentFunction } from '../../constants/nodepackages';
 import { existsLinksBetween, findLink, existsLinkBetween, Paused, SetPause } from '../../methods/graph_methods';
 
 export default async function AddAgentMethods(progresFunc: any) {
-  SetPause(true);
+	SetPause(true);
 	const agents = GetNodesByProperties({
 		[NodeProperties.NODEType]: NodeTypes.Model,
 		[NodeProperties.IsAgent]: (v: string | boolean) => v === 'true' || v === true,
 		[NodeProperties.UIText]: (v: string) => v !== 'User'
-  }); //  NodesByType(null, NodeTypes.Model).filter(x => GetNodeProp(x, NodeProperties.IsAgent)).filter(x => GetNodeTitle(x) !== 'User');
-  console.log('executing add agent methods');
+	}); //  NodesByType(null, NodeTypes.Model).filter(x => GetNodeProp(x, NodeProperties.IsAgent)).filter(x => GetNodeTitle(x) !== 'User');
+	console.log('executing add agent methods');
 	const models = NodesByType(null, NodeTypes.Model).filter((x: any) => !GetNodeProp(x, NodeProperties.IsAgent));
-	const functionTypes = [
-		FunctionTypes.Create_Object__Object,
-		FunctionTypes.Get_Objects_From_List_Of_Ids,
-		FunctionTypes.Update_Object_Agent_Value__Object,
-		FunctionTypes.Get_Agent_Value__IListObject,
-    FunctionTypes.Get_Object_Agent_Value__Object,
-    FunctionTypes.Get_Unique_Object_To_Agent,
-    FunctionTypes.Get_Default_Object_For_Agent
+	const functionTypes: string[] = [
+		// FunctionTypes.Create_Object__Object,
+		// FunctionTypes.Get_Objects_From_List_Of_Ids,
+		// FunctionTypes.Update_Object_Agent_Value__Object,
+		// FunctionTypes.Get_Agent_Value__IListObject,
+		// FunctionTypes.Get_Object_Agent_Value__Object,
+		// FunctionTypes.Get_Default_Object_For_Agent
 	];
 	const agentAccesses = NodesByType(null, NodeTypes.AgentAccessDescription);
 
 	await agents.forEachAsync(async (agent: any, aindex: any) => {
-
-    console.log(`adding ${GetNodeTitle(agent)} methods`);
-    await models.forEachAsync(async (model: any, mindex: any) => {
-      console.log(`${GetNodeTitle(model)} methods`);
+		console.log(`adding ${GetNodeTitle(agent)} methods`);
+		await models.forEachAsync(async (model: any, mindex: any) => {
+			console.log(`${GetNodeTitle(model)} methods`);
 			const graph = GetCurrentGraph();
-			const agentAcesses = agentAccesses.find((aa: any) => isAccessNode(agent, model, aa, graph));
+			const agentAcesses = agentAccesses.find((aa: any) => isAccessNode(agent, model, aa, '', graph));
 			if (agentAcesses) {
 				const agentCreds = findLink(graph, { target: agentAcesses.id, source: agent.id });
 				await functionTypes.forEachAsync(async (functionType: any, findex: any) => {
@@ -88,6 +86,6 @@ export default async function AddAgentMethods(progresFunc: any) {
 		});
 	});
 
-  SetPause(false);
+	SetPause(false);
 	return [];
 }

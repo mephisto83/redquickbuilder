@@ -34,6 +34,7 @@ import { NodeType } from '../components/titles';
 import NamespaceGenerator from './namespacegenerator';
 import { enumerate } from '../utils/utils';
 import { Node } from '../methods/graph_types';
+import AfterEffectsGenerator from './aftereffectsgenerator';
 
 const EXECUTOR_CLASS = './app/templates/executor/executor_class.tpl';
 const EXECUTOR_INTERFACE = './app/templates/executor/executor_class_interface.tpl';
@@ -147,7 +148,9 @@ export default class ExecutorGenerator {
 			method: any;
 		}[] = [];
 		const allmodels = NodesByType(state, NodeTypes.Model);
-		const allagents = allmodels.filter((x: any) => GetNodeProp(x, NodeProperties.IsAgent));
+		const allagents = allmodels.filter(
+			(x: any) => GetNodeProp(x, NodeProperties.IsAgent) && !GetNodeProp(x, NodeProperties.IsUser)
+		);
 		const allfunctions = NodesByType(state, [ NodeTypes.Function, NodeTypes.Method ]);
 
 		allfunctions.map((fun: Node) => {
@@ -242,7 +245,7 @@ export default class ExecutorGenerator {
 				funct: GetCodeName(functNode)
 			});
 			const methodProps = GetMethodProps(functNode);
-			const propertyValidationStatements = Object.keys(executorProperties || {})
+			let propertyValidationStatements = Object.keys(executorProperties || {})
 				.map((property) => {
 					const propertyNode = GraphMethods.GetNode(graph, property);
 					const validatorPs = executorProperties[property];
@@ -307,6 +310,9 @@ export default class ExecutorGenerator {
 									break;
 								case ExecutorRules.Copy:
 									break;
+								case ExecutorRules.DataChain:
+									template = `result{{model_property}} = await {{node}}.Execute(agent, data, change);`;
+									break;
 								case ExecutorRules.AddModelReference:
 									template = fs.readFileSync(
 										`app/templates/executor/snippets/add-model-reference.tpl`,
@@ -332,6 +338,7 @@ export default class ExecutorGenerator {
 							const templateRes = bindTemplate(template, {
 								attribute_type: validators.code[ProgrammingLanguages.CSHARP],
 								attribute_type_arguments,
+								node: GetCodeName(node),
 								model_property: `.${GetNodeProp(propertyNode, NodeProperties.CodeName)}`,
 								...{ ...templateBindings }
 							});
@@ -368,13 +375,6 @@ export default class ExecutorGenerator {
 				default:
 					break;
 			}
-			var templateRes = bindTemplate(template, {
-				property_sets: propertyValidationStatements,
-				model: `${GetCodeName(modelNode)}`,
-				model_output: GetCodeName(modelOutputNode)
-			});
-
-			// var vectors = ExecutorGenerator.enumerateValidationTestVectors(validation_test_vectors);
 
 			let agent_parameter: any = GetCodeName(agentNode);
 			agent_parameter = agent_parameter ? `${agent_parameter} agent` : false;
@@ -391,6 +391,36 @@ export default class ExecutorGenerator {
 			change_parameter = change_parameter ? `${change_parameter} change` : false;
 
 			const parameters = [ data_parameter, agent_parameter, change_parameter ].filter((x) => x).join(', ');
+
+			let executionDataChains = GraphMethods.GetNodesLinkedTo(graph, {
+				id: executor_node.id,
+				componentType: NodeTypes.ExecutionDataChain
+			});
+
+			executionDataChains.forEach((executionDataChain: Node) => {
+				let dataChains = GraphMethods.GetNodesLinkedTo(graph, {
+					id: executionDataChain.id,
+					link: LinkType.DataChainLink
+				});
+				dataChains.map((dataChain: Node) => {
+					let targetProperty = GetNodeProp(dataChain, NodeProperties.TargetProperty);
+					if (targetProperty) {
+						propertyValidationStatements +=
+							`result.${GetCodeName(targetProperty)} = await ${GetCodeName(
+								dataChain
+							)}.Execute(data, agent, change);` + NEW_LINE;
+					}
+					return null;
+				});
+			});
+
+			var templateRes = bindTemplate(template, {
+				property_sets: propertyValidationStatements,
+				model: `${GetCodeName(modelNode)}`,
+				model_output: GetCodeName(modelOutputNode)
+			});
+
+			// var vectors = ExecutorGenerator.enumerateValidationTestVectors(validation_test_vectors);
 
 			var templateRes = bindTemplate(execution_method, {
 				model: GetCodeName(modelNode),
@@ -527,7 +557,8 @@ export default class ExecutorGenerator {
 						`${namespace}${NameSpace.Model}`,
 						`${namespace}${NameSpace.Parameters}`,
 						`${namespace}${NameSpace.Interface}`,
-						`${namespace}${NameSpace.Constants}`
+						`${namespace}${NameSpace.Constants}`,
+						`${namespace}${NameSpace.Controllers}`
 					],
 					namespace,
 					space: NameSpace.Executors
@@ -557,6 +588,79 @@ export default class ExecutorGenerator {
 			};
 		});
 
+		allagents.forEach((node: Node) => {
+			if (!result[GetNodeProp(node, NodeProperties.CodeName)]) {
+				// add empty executor
+				const templateRes = bindTemplate(_executor_class, {
+					model: GetNodeProp(node, NodeProperties.CodeName),
+					methods: '',
+					staticentry: static_methods
+						.unique((x: { template: any }) => x.template)
+						.filter((x: { agent: string }) => x.agent === node.id)
+						.map((x: { template: any }) => x.template)
+						.join('')
+				});
+				const templateInterfaceRes = bindTemplate(_executor_class_interface, {
+					model: GetNodeProp(node, NodeProperties.CodeName),
+					methods: '',
+					staticentry: static_methods_interface
+						.unique((x: { template: any }) => x.template)
+						.filter((x: { agent: string }) => x.agent === node.id)
+						.map((x: { template: any }) => x.template)
+						.join('')
+				});
+
+				result[GetNodeProp(node, NodeProperties.CodeName)] = {
+					id: GetNodeProp(node, NodeProperties.CodeName),
+					name: `${GetNodeProp(node, NodeProperties.CodeName)}Executor`,
+					tname: `${GetNodeProp(node, NodeProperties.CodeName)}ExecutorTests`,
+					iname: `I${GetNodeProp(node, NodeProperties.CodeName)}Executor`,
+					template: NamespaceGenerator.Generate({
+						template: templateRes,
+						usings: [
+							...STANDARD_CONTROLLER_USING,
+							`${namespace}${NameSpace.Model}`,
+							`${namespace}${NameSpace.Parameters}`,
+							`${namespace}${NameSpace.Interface}`,
+							`${namespace}${NameSpace.Constants}`
+						],
+						namespace,
+						space: NameSpace.Executors
+					}),
+					interface: NamespaceGenerator.Generate({
+						template: templateInterfaceRes,
+						usings: [
+							...STANDARD_CONTROLLER_USING,
+							`${namespace}${NameSpace.Model}`,
+							`${namespace}${NameSpace.Parameters}`,
+							`${namespace}${NameSpace.Constants}`
+						],
+						namespace,
+						space: NameSpace.Interface
+					})
+					// test: NamespaceGenerator.Generate({
+					//     template: testTemplate,
+					//     usings: [
+					//         ...STANDARD_CONTROLLER_USING,
+					//         ...STANDARD_TEST_USING,
+					//         `${namespace}${NameSpace.Executors}`,
+					//         `${namespace}${NameSpace.Model}`,
+					//         `${namespace}${NameSpace.Constants}`],
+					//     namespace,
+					//     space: NameSpace.Tests
+					// }),
+				};
+			}
+		});
+		result['AfterEffect Chains'] = {
+			id: 'After Effect Chains',
+			name: 'AfterEffectChains',
+			template: NamespaceGenerator.Generate({
+				template: AfterEffectsGenerator(),
+				namespace,
+				space: NameSpace.Controllers
+			})
+		};
 		return result;
 	}
 }

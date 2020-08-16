@@ -1,4 +1,6 @@
 import { uuidv4 } from "../utils/array";
+import { GetNodeByProperties } from "../actions/uiactions";
+import { NodeProperties, NodeTypes } from "../constants/nodetypes";
 export default function (args : any= {}) {
   // node1,node2
 
@@ -679,6 +681,14 @@ export default function (args : any= {}) {
     },
 
     function (graph: any) {
+      let controllerNode = GetNodeByProperties({
+        [NodeProperties.UIText]:modelName + " Controller",
+        [NodeProperties.NODEType]:NodeTypes.Controller
+      });
+      if(controllerNode){
+        context.node10 = controllerNode.id;
+        return [];
+      }
       return [
         {
           operation: "ADD_NEW_NODE",
@@ -724,13 +734,21 @@ export default function (args : any= {}) {
     },
 
     function (graph: any) {
+      let maestroNode = GetNodeByProperties({
+        [NodeProperties.UIText]:modelName + " Maestro",
+        [NodeProperties.NODEType]:NodeTypes.Maestro
+      });
+      if(maestroNode){
+        context.node11 = maestroNode.id;
+        return [];
+      }
       return [
         {
           operation: "ADD_NEW_NODE",
           options: {
-            nodeType: "maestro",
+            nodeType: NodeTypes.Maestro,
             properties: {
-              text: "" + modelName + " Maestro"
+              text:  modelName + " Maestro"
             },
             links: [
               function (graph: any) {

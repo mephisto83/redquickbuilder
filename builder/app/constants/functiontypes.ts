@@ -3,6 +3,8 @@ import fs from 'fs';
 import { Methods, NodeTypes, NodeProperties } from './nodetypes';
 
 export const FunctionTypes = {
+	// Get Self
+	GetSelf: 'Get/Self',
 	//Functions with List<Child> result
 	Create_ManyToMany_Agent_Value__IListChild: 'Create/ManyToMany/Agent/Value => IList<Child>',
 	Update_ManyToMany_Agent_Value__IListChild: 'Update/ManyToMany/Agent/Value => IList<Child>',
@@ -27,8 +29,10 @@ export const FunctionTypes = {
 	//Delete
 	Delete_M2M_By_Reference: 'Delete M2M by reference => list',
 	//Unique object to an agent function
-  Get_Unique_Object_To_Agent: 'Get_Unique_Object_To_Agent',
-  Get_Default_Object_For_Agent:'Get_Default_Object_For_Agent',
+	Get_Unique_Object_To_Agent: 'Get_Unique_Object_To_Agent',
+	Get_Default_Object_For_Agent: 'Get_Default_Object_For_Agent',
+	Get_Default_Object_For_Agent_With_Parent: 'Get_Default_Object_For_Agent_With_Parent',
+	Get_Default_Object_For_Agent_With_ParentandAgent: 'Get_Default_Object_For_Agent_With_ParentandAgent',
 
 	//Functions with Object result
 	Create_Parent_Child_Agent_Value__Child: 'Create/Parent-Child/Agent/Value => Child',
@@ -68,7 +72,7 @@ export const FunctionTypes = {
 	// IAgent_and_Permission_determing_the_permission_based_on_a_PROPERTY: 'Given an Agent and Permission, determing the permission based on a PROPERTY'
 };
 
-export const FunctionTemplateKeys: { [str: string]: string } = {
+export const FunctionTemplateKeys = {
 	Model: 'model',
 	ModelOutput: 'model_output',
 	ChangeParameter: 'change_parameter',
@@ -84,6 +88,7 @@ export const FunctionTemplateKeys: { [str: string]: string } = {
 	Parent: 'parent',
 	AgentInstance: 'agent_instance',
 	Agent: 'agent',
+	Owner: 'owner',
 	Item: 'item',
 	AgentProperty: 'agent-property',
 	AgentType: 'agent_type',
@@ -150,7 +155,7 @@ const COMMON_CONSTRAINTS = {
 		key: FunctionTemplateKeys.AgentType
 	},
 	[FunctionTemplateKeys.User]: {
-		[FunctionConstraintKeys.IsUser]: true,
+		[NodeProperties.IsUser]: true,
 		[FunctionConstraintKeys.IsSingleLink]: true,
 		[FunctionConstraintKeys.IsModel]: true,
 		key: FunctionTemplateKeys.User
@@ -261,12 +266,18 @@ const COMMON_CONSTRAINTS_AGENT_OBJECT_MANY_TO_MANY_COMPOSITEINPUT_METHOD = {
 	}
 };
 
-const AfterEffectsTemplate = {
+export const AfterEffectsTemplate = {
+	DataChained: 'Data chained',
 	GenerateM2M_From_Result_and_Input: 'Generate Many 2 Many from result and input',
 	ExecuteStreamProcess: 'Execute stream process',
 	ExecuteStreamProcessUpdate: 'Execute stream process update'
 };
 export const AFTER_EFFECTS: any = {
+	[AfterEffectsTemplate.DataChained]: {
+		template: './app/templates/aftereffects/generate_m2m_from_result_and_input.tpl',
+		template_call: '                    await {{function_name}}(agent, data, result);',
+		templateKeys: {}
+	},
 	[AfterEffectsTemplate.GenerateM2M_From_Result_and_Input]: {
 		template: './app/templates/aftereffects/generate_m2m_from_result_and_input.tpl',
 		template_call: '                    await {{function_name}}(agent, data, result);',
@@ -619,6 +630,18 @@ const PERMISSION_DEFAULTS = {
 	params: [ FunctionTemplateKeys.Model, FunctionTemplateKeys.Agent ]
 };
 
+const PERMISSION_ON_AGENT = {
+	implementation: './app/templates/permissions/permission_method.tpl',
+	interface_: './app/templates/permissions/permission_method_interface.tpl',
+	params: [ FunctionTemplateKeys.Agent ]
+};
+
+const PERMISSION_ON_AGENT_PARENT = {
+	implementation: './app/templates/permissions/permission_method.tpl',
+	interface_: './app/templates/permissions/permission_method_interface.tpl',
+	params: [ FunctionTemplateKeys.Agent, FunctionTemplateKeys.Parent ]
+};
+
 const VALIDATION_DEFAULTS = {
 	implementation: './app/templates/validation/validation_method.tpl',
 	interface_: './app/templates/validation/validation_method_interface.tpl',
@@ -650,8 +673,10 @@ export const QUERY_PARAMETER_KEYS = {
 	Id: 'id'
 };
 export const TEMPLATE_PARAMETER_KEYS = {
-	ModelId: 'modelId',
-	ParentId: 'parentId'
+	ModelId: 'model', // changed this for consistency
+	Model: 'model', // changed this for consistency
+	ParentId: 'parent', // changed this for consistency
+	Parent: 'parent'
 };
 export const QUERY_PARAMETERS = {
 	[QUERY_PARAMETER_KEYS.Skip]: true,
@@ -660,7 +685,13 @@ export const QUERY_PARAMETERS = {
 	[QUERY_PARAMETER_KEYS.Sort]: true
 };
 export const TEMPLATE_PARAMETERS = {
-	[TEMPLATE_PARAMETER_KEYS.ModelId]: {
+	[TEMPLATE_PARAMETER_KEYS.Model]: {
+		isGuid: true,
+		defaultValue: true // When there is a value api for a component, that value should be from the model
+	}
+};
+export const TEMPLATE_PARENT_PARAMETERS = {
+	[TEMPLATE_PARAMETER_KEYS.Parent]: {
 		isGuid: true
 	}
 };
@@ -669,13 +700,19 @@ export const GET_QUERY_PARAMETERS = {
 		isGuid: true
 	}
 };
-
+export function GetConstraints(functionType: string) {
+	if (MethodFunctions[functionType]) {
+		return MethodFunctions[functionType].constraints;
+	}
+	return null;
+}
 export const MethodFunctions: any = {
 	[FunctionTypes.Get_Unique_Object_To_Agent]: {
-		title: Titles.Create_Object__Object,
+		title: Titles.Get_Unique_Object_To_Agent,
 		titleTemplate: function(t: any, a: any) {
 			return `Get Unique ${t} by ${a}`;
 		},
+		working: true,
 		template: './app/templates/standard/unique_model_to_agent.tpl',
 		interface: './app/templates/standard/unique_model_to_agent_interface.tpl',
 		controller: './app/templates/controller/controller_get_model_user_object.tpl', //controller_get_all_by_ids
@@ -726,8 +763,9 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Create_Object__Object]: {
 		title: Titles.Create_Object__Object,
 		titleTemplate: function(t: any, a: any) {
-			return `Create ${t} by ${a}`;
+			return `Create ${t} Object by ${a}`;
 		},
+		working: true,
 		template: './app/templates/standard/create_model_agent_object.tpl',
 		interface: './app/templates/standard/create_model_agent_object_interface.tpl',
 		templates: {},
@@ -762,7 +800,7 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Update_Object_With_User]: {
 		title: Titles.Update_Object_With_User,
 		titleTemplate: function(t: any, a: any) {
-			return `Update ${t} by ${a}`;
+			return `Update ${t} Object by ${a}`;
 		},
 		template: './app/templates/standard/update_model_user_object.tpl',
 		interface: './app/templates/standard/update_model_user_object_interface.tpl',
@@ -790,8 +828,9 @@ export const MethodFunctions: any = {
 		title: Titles.GetObjectsFromLIstOfIds,
 		description: 'Gets objects from a list of Ids',
 		titleTemplate: function(t: any, a: any) {
-			return `Get ${t}s With IdList by ${a}`;
+			return `Get ${t} Objects With IdList by ${a}`;
 		},
+		working: true,
 		template: './app/templates/standard/get_agent_listobject_with_id_list.tpl',
 		interface: './app/templates/standard/get_agent_listobject_with_id_list_interface.tpl',
 		controller: './app/templates/controller/controller_get_all_by_ids.tpl', //controller_get_all_by_ids
@@ -833,8 +872,9 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Create_Object_With_User]: {
 		title: Titles.Create_Object_With_User,
 		titleTemplate: function(t: any, a: any) {
-			return `Create ${t} by ${a}`;
+			return `Create ${t} by ${a} User`;
 		},
+		working: true,
 		template: './app/templates/standard/create_model_user_object.tpl',
 		interface: './app/templates/standard/create_model_user_object_interface.tpl',
 		templates: {},
@@ -860,7 +900,7 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Create_ManyToMany_Object_With_Agent_And_Return_M2M_SET]: {
 		title: FunctionTypes.Create_ManyToMany_Object_With_Agent_And_Return_M2M_SET,
 		titleTemplate: function(t: any, a: any) {
-			return `Create ${t} by ${a}`;
+			return `Create ${t} MtM by ${a} and Return MtM Set`;
 		},
 		template: './app/templates/standard/many_2_many/create_with_agent_and_return_m2m_set.tpl',
 		interface: './app/templates/standard/many_2_many/create_with_agent_and_return_m2m_set_interface.tpl',
@@ -884,7 +924,7 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Create_Object_Agent_Many_to_Many_CompositeInput__Object]: {
 		title: Titles.Create_Object_Agent_Many_to_Many_CompositeInput__Object,
 		titleTemplate: function(t: any, a: any) {
-			return `Create ${t} by ${a}`;
+			return `Create ${t} Object MtM by ${a} Composite Input`;
 		},
 		template: './app/templates/standard/create_object_agent_many_to_many_compositeinput.tpl',
 		interface: './app/templates/standard/create_object_agent_many_to_many_compositeinput_interface.tpl',
@@ -964,7 +1004,7 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Update_Object_Agent_Value__IListObject]: {
 		title: Titles.Update_Object_Agent_Value__IListObject,
 		titleTemplate: function(t: any, a: any) {
-			return `Update ${t} by ${a}`;
+			return `Update ${t} Object by ${a} And Return List of ${t} Objects`;
 		},
 		template: './app/templates/standard/update_model_agent_listobject.tpl',
 		interface: './app/templates/standard/update_model_agent_listobject_interface.tpl',
@@ -985,8 +1025,9 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Update_Object_Agent_Value__Object]: {
 		title: Titles.Update_Object_Agent_Value__Object,
 		titleTemplate: function(t: any, a: any) {
-			return `Update ${t} by ${a}`;
+			return `Update ${t} Object by ${a}`;
 		},
+		working: true,
 		template: './app/templates/standard/update_model_agent_object.tpl',
 		interface: './app/templates/standard/update_model_agent_object_interface.tpl',
 		permission: {
@@ -1011,7 +1052,7 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Update_Object_Agent_Value__Object_With_Object]: {
 		title: Titles.Update_Object_Agent_Value__Object_With_Object,
 		titleTemplate: function(t: any, a: any) {
-			return `Update ${t} by ${a}`;
+			return `Update ${t} Object by ${a} with Update Model`;
 		},
 		template: './app/templates/standard/update_model_agent_object_with_model.tpl',
 		interface: './app/templates/standard/update_model_agent_object_with_model_interface.tpl',
@@ -1038,7 +1079,7 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Delete_Object_Agent_Value__IListObject]: {
 		title: Titles.Delete_Object_Agent_Value__IListObject,
 		titleTemplate: function(t: any, a: any) {
-			return `Delete ${t} by ${a}`;
+			return `Delete ${t} Object by ${a} Return List`;
 		},
 		template: './app/templates/standard/delete_model_agent_listobject.tpl',
 		interface: './app/templates/standard/delete_model_agent_listobject_interface.tpl',
@@ -1059,7 +1100,7 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Delete_M2M_By_Reference]: {
 		title: FunctionTypes.Delete_M2M_By_Reference,
 		titleTemplate: function(t: any, a: any) {
-			return `Delete ${t} by ${a}`;
+			return `Delete ${t} Object by ${a} by Reference`;
 		},
 		template: './app/templates/standard/delete_m2m_by_reference.tpl',
 		interface: './app/templates/standard/delete_m2m_by_reference_interface.tpl',
@@ -1089,18 +1130,18 @@ export const MethodFunctions: any = {
 	[FunctionTypes.Get_Object_Agent_Value__IListObject]: {
 		title: Titles.Get_Object_Agent_Value__IListObject,
 		titleTemplate: function(t: any, a: any) {
-			return `Get ${t}s by ${a}`;
+			return `Get ${t}s by ${a} Return List`;
 		},
+		working: true,
 		template: './app/templates/standard/get_model_agent_listobject.tpl',
 		interface: './app/templates/standard/get_model_agent_listobject_interface.tpl',
-		controller_parameters: {
-			params: [ FunctionTemplateKeys.Model ]
-		},
+		controller: './app/templates/standard/get_agent_listobjects_controller.tpl',
 		permission: {
-			...PERMISSION_DEFAULTS
+			...PERMISSION_ON_AGENT
 		},
 		filter: {
-			...FILTER_DEFAULTS
+			...FILTER_DEFAULTS,
+			params: [ FunctionTemplateKeys.Agent, { key: FunctionTemplateKeys.ModelOutput, metaparameter: true } ]
 		},
 		constraints: {
 			...COMMON_CONSTRAINTS_AGENT_OBJECT_METHOD
@@ -1117,18 +1158,19 @@ export const MethodFunctions: any = {
 		isList: true,
 		method: Methods.GetAll,
 		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
-  },
-  [FunctionTypes.Get_Default_Object_For_Agent] :{
-    title: Titles.Get_Object_Agent_Value__Object,
+	},
+	[FunctionTypes.Get_Default_Object_For_Agent]: {
+		title: Titles.Get_Default_Object_For_Agent,
 		titleTemplate: function(t: any, a: any) {
 			return `Get Default ${t} by ${a}`;
 		},
-		template: './app/templates/standard/get_model_agent_object.tpl',
-		interface: './app/templates/standard/get_model_agent_object_interface.tpl',
+		template: './app/templates/standard/get_default_model_agent_object.tpl',
+		interface: './app/templates/standard/get_default_model_agent_object_interface.tpl',
 		controller: './app/templates/standard/get_default_model_agent_controller.tpl',
 		permission: {
-			...PERMISSION_DEFAULTS
+			...PERMISSION_ON_AGENT
 		},
+		working: true,
 		lambda: {
 			default: {
 				user: 'user',
@@ -1157,6 +1199,10 @@ export const MethodFunctions: any = {
 			[FunctionTemplateKeys.Permission]: {
 				key: FunctionTemplateKeys.Permission,
 				nodeTypes: [ NodeTypes.Permission ]
+			},
+			[FunctionTemplateKeys.ModelFilter]: {
+				key: FunctionTemplateKeys.ModelFilter,
+				nodeTypes: [ NodeTypes.ModelFilter ]
 			}
 		},
 		output: {
@@ -1170,12 +1216,141 @@ export const MethodFunctions: any = {
 		isList: false,
 		method: Methods.Get,
 		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
-  },
+	},
+	[FunctionTypes.Get_Default_Object_For_Agent_With_Parent]: {
+		title: Titles.Get_Default_Object_For_Agent_With_Parent,
+		titleTemplate: function(t: any, a: any) {
+			return `Get Default ${t} by ${a} with Parent`;
+		},
+		working: true,
+		template: './app/templates/standard/get_default_model_agent_object_with_parent.tpl',
+		interface: './app/templates/standard/get_default_model_agent_object_with_parent_interface.tpl',
+		controller: './app/templates/standard/get_default_model_agent_object_with_parent_controller.tpl',
+		permission: {
+			...PERMISSION_ON_AGENT_PARENT
+		},
+		lambda: {
+			default: {
+				user: 'user',
+				value: 'model',
+				model_output: 'model',
+				'result.IdValue': 'string',
+				parent: 'parent',
+				agent: 'agent',
+				return: 'model_output'
+			}
+		},
+		constraints: {
+			[FunctionTemplateKeys.Model]: {
+				key: FunctionTemplateKeys.Model,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.Agent]: {
+				[NodeProperties.IsAgent]: true,
+				key: FunctionTemplateKeys.Agent,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+
+			[FunctionTemplateKeys.Parent]: {
+				key: FunctionTemplateKeys.Parent,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.User]: {
+				[NodeProperties.IsUser]: true,
+				key: FunctionTemplateKeys.User,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.Permission]: {
+				key: FunctionTemplateKeys.Permission,
+				nodeTypes: [ NodeTypes.Permission ]
+			},
+			[FunctionTemplateKeys.ModelFilter]: {
+				key: FunctionTemplateKeys.ModelFilter,
+				nodeTypes: [ NodeTypes.ModelFilter ]
+			}
+		},
+		output: {
+			...COMMON_OUTPUT.OBJECT
+		},
+		parameters: {
+			body: false,
+			parameters: {
+				template: { ...TEMPLATE_PARENT_PARAMETERS }
+			}
+		},
+		isList: false,
+		method: Methods.Get,
+		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+	},
+	[FunctionTypes.Get_Default_Object_For_Agent_With_ParentandAgent]: {
+		title: Titles.Get_Default_Object_For_Agent_With_ParentandAgent,
+		titleTemplate: function(t: any, a: any) {
+			return `Get Default ${t} by ${a} with Parent And ${a}`;
+		},
+		template: './app/templates/standard/get_default_model_agent_object_with_parentagent.tpl',
+		interface: './app/templates/standard/get_default_model_agent_object_with_parentagent_interface.tpl',
+		controller: './app/templates/standard/get_default_model_agent_object_with_parent_controller.tpl',
+		permission: {
+			...PERMISSION_ON_AGENT_PARENT
+		},
+		lambda: {
+			default: {
+				user: 'user',
+				value: 'model',
+				model_output: 'model',
+				'result.IdValue': 'string',
+				parent: 'parent',
+				agent: 'agent',
+				return: 'model_output'
+			}
+		},
+		constraints: {
+			[FunctionTemplateKeys.Model]: {
+				key: FunctionTemplateKeys.Model,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.Agent]: {
+				[NodeProperties.IsAgent]: true,
+				key: FunctionTemplateKeys.Agent,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.Parent]: {
+				key: FunctionTemplateKeys.Parent,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.User]: {
+				[NodeProperties.IsUser]: true,
+				key: FunctionTemplateKeys.User,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.Permission]: {
+				key: FunctionTemplateKeys.Permission,
+				nodeTypes: [ NodeTypes.Permission ]
+			},
+			[FunctionTemplateKeys.ModelFilter]: {
+				key: FunctionTemplateKeys.ModelFilter,
+				nodeTypes: [ NodeTypes.ModelFilter ]
+			}
+		},
+		output: {
+			...COMMON_OUTPUT.OBJECT
+		},
+		parameters: {
+			body: false,
+			parameters: {
+				template: { ...TEMPLATE_PARENT_PARAMETERS }
+			}
+		},
+		isList: false,
+		method: Methods.Get,
+		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+	},
 	[FunctionTypes.Get_Agent_Value__IListObject]: {
 		title: Titles.Get_Agent_Value__IListObject,
 		titleTemplate: function(t: any, a: any) {
 			return `Get ${t}s List by ${a}`;
 		},
+		working: true,
 		template: './app/templates/standard/get_agent_listobject.tpl',
 		interface: './app/templates/standard/get_agent_listobject_interface.tpl',
 		controller: './app/templates/standard/get_agent_listobjects_controller.tpl',
@@ -1205,6 +1380,9 @@ export const MethodFunctions: any = {
 	},
 	[FunctionTypes.Login]: {
 		title: Titles.Login,
+		titleTemplate: function(t: any, a: any) {
+			return `Login ${t} by ${a}`;
+		},
 		constraints: {
 			...COMMON_CONSTRAINTS_ANONYMOUS
 		},
@@ -1322,6 +1500,7 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Create ${t} List by ${a}`;
 		},
+		working: true,
 		template: './app/templates/create_agent_childparent_listchild.tpl',
 		interface: './app/templates/create_agent_childparent_listchild_interface.tpl',
 		permission: {
@@ -1372,6 +1551,7 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Get ${t} List by ${a}`;
 		},
+		working: true,
 		template: './app/templates/get_agent_childparent_listchild.tpl',
 		interface: './app/templates/get_agent_childparent_listchild_interface.tpl',
 		controller: './app/templates/controller/controller_get_all_by_parent.tpl',
@@ -1427,7 +1607,7 @@ export const MethodFunctions: any = {
 		parameters: {
 			body: false,
 			parameters: {
-				path: [ FunctionTemplateKeys.Parent ],
+				template: { ...TEMPLATE_PARENT_PARAMETERS },
 				query: { ...QUERY_PARAMETERS }
 			}
 		},
@@ -1497,6 +1677,7 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Get ${t} by ${a}`;
 		},
+		working: true,
 		template: './app/templates/standard/get_model_agent_object.tpl',
 		interface: './app/templates/standard/get_model_agent_object_interface.tpl',
 		permission: {
@@ -1541,6 +1722,56 @@ export const MethodFunctions: any = {
 		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
 	},
 
+	[FunctionTypes.GetSelf]: {
+		title: Titles.GetSelf,
+		titleTemplate: function(t: any, a: any) {
+			return `Get ${a} Self`;
+		},
+		working: true,
+		template: './app/templates/standard/get_agent_self.tpl',
+		interface: './app/templates/standard/get_agent_self_interface.tpl',
+		controller: './app/templates/controller/controller_get_agent_self.tpl', //controller_get_all_by_ids
+		permission: {
+			...PERMISSION_DEFAULTS,
+			params: [ FunctionTemplateKeys.Agent ]
+		},
+		constraints: {
+			[FunctionTemplateKeys.Model]: {
+				key: FunctionTemplateKeys.Model,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.Agent]: {
+				[NodeProperties.IsAgent]: true,
+				key: FunctionTemplateKeys.Agent,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.User]: {
+				[NodeProperties.IsUser]: true,
+				key: FunctionTemplateKeys.User,
+				nodeTypes: [ NodeTypes.Model ]
+			},
+			[FunctionTemplateKeys.Permission]: {
+				key: FunctionTemplateKeys.Permission,
+				nodeTypes: [ NodeTypes.Permission ]
+			},
+			[FunctionTemplateKeys.ModelFilter]: {
+				key: FunctionTemplateKeys.ModelFilter,
+				nodeTypes: [ NodeTypes.ModelFilter ]
+			}
+		},
+		output: {
+			...COMMON_OUTPUT.OBJECT,
+			[FunctionConstraintKeys.IsTypeOf]: FunctionTemplateKeys.Agent
+		},
+
+		parameters: {
+			body: false,
+			parameters: false
+		},
+		isList: false,
+		method: Methods.Get,
+		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+	},
 	[FunctionTypes.Get_Object_User_Object]: {
 		title: FunctionTypes.Get_Object_User_Object,
 		titleTemplate: function(t: any, a: any) {
@@ -1848,6 +2079,31 @@ export function bindTemplate(templateString: any, data: any) {
 	return templateString;
 }
 
+export function bindReferenceJSONTemplates(templateString: string, data: any) {
+	const regex = /\#{[a-zA-Z0-9_@|\-\{\}\:\'\.\"\, ~]*}\#/gm;
+	try {
+		var hasTemplate;
+		try {
+			hasTemplate = regex.test(templateString);
+		} catch (e) {}
+
+		if (hasTemplate) {
+			for (var t in data) {
+				// var subregex = new RegExp('(#{)' + t + '(})', 'g');
+				var val = data[t];
+				let old = templateString;
+				do {
+          old = templateString;
+          templateString = templateString.replace(t, val === null || val === undefined ? '' : val);
+				} while (old !== templateString);
+			}
+		}
+	} catch (e) {
+		throw e;
+	}
+	return templateString;
+}
+
 export function bindReferenceTemplate(templateString: any, data: any) {
 	var singularSymbol = '@';
 	try {
@@ -1876,4 +2132,31 @@ export function bindReferenceTemplate(templateString: any, data: any) {
 		throw e;
 	}
 	return templateString;
+}
+
+export function GetFunctionTypeOptions() {
+	return Object.keys(FunctionTypes)
+		.filter((d) => {
+			let functionType = FunctionTypes[d];
+			if (MethodFunctions[functionType]) {
+				return MethodFunctions[functionType].working;
+			}
+			return false;
+		})
+		.map((d) => {
+			let functionType = FunctionTypes[d];
+			if (MethodFunctions[functionType] && MethodFunctions[functionType].title) {
+				return {
+					title: MethodFunctions[functionType].title,
+					value: functionType
+				};
+			}
+			return {
+				title: d,
+				value: functionType
+			};
+		})
+		.sort((a, b) => {
+			return `${a.title}`.localeCompare(`${b.title}`);
+		});
 }

@@ -2104,7 +2104,9 @@ export const CreateDefaultView = {
 											parent: screenNodeId,
 											properties: {
 												...viewPackage,
-												[NodeProperties.UIText]: `${viewName} ${uiType} Form`,
+												[NodeProperties.UIText]: `${viewName} ${agentId
+													? GetNodeTitle(agentId)
+													: ''} ${uiType} Form`,
 												[NodeProperties.UIType]: uiType,
 												[NodeProperties.ComponentType]: ComponentTypes[uiType].Generic.key,
 												[NodeProperties.ComponentApi]: componentProps,
@@ -4185,6 +4187,7 @@ function CreateFunction(option: {
 								case FunctionTemplateKeys.Model:
 								case FunctionTemplateKeys.Agent:
 								case FunctionTemplateKeys.User:
+								case FunctionTemplateKeys.Owner:
 								case FunctionTemplateKeys.ModelOutput:
 									methodProps = {
 										...methodProps,
@@ -4409,6 +4412,7 @@ export function CreateAgentFunction(option: any): any {
 		viewPackage,
 		modelNotRequired = false,
 		model,
+		model_output,
 		agent
 	} = option;
 
@@ -4518,7 +4522,15 @@ export function CreateAgentFunction(option: any): any {
 										}
 									});
 								} else if (constraint.key === FunctionTemplateKeys.Parent) {
-									methodProps[constraint.key] = parent.id;
+									if (typeof parent === 'string') {
+										methodProps[constraint.key] = parent;
+									} else if (parent && parent.id) {
+										// add parent if set.
+										methodProps[constraint.key] = parent.id;
+									}
+								} else if (constraint.key === FunctionTemplateKeys.ModelOutput && model_output) {
+									methodProps[constraint.key] =
+										typeof model_output === 'string' ? model_output : model_output.id;
 								} else if (!modelNotRequired) {
 									methodProps[constraint.key] = model.id;
 								}
@@ -4830,6 +4842,9 @@ export function CreateAgentFunction(option: any): any {
 		}
 
 		setViewPackageStamp(null, 'CreateAgentFunction');
+		if (option.callback && new_nodes.methodNode) {
+			option.callback(new_nodes.methodNode.id);
+		}
 		return new_nodes;
 	};
 }

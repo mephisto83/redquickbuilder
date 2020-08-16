@@ -17,8 +17,9 @@ export default class FlatList extends React.Component {
 			...this.props
 		};
 		delete props.children;
+		let { style = {} } = props;
 		return (
-			<ul className={styles['flat-list']}>
+			<ul className={styles['flat-list']} style={style}>
 				{(this.props.data || [])
 					.map((item: any, index: any) => {
 						if (this.props.renderItem) {

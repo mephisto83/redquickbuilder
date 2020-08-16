@@ -1,4 +1,4 @@
-<Header>
+<Header  style={props.style || {}}>
     { {{left}} ? (<Left>
         <Button transparent>
             <Icon name='arrow-back' />

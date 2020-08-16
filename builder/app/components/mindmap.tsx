@@ -95,17 +95,22 @@ export default class MindMap extends Component<any, any> {
 		}
 	}
 
-	calculateNodeTextSize(text, pad) {
-		let div = document.querySelector('#secret-div-space');
-		if (!div) {
-			div = document.createElement('div');
+	calculateNodeTextSize(text, pad, $width? = null) {
+		let div: any = document.querySelector('#secret-div-space');
+		if (true || !div || $width) {
+			div = div || document.createElement('div');
 			div.id = 'secret-div-space';
 			div.setAttribute('id', 'secret-div-space');
 			div.style.visibility = 'hidden';
 			div.style.position = 'absolute';
 			div.classList.add('label');
 			div.style.whiteSpace = 'normal';
-			div.style.maxWidth = (text || '').split(' ').length > 1 ? `200px` : '300px';
+			div.style.maxWidth = $width ? `${$width}px` : (text || '').split(' ').length > 1 ? `300px` : '300px';
+			if ($width) {
+				div.style.width = `${$width}px`;
+			} else {
+				div.style.width = '';
+			}
 			div.style.top = '-10000px';
 			div.style.padding = `${pad * 2}px`;
 			const statenode = document.querySelector(`#${this.state.id}`);
@@ -221,15 +226,15 @@ export default class MindMap extends Component<any, any> {
 		const graph = this.state.graph;
 
 		graph.nodes.forEach((v) => {
+			const propType = GetNodeProp(v, NodeProperties.NODEType);
 			if (me.props && me.props.minimizeTypes) {
-				const propType = GetNodeProp(v, NodeProperties.NODEType);
 				if (!v.selected && me.props.minimizeTypes[propType]) {
 					v.width = MIN_DIMENSIONAL_SIZE;
 					v.height = MIN_DIMENSIONAL_SIZE;
 					return;
 				}
 			}
-			const bb = me.calculateNodeTextSize(getLabelText(v), pad);
+			const bb = me.calculateNodeTextSize(getLabelText(v), pad, me.props.typeWidths[propType]);
 			v.width = Math.max(MIN_DIMENSIONAL_SIZE, bb.width);
 			v.height = Math.max(MIN_DIMENSIONAL_SIZE, bb.height);
 		});
@@ -466,13 +471,9 @@ export default class MindMap extends Component<any, any> {
 		function tick() {
 			if (me.$_nodes) {
 				me.$_nodes.each((d) => {
-					const bb = me.calculateNodeTextSize(getLabelText(d), pad);
-					if (
-						!d.selected &&
-						d.properties &&
-						me.props.minimizeTypes &&
-						me.props.minimizeTypes[d.properties[NodeProperties.NODEType]]
-					) {
+					let propType = d.properties[NodeProperties.NODEType];
+					const bb = me.calculateNodeTextSize(getLabelText(d), pad, me.props.typeWidths[propType]);
+					if (!d.selected && d.properties && me.props.minimizeTypes && me.props.minimizeTypes[propType]) {
 						d.width = MIN_DIMENSIONAL_SIZE;
 						d.height = MIN_DIMENSIONAL_SIZE;
 					} else {
@@ -742,7 +743,7 @@ export default class MindMap extends Component<any, any> {
 
 				if (graph.groups && this.state && this.state.graph && this.state.graph.groups) {
 					const graph_groups = (graph.$vGroups || graph.groups)
-            .filter((x) => graph.groupLib[x] && (graph.groupLib[x].leaves || graph.groupLib[x].groups));
+						.filter((x) => graph.groupLib[x] && (graph.groupLib[x].leaves || graph.groupLib[x].groups));
 
 					let removedGroups = null;
 					if (this.props.groupsDisabled) {

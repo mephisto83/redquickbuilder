@@ -5,6 +5,9 @@ export default class TreeViewMenu extends Component<any, any> {
 	active() {
 		return this.props.active ? 'active' : '';
 	}
+	greyed() {
+		return this.props.greyed ? { color: '#aaaaaa' } : {};
+	}
 	open() {
 		return this.props.open ? 'menu-open' : '';
 	}
@@ -14,7 +17,16 @@ export default class TreeViewMenu extends Component<any, any> {
 	icon() {
 		return this.props.icon || (this.props.children ? 'fa fa-folder' : null) || 'fa fa-wrench';
 	}
+	error(): any {
+		return this.props.error ? { color: '#dd4b39', fontWeight: 'bold' } : {};
+	}
+	hide() {
+		return this.props.hide;
+	}
 	render() {
+		if (this.hide()) {
+			return <li className={`treeview ${this.active()}`} />;
+		}
 		return (
 			<li title={this.props.description} className={`treeview ${this.active()} ${this.open()}`}>
 				<a
@@ -25,8 +37,13 @@ export default class TreeViewMenu extends Component<any, any> {
 						}
 					}}
 				>
-					{this.props.hideIcon ? null : <i className={`${this.icon()}`} />}
-					<span title={this.props.description || this.props.title}>{this.props.title}</span>
+					{this.props.hideIcon ? null : <i style={{ ...this.error() }} className={`${this.icon()}`} />}
+					<span
+						style={{ ...this.error(), ...this.greyed() }}
+						title={this.props.description || this.props.title}
+					>
+						{this.props.title}
+					</span>
 					{this.props.hideArrow || !this.props.children ? null : (
 						<span className="pull-right-container">
 							<i className="fa fa-angle-left pull-right" />

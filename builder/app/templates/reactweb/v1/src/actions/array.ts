@@ -30,30 +30,28 @@ declare global {
 	}
 }
 export default function() {
-	((array: Array<any>) => {
+	((array: Array<any>): void => {
 		if (!array.relativeCompliment) {
 			const extrasection_relativeCompliment = {
 				enumerable: false,
 				writable: true,
 				configurable: true,
-				value(othercollection: [], func: Function, output: []): [] {
-					const collection = <[]>(<unknown>this);
-					const result: any = [];
-
+				value(othercollection: [], func: Function, output: any): any {
+					const collection: any = this;
+					let result: any = [];
 					func =
 						func ||
 						function(x: any, y: any) {
 							return x === y;
 						};
 					for (let i = collection.length; i-- /**/; ) {
-						// function (x) { return x == collection[i]; }
 						if (!othercollection.some(func.bind(null, collection[i]))) {
 							result.push(collection[i]);
 						} else if (output) {
 							output.push(collection[i]);
 						}
 					}
-					return result as [];
+					return result;
 				}
 			};
 			if (!array.relativeCompliment) {

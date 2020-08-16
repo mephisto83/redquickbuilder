@@ -1,1 +1,1 @@
-<Menu value={{{value}}} {{events}} />
+<Menu  style={props.style || {}} value={{{value}}} {{events}} />

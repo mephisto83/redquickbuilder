@@ -15,13 +15,14 @@ import {
 	GetLambdaVariableTitle
 } from '../actions/uiactions';
 import { UIConnect } from '../utils/utils';
-import { GetNodeProp } from '../methods/graph_methods';
-import { NodeProperties, NEW_LINE, MakeConstant } from '../constants/nodetypes';
+import { GetNodeProp, GetNodesLinkedTo } from '../methods/graph_methods';
+import { NodeProperties, NEW_LINE, MakeConstant, LinkType } from '../constants/nodetypes';
 import fs from 'fs';
 import * as UIA from '../actions/uiactions';
 import ModelGenerator from '../generators/modelgenerators';
 import { Node } from '../methods/graph_types';
 import ConstantsGenerator from '../generators/constantsgenerator';
+import { GenerateModelKeys } from '../service/keyservice';
 
 class CodeEditor extends Component<any, any> {
 	constructor(props: any) {
@@ -63,48 +64,64 @@ class CodeEditor extends Component<any, any> {
 		const currentNode = UIA.Node(state, UIA.Visual(state, SELECTED_NODE));
 		const code = GetNodeProp(currentNode, NodeProperties.Lambda);
 		const defs = '//<!-uiactions - defs->';
-		let value: string = this.state.value || this.props.value;
-		value = this.untransformLambda(value);
-		if (value.indexOf(defs) === -1) {
-			let tsModels = ModelGenerator.GenerateTs({ state: this.props.state });
-			const enumerations_ts = NodesByType(state, NodeTypes.Enumeration).map((node: any) => {
-				const enums_ts = GetNodeProp(node, NodeProperties.Enumeration);
-				const larg_ts: any = {};
-				enums_ts.forEach((t: { value: any }) => {
-					larg_ts[MakeConstant(t.value || t)] = t.value;
+		let value: string = this.state.value || this.props.value || '';
+		if (!GetNodeProp(currentNode, NodeProperties.CS)) value = this.untransformLambda(value);
+		if (!GetNodeProp(currentNode, NodeProperties.CS))
+			if (value.indexOf(defs) === -1) {
+				let tsModels = ModelGenerator.GenerateTs({ state: this.props.state });
+				let contextInterfaces = this.generateContextInterfaces();
+				let temps = GenerateModelKeys({
+					state,
+					codeGenerator: true
 				});
-				return {
-					name: GetNodeProp(node, NodeProperties.CodeName),
-					model: larg_ts
-				};
-			});
+				let modelkey_stuff = '';
+				temps.map((t: any) => {
+					if (t && t.template) modelkey_stuff += t.template + NEW_LINE;
+				});
+				const enumerations_ts = NodesByType(state, NodeTypes.Enumeration).map((node: any) => {
+					const enums_ts = GetNodeProp(node, NodeProperties.Enumeration) || [];
+					const larg_ts: any = {};
+					enums_ts.forEach((t: { value: any }) => {
+						larg_ts[MakeConstant(t.value || t)] = t.value;
+					});
+					return {
+						name: GetNodeProp(node, NodeProperties.CodeName),
+						model: larg_ts
+					};
+				});
 
-			let common_functions: any = ModelGenerator.GenerateCommon({ state: this.props.state });
-			let _consts = ConstantsGenerator.GenerateTs({
-				values: [ ...enumerations_ts ],
-				state: this.props.state
-			});
-			let constants = Object.keys(_consts)
-				.map((key: string) => {
-					let { template } = _consts[key];
-					return `
+				let common_functions: any = ModelGenerator.GenerateCommon({ state: this.props.state });
+				let _consts = ConstantsGenerator.GenerateTs({
+					values: [ ...enumerations_ts ],
+					state: this.props.state
+				});
+				let constants = Object.keys(_consts)
+					.map((key: string) => {
+						let { template } = _consts[key];
+						return `
           ${template || ''}`;
-				})
-				.join(NEW_LINE);
-			let modelTsScript = Object.keys(tsModels)
-				.map((key: string) => {
-					let { template } = tsModels[key];
-					return `
+					})
+					.join(NEW_LINE);
+				let modelTsScript = Object.keys(tsModels)
+					.map((key: string) => {
+						let { template } = tsModels[key];
+						return `
         ${template || ''}`;
-				})
-				.join(NEW_LINE);
-			value += `
+					})
+					.join(NEW_LINE);
+				value += `
 ${defs}
+//#region
+${contextInterfaces}
+//#endregion
 //#region constants
 ${constants}
 //#endregion
 //#region models
 ${modelTsScript}
+//#endregion
+//#region
+${modelkey_stuff}
 //#endregion
 //#region mocks
 export const titleService = {
@@ -113,18 +130,18 @@ export const titleService = {
 //#endregion
 //#region common functions
 ${Object.keys(common_functions)
-				.map((key: string) => {
-					let { template } = common_functions[key];
-					return `
+					.map((key: string) => {
+						let { template } = common_functions[key];
+						return `
   ${template || ''}`;
-				})
-				.join(NEW_LINE)}
+					})
+					.join(NEW_LINE)}
 //#endregion
 //#region section
 ${this.state.definitions}
 //#endregion
   `;
-		}
+			}
 		return (
 			<TopViewer active={this.props.active} style={{ width: `calc(100% - ${offsetWidth}px)` }}>
 				<div style={{ position: 'relative' }}>
@@ -136,9 +153,10 @@ ${this.state.definitions}
 									const id = currentNode.id;
 									let lambdaValue = `${this.state.value}`.split(defs)[0] || '';
 									let _insertArgs: any;
-									lambdaValue = this.transformLambdaValue(lambdaValue, (insertArgs) => {
-										_insertArgs = insertArgs;
-									});
+									if (!GetNodeProp(currentNode, NodeProperties.CS))
+										lambdaValue = this.transformLambdaValue(lambdaValue, (insertArgs: any) => {
+											_insertArgs = insertArgs;
+										});
 									this.props.graphOperation(CHANGE_NODE_PROPERTY, {
 										prop: this.props.prop || NodeProperties.Lambda,
 										id,
@@ -179,6 +197,46 @@ ${this.state.definitions}
 				</div>
 			</TopViewer>
 		);
+	}
+	generateContextInterfaces(): string {
+		let result = '';
+		let { state } = this.props;
+		const currentNode = UIA.Node(state, UIA.Visual(state, SELECTED_NODE));
+		if (!currentNode) {
+			return '';
+		}
+		let screenEffectApis = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+			id: currentNode.id,
+			link: LinkType.ScreenEffectApi
+		}).map((node: Node) => {
+			return UIA.GetJSCodeName(node);
+		});
+		let contextParameters: string[] = [];
+		GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+			id: currentNode.id,
+			link: LinkType.ScreenEffectApi
+		}).forEach((node: Node) => {
+			let nodeParams = GetNodeProp(node, NodeProperties.ContextParams) || [];
+			contextParameters.push(...nodeParams);
+		});
+
+		if (currentNode) {
+			result = `
+let $internalComponentState: ComponentState;
+interface ComponentState {
+  ${[ ...screenEffectApis, ...contextParameters ]
+		.unique()
+		.map((param: string) => {
+			return `${param}: string | number | null,`;
+		})
+		.join(NEW_LINE)}
+  viewModel: string,
+  value: string,
+  model: string
+}
+      `;
+		}
+		return result;
 	}
 	untransformLambda(value: string): string {
 		let { state } = this.props;

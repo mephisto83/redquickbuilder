@@ -198,8 +198,8 @@ let dcTemplate = (collections: any, funcs: string, rel = '', enumerations = [], 
     GetItems,UI_MODELS,
     GetK, updateScreenInstance,
     UIKeys,
-    clearScreenInstance
-
+    clearScreenInstance,
+    SITE
   } from '../${rel}actions/uiactions';
 ${model_imports}
 import {
@@ -254,6 +254,10 @@ ${funcs}`;
 
 export function CollectionIsInLanguage(graph: Graph, collection: any, language: any): any {
 	const itsUiType = GetNodeProp(collection, NodeProperties.UIType);
+	const languageAgnostic = GetNodeProp(collection, NodeProperties.UIAgnostic);
+	if (languageAgnostic) {
+		return true;
+	}
 	if (itsUiType && itsUiType === language) {
 		return true;
 	}

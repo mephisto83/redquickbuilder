@@ -1,5 +1,9 @@
-        //Templated version.
+        //Get a list of {{model}}s for an agent of {{agent_type}}.
         public async Task<IList<{{model}}>> {{function_name}}({{user}} {{user_instance}}, QueryParameters queryParameter = null) {
+
+            if(user.{{agent_type}} == null) {
+              throw new InvalidAgentException();
+            }
 
             var agent = await arbiter{{agent_type}}.Get<{{agent_type}}>({{user_instance}}.{{agent_type}});
 

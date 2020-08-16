@@ -32,10 +32,10 @@ import StoreModelInLake from '../datachain/StoreModelInLake';
 import { Graph } from '../../methods/graph_types';
 
 export default function ScreenConnectGet(args: any = {}) {
-	let { node, method } = args;
+	let { node: screen, method } = args;
 	const { navigateTo } = args;
-	if (!node) {
-		throw 'no node';
+	if (!screen) {
+		throw 'no screen';
 	}
 	if (!method) {
 		throw 'no method';
@@ -43,9 +43,10 @@ export default function ScreenConnectGet(args: any = {}) {
 
 	const graph = GetCurrentGraph();
 	const screen_options = GetNodesLinkedTo(graph, {
-		id: node,
+		id: screen,
 		link: LinkType.ScreenOptions
 	}).filter(ScreenOptionFilter);
+
 	const result: any = [];
 	let { viewPackages } = args;
 	viewPackages = {
@@ -81,146 +82,156 @@ export default function ScreenConnectGet(args: any = {}) {
 					)
 				);
 				if (navigateTo) {
-					const _valueNavigateTargetApi = GetNodesLinkedTo(graph, {
-						id: navigateTo,
-						link: LinkType.ComponentExternalApi
-					}).find((x: any) => GetNodeTitle(x) === ComponentApiKeys.Value);
+					// const _valueNavigateTargetApi = GetNodesLinkedTo(graph, {
+					// 	id: navigateTo,
+					// 	link: LinkType.ComponentExternalApi
+					// }).find((x: any) => GetNodeTitle(x) === ComponentApiKeys.Value);
+					// HANDLED IN NEW Screen CONNECTION
+					// result.push(
+					// 	_valueNavigateTargetApi
+					// 		? {
+					// 				operation: UPDATE_NODE_PROPERTY,
+					// 				options() {
+					// 					return {
+					// 						id: _valueNavigateTargetApi.id,
+					// 						properties: {
+					// 							[NodeProperties.IsUrlParameter]: true
+					// 						}
+					// 					};
+					// 				}
+					// 			}
+					// 		: null
+					// );
+					// HANDLED IN NEW Screen CONNECTION
+					// This will cause a chain update, so the url for the screen will get updated to include
+					// the parameter, i think.
+					// 	result.push(
+					// 		_valueNavigateTargetApi
+					// 			? {
+					// 					operation: UPDATE_NODE_PROPERTY,
+					// 					options() {
+					// 						return {
+					// 							id: navigateTo,
+					// 							properties: {
+					// 								[NodeProperties.UIText]: GetNodeProp(navigateTo, NodeProperties.UIText)
+					// 							}
+					// 						};
+					// 					}
+					// 				}
+					// 			: null
+					// 	);
+					// }
+					// HANDLED IN NEW Screen CONNECTION
+					// const valueGetApi = GetNodesLinkedTo(graph, {
+					// 	id: node,
+					// 	link: LinkType.ComponentExternalApi
+					// }).find((x: any) => GetNodeTitle(x) === ComponentApiKeys.Value);
+					// result.push(
+					// 	valueGetApi
+					// 		? {
+					// 				operation: UPDATE_NODE_PROPERTY,
+					// 				options() {
+					// 					return {
+					// 						id: valueGetApi.id,
+					// 						properties: {
+					// 							[NodeProperties.IsUrlParameter]: true
+					// 						}
+					// 					};
+					// 				}
+					// 			}
+					// 		: null
+					// );
+					// HANDLED IN NEW Screen CONNECTION
+					// result.push(
+					// 	valueGetApi
+					// 		? {
+					// 				operation: UPDATE_NODE_PROPERTY,
+					// 				options() {
+					// 					return {
+					// 						id: node,
+					// 						properties: {
+					// 							[NodeProperties.UIText]: GetNodeProp(node, NodeProperties.UIText)
+					// 						}
+					// 					};
+					// 				}
+					// 			}
+					// 		: null
+					// );
+					events.forEach((evnt: { id: any }) => {
+						// const eventMethodInstances = GetNodesLinkedTo(graph, {
+						// 	id: evnt.id,
+						// 	link: LinkType.EventMethodInstance
+						// });
+						// eventMethodInstances.forEach((eventMethodInstance: any) => {
+						// 	const vp = GetNodeProp(eventMethodInstance, NodeProperties.ViewPackage);
+						// 	if (vp) {
+						// 		const inPackageNodes = GetNodesByProperties({
+						// 			[NodeProperties.ViewPackage]: vp
+						// 		});
 
-					result.push(
-						_valueNavigateTargetApi
-							? {
-									operation: UPDATE_NODE_PROPERTY,
-									options() {
-										return {
-											id: _valueNavigateTargetApi.id,
-											properties: {
-												[NodeProperties.IsUrlParameter]: true
-											}
-										};
-									}
+						// 		inPackageNodes.map((inPackageNode) => {
+						// 			result.push({
+						// 				operation: REMOVE_NODE,
+						// 				options: function() {
+						// 					return {
+						// 						id: inPackageNode.id
+						// 					};
+						// 				}
+						// 			});
+						// 		});
+						// 	}
+						// });
+
+						let _instanceNode: any = null;
+
+						result.push(
+							...[
+								{
+									operation: ADD_NEW_NODE,
+									options: addInstanceFunc(
+										evnt,
+										(instanceNode: any) => {
+											_instanceNode = instanceNode;
+										},
+										viewPackages
+									)
 								}
-							: null
-					);
-					result.push(
-						_valueNavigateTargetApi
-							? {
-									operation: UPDATE_NODE_PROPERTY,
-									options() {
-										return {
-											id: navigateTo,
-											properties: {
-												[NodeProperties.UIText]: GetNodeProp(navigateTo, NodeProperties.UIText)
-											}
-										};
-									}
-								}
-							: null
-					);
+							],
+							...(navigateTo
+								? // this can be updated to include different types of parameters,
+									// checkout the lambda property for the arguments, setting it to the appropriate
+									// lambda string will get use the parameters in the url that we desire.
+									CreateNavigateToScreenDC({
+										screen: navigateTo,
+										node: () => _instanceNode.id,
+										viewPackages
+									})
+								: []),
+							(currentGraph: any) => {
+								const valueComponentApiNode = GetComponentApiNode(
+									ComponentApiKeys.Value,
+									subcomponent.id,
+									currentGraph
+								);
+								// if all the values can be calculated in the lambda,
+								// this might not be necessary
+								return {
+									operation: ADD_LINK_BETWEEN_NODES,
+									options: Connect(
+										_instanceNode.id,
+										valueComponentApiNode.id,
+										LinkProperties.ComponentApi
+									)
+								};
+							}
+						);
+					});
 				}
-				const valueGetApi = GetNodesLinkedTo(graph, {
-					id: node,
-					link: LinkType.ComponentExternalApi
-				}).find((x: any) => GetNodeTitle(x) === ComponentApiKeys.Value);
-				result.push(
-					valueGetApi
-						? {
-								operation: UPDATE_NODE_PROPERTY,
-								options() {
-									return {
-										id: valueGetApi.id,
-										properties: {
-											[NodeProperties.IsUrlParameter]: true
-										}
-									};
-								}
-							}
-						: null
-				);
-				result.push(
-					valueGetApi
-						? {
-								operation: UPDATE_NODE_PROPERTY,
-								options() {
-									return {
-										id: node,
-										properties: {
-											[NodeProperties.UIText]: GetNodeProp(node, NodeProperties.UIText)
-										}
-									};
-								}
-							}
-						: null
-				);
-				events.forEach((evnt: { id: any }) => {
-					const eventMethodInstances = GetNodesLinkedTo(graph, {
-						id: evnt.id,
-						link: LinkType.EventMethodInstance
-					});
-					eventMethodInstances.forEach((eventMethodInstance: any) => {
-						const vp = GetNodeProp(eventMethodInstance, NodeProperties.ViewPackage);
-						if (vp) {
-							const inPackageNodes = GetNodesByProperties({
-								[NodeProperties.ViewPackage]: vp
-							});
-
-							inPackageNodes.map((inPackageNode) => {
-								result.push({
-									operation: REMOVE_NODE,
-									options: function() {
-										return {
-											id: inPackageNode.id
-										};
-									}
-								});
-							});
-						}
-					});
-
-					let _instanceNode: any = null;
-
-					result.push(
-						...[
-							{
-								operation: ADD_NEW_NODE,
-								options: addInstanceFunc(
-									evnt,
-									(instanceNode: any) => {
-										_instanceNode = instanceNode;
-									},
-									viewPackages
-								)
-							}
-						],
-						...(navigateTo
-							? CreateNavigateToScreenDC({
-									screen: navigateTo,
-									node: () => _instanceNode.id,
-									viewPackages
-								})
-							: []),
-						(currentGraph: any) => {
-							const valueComponentApiNode = GetComponentApiNode(
-								ComponentApiKeys.Value,
-								subcomponent.id,
-								currentGraph
-							);
-							return {
-								operation: ADD_LINK_BETWEEN_NODES,
-								options: Connect(
-									_instanceNode.id,
-									valueComponentApiNode.id,
-									LinkProperties.ComponentApi
-								)
-							};
-						}
-					);
-				});
 			}
 			result.push(
 				...AppendValidations({
 					subcomponents,
 					component,
-					methodType: Methods.Get,
 					screen_option,
 					method,
 					viewPackages
@@ -236,29 +247,29 @@ export default function ScreenConnectGet(args: any = {}) {
 		lifeCylcleMethods
 			.filter((x: any) => GetNodeProp(x, NodeProperties.UIText) === ComponentLifeCycleEvents.ComponentDidMount)
 			.map((lifeCylcleMethod: { id: any }) => {
-				const lifeCylcleMethodInstances = GetNodesLinkedTo(graph, {
-					id: lifeCylcleMethod.id,
-					link: LinkType.LifeCylceMethodInstance
-				});
-				lifeCylcleMethodInstances.map((lifeCylcleMethodInstance: any) => {
-					const vp = GetNodeProp(lifeCylcleMethodInstance, NodeProperties.ViewPackage);
-					if (vp) {
-						const inPackageNodes = GetNodesByProperties({
-							[NodeProperties.ViewPackage]: vp
-						});
+				// const lifeCylcleMethodInstances = GetNodesLinkedTo(graph, {
+				// 	id: lifeCylcleMethod.id,
+				// 	link: LinkType.LifeCylceMethodInstance
+				// });
+				// lifeCylcleMethodInstances.map((lifeCylcleMethodInstance: any) => {
+				// 	const vp = GetNodeProp(lifeCylcleMethodInstance, NodeProperties.ViewPackage);
+				// 	if (vp) {
+				// 		const inPackageNodes = GetNodesByProperties({
+				// 			[NodeProperties.ViewPackage]: vp
+				// 		});
 
-						inPackageNodes.map((inPackageNode) => {
-							result.push({
-								operation: REMOVE_NODE,
-								options: function() {
-									return {
-										id: inPackageNode.id
-									};
-								}
-							});
-						});
-					}
-				});
+				// 		inPackageNodes.map((inPackageNode) => {
+				// 			result.push({
+				// 				operation: REMOVE_NODE,
+				// 				options: function() {
+				// 					return {
+				// 						id: inPackageNode.id
+				// 					};
+				// 				}
+				// 			});
+				// 		});
+				// 	}
+				// });
 				const apiEndpoints: any = {};
 				let cycleInstance: { id: any } | null = null;
 				let datachain: string;
@@ -296,7 +307,7 @@ export default function ScreenConnectGet(args: any = {}) {
 						return [];
 					},
 					(graph: Graph) => {
-						let model = GetNodeProp(node, NodeProperties.Model, graph);
+						let model = GetNodeProp(screen, NodeProperties.Model, graph);
 						return StoreModelInLake({
 							modelId: model,
 							modelInsertName: GetLambdaVariableTitle(model, false, true),
