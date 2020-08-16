@@ -27,15 +27,6 @@ class NodeList extends Component<any, any> {
         }
         let linkType = this.props.linkType;
         let items = this.props.items;
-        //  (UIA.GetNodeProp(currentNode, nodeProperty) || []).map(t => {
-        //     let node = GetNode(UIA.GetCurrentGraph(state), t);
-        //     if (node) {
-        //         return {
-        //             title: UIA.GetNodeTitle(node),
-        //             id: node.id
-        //         }
-        //     }
-        // });
         let { state } = this.props;
 
         return <ButtonList active={true} isSelected={(item) => {

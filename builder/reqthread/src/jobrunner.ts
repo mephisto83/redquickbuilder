@@ -19,11 +19,12 @@ import CommunicationTower, {
 	RedQuickDistributionMessage,
 	ListenerReply
 } from '../../app/jobs/communicationTower';
-import { RunnerContext } from '../../app/jobs/interfaces';
+import { RunnerContext, CommandCenter } from '../../app/jobs/interfaces';
 import StoreGraph from '../../app/methods/storeGraph';
 let communicationTower: CommunicationTower;
 let runnerContext: RunnerContext = {
 	agents: {},
+	commandCenters: [],
 	commandCenter: {
 		commandCenterPort: null,
 		commandCenterHost: null
@@ -73,6 +74,11 @@ async function setCommandCenter(message: RedQuickDistributionMessage): Promise<L
 	// console.debug('set command center');
 	if (msg) {
 		runnerContext.commandCenter = { ...runnerContext.commandCenter, ...msg };
+		runnerContext.commandCenters = runnerContext.commandCenters || [];
+		runnerContext.commandCenters.push(msg);
+		runnerContext.commandCenters = runnerContext.commandCenters.unique(
+			(v: CommandCenter) => `${v.commandCenterHost} ${v.commandCenterPort}`
+		);
 	}
 	// console.debug(runnerContext.commandCenter);
 	return { success: true };
@@ -99,7 +105,8 @@ async function handleAgentProjectError(message: RedQuickDistributionMessage): Pr
 		if (runnerContext.agents[message.agentName]) {
 			if (runnerContext.agents[message.agentName].projects[message.agentProject]) {
 				runnerContext.agents[message.agentName].projects[message.agentProject].error = true;
-				runnerContext.agents[message.agentName].projects[message.agentProject].errorMessage = message.errorMessage;
+				runnerContext.agents[message.agentName].projects[message.agentProject].errorMessage =
+					message.errorMessage;
 			}
 		}
 	}
@@ -135,39 +142,35 @@ async function handleAgentProjectBusy(message: RedQuickDistributionMessage): Pro
 }
 async function tellCommandCenter() {
 	// console.debug('tell command center');
-	if (
-		runnerContext.commandCenter &&
-		runnerContext.commandCenter.commandCenterPort &&
-		runnerContext.commandCenter.commandCenterHost
-	) {
-		try {
-			let jobs = await JobService.getJobs();
-			await jobs.forEachAsync(async (job: Job) => {
-				let parts = [];
-				await job.parts.forEachAsync(async (part: string) => {
-					parts.push(await JobService.loadJobItem(job.name, part, JobServiceConstants.JobPath()));
+	let { commandCenters } = runnerContext;
+	await commandCenters.forEachAsync(async (commandCenter: CommandCenter) => {
+		if (commandCenter && commandCenter.commandCenterPort && commandCenter.commandCenterHost) {
+			try {
+				let jobs = await JobService.getJobs();
+				await jobs.forEachAsync(async (job: Job) => {
+					let parts = [];
+					await job.parts.forEachAsync(async (part: string) => {
+						parts.push(await JobService.loadJobItem(job.name, part, JobServiceConstants.JobPath()));
+					});
+					currentJobInformation.jobs = currentJobInformation.jobs || {};
+					currentJobInformation.jobs[job.name] = { job: job, parts };
 				});
-				currentJobInformation.jobs = currentJobInformation.jobs || {};
-				currentJobInformation.jobs[job.name] = { job: job, parts };
-			});
 
-			await communicationTower.send(
-				{
-					host: runnerContext.commandCenter.commandCenterHost,
-					port: runnerContext.commandCenter.commandCenterPort
-				},
-				'',
-				RedQuickDistributionCommand.UpdateCommandCenter,
-				{
-					agents: JobService.agentProjects,
-					currentJobInformation: GetCurrentJobInformation()
-				}
-			);
-			// console.debug('told command center');
-		} catch (e) {
-			// console.debug(e);
+				await communicationTower.send(
+					{
+						host: commandCenter.commandCenterHost,
+						port: commandCenter.commandCenterPort
+					},
+					'',
+					RedQuickDistributionCommand.UpdateCommandCenter,
+					{
+						agents: JobService.agentProjects,
+						currentJobInformation: GetCurrentJobInformation()
+					}
+				);
+			} catch (e) {}
 		}
-	}
+	});
 }
 async function pullCompletedJobItemTogether(message: RedQuickDistributionMessage): Promise<void> {
 	let relativePath = path_join(
@@ -188,8 +191,8 @@ async function pullCompletedJobItemTogether(message: RedQuickDistributionMessage
 		}
 		// fs.writeFileSync(path_join(relativePath, JobServiceConstants.OUTPUT), content, 'utf8');
 		let temp: any = message;
-    console.log('completed');
-    console.log(message);
+		console.log('completed');
+		console.log(message);
 		if (
 			temp.agent &&
 			runnerContext.agents &&
@@ -197,13 +200,13 @@ async function pullCompletedJobItemTogether(message: RedQuickDistributionMessage
 			runnerContext.agents[temp.agent] &&
 			runnerContext.agents[temp.agent].projects[temp.name]
 		) {
-      console.log('updating progress to 1')
+			console.log('updating progress to 1');
 			runnerContext.agents[temp.agent].projects[temp.name].workingOnFile = '';
 			runnerContext.agents[temp.agent].projects[temp.name].workingOnJob = '';
-      runnerContext.agents[temp.agent].projects[temp.name].progress = 1;
-      runnerContext.agents[temp.agent].projects[temp.name].updated = Date.now();
-    }
-    console.log(JSON.stringify(runnerContext.agents, null, 4));
+			runnerContext.agents[temp.agent].projects[temp.name].progress = 1;
+			runnerContext.agents[temp.agent].projects[temp.name].updated = Date.now();
+		}
+		console.log(JSON.stringify(runnerContext.agents, null, 4));
 		await tellCommandCenter();
 	}
 }

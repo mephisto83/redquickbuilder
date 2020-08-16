@@ -2,6 +2,7 @@
 /* eslint-disable func-names */
 import * as GraphMethods from '../methods/graph_methods';
 import * as GraphTypes from '../methods/graph_types';
+import path from 'path';
 import * as NodeConstants from '../constants/nodetypes';
 import * as Titles from '../components/titles';
 import { NavigateTypes } from '../constants/nodetypes';
@@ -22,7 +23,7 @@ import { ViewTypes } from '../constants/viewtypes';
 import { GraphLink, Graph } from '../methods/graph_types';
 import * as _ from '../methods/graph_types';
 import JobService, { Job, JobAssignment, JobFile, JobServiceConstants } from '../jobs/jobservice';
-import { AgentProject } from '../jobs/interfaces';
+import { AgentProject, CommandCenter } from '../jobs/interfaces';
 import { RouteSourceType, RouteSource } from '../interface/methodprops';
 import {
 	ReferenceInsert,
@@ -31,12 +32,8 @@ import {
 	ReferenceInsertType
 } from '../components/lambda/BuildLambda';
 import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
-import {
-	ProgrammingLanguages,
-	NodePropertyTypesByLanguage,
-	NEW_LINE
-} from '../constants/nodetypes';
-const fs = require('fs');
+import { ProgrammingLanguages, NodePropertyTypesByLanguage, NEW_LINE } from '../constants/nodetypes';
+import fs from 'fs';
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';
 export const BATCH = 'BATCH';
@@ -3448,6 +3445,83 @@ export function SelectNode(nodeId: string, boundingBox: any) {
 		);
 	};
 }
+
+export const RED_QUICK_CONFIG = 'RED_QUICK_CONFIG';
+export function loadRedQuickConfiguration() {
+	return async (dispatch: Function, getState: Function) => {
+		let userDir = getUserHome();
+		if (userDir) {
+			let redquickbuilder_folder = path.join(userDir, '.redquickbuilder');
+			Promise.resolve().then(async () => {
+				await ensureDirectory(redquickbuilder_folder);
+				if (!fs.existsSync(redquickbuilder_folder)) {
+					fs.writeFileSync(
+						path.join(redquickbuilder_folder, 'config.json'),
+						JSON.stringify(createRedQuickConfiguration()),
+						'utf-8'
+					);
+				}
+				let content = fs.readFileSync(path.join(redquickbuilder_folder, 'config.json'), 'utf-8');
+				let config = JSON.parse(content);
+				dispatch(Batch([ UIC(VISUAL, RED_QUICK_CONFIG, config) ]));
+			});
+		}
+	};
+}
+export function createRedQuickConfiguration(): RedQuickConfiguration {
+	return {
+		commandCenters: []
+	};
+}
+export function createCommandCenter(): CommandCenter {
+	return {
+		id: GUID(),
+		commandCenterPort: '',
+		commandCenterHost: ''
+	};
+}
+export interface RedQuickConfiguration {
+	commandCenters: CommandCenter[];
+}
+export function updateRedQuickConfiguration(config: RedQuickConfiguration) {
+	return (dispatch: any, getState: any) => {
+		let userDir = getUserHome();
+		if (userDir) {
+			let redquickbuilder_folder = path.join(userDir, '.redquickbuilder');
+			Promise.resolve().then(async () => {
+				await ensureDirectory(redquickbuilder_folder);
+				if (fs.existsSync(redquickbuilder_folder)) {
+					fs.writeFileSync(path.join(redquickbuilder_folder, 'config.json'), JSON.stringify(config), 'utf-8');
+				}
+				let content = fs.readFileSync(path.join(redquickbuilder_folder, 'config.json'), 'utf-8');
+				config = JSON.parse(content);
+				dispatch(Batch([ UIC(VISUAL, RED_QUICK_CONFIG, config) ]));
+			});
+		}
+	};
+}
+export async function ensureDirectory(dir: any) {
+	if (!fs.existsSync(dir)) {
+		console.log(`doesnt exist : ${dir}`);
+	} else {
+	}
+	const _dir_parts = dir.split(path.sep);
+	_dir_parts.map((_: any, i: number) => {
+		if (i > 1 || _dir_parts.length - 1 === i) {
+			let tempDir = path.join(..._dir_parts.subset(0, i + 1));
+			if (dir.startsWith(path.sep)) {
+				tempDir = `${path.sep}${tempDir}`;
+			}
+			if (!fs.existsSync(tempDir)) {
+				fs.mkdirSync(tempDir);
+			}
+		}
+	});
+}
+function getUserHome() {
+	return process.env[process.platform == 'win32' ? 'USERPROFILE' : 'HOME'];
+}
+
 export function setVisual(key: string, value: any) {
 	if (key === SELECTED_NODE || key === SELECTED_NODE_BB)
 		if (GraphMethods.Paused()) {

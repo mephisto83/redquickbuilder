@@ -30,6 +30,7 @@ import SideBar from './sidebar';
 import DataSourceActivityMenu from './datasourceactivitymenu';
 import SideBarTabs from './sidebartabs';
 import SideBarTab from './sidebartab';
+import RedQuickConfigurationComponent from './redquickconfigurationcomponent';
 import ScreenOptionsActivityMenu from './screenoptionsactivitymenu';
 import ServiceActivityMenu from './serviceactivitymenu';
 import SideBarContent from './sidebarcontent';
@@ -2643,6 +2644,7 @@ class Dashboard extends Component<any, any> {
 							{UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? <MethodParameterMenu /> : null}
 							{UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? <QuickMethods /> : null}
 							{UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? <CurrentNodeProperties /> : null}
+							{UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? <RedQuickConfigurationComponent /> : null}
 							{UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? <ThemeProperties /> : null}
 						</SideBar>
 					</div>
