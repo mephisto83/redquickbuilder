@@ -35,7 +35,7 @@ import {
 	ProgrammingLanguages,
 	NodePropertyTypesByLanguage,
 	NEW_LINE
-} from '../../visi_blend/dist/app/constants/nodetypes';
+} from '../constants/nodetypes';
 const fs = require('fs');
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';

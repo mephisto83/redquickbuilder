@@ -46,7 +46,6 @@ import RelativeTypeComponent from './relativetypecomponent';
 import BooleanConfigComponent from './booleanconfigcomponent';
 import NumberConfigComponent from './numberconfigcomponent';
 import OneOfEnumerationComponent from './oneofenumeration';
-import { GetCodeName } from '../../visi_blend/dist/app/actions/uiactions';
 import EqualityConfigComponent from './equalityconfigcomponent';
 
 export default class SimpleValidationComponent extends Component<any, any> {
