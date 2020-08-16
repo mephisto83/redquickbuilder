@@ -39,6 +39,7 @@ import {
 import { DataChainFunctionKeys } from '../../constants/datachain';
 import { codeTypeWord, GetNodeProp } from '../../methods/graph_methods';
 import { ReferenceInsertType } from '../../components/lambda/BuildLambda';
+import { code } from '../../components/editor.main.css';
 
 export interface AfterEffectConvertArgs {
 	from: MethodDescription;
@@ -46,7 +47,9 @@ export interface AfterEffectConvertArgs {
 	dataChain?: string;
 	afterEffectParent?: string;
 	afterEffectChild?: string;
+	afterEffect: AfterEffect;
 	override?: boolean;
+	currentDescription: MountingDescription;
 	name: string;
 	routes: AfterEffect[];
 	methods: MountingDescription[];
@@ -64,6 +67,8 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		from,
 		to,
 		type,
+		currentDescription,
+		afterEffect,
 		dataChain,
 		afterEffectOptions: dataChainConfigOptions,
 		routes,
@@ -82,6 +87,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 	let copy_config: string = '';
 	let outputType: string = '';
 	let simplevalidation: string = '';
+	let route_config: string = '';
 	let can_complete = false;
 	let arbiterModels: string[] = [];
 	let target_property = '';
@@ -173,7 +179,23 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				)
 			);
 			staticMethods.push(...GenerateBranchMethods(dataChainConfigOptions, routes, methods));
-		}
+    }
+
+		if (
+			dataChainConfigOptions.routeConfig &&
+			dataChainConfigOptions.routeConfig.enabled &&
+			dataChainConfigOptions.routeConfig.pushChange
+		) {
+			route_config = `await _${codeTypeWord(name)}(model, agent, change, value);`;
+			staticMethods.push(
+				...GeneratePushChange({
+					methods,
+					afterEffect,
+					name: codeTypeWord(name)
+				})
+			);
+    }
+
 		if (dataChainConfigOptions.getExisting && dataChainConfigOptions.getExisting.enabled) {
 			if (dataChainConfigOptions.checkExistence && dataChainConfigOptions.checkExistence.enabled) {
 				get_existing = 'var value = checkModel.FirstOrDefault()';
@@ -369,7 +391,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
           {{copy_config}}
           {{set_properties}}
           {{get_existing}}
-
+          {{route_config}}
        };
 
        await func(agent, model, change);
@@ -383,6 +405,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		checking_existence,
 		get_existing,
 		compare_enumeration,
+		route_config,
 		set_properties,
 		copy_config,
 		guts,
@@ -679,16 +702,16 @@ function GenerateStretchMethods(
 				[ReferenceInsertType.PropertyType]: _prop,
 				[ReferenceInsertType.Model]: _model.id,
 				type: ReferenceInsertType.PropertyType
-      };
-      tempLambdaInsertArgumentValues[`stretch.${name}.${GetCodeName(_model)}.${GetCodeName(_prop)}`] = {
+			};
+			tempLambdaInsertArgumentValues[`stretch.${name}.${GetCodeName(_model)}.${GetCodeName(_prop)}`] = {
 				[ReferenceInsertType.Property]: _prop,
 				[ReferenceInsertType.Model]: _model.id,
 				type: ReferenceInsertType.Property
 			};
-      tempLambdaInsertArgumentValues[`stretch.${name}.${GetCodeName(_model)}`] = {
-        [ReferenceInsertType.Model]: _model.id,
-        type: ReferenceInsertType.Model
-      };
+			tempLambdaInsertArgumentValues[`stretch.${name}.${GetCodeName(_model)}`] = {
+				[ReferenceInsertType.Model]: _model.id,
+				type: ReferenceInsertType.Model
+			};
 		}
 
 		let output = `#{{"key":"stretch.${name}.${GetCodeName(
@@ -743,27 +766,70 @@ function GenerateIfBranch(
 		});
 		if (route) {
 			let mountDescription = methods.find((v) => route && v.id === route.target);
-			let methodType = 'Create';
 			if (mountDescription) {
-				methodType = mountDescription.viewType;
+				let method = CreateStreamProcessFunc(mountDescription, funcName, ifAfterEffect, route, {
+					updatePath: true
+				});
+				result.push(method);
 			}
-			let method = `
+		}
+	}
+}
+function GeneratePushChange(args: {
+	afterEffect: AfterEffect;
+	methods: MountingDescription[];
+	name: string;
+}): string[] {
+	let result: string[] = [];
+
+	let { afterEffect, name, methods } = args;
+
+	let currentDescription: MountingDescription | undefined = (methods || []).find((method: MountingDescription) => {
+		return afterEffect && method.id === afterEffect.target;
+	});
+	if (currentDescription) {
+		result.push(
+			CreateStreamProcessFunc(
+				currentDescription,
+				`_${codeTypeWord(name)}`,
+				', #{{"key":"tomodel"}}# checkModel',
+				afterEffect,
+				{ updatePath: false }
+			)
+		);
+	}
+	return result;
+}
+
+function CreateStreamProcessFunc(
+	mountDescription: MountingDescription,
+	funcName: any,
+	ifAfterEffect: string,
+	route: AfterEffect,
+	ops: { updatePath: boolean }
+) {
+	let methodType = 'Create';
+	if (mountDescription) {
+		methodType = mountDescription.viewType;
+	}
+	let updatePath = ops.updatePath
+		? `  #{{"key":"tomodel"}}#ChangeBy#{{"key":"agent"}}#.UpdatePath(parameters, AfterEffectChains.{{after_effect_parent}}.${codeTypeWord(
+				route.name
+			)});`
+		: '';
+	let method = `
         public static async Task ${funcName}(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change${ifAfterEffect}) {
           var value = checkModel;
           var parameters = #{{"key":"tomodel"}}#ChangeBy#{{"key":"agent"}}#.${methodType}(agent, value, FunctionName.#{{"key":"${codeTypeWord(
-				route.name
-			)}","type":"method"}}#);
+		route.name
+	)}","type":"method"}}#);
 
-          #{{"key":"tomodel"}}#ChangeBy#{{"key":"agent"}}#.UpdatePath(parameters, AfterEffectChains.{{after_effect_parent}}.${codeTypeWord(
-				route.name
-			)});
+            ${updatePath}
+
           await StreamProcess.#{{"key":"tomodel"}}#_#{{"key":"agent"}}#(parameters, false);
         }
       `;
-
-			result.push(method);
-		}
-	}
+	return method;
 }
 
 function checkExistenceFunction(

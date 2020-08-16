@@ -8,7 +8,8 @@ import {
 	DataChainConfiguration,
 	RouteConfig,
 	CreateRouteConfig,
-  AfterEffect
+	AfterEffect,
+	CheckRouteConfig
 } from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewItemContainer from './treeviewitemcontainer';
@@ -36,9 +37,7 @@ export default class AfterEffectRouteConfigComponent extends Component<any, any>
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				icon={
-					CheckAfterEffectDataChainConfiguration(dataChainOptions) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'
-				}
+				icon={CheckRouteConfig(routeConfig) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
@@ -52,6 +51,21 @@ export default class AfterEffectRouteConfigComponent extends Component<any, any>
 						value={routeConfig.enabled}
 						onChange={(value: boolean) => {
 							routeConfig.enabled = value;
+							this.setState({
+								turn: UIA.GUID()
+							});
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
+						}}
+					/>
+				</TreeViewItemContainer>
+				<TreeViewItemContainer>
+					<CheckBox
+						label={Titles.PushChangeIntoLake}
+						value={routeConfig.pushChange}
+						onChange={(value: boolean) => {
+							routeConfig.pushChange = value;
 							this.setState({
 								turn: UIA.GUID()
 							});

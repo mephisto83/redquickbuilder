@@ -30,6 +30,7 @@ export const BuildMenus = 'Build Menus';
 export const Enabled = 'Enabled';
 export const EventType = 'Event Type';
 export const DefaultAgent = 'Default Agent Type';
+export const PushChangeIntoLake = 'Push change into lake';
 export const UIParameters = 'UI Parameters';
 export const IsFetchOutput = 'Is Fetch Output';
 export const Dashboard = 'Dashboard';

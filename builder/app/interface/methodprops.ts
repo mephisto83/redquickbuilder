@@ -99,11 +99,13 @@ export interface DataChainConfiguration {
 
 export interface RouteConfig extends ConfigItem {
 	targetId: string;
+	pushChange: boolean;
 }
 export function CreateRouteConfig(): RouteConfig {
 	return {
 		targetId: '',
 		enabled: false,
+		pushChange: false,
 		id: GUID()
 	};
 }
@@ -116,6 +118,9 @@ export function CreateSetProperties(): SetPropertiesConfig {
 		id: GUID(),
 		properties: []
 	};
+}
+export function CheckRouteConfig(routeConfig: RouteConfig): boolean {
+	return routeConfig && routeConfig.enabled && (routeConfig.pushChange || !!routeConfig.targetId);
 }
 export function CheckAfterEffectDataChainConfiguration(options: DataChainConfiguration) {
 	return (

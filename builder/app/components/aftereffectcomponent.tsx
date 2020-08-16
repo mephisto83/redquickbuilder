@@ -167,11 +167,13 @@ export default class AfterEffectComponent extends Component<any, any> {
 											BuildDataChainAfterEffectConverter(
 												{
 													name: afterEffect.name,
-													from: methodDescription,
+                          from: methodDescription,
+                          afterEffect,
 													dataChain: afterEffect.dataChain,
 													methods: this.props.methods,
 													type: DataChainType.AfterEffect,
-													to: currentDescription.methodDescription,
+                          to: currentDescription.methodDescription,
+                          currentDescription,
 													routes: this.props.routes || [],
 													afterEffectChild: afterEffect.name,
 													afterEffectParent: this.props.mountingItem.name,
@@ -203,7 +205,9 @@ export default class AfterEffectComponent extends Component<any, any> {
 													{
 														name: afterEffect.name,
 														from: currentDescription.methodDescription,
-														dataChain: afterEffect.dataChain,
+                            dataChain: afterEffect.dataChain,
+                            currentDescription,
+                            afterEffect,
 														methods: this.props.methods,
 														to: currentDescription.methodDescription,
 														routes: this.props.routes || [],
