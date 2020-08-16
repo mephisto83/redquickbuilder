@@ -110,17 +110,21 @@ export default class Generator {
 					key
 				});
 			case ReactNativeTypes.ConstantsTs:
-				const enumerations_ts = NodesByType(state, NodeTypes.Enumeration).map((node: any) => {
-					const enums_ts = GetNodeProp(node, NodeProperties.Enumeration);
-					const larg_ts: any = {};
-					enums_ts.forEach((t: { value: any }) => {
-						larg_ts[MakeConstant(t.value || t)] = t.value;
-					});
-					return {
-						name: GetNodeProp(node, NodeProperties.CodeName),
-						model: larg_ts
-					};
-				});
+				const enumerations_ts = NodesByType(state, NodeTypes.Enumeration)
+					.map((node: any) => {
+						const enums_ts = GetNodeProp(node, NodeProperties.Enumeration);
+						const larg_ts: any = {};
+						if (enums_ts) {
+							enums_ts.forEach((t: { value: any }) => {
+								larg_ts[MakeConstant(t.value || t)] = t.value;
+							});
+							return {
+								name: GetNodeProp(node, NodeProperties.CodeName),
+								model: larg_ts
+							};
+						}
+					})
+					.filter((v: any) => v);
 
 				return ConstantsGenerator.GenerateTs({
 					values: [ ...enumerations_ts ],

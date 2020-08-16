@@ -337,6 +337,7 @@ export const NodeProperties = {
 	DefaultPropertyValue: 'DefaultPropertyValue',
 	GridPlacement: 'GridPlacement',
 	CompleteFunction: 'CompleteFunction',
+	ArbiterModels: 'ArbiterModels',
 	IsFetchDataChainStorage: 'IsFetchDataChainStorage',
 	IsDashboard: 'IsDashboard',
 	GridRowCount: 'GridRowCount',

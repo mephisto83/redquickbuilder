@@ -47,6 +47,7 @@ import BooleanConfigComponent from './booleanconfigcomponent';
 import NumberConfigComponent from './numberconfigcomponent';
 import OneOfEnumerationComponent from './oneofenumeration';
 import { GetCodeName } from '../../visi_blend/dist/app/actions/uiactions';
+import EqualityConfigComponent from './equalityconfigcomponent';
 
 export default class SimpleValidationComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -135,6 +136,13 @@ export default class SimpleValidationComponent extends Component<any, any> {
 					enabled={simpleValidation.enabled}
 					numberConfig={simpleValidation.minLength}
 					title={Titles.MinLength}
+				/>
+				<EqualityConfigComponent
+					enabled={simpleValidation.enabled}
+					methodDescription={methodDescription}
+					properties={properties}
+					config={simpleValidation.areEqual}
+					title={Titles.AreEqual}
 				/>
 				<BooleanConfigComponent
 					enabled={simpleValidation.enabled}

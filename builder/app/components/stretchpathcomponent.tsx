@@ -40,7 +40,8 @@ class StretchPathComponent extends Component<any, any> {
 		let fromProperties =
 			stretch.path && stretch.path.length
 				? UIA.GetModelPropertyChildren(stretch.path[stretch.path.length - 1].model)
-				: [];
+				: UIA.GetModelPropertyChildren(this.props.model) || [];
+		let selectedProperty = stretch.path && stretch.path.length ? this.state.fromModel : this.props.property;
 		return (
 			<TreeViewMenu
 				open={this.state.config}
@@ -54,7 +55,7 @@ class StretchPathComponent extends Component<any, any> {
 			>
 				<TreeViewItemContainer>
 					<TextInput
-            label={Titles.Name}
+						label={Titles.Name}
 						value={stretch.name}
 						onChange={(val: string) => {
 							stretch.name = val;
@@ -87,7 +88,7 @@ class StretchPathComponent extends Component<any, any> {
 					<SelectInput
 						label={Titles.FromProperty}
 						options={fromProperties.toNodeSelect()}
-						value={this.state.fromModel}
+						value={selectedProperty}
 						onChange={(value: string) => {
 							this.setState({
 								fromModel: value,

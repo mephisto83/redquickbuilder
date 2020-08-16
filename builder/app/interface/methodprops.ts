@@ -311,6 +311,7 @@ export function CreateSimpleValidation(): SimpleValidationConfig {
 			enabled: false,
 			value: '1'
 		},
+		areEqual: CreateAreEqual(),
 		oneOf: CreateOneOf()
 	};
 }
@@ -323,7 +324,16 @@ export function CreateOneOf(): EnumerationConfig {
 		enumerations: []
 	};
 }
-
+export function CreateAreEqual(): AreEqualConfig {
+	return {
+		id: GUID(),
+		agentProperty: '',
+		enabled: false,
+		modelProperty: '',
+		relationType: RelationType.Agent,
+		targetProperty: ''
+	};
+}
 export function SetupConfigInstanceInformation(
 	dataChainOptions: DataChainConfiguration,
 	methodDescription: MethodDescription
@@ -441,6 +451,7 @@ export interface BranchConfig {
 	dataChainOptions: DataChainConfiguration;
 }
 export interface CopyConfig extends AfterEffectRelations {}
+export interface AreEqualConfig extends AfterEffectRelations {}
 export interface Setter extends HalfRelation {
 	value: string;
 }
@@ -454,6 +465,7 @@ export interface SimpleValidationConfig extends AfterEffectRelations {
 	maxLength: NumberConfig;
 	alphaOnlyWithSpaces: BooleanConfig;
 	isNotNull: BooleanConfig;
+	areEqual: AreEqualConfig;
 	isNull: BooleanConfig;
 	oneOf: EnumerationConfig;
 }

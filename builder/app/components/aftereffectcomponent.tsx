@@ -175,7 +175,8 @@ export default class AfterEffectComponent extends Component<any, any> {
 													routes: this.props.routes || [],
 													afterEffectChild: afterEffect.name,
 													afterEffectParent: this.props.mountingItem.name,
-													afterEffectOptions: afterEffect.dataChainOptions
+													afterEffectOptions: afterEffect.dataChainOptions,
+													override: this.state.override
 												},
 												(dataChain: Node) => {
 													afterEffect.dataChain = dataChain.id;
@@ -203,13 +204,14 @@ export default class AfterEffectComponent extends Component<any, any> {
 														name: afterEffect.name,
 														from: currentDescription.methodDescription,
 														dataChain: afterEffect.dataChain,
-                            methods: this.props.methods,
-                            to: currentDescription.methodDescription,
+														methods: this.props.methods,
+														to: currentDescription.methodDescription,
 														routes: this.props.routes || [],
 														afterEffectChild: afterEffect.name,
 														type: DataChainType.AfterEffect,
 														afterEffectParent: this.props.mountingItem.name,
-														afterEffectOptions: afterEffect.dataChainOptions
+														afterEffectOptions: afterEffect.dataChainOptions,
+                            override: this.state.override
 													},
 													(dataChain: Node) => {
 														afterEffect.dataChain = dataChain.id;
@@ -226,6 +228,15 @@ export default class AfterEffectComponent extends Component<any, any> {
 						}}
 						icon="fa fa-gears"
 					/>
+					<TreeViewItemContainer>
+						<CheckBox
+							label={'Override'}
+							value={this.state.override}
+							onChange={(val: boolean) => {
+								this.setState({ override: val });
+							}}
+						/>
+					</TreeViewItemContainer>
 				</TreeViewButtonGroup>
 			</TreeViewMenu>
 		);

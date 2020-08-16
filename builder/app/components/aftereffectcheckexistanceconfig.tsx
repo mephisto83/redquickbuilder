@@ -115,17 +115,17 @@ export default class AfterEffectCheckExistanceConfig extends Component<any, any>
 				>
 					<TreeViewItemContainer>
 						<SelectInput
-							label={
-								checkExistence.relationType === RelationType.Agent ? (
-									UIA.GetNodeTitle(previousMethodDescription.properties.agent)
-								) : (
-									UIA.GetNodeTitle(
-										previousMethodDescription.properties.model_output ||
-											previousMethodDescription.properties.model
-									)
-								)
-							}
-							options={Object.values(RelationType).map((v: RelationType) => ({ title: v, value: v }))}
+							label={checkExistence.relationType}
+							options={Object.values(RelationType).map((v: RelationType) => ({
+								title:
+									v === RelationType.Agent
+										? UIA.GetNodeTitle(previousMethodDescription.properties.agent)
+										: UIA.GetNodeTitle(
+												previousMethodDescription.properties.model_output ||
+													previousMethodDescription.properties.model
+											),
+								value: v
+							}))}
 							value={checkExistence.relationType}
 							onChange={(value: RelationType) => {
 								checkExistence.relationType = value;
@@ -182,12 +182,16 @@ export default class AfterEffectCheckExistanceConfig extends Component<any, any>
 					</TreeViewItemContainer>
 					<StretchPathComponent
 						stretch={checkExistence.stretchPath}
+						model={model}
+						property={property}
 						show={checkExistence && checkExistence.isStrech}
 					/>
 					<TreeViewItemContainer>
 						<SelectInput
 							label={UIA.GetNodeTitle(currentMethodDescription.properties.model)}
-							options={targetProperties}
+							options={UIA.GetModelPropertyChildren(
+								currentMethodDescription.properties.model || ''
+							).toNodeSelect()}
 							value={checkExistence.targetProperty}
 							onChange={(value: string) => {
 								checkExistence.targetProperty = value;

@@ -31,6 +31,11 @@ import {
 	ReferenceInsertType
 } from '../components/lambda/BuildLambda';
 import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
+import {
+	ProgrammingLanguages,
+	NodePropertyTypesByLanguage,
+	NEW_LINE
+} from '../../visi_blend/dist/app/constants/nodetypes';
 const fs = require('fs');
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';
@@ -1131,6 +1136,20 @@ export function GetConditionSetup(condition: any) {
 export function GetDataChainEntryNodes(cs?: any) {
 	return GraphMethods.GetDataChainEntryNodes(_getState(), cs);
 }
+export function GetPropertyModel(propId: string): _.Node | null {
+	let nodes = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+		id: propId,
+		link: NodeConstants.LinkType.ModelTypeLink
+	});
+	nodes.push(
+		...GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+			id: propId,
+			link: NodeConstants.LinkType.PropertyLink
+		})
+	);
+
+	return nodes && nodes.length ? nodes[0] : null;
+}
 export function GetLambdaDefinition(method: any | null) {
 	const functionType = GetNodeProp(method, NodeProperties.FunctionType);
 	const { lambda } = MethodFunctions[functionType];
@@ -1162,19 +1181,40 @@ export function GenerateDataChainArguments(id: string) {
 export function GenerateCSChainFunction(id: string) {
 	const lastNodeName = GenerateCDDataChainMethod(id);
 	const arbiters = GetArbitersInCSDataChainMethod(id);
+	const staticArbiters = GetStaticArbitersInCSDataChainMethod(id);
 	let alternateOutputType = null;
 	const outputType = GetOutputTypeInCSDataChainMethod(id, (v: string) => {
 		alternateOutputType = v;
 	});
-	const arbiterInterfaces = arbiters
-		.map((arb) => `IRedArbiter<${GetCodeName(arb)}> _arbiter${GetCodeName(arb)}`)
+	let arbiterInterfaces = arbiters
+		.map((arb: string | Node) => `IRedArbiter<${GetCodeName(arb)}> _arbiter${GetCodeName(arb)}`)
 		.join(', ');
-	const arbiterSets = addNewLine(
-		arbiters.map((arb) => `arbiter${GetCodeName(arb)} = _arbiter${GetCodeName(arb)};`).join(NodeConstants.NEW_LINE)
+	let arbiterInterfacesStatic = staticArbiters
+		.map((arb: string | Node) => `static IRedArbiter<${GetCodeName(arb)}> _arbiter${GetCodeName(arb)}Static;`)
+		.join(NEW_LINE);
+	let arbiterSets = addNewLine(
+		arbiters
+			.map((arb: string | Node) => `arbiter${GetCodeName(arb)} = _arbiter${GetCodeName(arb)};`)
+			.join(NodeConstants.NEW_LINE)
 	);
-	const arbiterProperties = arbiters
-		.map((arb) => `IRedArbiter<${GetCodeName(arb)}> arbiter${GetCodeName(arb)};`)
+
+	let arbiterProperties = arbiters
+		.map((arb: string | Node) => `IRedArbiter<${GetCodeName(arb)}> arbiter${GetCodeName(arb)};`)
 		.join(NodeConstants.NEW_LINE);
+
+	let arbiterPropertiesStatic = staticArbiters
+		.map(
+			(arb: string | Node) => `static IRedArbiter<${GetCodeName(arb)}> arbiter${GetCodeName(arb)}Static {
+      get {
+        if(arbiter${GetCodeName(arb)}Static == null) {
+          _arbiter${GetCodeName(arb)}Static = RedStrapper.Resolve<IRedArbiter<${GetCodeName(arb)}>>();
+        }
+        return _arbiter${GetCodeName(arb)}Static;
+      }
+    }`
+		)
+		.join(NodeConstants.NEW_LINE);
+
 	const currentNode: any = GetNodeById(id);
 	let _arguments = '';
 	if (GetNodeProp(currentNode, NodeProperties.CS)) {
@@ -1205,6 +1245,8 @@ export function GenerateCSChainFunction(id: string) {
 		method = `public class ${GetCodeName(id)}
               {
               ${arbiterProperties}
+              ${arbiterPropertiesStatic}
+              ${arbiterInterfacesStatic}
 
                   public ${GetCodeName(id)}(${arbiterInterfaces}) {
               ${arbiterSets}
@@ -1906,8 +1948,24 @@ export function GetArbitersInCSDataChainMethod(id: string) {
 					}
 				}
 			});
+			result.push(...(GetNodeProp(node, NodeProperties.ArbiterModels) || []));
+			break;
 	}
-	return result;
+	return result.unique();
+}
+
+export function GetStaticArbitersInCSDataChainMethod(id: string) {
+	const node = GetNodeById(id);
+	const functionType = GetNodeProp(node, NodeProperties.DataChainFunctionType);
+	const lambda = GetNodeProp(node, NodeProperties.Lambda);
+
+	const result: any[] = [];
+	switch (functionType) {
+		case DataChainFunctionKeys.Lambda:
+			result.push(...(GetNodeProp(node, NodeProperties.ArbiterModels) || []));
+			break;
+	}
+	return result.unique();
 }
 
 export function GetOutputTypeInCSDataChainMethod(id: string, callback?: any) {
@@ -1990,6 +2048,27 @@ export function GenerateCDDataChainMethod(id: string) {
 							);
 							if (temp) {
 								codeName = `${temp.value}`.toUpperCase();
+							}
+						} else if (type === ReferenceInsertType.PropertyType) {
+							let uiType = GetNodeProp(
+								lambdaInsertArguments[key]
+									? lambdaInsertArguments[key][ReferenceInsertType.PropertyType]
+									: null,
+								NodeProperties.UIAttributeType
+							);
+							if (
+								!uiType &&
+								GetNodeProp(
+									lambdaInsertArguments[key]
+										? lambdaInsertArguments[key][ReferenceInsertType.PropertyType]
+										: null,
+									NodeProperties.NODEType
+								) === NodeTypes.Model
+							) {
+								uiType = 'STRING';
+							}
+							if (uiType) {
+								codeName = NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][uiType];
 							}
 						}
 						lambda = bindReferenceJSONTemplates(lambda, {

@@ -551,6 +551,7 @@ export const AlphaOnlyWithSpaces = 'Alpha only with spaces';
 export const MaxLength = 'Max length';
 export const DefaultGraphTitle = 'Red Quick Graph';
 export const SkipSettings = 'Skip settings';
+export const AreEqual = 'Are equal';
 export const SimpleValidation = 'Simple Validations';
 export const IsOneOf = 'Is one of';
 export const SkipSetting = 'Skip setting';

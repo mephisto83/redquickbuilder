@@ -105,15 +105,31 @@ class DataChainActvityMenu extends Component<any, any> {
 					lambdaInsertArgumentValues[key] = lambdaInsertArgumentValues[key] || {};
 					let nodes: any[] = [];
 					switch (type) {
-            case ReferenceInsertType.PropertyType:
+						case ReferenceInsertType.PropertyType:
 						case ReferenceInsertType.Property:
-							nodes = GetNodesLinkedTo(null, {
-								id:
-									model && lambdaInsertArgumentValues[model]
-										? lambdaInsertArgumentValues[model][ReferenceInsertType.Model]
-										: null,
-								link: LinkType.PropertyLink
-							}).toNodeSelect();
+							nodes = [
+								...GetNodesLinkedTo(null, {
+									id:
+										model && lambdaInsertArgumentValues[model]
+											? lambdaInsertArgumentValues[model][ReferenceInsertType.Model]
+											: null,
+									link: LinkType.ModelTypeLink
+								}),
+								...GetNodesLinkedTo(null, {
+									id:
+										model && lambdaInsertArgumentValues[model]
+											? lambdaInsertArgumentValues[model][ReferenceInsertType.Model]
+											: null,
+									link: LinkType.UserLink
+								}),
+								...GetNodesLinkedTo(null, {
+									id:
+										model && lambdaInsertArgumentValues[model]
+											? lambdaInsertArgumentValues[model][ReferenceInsertType.Model]
+											: null,
+									link: LinkType.PropertyLink
+								})
+							].toNodeSelect();
 							break;
 						case ReferenceInsertType.Type:
 							nodes = Object.values(
