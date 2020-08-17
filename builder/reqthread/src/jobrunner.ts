@@ -26,6 +26,7 @@ let runnerContext: RunnerContext = {
 	agents: {},
 	commandCenters: [],
 	commandCenter: {
+		id: 'temp',
 		commandCenterPort: null,
 		commandCenterHost: null
 	},
