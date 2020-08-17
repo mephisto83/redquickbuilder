@@ -93,7 +93,12 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 			properties: any[];
 			targetProperties: any[];
 		} = this.setupInstanceInfo(dataChainOptions);
-
+		let canAddLink =
+			GetNodeProp(
+				this.state.selectedNode,
+				NodeProperties.NODEType,
+				simpleValidationConfiguration.composition.graph
+			) !== NodeTypes.LeafNode;
 		return (
 			<TreeViewMenu
 				open={this.state.open}
@@ -143,24 +148,33 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 					title={Titles.SimpleValidation}
 				>
 					<TreeViewButtonGroup>
-						<TreeViewGroupButton
-							title={`${Titles.Add} Node`}
-							onClick={() => {
-								simpleValidationConfiguration.composition.graph = AddNewNodeToComposition(
-									simpleValidationConfiguration.composition.graph
-								);
-								this.setState({ turn: UIA.GUID() });
-								if (this.props.onChange) {
-									this.props.onChange();
-								}
-							}}
-							icon="fa fa-plus-square"
-						/>
+						{false ? null : (
+							<TreeViewGroupButton
+								title={`${Titles.Add} Node`}
+								onClick={() => {
+									simpleValidationConfiguration.composition.graph = AddNewNodeToComposition(
+										simpleValidationConfiguration.composition.graph
+									);
+									this.setState({ turn: UIA.GUID() });
+									if (this.props.onChange) {
+										this.props.onChange();
+									}
+								}}
+								icon="fa fa-plus-square"
+							/>
+						)}
 						{!this.state.selectedNode ? null : (
 							<TreeViewGroupButton
 								title={`${Titles.Remove} Node`}
 								onClick={() => {
-									if (this.state.selectedNode)
+									if (
+										this.state.selectedNode &&
+										!GetNodeProp(
+											this.state.selectedNode,
+											NodeProperties.IsRoot,
+											simpleValidationConfiguration.composition.graph
+										)
+									)
 										simpleValidationConfiguration.composition.graph = RemoveNodeFromComposition(
 											simpleValidationConfiguration.composition.graph,
 											this.state.selectedNode
@@ -238,13 +252,15 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 							/>
 						)}
 
-						<TreeViewGroupButton
-							title={`${Titles.Add} Link`}
-							onClick={() => {
-								this.setState({ linkNext: true, turn: UIA.GUID() });
-							}}
-							icon="fa fa-anchor"
-						/>
+						{!canAddLink ? null : (
+							<TreeViewGroupButton
+								title={`${Titles.Add} Link`}
+								onClick={() => {
+									this.setState({ linkNext: true, turn: UIA.GUID() });
+								}}
+								icon="fa fa-anchor"
+							/>
+						)}
 						{this.state.selectedLink ? (
 							<TreeViewGroupButton
 								title={`${Titles.Remove} Link`}

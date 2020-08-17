@@ -16,6 +16,7 @@ export const NodeTypes = {
 	ScreenEffect: 'ScreenEffect',
 	ScreenEffectApi: 'ScreenEffectApi',
 	RootNode: 'composition-rootNode',
+	LeafNode: 'composition-leafNode',
 	ANDNode: 'composition-andNode',
 	ORNode: 'composition-orNode',
 	ContextualParameters: 'ContextualParameters',

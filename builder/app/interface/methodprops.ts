@@ -380,7 +380,7 @@ export function AddNewSimpleValidationConfigToGraph(graph: Graph, validationId: 
 				[NodeProperties.UIText]: name,
 			}
 		},
-		NodeTypes.RootNode
+		NodeTypes.LeafNode
 	);
 	return graph;
 }
