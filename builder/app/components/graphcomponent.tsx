@@ -65,16 +65,16 @@ export default class GraphComponent extends Component<any, any> {
 		window.addEventListener('mousedown', this.mouseDown);
 	}
 
-	mouseDown(evt) {
+	mouseDown(evt: any) {
 		this.mouseStartEvent = evt;
 	}
 
-	mouseUp(evt) {
+	mouseUp(evt: any) {
 		this.mouseStartEvent = null;
 		this.mouseMoved = null;
 	}
 
-	mouseMove(evt) {
+	mouseMove(evt: { clientX: number; clientY: number; }) {
 		if (this.mouseStartEvent) {
 			this.mouseMoveEvt = evt;
 			this.mouseMoved = {
@@ -95,7 +95,7 @@ export default class GraphComponent extends Component<any, any> {
 		}
 	}
 
-	calculateNodeTextSize(text, pad, $width? = null) {
+	calculateNodeTextSize(text: any, pad: number, $width? = null) {
 		let div: any = document.querySelector('#secret-div-space' + this.state.id);
 		if (true || !div || $width) {
 			div = div || document.createElement('div');
@@ -149,7 +149,7 @@ export default class GraphComponent extends Component<any, any> {
 			const body = d3.select(`#${me.state.id}`);
 			const outer = body.append('svg').attr('width', width).attr('height', height).attr('pointer-events', 'all');
 			// define arrow markers for graph links
-			const centerGuid = body.append('div');
+			// const centerGuid = body.append('div');
 
 			outer
 				.append('svg:defs')
@@ -163,7 +163,7 @@ export default class GraphComponent extends Component<any, any> {
 				.append('svg:path')
 				.attr('d', 'M0,-5L10,0L0,5L2,0')
 				.attr('stroke-width', '0px')
-				.attr('fill', (d) => {
+				.attr('fill', (d: { properties: { type: string | number; }; }) => {
 					if (
 						d &&
 						d.properties &&
@@ -177,7 +177,7 @@ export default class GraphComponent extends Component<any, any> {
 				});
 
 			const vis = outer.append('g');
-			outer.on('wheel', (d) => {
+			outer.on('wheel', (d: any) => {
 				me.mapScale += d3.event.wheelDelta / (me.props.zoomFactor || 5000);
 				redraw();
 			});
@@ -192,23 +192,23 @@ export default class GraphComponent extends Component<any, any> {
 					'data-transform',
 					`(${me.mapScale || 1})  (${me.mapTranslate.x + x}x, ${me.mapTranslate.y + y})y`
 				);
-				centerGuid.attr(
-					'style',
-					`position:absolute; top: 10px; left:330px; height: 20px; width:3px; background-color: red; transform:rotate(${Math.abs(
-						ang
-					)}deg)`
-				);
+				// centerGuid.attr(
+				// 	'style',
+				// 	`position:absolute; top: 10px; left:330px; height: 20px; width:3px; background-color: red; transform:rotate(${Math.abs(
+				// 		ang
+				// 	)}deg)`
+				// );
 			}
-			outer.on('mousemove', (x, v) => {
+			outer.on('mousemove', (x: any, v: any) => {
 				if (me.panning) {
 					redraw();
 				}
 			});
 
-			outer.on('mousedown', (d) => {
+			outer.on('mousedown', (d: any) => {
 				me.panning = true;
 			});
-			outer.on('mouseup', (d) => {
+			outer.on('mouseup', (d: any) => {
 				me.panning = false;
 
 				if (me.mouseMoved && me.mapTranslate) {
@@ -225,7 +225,7 @@ export default class GraphComponent extends Component<any, any> {
 
 		const graph = this.state.graph;
 
-		graph.nodes.forEach((v) => {
+		graph.nodes.forEach((v: { selected: any; width: number; height: number; }) => {
 			const propType = GetNodeProp(v, NodeProperties.NODEType);
 			if (me.props && me.props.minimizeTypes) {
 				if (!v.selected && me.props.minimizeTypes[propType]) {
@@ -242,7 +242,7 @@ export default class GraphComponent extends Component<any, any> {
 			v.width = Math.max(MIN_DIMENSIONAL_SIZE, bb.width);
 			v.height = Math.max(MIN_DIMENSIONAL_SIZE, bb.height);
 		});
-		graph.groups.forEach((g) => {
+		graph.groups.forEach((g: { padding: number; }) => {
 			g.padding = pad;
 		});
 
@@ -260,7 +260,7 @@ export default class GraphComponent extends Component<any, any> {
 			.attr('rx', 8)
 			.attr('ry', 8)
 			.attr('class', 'group')
-			.style('fill', (d, i) => Object.values(NodeTypeColors)[i] || color(i))
+			.style('fill', (d: any, i: string | number) => Object.values(NodeTypeColors)[i] || color(i))
 			.call(force.drag);
 
 		const node = svg.selectAll('.node');
@@ -272,7 +272,7 @@ export default class GraphComponent extends Component<any, any> {
 			.enter()
 			.append('line')
 			.attr('class', 'link')
-			.style('stroke', (d) => {
+			.style('stroke', (d: { selected: any; properties: { [x: string]: any; type: string; }; }) => {
 				if (d.selected) {
 					return '#ff0000';
 				}
@@ -295,7 +295,7 @@ export default class GraphComponent extends Component<any, any> {
 				}
 				return '#000';
 			})
-			.style('stroke-dasharray', (d) => {
+			.style('stroke-dasharray', (d: { properties: { [x: string]: any; type: string; }; }) => {
 				if (
 					d &&
 					d.properties &&
@@ -306,7 +306,7 @@ export default class GraphComponent extends Component<any, any> {
 				}
 				return '';
 			})
-			.style('d', (d) => {
+			.style('d', (d: { properties: { [x: string]: any; type: string; }; }) => {
 				if (
 					d &&
 					d.properties &&
@@ -317,7 +317,7 @@ export default class GraphComponent extends Component<any, any> {
 				}
 				return '';
 			})
-			.style('stroke-width', (d) => {
+			.style('stroke-width', (d: { properties: { type: string | number; }; value: number; }) => {
 				if (
 					d &&
 					d.properties &&
@@ -329,7 +329,7 @@ export default class GraphComponent extends Component<any, any> {
 				}
 				return Math.sqrt(d.value);
 			});
-		link.on('click', (d, index, els) => {
+		link.on('click', (d: { id: any; source: { id: any; }; target: { id: any; }; }, index: string | number, els: { [x: string]: { getBoundingClientRect: () => any; }; }) => {
 			if (me.props.onLinkClick && d) {
 				me.props.onLinkClick(
 					{
@@ -341,7 +341,7 @@ export default class GraphComponent extends Component<any, any> {
 				);
 			}
 		});
-		link.on('mouseover', (d, index, els) => {
+		link.on('mouseover', (d: { id: any; source: { id: any; }; target: { id: any; }; }, index: string | number, els: { [x: string]: { getBoundingClientRect: () => any; }; }) => {
 			if (me.props.onLinkHover && d) {
 				me.props.onLinkHover(
 					{
@@ -360,7 +360,7 @@ export default class GraphComponent extends Component<any, any> {
 			.append('foreignObject')
 			.style('overflow', 'visible')
 			.attr('class', 'label');
-		label.on('click', (d, index, els) => {
+		label.on('click', (d: { id: any; }, index: string | number, els: { [x: string]: { getBoundingClientRect: () => any; }; }) => {
 			if (me.props.onNodeClick && d && d.id) {
 				me.props.onNodeClick(d.id, els[index].getBoundingClientRect());
 			}
@@ -370,13 +370,13 @@ export default class GraphComponent extends Component<any, any> {
 
 		features
 			.append('rect')
-			.attr('width', (d) => (d.selected ? 5 : 0))
-			.attr('height', (d) => d.height - 10)
+			.attr('width', (d: { selected: any; }) => (d.selected ? 5 : 0))
+			.attr('height', (d: { height: number; }) => d.height - 10)
 			.attr('x', 3)
 			.attr('y', 5)
 			.attr('rx', 5)
 			.attr('ry', 5)
-			.style('fill', (d) => {
+			.style('fill', (d: { selected: any; }) => {
 				if (d.selected && me.props.selectedColor) {
 					return me.props.selectedColor;
 				}
@@ -384,13 +384,13 @@ export default class GraphComponent extends Component<any, any> {
 			});
 		features
 			.append('rect')
-			.attr('width', (d) => (d.marked ? 15 : 0))
-			.attr('height', (d) => 15)
-			.attr('x', (d) => d.width - 5)
+			.attr('width', (d: { marked: any; }) => (d.marked ? 15 : 0))
+			.attr('height', (d: any) => 15)
+			.attr('x', (d: { width: number; }) => d.width - 5)
 			.attr('y', 5)
 			.attr('rx', 5)
 			.attr('ry', 5)
-			.style('fill', (d) => {
+			.style('fill', (d: { marked: any; }) => {
 				if (d.marked && me.props.markedColor) {
 					return me.props.markedColor;
 				}
@@ -400,27 +400,27 @@ export default class GraphComponent extends Component<any, any> {
 
 		topdiv
 			.append('xhtml:object')
-			.attr('data', (d) => {
+			.attr('data', (d: { properties: { nodeType: string | number; }; }) => {
 				if (d && d.properties && d.properties.nodeType && NodeTypeColors[d.properties.nodeType]) {
 					return GetNodeTypeIcon(d.properties.nodeType);
 				}
 				return './css/svg/003-cupcake.svg';
 			})
-			.attr('type', (n) => 'image/svg+xml')
-			.attr('width', (d) => iconSize)
-			.attr('height', (d) => iconSize)
+			.attr('type', (n: any) => 'image/svg+xml')
+			.attr('width', (d: any) => iconSize)
+			.attr('height', (d: any) => iconSize)
 			.attr('x', 40)
 			.attr('y', 40)
 			.style('width', 40)
 			.style('height', 40);
 		const titles = topdiv
 			.append('xhtml:div')
-			.style('width', (x) => `${x.width - pad / 2}px`)
+			.style('width', (x: { width: number; }) => `${x.width - pad / 2}px`)
 			.style('white-space', 'normal')
 			.style('text-align', 'start')
 			// .style('word-break', 'break-all')
-			.style('height', (x) => `${x.height - pad / 2}px`)
-			.text((d) => `${getLabelText(d)}`)
+			.style('height', (x: { height: number; }) => `${x.height - pad / 2}px`)
+			.text((d: any) => `${getLabelText(d)}`)
 			.call(force.drag);
 
 		this.$force = force;
@@ -429,7 +429,7 @@ export default class GraphComponent extends Component<any, any> {
 			$color: color
 		});
 
-		function getLabelText(d) {
+		function getLabelText(d: { selected: any; properties: { [x: string]: string | number; text: any; }; name: any; }) {
 			if (!d.selected) {
 				if (
 					d.properties &&
@@ -441,7 +441,7 @@ export default class GraphComponent extends Component<any, any> {
 			}
 			return d && d.properties ? d.properties.text || d.name : d.name;
 		}
-		function createRectangle(source) {
+		function createRectangle(source: { x: number; width: number; y: number; height: number; }) {
 			const temp = {
 				x: source.x - source.width / 2,
 				y: source.y - source.height / 2,
@@ -451,7 +451,7 @@ export default class GraphComponent extends Component<any, any> {
 
 			return new Cola.Rectangle(temp.x, temp.X, temp.y, temp.Y);
 		}
-		function rotate(source, degree = Math.PI / 2) {
+		function rotate(source: { x: any; width?: any; y: any; height?: any; innerBounds?: any; }, degree = Math.PI / 2) {
 			let { innerBounds, x, y } = source;
 			if (!innerBounds) {
 				innerBounds = {
@@ -474,7 +474,7 @@ export default class GraphComponent extends Component<any, any> {
 
 		function tick() {
 			if (me.$_nodes) {
-				me.$_nodes.each((d) => {
+				me.$_nodes.each((d: { properties: { [x: string]: any; }; selected: any; width: number; height: number; innerBounds: any; bounds: { inflate: (arg0: number) => any; }; }) => {
 					let propType = d.properties[NodeProperties.NODEType];
 					const bb = me.calculateNodeTextSize(
 						getLabelText(d),
@@ -494,7 +494,7 @@ export default class GraphComponent extends Component<any, any> {
 
 			if (me.$_nodes) {
 				me.$_nodes
-					.attr('width', (d) => {
+					.attr('width', (d: { selected: any; properties: { [x: string]: string | number; }; width: any; }) => {
 						if (
 							!d.selected &&
 							d.properties &&
@@ -505,7 +505,7 @@ export default class GraphComponent extends Component<any, any> {
 						}
 						return d.width;
 					})
-					.attr('height', (d) => {
+					.attr('height', (d: { selected: any; properties: { [x: string]: string | number; }; height: any; }) => {
 						if (
 							!d.selected &&
 							d.properties &&
@@ -516,7 +516,7 @@ export default class GraphComponent extends Component<any, any> {
 						}
 						return d.height;
 					})
-					.attr('x', (d) => {
+					.attr('x', (d: { selected: any; properties: { [x: string]: string | number; }; x: number; width: number; }) => {
 						if (
 							!d.selected &&
 							d.properties &&
@@ -527,7 +527,7 @@ export default class GraphComponent extends Component<any, any> {
 						}
 						return d.x - d.width / 2;
 					})
-					.attr('y', (d) => {
+					.attr('y', (d: { selected: any; properties: { [x: string]: string | number; }; y: number; height: number; }) => {
 						if (
 							!d.selected &&
 							d.properties &&
@@ -541,42 +541,42 @@ export default class GraphComponent extends Component<any, any> {
 			}
 			// if (me.avoidOverlapss)
 			group
-				.attr('x', (d) => {
+				.attr('x', (d: { bounds: { x: any; }; leaves: { minimum: (arg0: (x: any) => number) => any; maximum: (arg0: (x: any) => any) => any; summation: (arg0: (x: any) => any) => number; length: number; }; }) => {
 					if (!d.bounds) {
-						const min = d.leaves.minimum((x) => x.x - x.width / 2);
-						const max = d.leaves.maximum((x) => x.x + x.width / 2);
+						const min = d.leaves.minimum((x: { x: number; width: number; }) => x.x - x.width / 2);
+						const max = d.leaves.maximum((x: { x: number; width: number; }) => x.x + x.width / 2);
 						const width = max - min;
-						return d.leaves.summation((x) => x.x) / d.leaves.length - width / 2;
+						return d.leaves.summation((x: { x: any; }) => x.x) / d.leaves.length - width / 2;
 					}
 					return d.bounds.x;
 				})
-				.attr('y', (d) => {
+				.attr('y', (d: { bounds: { y: any; }; leaves: { minimum: (arg0: (x: any) => number) => any; maximum: (arg0: (x: any) => any) => any; summation: (arg0: (x: any) => any) => number; length: number; }; }) => {
 					if (!d.bounds) {
-						const min = d.leaves.minimum((x) => x.y - x.height / 2);
-						const max = d.leaves.maximum((x) => x.y + x.height / 2);
+						const min = d.leaves.minimum((x: { y: number; height: number; }) => x.y - x.height / 2);
+						const max = d.leaves.maximum((x: { y: number; height: number; }) => x.y + x.height / 2);
 						const height = max - min;
-						return d.leaves.summation((x) => x.y) / d.leaves.length - height / 2;
+						return d.leaves.summation((x: { y: any; }) => x.y) / d.leaves.length - height / 2;
 					}
 					return d.bounds.y;
 				})
-				.attr('width', (d) => {
+				.attr('width', (d: { bounds: { width: () => any; }; leaves: { minimum: (arg0: (x: any) => number) => any; maximum: (arg0: (x: any) => any) => any; }; }) => {
 					if (!d.bounds) {
-						const min = d.leaves.minimum((x) => x.x - x.width / 2);
-						const max = d.leaves.maximum((x) => x.x + x.width / 2);
+						const min = d.leaves.minimum((x: { x: number; width: number; }) => x.x - x.width / 2);
+						const max = d.leaves.maximum((x: { x: number; width: number; }) => x.x + x.width / 2);
 						return max - min;
 					}
 					return d.bounds.width();
 				})
-				.attr('height', (d) => {
+				.attr('height', (d: { bounds: { height: () => any; }; leaves: { minimum: (arg0: (x: any) => number) => any; maximum: (arg0: (x: any) => any) => any; }; }) => {
 					if (!d.bounds) {
-						const min = d.leaves.minimum((x) => x.y - x.height / 2);
-						const max = d.leaves.maximum((x) => x.y + x.height / 2);
+						const min = d.leaves.minimum((x: { y: number; height: number; }) => x.y - x.height / 2);
+						const max = d.leaves.maximum((x: { y: number; height: number; }) => x.y + x.height / 2);
 						return max - min;
 					}
 					return d.bounds.height();
 				});
 
-			link.each((d) => {
+			link.each((d: { route: { sourceIntersection: Cola.Point; targetIntersection: Cola.Point; arrowStart: Cola.Point; }; source: any; target: any; }) => {
 				//  d.route = Cola.makeEdgeBetween(rotate(d.source), rotate(d.target, -Math.PI / 2), 5);
 				if (!me.avoidOverlaps) {
 					d.route = Cola.makeEdgeBetween(createRectangle(d.source), createRectangle(d.target), 5);
@@ -586,18 +586,18 @@ export default class GraphComponent extends Component<any, any> {
 			});
 
 			link
-				.attr('x1', (d) => d.route.sourceIntersection.x)
-				.attr('y1', (d) => d.route.sourceIntersection.y)
-				.attr('x2', (d) => d.route.arrowStart.x)
-				.attr('y2', (d) => d.route.arrowStart.y);
+				.attr('x1', (d: { route: { sourceIntersection: { x: any; }; }; }) => d.route.sourceIntersection.x)
+				.attr('y1', (d: { route: { sourceIntersection: { y: any; }; }; }) => d.route.sourceIntersection.y)
+				.attr('x2', (d: { route: { arrowStart: { x: any; }; }; }) => d.route.arrowStart.x)
+				.attr('y2', (d: { route: { arrowStart: { y: any; }; }; }) => d.route.arrowStart.y);
 
-			features.attr('transform', (d) => {
+			features.attr('transform', (d: { y: number; height: number; x: number; width: number; }) => {
 				const y = d.y - d.height / 2;
 				const x = d.x - d.width / 2;
 				return `translate(${x},${y})`;
 			});
 
-			label.attr('x', (d) => d.x - d.width / 2).attr('y', function(d) {
+			label.attr('x', (d: { x: number; width: number; }) => d.x - d.width / 2).attr('y', function(d: { y: number; height: number; }) {
 				const innerbit = this.querySelector('div');
 				const h = innerbit ? innerbit.getBoundingClientRect().height : 0;
 
@@ -614,18 +614,18 @@ export default class GraphComponent extends Component<any, any> {
 		this.hasStarted = true;
 	}
 
-	buildNode(graph, cola, color) {
+	buildNode(graph: { groups: string | any[]; }, cola: Cola.Layout & Cola.ID3StyleLayoutAdaptor, color: (arg0: any) => any) {
 		const me = this;
-		const node = this.$node.data(cola.nodes(), (x) => x.id || x.name);
+		const node = this.$node.data(cola.nodes(), (x: { id: any; name: any; }) => x.id || x.name);
 		const temp = node
 			.enter()
 			.append('rect')
 			.attr('class', 'node')
-			.attr('width', (d) => d.width)
-			.attr('height', (d) => d.height)
+			.attr('width', (d: { width: any; }) => d.width)
+			.attr('height', (d: { height: any; }) => d.height)
 			.attr('rx', 5)
 			.attr('ry', 5)
-			.style('fill', (d) => {
+			.style('fill', (d: { properties: { nodeType: string | number; }; id: any; }) => {
 				if (d && d.properties && d.properties.nodeType) {
 					const uiType = d.id ? GetNodeProp(d.id, NodeProperties.UIType) : null;
 					return UITypeColors[uiType] || NodeTypeColors[d.properties.nodeType] || '#ff0000';
@@ -633,7 +633,7 @@ export default class GraphComponent extends Component<any, any> {
 
 				return color(graph.groups.length);
 			})
-			.on('click', (d, index, els) => {
+			.on('click', (d: { id: any; }, index: string | number, els: { [x: string]: { getBoundingClientRect: () => any; }; }) => {
 				if (me.props.onNodeClick && d) {
 					me.props.onNodeClick(d.id, els[index].getBoundingClientRect());
 				}
@@ -644,7 +644,7 @@ export default class GraphComponent extends Component<any, any> {
 		this.$_nodes = temp;
 	}
 
-	applyNodeVisualData(nn) {
+	applyNodeVisualData(nn: { width: number; height: number; name: any; id: any; fixed: boolean; }) {
 		nn.width = 40;
 		nn.height = 40;
 		nn.name = nn.id;
@@ -652,27 +652,27 @@ export default class GraphComponent extends Component<any, any> {
 		return nn;
 	}
 
-	componentWillReceiveProps(props, state) {
+	componentWillReceiveProps(props: { graph: any; selectedNodes?: any; markedNodes?: any; selectedLinks?: any; }, state: any) {
 		if (GraphMethods.Paused()) {
 			return;
 		}
 		if (props.graph) {
-			const graphVersion = GraphMethods.GetAppCacheVersion();
-			if (graphVersion === version) {
-				if (mapSelectedNodes && props.selectedNodes.length === mapSelectedNodes.length) {
-					if ([ ...props.selectedNodes, ...mapSelectedNodes ].unique().length === mapSelectedNodes.length) {
-						if (mapSelectedLinks && props.selectedLinks.length === mapSelectedLinks.length) {
-							if (
-								[ ...props.selectedLinks, ...mapSelectedLinks ].unique().length ===
-								mapSelectedLinks.length
-							) {
-								return;
-							}
-						}
-					}
-				}
-			}
-			version = graphVersion;
+			// const graphVersion = GraphMethods.GetAppCacheVersion();
+			// if (graphVersion === version) {
+			// 	if (mapSelectedNodes && props.selectedNodes.length === mapSelectedNodes.length) {
+			// 		if ([ ...props.selectedNodes, ...mapSelectedNodes ].unique().length === mapSelectedNodes.length) {
+			// 			if (mapSelectedLinks && props.selectedLinks.length === mapSelectedLinks.length) {
+			// 				if (
+			// 					[ ...props.selectedLinks, ...mapSelectedLinks ].unique().length ===
+			// 					mapSelectedLinks.length
+			// 				) {
+			// 					return;
+			// 				}
+			// 			}
+			// 		}
+			// 	}
+			// }
+			// version = graphVersion;
 			mapSelectedNodes = props.selectedNodes;
 			if (props.graph) {
 				const { graph } = props;
@@ -681,13 +681,13 @@ export default class GraphComponent extends Component<any, any> {
 				this.$force.stop();
 				if (graph.nodes && this.state && this.state.graph && this.state.graph.nodes) {
 					const removedNodes = this.state.graph.nodes
-						.relativeCompliment(graph.nodes, (x, y) => x.id === y)
-						.map((t) => this.state.graph.nodes.indexOf(t));
+						.relativeCompliment(graph.nodes, (x: { id: any; }, y: any) => x.id === y)
+						.map((t: any) => this.state.graph.nodes.indexOf(t));
 					this.state.graph.nodes.removeIndices(removedNodes);
-					const newNodes = graph.nodes.relativeCompliment(this.state.graph.nodes, (x, y) => x === y.id);
-					let unanchored = {};
+					const newNodes = graph.nodes.relativeCompliment(this.state.graph.nodes, (x: any, y: { id: any; }) => x === y.id);
+					let unanchored: any = {};
 					if (props.selectedNodes) {
-						props.selectedNodes.forEach((t) => {
+						props.selectedNodes.forEach((t: any) => {
 							unanchored = {
 								...unanchored,
 								...GraphMethods.GetLinkedNodes(null, { id: t })
@@ -695,7 +695,7 @@ export default class GraphComponent extends Component<any, any> {
 						});
 					}
 					if (this.props.positionPinning)
-						this.state.graph.nodes.forEach((v) => {
+						this.state.graph.nodes.forEach((v: { id: string | number; fixed: boolean; }) => {
 							if (!unanchored[v.id]) {
 								v.fixed = true;
 							} else {
@@ -703,22 +703,22 @@ export default class GraphComponent extends Component<any, any> {
 							}
 						});
 
-					newNodes.map((nn) => {
+					newNodes.map((nn: string | number) => {
 						this.state.graph.nodes.push(
 							this.applyNodeVisualData(GraphMethods.duplicateNode(graph.nodeLib[nn]))
 						);
 					});
 					if (props.markedNodes) {
-						this.state.graph.nodes.map((nn) => {
-							nn.marked = !!props.markedNodes.find((t) => t == nn.id);
+						this.state.graph.nodes.map((nn: { marked: boolean; id: any; }) => {
+							nn.marked = !!props.markedNodes.find((t: any) => t == nn.id);
 						});
 					}
 					if (props.selectedNodes) {
-						this.state.graph.nodes.map((nn) => {
-							nn.selected = !!props.selectedNodes.find((t) => t == nn.id);
+						this.state.graph.nodes.map((nn: { selected: boolean; id: any; }) => {
+							nn.selected = !!props.selectedNodes.find((t: any) => t == nn.id);
 						});
 					}
-					this.state.graph.nodes.map((nn) => {
+					this.state.graph.nodes.map((nn: { id: string | number; properties: any; }) => {
 						const nl = graph.nodeLib[nn.id];
 						if (nl && nl.properties) {
 							nn.properties = { ...nl.properties };
@@ -729,19 +729,19 @@ export default class GraphComponent extends Component<any, any> {
 				}
 				if (graph.links && this.state && this.state.graph && this.state.graph.links) {
 					const removedLinks = this.state.graph.links
-						.relativeCompliment(graph.links, (x, y) => x.id === y)
-						.map((t) => this.state.graph.links.indexOf(t));
+						.relativeCompliment(graph.links, (x: { id: any; }, y: any) => x.id === y)
+						.map((t: any) => this.state.graph.links.indexOf(t));
 					this.state.graph.links.removeIndices(removedLinks);
-					const newLinks = graph.links.relativeCompliment(this.state.graph.links, (x, y) => x === y.id);
-					newLinks.map((nn) => {
+					const newLinks = graph.links.relativeCompliment(this.state.graph.links, (x: any, y: { id: any; }) => x === y.id);
+					newLinks.map((nn: string | number) => {
 						this.state.graph.links.push(duplicateLink(graph.linkLib[nn], this.state.graph.nodes));
 					});
 					if (props.selectedLinks) {
-						this.state.graph.links.map((nn) => {
-							nn.selected = !!props.selectedLinks.find((t) => t.id === nn.id);
+						this.state.graph.links.map((nn: { selected: boolean; id: any; }) => {
+							nn.selected = !!props.selectedLinks.find((t: { id: any; }) => t.id === nn.id);
 						});
 					}
-					this.state.graph.links.map((nn) => {
+					this.state.graph.links.map((nn: { id: string | number; properties: any; }) => {
 						const nl = graph.linkLib[nn.id];
 						if (nl && nl.properties) {
 							nn.properties = { ...nl.properties };
@@ -752,27 +752,27 @@ export default class GraphComponent extends Component<any, any> {
 
 				if (graph.groups && this.state && this.state.graph && this.state.graph.groups) {
 					const graph_groups = (graph.$vGroups || graph.groups)
-						.filter((x) => graph.groupLib[x] && (graph.groupLib[x].leaves || graph.groupLib[x].groups));
+						.filter((x: string | number) => graph.groupLib[x] && (graph.groupLib[x].leaves || graph.groupLib[x].groups));
 
 					let removedGroups = null;
 					if (this.props.groupsDisabled) {
-						removedGroups = [].interpolate(0, this.state.graph.groups.length, (x) => x);
+						removedGroups = [].interpolate(0, this.state.graph.groups.length, (x: any) => x);
 					} else {
 						removedGroups = this.state.graph.groups
-							.relativeCompliment(graph_groups, (x, y) => x.id === y)
-							.map((t) => this.state.graph.groups.indexOf(t));
+							.relativeCompliment(graph_groups, (x: { id: any; }, y: any) => x.id === y)
+							.map((t: any) => this.state.graph.groups.indexOf(t));
 					}
 					this.state.graph.groups.removeIndices(removedGroups);
 					if (!this.props.groupsDisabled) {
 						const newGroups = graph_groups
-							.relativeCompliment(this.state.graph.groups, (x, y) => x === y.id)
-							.filter((x) => graph.groupLib[x] && (graph.groupLib[x].leaves || graph.groupLib[x].groups));
+							.relativeCompliment(this.state.graph.groups, (x: any, y: { id: any; }) => x === y.id)
+							.filter((x: string | number) => graph.groupLib[x] && (graph.groupLib[x].leaves || graph.groupLib[x].groups));
 						newGroups.map((nn: any) => {
 							this.state.graph.groups.push(duplicateGroup(graph.groupLib[nn]));
 						});
 						let toremove: any[] = [];
 						graph_groups.forEach((group: any) => {
-							const g = this.state.graph.groups.find((x) => x.id === group);
+							const g = this.state.graph.groups.find((x: { id: any; }) => x.id === group);
 							let ok: boolean = applyGroup(
 								g,
 								graph.groupLib[group],
@@ -815,11 +815,11 @@ export default class GraphComponent extends Component<any, any> {
 	}
 }
 
-function duplicateLink(nn, nodes) {
+function duplicateLink(nn: { source: any; target: any; }, nodes: any[]) {
 	return {
 		...nn,
-		source: nodes.findIndex((x) => x.id === nn.source),
-		target: nodes.findIndex((x) => x.id === nn.target)
+		source: nodes.findIndex((x: { id: any; }) => x.id === nn.source),
+		target: nodes.findIndex((x: { id: any; }) => x.id === nn.target)
 	};
 }
 function applyGroup(mindmapgroup: any, lib_group: any, groups: any, nodes: any) {
@@ -867,7 +867,7 @@ function applyGroup(mindmapgroup: any, lib_group: any, groups: any, nodes: any) 
 	}
 	return true;
 }
-function duplicateGroup(nn) {
+function duplicateGroup(nn: any) {
 	const temp = {
 		...nn
 	};
@@ -875,8 +875,8 @@ function duplicateGroup(nn) {
 	delete temp.groups;
 	return temp;
 }
-const throttle = (func, limit) => {
-	let inThrottle;
+const throttle = (func: { apply: (arg0: any, arg1: IArguments) => void; }, limit: number) => {
+	let inThrottle: boolean;
 	return function() {
 		const args = arguments;
 		const context = this;
@@ -888,7 +888,7 @@ const throttle = (func, limit) => {
 	};
 };
 
-function angle(cx, cy, ex, ey) {
+function angle(cx: number, cy: number, ex: number, ey: number) {
 	let vect1 = new Vector(ex, ey, 0);
 	vect1 = vect1.normalisedVector();
 	ex = vect1.getX();
@@ -901,7 +901,7 @@ function angle(cx, cy, ex, ey) {
 }
 
 var Vector = (function() {
-	function Vector(pX, pY, pZ) {
+	function Vector(pX: number, pY: number, pZ: number) {
 		this.setX(pX);
 		this.setY(pY);
 		this.setZ(pZ);
@@ -909,35 +909,35 @@ var Vector = (function() {
 	Vector.prototype.getX = function() {
 		return this.mX;
 	};
-	Vector.prototype.setX = function(pX) {
+	Vector.prototype.setX = function(pX: any) {
 		this.mX = pX;
 	};
 	Vector.prototype.getY = function() {
 		return this.mY;
 	};
-	Vector.prototype.setY = function(pY) {
+	Vector.prototype.setY = function(pY: any) {
 		this.mY = pY;
 	};
 	Vector.prototype.getZ = function() {
 		return this.mZ;
 	};
-	Vector.prototype.setZ = function(pZ) {
+	Vector.prototype.setZ = function(pZ: any) {
 		this.mZ = pZ;
 	};
 
-	Vector.prototype.add = function(v) {
+	Vector.prototype.add = function(v: { getX: () => any; getY: () => any; getZ: () => any; }) {
 		return new Vector(this.getX() + v.getX(), this.getY() + v.getY(), this.getZ() + v.getZ());
 	};
 
-	Vector.prototype.subtract = function(v) {
+	Vector.prototype.subtract = function(v: { getX: () => number; getY: () => number; getZ: () => number; }) {
 		return new Vector(this.getX() - v.getX(), this.getY() - v.getY(), this.getZ() - v.getZ());
 	};
 
-	Vector.prototype.multiply = function(scalar) {
+	Vector.prototype.multiply = function(scalar: number) {
 		return new Vector(this.getX() * scalar, this.getY() * scalar, this.getZ() * scalar);
 	};
 
-	Vector.prototype.divide = function(scalar) {
+	Vector.prototype.divide = function(scalar: number) {
 		return new Vector(this.getX() / scalar, this.getY() / scalar, this.getZ() / scalar);
 	};
 

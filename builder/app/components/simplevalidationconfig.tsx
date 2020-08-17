@@ -28,7 +28,8 @@ import {
 	SimpleValidationConfig,
 	CreateSimpleValidation,
 	CreateOneOf,
-  CreateBoolean
+	CreateBoolean,
+  GetSimpleValidationId
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
@@ -48,6 +49,7 @@ import BooleanConfigComponent from './booleanconfigcomponent';
 import NumberConfigComponent from './numberconfigcomponent';
 import OneOfEnumerationComponent from './oneofenumeration';
 import EqualityConfigComponent from './equalityconfigcomponent';
+import TreeViewItem from './treeviewitem';
 
 export default class SimpleValidationComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -70,28 +72,16 @@ export default class SimpleValidationComponent extends Component<any, any> {
 		}
 
 		let { methodDescription, simpleValidation, properties, targetProperties } = this.props;
-    simpleValidation.oneOf = simpleValidation.oneOf || CreateOneOf();
-    simpleValidation.isTrue = simpleValidation.isTrue || CreateBoolean();
-    simpleValidation.isFalse = simpleValidation.isFalse || CreateBoolean();
+		simpleValidation.oneOf = simpleValidation.oneOf || CreateOneOf();
+		simpleValidation.isTrue = simpleValidation.isTrue || CreateBoolean();
+		simpleValidation.isFalse = simpleValidation.isFalse || CreateBoolean();
 		let valid =
 			simpleValidation &&
 			simpleValidation.enabled &&
 			((simpleValidation.relationType === RelationType.Agent && simpleValidation.agentProperty) ||
 				(simpleValidation.relationType === RelationType.Model && simpleValidation.modelProperty));
 
-		let name = '';
-		if (valid) {
-			switch (simpleValidation.relationType) {
-				case RelationType.Agent:
-					let prop = properties.find((v: any) => v.id === simpleValidation.agentProperty);
-					name = `agent.${prop.title}`;
-					break;
-				case RelationType.Model:
-					let prop2 = properties.find((v: any) => v.id === simpleValidation.modelProperty);
-					name = `model.${prop2.title}`;
-					break;
-			}
-		}
+		let name = GetSimpleValidationId(simpleValidation, properties);
 
 		return (
 			<TreeViewMenu
@@ -119,6 +109,15 @@ export default class SimpleValidationComponent extends Component<any, any> {
 						}}
 					/>
 				</TreeViewItemContainer>
+				<TreeViewItem
+					icon={'fa fa-plus-square'}
+					title={Titles.AddValidationItem}
+					onClick={() => {
+						if (this.props.onValidationAdd) {
+							this.props.onValidationAdd(simpleValidation.id);
+						}
+					}}
+				/>
 				<RelativeTypeComponent
 					methodDescription={methodDescription}
 					relations={simpleValidation}

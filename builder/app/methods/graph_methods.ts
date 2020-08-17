@@ -3191,15 +3191,16 @@ export function updateNodeProperty(graph: any, options: any) {
 				value = false;
 			}
 		}
-		updateCache({
-			prop,
-			id,
-			value,
-			previous:
-				graph.nodeLib[id] && graph.nodeLib[id].properties && graph.nodeLib[id].properties[prop]
-					? graph.nodeLib[id].properties[prop]
-					: null
-		});
+		if (!options.skipCache)
+			updateCache({
+				prop,
+				id,
+				value,
+				previous:
+					graph.nodeLib[id] && graph.nodeLib[id].properties && graph.nodeLib[id].properties[prop]
+						? graph.nodeLib[id].properties[prop]
+						: null
+			});
 
 		if (NodePropertiesDirtyChain[prop]) {
 			const temps = NodePropertiesDirtyChain[prop];

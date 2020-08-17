@@ -3,8 +3,15 @@ import { GetModelPropertyChildren, GUID } from '../actions/uiactions';
 import datachainactivitymenu from '../components/datachainactivitymenu';
 import SimpleValidationComponent from '../components/simplevalidationconfig';
 import { Graph } from '../methods/graph_types';
-import { createGraph, addNewNodeOfType } from '../methods/graph_methods';
-import { NodeTypes, NodeProperties } from '../constants/nodetypes';
+import {
+	createGraph,
+	addNewNodeOfType,
+	addLinkBetweenNodes,
+	removeNode,
+	removeLink,
+	updateNodeProperty
+} from '../methods/graph_methods';
+import { NodeTypes, NodeProperties, LinkProperties } from '../constants/nodetypes';
 
 export interface DashboardAccessProps {
 	access: false;
@@ -299,6 +306,102 @@ export function CreateSimpleValidationComposition(): SimpleValidationsConfigurat
 		id: GUID()
 	};
 }
+export function AddLinkBetweenCompositionNodes(graph: Graph, from: string, to: string): Graph {
+	graph = addLinkBetweenNodes(
+		graph,
+		{
+			target: to,
+			source: from,
+			properties: LinkProperties.Composition
+		},
+		() => {}
+	);
+	return graph;
+}
+export function RemoveLinkFromComposition(graph: Graph, linkId: string): Graph {
+	graph = removeLink(graph, {
+		id: linkId
+	});
+
+	return graph;
+}
+export function ChangeNodeType(graph: Graph, nodeId: string, nodeType: string): Graph {
+	graph = updateNodeProperty(graph, {
+		skipCache: true,
+		id: nodeId,
+		prop: NodeProperties.NODEType,
+		value: nodeType
+	});
+	return graph;
+}
+export function ChangeNodeProp(graph: Graph, nodeId: string, prop: string, value: string): Graph {
+	graph = updateNodeProperty(graph, {
+		skipCache: true,
+		id: nodeId,
+		prop,
+		value
+	});
+	return graph;
+}
+export function RemoveNodeFromComposition(graph: Graph, nodeId: string): Graph {
+	graph = removeNode(graph, { id: nodeId });
+	return graph;
+}
+
+export function GetSimpleValidationId(simpleValidation: any, properties: any) {
+	let name = '';
+	let valid =
+		simpleValidation &&
+		simpleValidation.enabled &&
+		((simpleValidation.relationType === RelationType.Agent && simpleValidation.agentProperty) ||
+			(simpleValidation.relationType === RelationType.Model && simpleValidation.modelProperty));
+	if (valid) {
+		switch (simpleValidation.relationType) {
+			case RelationType.Agent:
+				let prop = properties.find((v: any) => v.id === simpleValidation.agentProperty);
+				name = `agent.${prop.title}`;
+				break;
+			case RelationType.Model:
+				let prop2 = properties.find((v: any) => v.id === simpleValidation.modelProperty);
+				name = `model.${prop2.title}`;
+				break;
+		}
+	}
+	return name;
+}
+export function AddNewSimpleValidationConfigToGraph(graph: Graph, validationId: string, name: string): Graph {
+	graph = addNewNodeOfType(
+		graph,
+		{
+			properties: {
+				[NodeProperties.IsRoot]: false,
+				[NodeProperties.IsCompositionLeaf]: false,
+				[NodeProperties.ValidationConfigurationItem]: validationId,
+				[NodeProperties.UIText]: name,
+			}
+		},
+		NodeTypes.RootNode
+	);
+	return graph;
+}
+export function AddNewNodeToComposition(graph: Graph): Graph {
+	graph = addNewNodeOfType(
+		graph,
+		{
+			properties: {
+				[NodeProperties.IsRoot]: false,
+				[NodeProperties.UIText]: BooleanTypes.AND,
+				[NodeProperties.BooleanType]: BooleanTypes.AND
+			}
+		},
+		NodeTypes.RootNode
+	);
+	return graph;
+}
+export enum BooleanTypes {
+	OR = 'OR',
+	AND = 'AND'
+}
 export function CreateGraphValidationComposition(): SimpleValidationComposition {
 	let graph: Graph = createGraph();
 
@@ -307,7 +410,8 @@ export function CreateGraphValidationComposition(): SimpleValidationComposition 
 		{
 			properties: {
 				[NodeProperties.IsRoot]: true,
-				[NodeProperties.UIText]: 'root'
+				[NodeProperties.UIText]: 'root',
+				[NodeProperties.BooleanType]: BooleanTypes.AND
 			}
 		},
 		NodeTypes.RootNode

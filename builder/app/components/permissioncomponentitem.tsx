@@ -5,10 +5,7 @@ import * as Titles from './titles';
 import SelectInput from './selectinput';
 import TextInput from './textinput';
 import TreeViewMenu from './treeviewmenu';
-import {
-	MountingDescription,
-	PermissionConfig
-} from '../interface/methodprops';
+import { MountingDescription, PermissionConfig } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes } from '../constants/nodetypes';
 import TreeViewButtonGroup from './treeviewbuttongroup';
@@ -75,8 +72,8 @@ export default class PermissionComponentItem extends Component<any, any> {
 					<DataChainOptions
 						methods={this.props.methods}
 						methodDescription={this.props.methodDescription}
-            currentDescription={mountingItem}
-            onContext={this.props.onContext}
+						currentDescription={mountingItem}
+						onContext={this.props.onContext}
 						dataChainType={DataChainType.Permission}
 						previousEffect={this.props.previousEffect}
 						dataChainOptions={permissionConfig.dataChainOptions}
@@ -108,7 +105,9 @@ export default class PermissionComponentItem extends Component<any, any> {
 												from: methodDescription,
 												dataChain: permissionConfig.dataChain,
 												type: DataChainType.Permission,
-												afterEffectOptions: permissionConfig.dataChainOptions
+												afterEffectOptions: permissionConfig.dataChainOptions,
+												methods: this.props.methods,
+												routes: this.props.routes
 											},
 											(dataChain: Node) => {
 												permissionConfig.dataChain = dataChain.id;

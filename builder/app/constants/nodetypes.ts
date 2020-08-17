@@ -16,6 +16,8 @@ export const NodeTypes = {
 	ScreenEffect: 'ScreenEffect',
 	ScreenEffectApi: 'ScreenEffectApi',
 	RootNode: 'composition-rootNode',
+	ANDNode: 'composition-andNode',
+	ORNode: 'composition-orNode',
 	ContextualParameters: 'ContextualParameters',
 	Screen: 'screen',
 	EventMethod: 'EventMethod',
@@ -190,6 +192,9 @@ export const NodeTypeColors = {
 	[NodeTypes.Model]: '#713E5A',
 	[NodeTypes.Property]: '#484349',
 	[NodeTypes.Screen]: '#3A405A',
+	[NodeTypes.RootNode]: '#44CCFF',
+	[NodeTypes.ANDNode]: '#35FF69',
+	[NodeTypes.ORNode]: '#D138BF',
 	[NodeTypes.Attribute]: '#414770',
 	[NodeTypes.ChoiceList]: '#457B9D',
 	[NodeTypes.ValidationList]: '#A8DADC',
@@ -356,8 +361,10 @@ export const NodeProperties = {
 	DataChainName: 'DataChainName',
 	ActiveStyle: ':active',
 	Themes: 'Themes',
+	IsCompositionLeaf: 'IsCompositionLeaf',
 	SharedReferenceCollection: 'SharedReferenceCollection',
 	BeforeStyle: '::before',
+	ValidationConfigurationItem: 'ValidationConfigurationItem',
 	AfterEffectKey: 'AfterEffectKey',
 	GridAreas: 'GridAreas',
 	AfterStyle: '::after',
@@ -503,6 +510,7 @@ export const NodeProperties = {
 	IsViewModel: 'IsViewModel',
 	// ComponentApiKey: 'ComponentApiKey',
 	IsDataChainPagingSkip: 'IsDataChainPagingSkip',
+	BooleanType: 'composition-boolean',
 	IsDataChainPagingTake: 'IsDataChainPagingTake',
 	UIText: 'text',
 	Target: 'Target',
@@ -703,6 +711,7 @@ export const LinkType = {
 	ValidationDataChain: 'ValidationDataChain',
 	ExecutionDataChain: 'ExecutionDataChain',
 	DataChainIsDisabled: 'DataChainIsDisabled',
+	Composition: 'Composition',
 	StateKey: 'StateKey',
 	DataChainScreenEffect: 'DataChainScreenEffect',
 	DataChainScreenEffectImpl: 'DataChainScreenEffectImpl',
@@ -985,6 +994,9 @@ export const LinkProperties = {
 	},
 	UserOfAgentType: {
 		type: LinkType.UserOfAgentType
+	},
+	Composition: {
+		type: LinkType.Composition
 	},
 	DataChainAfterEffectConverter: {
 		type: LinkType.DataChainAfterEffectConverter

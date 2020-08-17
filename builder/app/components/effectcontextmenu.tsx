@@ -347,13 +347,16 @@ class EffectContextMenu extends Component<any, any> {
 									agent={agent}
 									mountingItem={effectItem}
 									methods={mode.methods}
+									onContext={(msg: { largerPlease: boolean }) => {
+										if (msg) this.setState({ pLarger: msg.largerPlease });
+									}}
 									methodDescription={effectItem.methodDescription}
 								/>
 								<ValidationComponent
 									agent={agent}
 									mountingItem={effectItem}
 									onContext={(msg: { largerPlease: boolean }) => {
-										if (msg) this.setState({ largerPlease: msg.largerPlease });
+										if (msg) this.setState({ vLarger: msg.largerPlease });
 									}}
 									methods={mode.methods}
 									methodDescription={effectItem.methodDescription}
@@ -362,11 +365,17 @@ class EffectContextMenu extends Component<any, any> {
 									agent={agent}
 									mountingItem={effectItem}
 									methods={mode.methods}
+									onContext={(msg: { largerPlease: boolean }) => {
+										if (msg) this.setState({ eLarger: msg.largerPlease });
+									}}
 									methodDescription={effectItem.methodDescription}
 								/>
 								<AfterEffectsComponent
 									agent={agent}
 									mountingItem={effectItem}
+									onContext={(msg: { largerPlease: boolean }) => {
+										if (msg) this.setState({ aLarger: msg.largerPlease });
+									}}
 									methods={mode.methods}
 									afterEffects={effectItem.afterEffects}
 									methodDescription={effectItem.methodDescription}

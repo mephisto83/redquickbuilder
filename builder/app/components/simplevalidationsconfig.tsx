@@ -28,7 +28,15 @@ import {
 	SimpleValidationConfig,
 	CreateSimpleValidation,
 	CreateOneOf,
-	SimpleValidationsConfiguration
+	SimpleValidationsConfiguration,
+	AddNewNodeToComposition,
+	AddLinkBetweenCompositionNodes,
+	RemoveNodeFromComposition,
+	RemoveLinkFromComposition,
+	ChangeNodeType,
+	ChangeNodeProp,
+	AddNewSimpleValidationConfigToGraph,
+	GetSimpleValidationId
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
@@ -49,6 +57,7 @@ import NumberConfigComponent from './numberconfigcomponent';
 import OneOfEnumerationComponent from './oneofenumeration';
 import SimpleValidationComponent from './simplevalidationconfig';
 import GraphComponent from './graphcomponent';
+import { GetNodeProp } from '../methods/graph_methods';
 
 export default class SimpleValidationsComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -125,7 +134,7 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 						this.setState({ graph: !this.state.graph });
 						if (this.props.onContext) {
 							this.props.onContext({
-								largePlease: !this.state.graph
+								largerPlease: !this.state.graph
 							});
 						}
 					}}
@@ -133,19 +142,153 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 					greyed={!simpleValidations.some((v) => v.enabled)}
 					title={Titles.SimpleValidation}
 				>
-					<GraphComponent
-						onNodeClick={(nodeId, boundingBox) => {
-							this.setState({ selectedNodes: [ nodeId ] });
-						}}
-						onLinkClick={(linkId, boundingBox) => {
-							this.setState({ selectedLinks: [ linkId ] });
-						}}
-						selectedColor={UIA.Colors.SelectedNode}
-						markedColor={UIA.Colors.MarkedNode}
-						selectedLinks={this.state.selectedLinks || []}
-						selectedNodes={this.state.selectedNodes || []}
-						graph={simpleValidationConfiguration.composition.graph}
-					/>
+					<TreeViewButtonGroup>
+						<TreeViewGroupButton
+							title={`${Titles.Add} Node`}
+							onClick={() => {
+								simpleValidationConfiguration.composition.graph = AddNewNodeToComposition(
+									simpleValidationConfiguration.composition.graph
+								);
+								this.setState({ turn: UIA.GUID() });
+								if (this.props.onChange) {
+									this.props.onChange();
+								}
+							}}
+							icon="fa fa-plus-square"
+						/>
+						{!this.state.selectedNode ? null : (
+							<TreeViewGroupButton
+								title={`${Titles.Remove} Node`}
+								onClick={() => {
+									if (this.state.selectedNode)
+										simpleValidationConfiguration.composition.graph = RemoveNodeFromComposition(
+											simpleValidationConfiguration.composition.graph,
+											this.state.selectedNode
+										);
+									this.setState({ turn: UIA.GUID(), selectedNode: null });
+									if (this.props.onChange) {
+										this.props.onChange();
+									}
+								}}
+								icon="fa  fa-minus-square"
+							/>
+						)}
+						{!this.state.selectedNode ? null : (
+							<TreeViewGroupButton
+								title={`${Titles.OrNode}`}
+								onClick={() => {
+									if (
+										this.state.selectedNode &&
+										!GetNodeProp(
+											this.state.selectedNode,
+											NodeProperties.IsRoot,
+											simpleValidationConfiguration.composition.graph
+										)
+									) {
+										simpleValidationConfiguration.composition.graph = ChangeNodeType(
+											simpleValidationConfiguration.composition.graph,
+											this.state.selectedNode,
+											NodeTypes.ORNode
+										);
+										simpleValidationConfiguration.composition.graph = ChangeNodeProp(
+											simpleValidationConfiguration.composition.graph,
+											this.state.selectedNode,
+											NodeProperties.UIText,
+											Titles.OrNode
+										);
+										this.setState({ turn: UIA.GUID() });
+										if (this.props.onChange) {
+											this.props.onChange();
+										}
+									}
+								}}
+								icon="fa fa-thumbs-o-up"
+							/>
+						)}
+						{!this.state.selectedNode ? null : (
+							<TreeViewGroupButton
+								title={`${Titles.ANDNode}`}
+								onClick={() => {
+									if (
+										this.state.selectedNode &&
+										!GetNodeProp(
+											this.state.selectedNode,
+											NodeProperties.IsRoot,
+											simpleValidationConfiguration.composition.graph
+										)
+									) {
+										simpleValidationConfiguration.composition.graph = ChangeNodeType(
+											simpleValidationConfiguration.composition.graph,
+											this.state.selectedNode,
+											NodeTypes.ANDNode
+										);
+										simpleValidationConfiguration.composition.graph = ChangeNodeProp(
+											simpleValidationConfiguration.composition.graph,
+											this.state.selectedNode,
+											NodeProperties.UIText,
+											Titles.ANDNode
+										);
+										this.setState({ turn: UIA.GUID() });
+										if (this.props.onChange) {
+											this.props.onChange();
+										}
+									}
+								}}
+								icon="fa fa-thumbs-o-down"
+							/>
+						)}
+
+						<TreeViewGroupButton
+							title={`${Titles.Add} Link`}
+							onClick={() => {
+								this.setState({ linkNext: true, turn: UIA.GUID() });
+							}}
+							icon="fa fa-anchor"
+						/>
+						{this.state.selectedLink ? (
+							<TreeViewGroupButton
+								title={`${Titles.Remove} Link`}
+								onClick={() => {
+									if (this.state.selectedLink) {
+										simpleValidationConfiguration.composition.graph = RemoveLinkFromComposition(
+											simpleValidationConfiguration.composition.graph,
+											this.state.selectedLink
+										);
+										this.setState({ linkNext: false, turn: UIA.GUID() });
+									}
+								}}
+								icon="fa  fa-minus-square-o"
+							/>
+						) : null}
+					</TreeViewButtonGroup>
+					<TreeViewItemContainer>
+						<GraphComponent
+							linkDistance={100}
+							onNodeClick={(nodeId: string, boundingBox: any) => {
+								let currentSelected = this.state.selectedNode ? this.state.selectedNode : null;
+								if (this.state.linkNext && currentSelected) {
+									if (currentSelected != nodeId) {
+										simpleValidationConfiguration.composition.graph = AddLinkBetweenCompositionNodes(
+											simpleValidationConfiguration.composition.graph,
+											currentSelected,
+											nodeId
+										);
+									}
+									this.setState({ linkNext: false });
+								} else {
+									this.setState({ selectedNode: nodeId });
+								}
+							}}
+							onLinkClick={(linkId: string, boundingBox: any) => {
+								this.setState({ selectedLink: this.state.selectedLink === linkId ? null : linkId });
+							}}
+							selectedColor={UIA.Colors.SelectedNode}
+							markedColor={UIA.Colors.MarkedNode}
+							selectedLinks={this.state.selectedLink ? [ this.state.selectedLink ] : []}
+							selectedNodes={this.state.selectedNode ? [ this.state.selectedNode ] : []}
+							graph={simpleValidationConfiguration.composition.graph}
+						/>
+					</TreeViewItemContainer>
 				</TreeViewMenu>
 				<TreeViewButtonGroup>
 					<TreeViewGroupButton
@@ -164,6 +307,18 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 					return (
 						<SimpleValidationComponent
 							key={`${index}-simple-validations`}
+							onValidationAdd={(validationId: string) => {
+								let name = GetSimpleValidationId(simpleValidation, properties);
+								simpleValidationConfiguration.composition.graph = AddNewSimpleValidationConfigToGraph(
+									simpleValidationConfiguration.composition.graph,
+									validationId,
+									name
+								);
+								this.setState({ turn: UIA.GUID() });
+								if (this.props.onChange) {
+									this.props.onChange();
+								}
+							}}
 							dataChainType={this.props.dataChainType}
 							simpleValidation={simpleValidation}
 							methodDescription={methodDescription}

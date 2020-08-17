@@ -52,9 +52,10 @@ export default class CompareEnumerations extends Component<any, any> {
 				active
 				title={Titles.MatchPropertyToEnum}
 			>
-				{compareEnumerations.map((compareEnumeration: CompareEnumeration) => {
+				{compareEnumerations.map((compareEnumeration: CompareEnumeration, index: number) => {
 					return (
 						<CompareComponent
+							key={`asldfk${index}`}
 							getFromInfo={(temp: { compareEnumeration: SetInteger }) => {
 								return compareEnumeration;
 							}}
