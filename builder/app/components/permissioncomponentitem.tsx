@@ -75,7 +75,8 @@ export default class PermissionComponentItem extends Component<any, any> {
 					<DataChainOptions
 						methods={this.props.methods}
 						methodDescription={this.props.methodDescription}
-						currentDescription={mountingItem}
+            currentDescription={mountingItem}
+            onContext={this.props.onContext}
 						dataChainType={DataChainType.Permission}
 						previousEffect={this.props.previousEffect}
 						dataChainOptions={permissionConfig.dataChainOptions}

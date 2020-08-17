@@ -51,6 +51,7 @@ export default class PermissionComponent extends Component<any, any> {
 					return (
 						<ValidationComponentItem
 							title={Titles.PermissionType}
+              onContext={this.props.onContext}
 							key={permissionConfig.id}
 							methodDescription={index && mountingItem ? null : mountingItem.methodDescription}
 							mountingItem={mountingItem}

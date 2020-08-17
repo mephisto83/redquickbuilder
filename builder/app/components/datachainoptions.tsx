@@ -110,7 +110,8 @@ export default class DataChainOptions extends Component<any, any> {
 				/>
 				<SimpleValidationsComponent
 					dataChainType={this.props.dataChainType}
-					methodDescription={methodDescription}
+          methodDescription={methodDescription}
+          onContext={this.props.onContext}
 					dataChainOptions={dataChainOptions}
 					onChange={onchange}
 				/>

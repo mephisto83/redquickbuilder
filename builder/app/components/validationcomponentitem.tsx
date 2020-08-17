@@ -70,7 +70,8 @@ export default class ValidationComponentItem extends Component<any, any> {
 				</TreeViewItemContainer>
 				{validationConfig && validationConfig.dataChain ? (
 					<DataChainOptions
-						methods={this.props.methods}
+            methods={this.props.methods}
+            onContext={this.props.onContext}
 						methodDescription={this.props.methodDescription}
 						currentDescription={mountingItem}
 						dataChainType={this.props.dataChainType || DataChainType.Validation}

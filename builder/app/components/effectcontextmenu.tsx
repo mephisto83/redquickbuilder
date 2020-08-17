@@ -352,6 +352,9 @@ class EffectContextMenu extends Component<any, any> {
 								<ValidationComponent
 									agent={agent}
 									mountingItem={effectItem}
+									onContext={(msg: { largerPlease: boolean }) => {
+										if (msg) this.setState({ largerPlease: msg.largerPlease });
+									}}
 									methods={mode.methods}
 									methodDescription={effectItem.methodDescription}
 								/>
@@ -500,7 +503,8 @@ class EffectContextMenu extends Component<any, any> {
 		const currentInfo = this.getCurrentInfo(menuMode);
 		const menuitems = this.getMenuMode(menuMode);
 		const defaultMenus = this.getDefaultMenu(menuMode);
-		const menu_width = 350;
+		const menu_width =
+			this.state.pLarger || this.state.vLarger || this.state.aLarger || this.state.eLarger ? 650 : 350;
 		return (
 			<Draggable handle=".draggable-header,.draggable-footer">
 				<div

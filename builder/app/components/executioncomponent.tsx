@@ -64,7 +64,8 @@ export default class ExecutionComponent extends Component<any, any> {
 				{(executions || []).map((executionConfig: ExecutionConfig, index: number) => {
 					return (
 						<ExecutionComponentItem
-							key={executionConfig.id}
+              key={executionConfig.id}
+              onContext={this.props.onContext}
 							title={Titles.Execution}
 							methodDescription={index && mountingItem ? null : mountingItem.methodDescription}
 							mountingItem={mountingItem}

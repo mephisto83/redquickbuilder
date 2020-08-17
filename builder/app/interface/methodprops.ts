@@ -1,6 +1,10 @@
 import { Config } from 'electron';
 import { GetModelPropertyChildren, GUID } from '../actions/uiactions';
 import datachainactivitymenu from '../components/datachainactivitymenu';
+import SimpleValidationComponent from '../components/simplevalidationconfig';
+import { Graph } from '../methods/graph_types';
+import { createGraph, addNewNodeOfType } from '../methods/graph_methods';
+import { NodeTypes, NodeProperties } from '../constants/nodetypes';
 
 export interface DashboardAccessProps {
 	access: false;
@@ -84,6 +88,7 @@ export interface AutoSetupConfiguration {
 export interface DataChainConfiguration {
 	checkExistence?: CheckExistenceConfig;
 	simpleValidation?: SimpleValidationConfig;
+	simpleValidationConfiguration?: SimpleValidationsConfiguration;
 	simpleValidations?: SimpleValidationConfig[];
 	copyConfig?: CopyConfig;
 	setBoolean?: SetBoolean;
@@ -287,6 +292,29 @@ export function CreateIncrementInteger(): IncrementInteger {
 export function CreateCompareEnumeration(): CompareEnumeration {
 	return { ...CreateHalf(), enumeration: '', value: '' };
 }
+export function CreateSimpleValidationComposition(): SimpleValidationsConfiguration {
+	return {
+		composition: CreateGraphValidationComposition(),
+		enabled: false,
+		id: GUID()
+	};
+}
+export function CreateGraphValidationComposition(): SimpleValidationComposition {
+	let graph: Graph = createGraph();
+
+	graph = addNewNodeOfType(
+		graph,
+		{
+			properties: {
+				[NodeProperties.IsRoot]: true,
+				[NodeProperties.UIText]: 'root'
+			}
+		},
+		NodeTypes.RootNode
+	);
+
+	return { graph };
+}
 export function CreateSimpleValidation(): SimpleValidationConfig {
 	return {
 		relationType: RelationType.Agent,
@@ -295,18 +323,11 @@ export function CreateSimpleValidation(): SimpleValidationConfig {
 		id: GUID(),
 		targetProperty: '',
 		enabled: false,
-		alphaOnlyWithSpaces: {
-			id: GUID(),
-			enabled: false
-		},
-		isNotNull: {
-			id: GUID(),
-			enabled: false
-		},
-		isNull: {
-			id: GUID(),
-			enabled: false
-		},
+		alphaOnlyWithSpaces: CreateBoolean(),
+		isNotNull: CreateBoolean(),
+		isNull: CreateBoolean(),
+		isTrue: CreateBoolean(),
+		isFalse: CreateBoolean(),
 		maxLength: {
 			id: GUID(),
 			enabled: false,
@@ -321,7 +342,12 @@ export function CreateSimpleValidation(): SimpleValidationConfig {
 		oneOf: CreateOneOf()
 	};
 }
-
+export function CreateBoolean(): BooleanConfig {
+	return {
+		id: GUID(),
+		enabled: false
+	};
+}
 export function CreateOneOf(): EnumerationConfig {
 	return {
 		id: GUID(),
@@ -346,6 +372,8 @@ export function SetupConfigInstanceInformation(
 ) {
 	dataChainOptions.checkExistence = dataChainOptions.checkExistence || CreateCheckExistence();
 	dataChainOptions.simpleValidation = dataChainOptions.simpleValidation || CreateSimpleValidation();
+	dataChainOptions.simpleValidationConfiguration =
+		dataChainOptions.simpleValidationConfiguration || CreateSimpleValidationComposition();
 	dataChainOptions.simpleValidations = dataChainOptions.simpleValidations || [];
 	dataChainOptions.copyConfig = dataChainOptions.copyConfig || CreateCopyConfig();
 	dataChainOptions.setInteger = dataChainOptions.setInteger || CreateSetInteger();
@@ -389,6 +417,7 @@ export function SetupConfigInstanceInformation(
 		simpleValidation: dataChainOptions.simpleValidation,
 		incrementDouble: dataChainOptions.incrementDouble,
 		incrementInteger: dataChainOptions.incrementInteger,
+		simpleValidationConfiguration: dataChainOptions.simpleValidationConfiguration,
 		setBoolean: dataChainOptions.setBoolean,
 		simpleValidations: dataChainOptions.simpleValidations,
 		setInteger: dataChainOptions.setInteger,
@@ -471,9 +500,17 @@ export interface SimpleValidationConfig extends AfterEffectRelations {
 	maxLength: NumberConfig;
 	alphaOnlyWithSpaces: BooleanConfig;
 	isNotNull: BooleanConfig;
+	isTrue: BooleanConfig;
+	isFalse: BooleanConfig;
 	areEqual: AreEqualConfig;
 	isNull: BooleanConfig;
 	oneOf: EnumerationConfig;
+}
+export interface SimpleValidationsConfiguration extends ConfigItem {
+	composition: SimpleValidationComposition;
+}
+export interface SimpleValidationComposition {
+	graph: Graph;
 }
 export interface EnumerationConfig extends ConfigItem {
 	enumerations: string[];

@@ -27,7 +27,8 @@ import {
 	CheckSimpleValidation,
 	SimpleValidationConfig,
 	CreateSimpleValidation,
-	CreateOneOf
+	CreateOneOf,
+  CreateBoolean
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
@@ -69,7 +70,9 @@ export default class SimpleValidationComponent extends Component<any, any> {
 		}
 
 		let { methodDescription, simpleValidation, properties, targetProperties } = this.props;
-		simpleValidation.oneOf = simpleValidation.oneOf || CreateOneOf();
+    simpleValidation.oneOf = simpleValidation.oneOf || CreateOneOf();
+    simpleValidation.isTrue = simpleValidation.isTrue || CreateBoolean();
+    simpleValidation.isFalse = simpleValidation.isFalse || CreateBoolean();
 		let valid =
 			simpleValidation &&
 			simpleValidation.enabled &&
@@ -139,6 +142,8 @@ export default class SimpleValidationComponent extends Component<any, any> {
 				<EqualityConfigComponent
 					enabled={simpleValidation.enabled}
 					methodDescription={methodDescription}
+					dataChainType={this.props.dataChainType}
+					targetProperties={targetProperties}
 					properties={properties}
 					config={simpleValidation.areEqual}
 					title={Titles.AreEqual}
@@ -148,6 +153,17 @@ export default class SimpleValidationComponent extends Component<any, any> {
 					booleanConfig={simpleValidation.isNotNull}
 					title={Titles.IsNotNull}
 				/>
+				<BooleanConfigComponent
+					enabled={simpleValidation.enabled}
+					booleanConfig={simpleValidation.isTrue}
+					title={Titles.IsTrue}
+				/>
+				<BooleanConfigComponent
+					enabled={simpleValidation.enabled}
+					booleanConfig={simpleValidation.isFalse}
+					title={Titles.IsFalse}
+				/>
+
 				<OneOfEnumerationComponent
 					enabled={simpleValidation.enabled}
 					enumerationConfig={simpleValidation.oneOf}

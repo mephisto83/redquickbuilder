@@ -128,8 +128,8 @@ class ContextMenu extends Component<any, any> {
 					mounting.mountings.forEach((mountingItem: MountingDescription, index: number) => {
 						let routeKey = `routing-${index}`;
 						let { name, model, agent, viewType, methodDescription } = mountingItem;
-            mountingItem.viewType = mode.viewType || mountingItem.viewType;
-            if (!mountingItem.screenEffect) {
+						mountingItem.viewType = mode.viewType || mountingItem.viewType;
+						if (!mountingItem.screenEffect) {
 							mountingItem.screenEffect = [];
 						}
 						if (!mountingItem.afterEffects) {
@@ -376,18 +376,27 @@ class ContextMenu extends Component<any, any> {
 								<PermissionComponent
 									agent={agent}
 									mountingItem={mountingItem}
+									onContext={(msg: { largerPlease: boolean }) => {
+										if (msg) this.setState({ pLarger: msg.largerPlease });
+									}}
 									methods={mode.methods}
 									methodDescription={mountingItem.methodDescription}
 								/>
 								<ValidationComponent
 									agent={agent}
 									mountingItem={mountingItem}
+									onContext={(msg: { largerPlease: boolean }) => {
+										if (msg) this.setState({ vLarger: msg.largerPlease });
+									}}
 									methods={mode.methods}
 									methodDescription={mountingItem.methodDescription}
 								/>
 								<ExecutionComponent
 									agent={agent}
 									mountingItem={mountingItem}
+									onContext={(msg: { largerPlease: boolean }) => {
+										if (msg) this.setState({ eLarger: msg.largerPlease });
+									}}
 									methods={mode.methods}
 									methodDescription={mountingItem.methodDescription}
 								/>
@@ -395,6 +404,9 @@ class ContextMenu extends Component<any, any> {
 									agent={agent}
 									mountingItem={mountingItem}
 									methods={mode.methods}
+									onContext={(msg: { largerPlease: boolean }) => {
+										if (msg) this.setState({ aLarger: msg.largerPlease });
+									}}
 									afterEffects={mountingItem.afterEffects}
 									methodDescription={mountingItem.methodDescription}
 								/>
@@ -523,7 +535,8 @@ class ContextMenu extends Component<any, any> {
 		const currentInfo = this.getCurrentInfo(menuMode);
 		const menuitems = this.getMenuMode(menuMode);
 		const defaultMenus = this.getDefaultMenu(menuMode);
-		const menu_width = 350;
+		const menu_width =
+			this.state.pLarger || this.state.vLarger || this.state.aLarger || this.state.eLarger ? 650 : 350;
 		return (
 			<Draggable handle=".draggable-header,.draggable-footer">
 				<div

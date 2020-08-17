@@ -50,6 +50,7 @@ export default class ValidationComponent extends Component<any, any> {
 							key={validationConfig.id}
 							methodDescription={index && mountingItem ? null : mountingItem.methodDescription}
 							mountingItem={mountingItem}
+              onContext={this.props.onContext}
 							onChange={() => {
 								if (this.props.onChange) {
 									this.props.onChange();

@@ -14,7 +14,10 @@ import {
 	MountingDescription,
 	EnumerationConfig,
 	AfterEffectRelations,
-	StretchPathItem
+	StretchPathItem,
+	SimpleValidationConfig,
+	AreEqualConfig,
+	HalfRelation
 } from '../../interface/methodprops';
 import { MethodFunctions, bindTemplate } from '../../constants/functiontypes';
 import {
@@ -40,6 +43,9 @@ import { DataChainFunctionKeys } from '../../constants/datachain';
 import { codeTypeWord, GetNodeProp } from '../../methods/graph_methods';
 import { ReferenceInsertType } from '../../components/lambda/BuildLambda';
 import { code } from '../../components/editor.main.css';
+import { SimpleValidation } from '../../components/titles';
+import SimpleValidationComponent from '../../components/simplevalidationconfig';
+import { equal } from 'assert';
 
 export interface AfterEffectConvertArgs {
 	from: MethodDescription;
@@ -47,9 +53,9 @@ export interface AfterEffectConvertArgs {
 	dataChain?: string;
 	afterEffectParent?: string;
 	afterEffectChild?: string;
-	afterEffect: AfterEffect;
+	afterEffect?: AfterEffect;
 	override?: boolean;
-	currentDescription: MountingDescription;
+	currentDescription?: MountingDescription;
 	name: string;
 	routes: AfterEffect[];
 	methods: MountingDescription[];
@@ -179,7 +185,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				)
 			);
 			staticMethods.push(...GenerateBranchMethods(dataChainConfigOptions, routes, methods));
-    }
+		}
 
 		if (
 			dataChainConfigOptions.routeConfig &&
@@ -194,7 +200,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 					name: codeTypeWord(name)
 				})
 			);
-    }
+		}
 
 		if (dataChainConfigOptions.getExisting && dataChainConfigOptions.getExisting.enabled) {
 			if (dataChainConfigOptions.checkExistence && dataChainConfigOptions.checkExistence.enabled) {
@@ -525,9 +531,23 @@ function GenerateSimpleValidations(
 					)}","type":"property","model":"model"}}#`;
 					break;
 			}
+			if (simpleValidation.areEqual && simpleValidation.areEqual.enabled) {
+				let equality = GenerateEqualityComparer(
+					simpleValidation,
+					simpleValidation.areEqual,
+					tempLambdaInsertArgumentValues
+				);
+				checks.push(equality);
+			}
 			if (simpleValidation.oneOf && simpleValidation.oneOf.enabled) {
 				let oneOf = GenerateOneOf(valuePropString, simpleValidation.oneOf, tempLambdaInsertArgumentValues);
 				checks.push(oneOf);
+			}
+			if (simpleValidation.isFalse && simpleValidation.isFalse.enabled) {
+				checks.push(`!${valuePropString}`);
+			}
+			if (simpleValidation.isTrue && simpleValidation.isTrue.enabled) {
+				checks.push(`${valuePropString}`);
 			}
 			if (simpleValidation.alphaOnlyWithSpaces && simpleValidation.alphaOnlyWithSpaces.enabled) {
 				let oneOf = `await new AlphaOnlyWithSpacesAttribute().IsOk(${valuePropString});`;
@@ -575,6 +595,55 @@ function GenerateSimpleValidations(
     }
   `;
 	return '';
+}
+function GenerateEqualityComparer(
+	simpleValidation: SimpleValidationConfig,
+	areEqual: AreEqualConfig,
+	tempLambdaInsertArgumentValues: any,
+	equal: string = '=='
+) {
+	let { relationType } = simpleValidation;
+	let valuePropString = GetRelationTypeValuePropString(relationType, simpleValidation);
+	let equalityTo = GetRelationTypeValuePropString(relationType, areEqual);
+	SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, relationType, simpleValidation);
+	SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, areEqual.relationType, areEqual);
+
+	return `${valuePropString} ${equal} ${equalityTo}`;
+}
+
+function SetLambdaInsertArgumentValues(
+	tempLambdaInsertArgumentValues: any,
+	relationType: RelationType,
+	simpleValidation: HalfRelation
+) {
+	switch (relationType) {
+		case RelationType.Agent:
+			tempLambdaInsertArgumentValues[`agent.${GetCodeName(simpleValidation.agentProperty)}`] = {
+				property: simpleValidation.agentProperty
+			};
+			break;
+		case RelationType.Model:
+			tempLambdaInsertArgumentValues[`model.${GetCodeName(simpleValidation.modelProperty)}`] = {
+				property: simpleValidation.modelProperty
+			};
+			break;
+	}
+}
+function GetRelationTypeValuePropString(relationType: RelationType, simpleValidation: HalfRelation): string {
+	let valuePropString: string = '';
+	switch (relationType) {
+		case RelationType.Agent:
+			valuePropString = `agent.#{{"key":"agent.${GetCodeName(
+				simpleValidation.agentProperty
+			)}","type":"property","model":"agent"}}#`;
+			break;
+		case RelationType.Model:
+			valuePropString = `model.#{{"key":"model.${GetCodeName(
+				simpleValidation.modelProperty
+			)}","type":"property","model":"model"}}#`;
+			break;
+	}
+	return valuePropString;
 }
 function GenerateOneOf(valuePropString: string, oneOf: EnumerationConfig, tempLambdaInsertArgumentValues: any): string {
 	let result: string = '';
@@ -641,7 +710,9 @@ function GenerateStretchMethods(
 				};
 				if (!index) {
 					arbiterModels.push(item.model);
-					return `#{{"key":"stretch.${name}.${GetCodeName(item.model)}"}}# item_0 = (await arbiter#{{"key":"stretch.${name}.${GetCodeName(
+					return `#{{"key":"stretch.${name}.${GetCodeName(
+						item.model
+					)}"}}# item_0 = (await arbiter#{{"key":"stretch.${name}.${GetCodeName(
 						item.model
 					)}"}}#Static.GetBy(v => v.#{{"key":"stretch.${name}.${GetCodeName(item.model)}.${GetCodeName(
 						item.property

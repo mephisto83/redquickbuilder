@@ -36,6 +36,7 @@
     "dll",
     "app/main.js",
     "app/main.js.map",
-    "build.js"
+    "build.js",
+    "release"
   ]
 }

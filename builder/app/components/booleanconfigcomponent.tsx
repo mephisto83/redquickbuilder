@@ -16,7 +16,9 @@ export default class BooleanConfigComponent extends Component<any, any> {
 	render() {
 		let props: any = this.props;
 		let { booleanConfig }: { booleanConfig: BooleanConfig } = props;
-
+		if (!booleanConfig) {
+			return <span />;
+		}
 		return (
 			<TreeViewMenu
 				open={this.state.open}

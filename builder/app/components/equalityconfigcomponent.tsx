@@ -36,13 +36,19 @@ export default class EqualityConfigComponent extends Component<any, any> {
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				icon={CheckCopyConfig(areEqual) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+				icon={
+					areEqual.enabled && (areEqual.agentProperty || areEqual.modelProperty) ? (
+						'fa fa-check-circle-o'
+					) : (
+						'fa fa-circle-o'
+					)
+				}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
 				active
-				greyed={areEqual.enabled}
-				title={Titles.Copy}
+				greyed={!areEqual.enabled}
+				title={Titles.IsEqualTo}
 			>
 				<TreeViewItemContainer>
 					<CheckBox
@@ -64,9 +70,9 @@ export default class EqualityConfigComponent extends Component<any, any> {
 					relations={areEqual}
 					valid={areEqual.enabled}
 					enabled={areEqual.enabled}
-					properties={properties}
+					properties={this.props.properties}
 					dataChainType={this.props.dataChainType}
-					targetProperties={targetProperties}
+					targetProperties={this.props.targetProperties}
 					hideTargetProperty
 				/>
 			</TreeViewMenu>

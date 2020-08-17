@@ -35,7 +35,9 @@ import MethodProps, {
 	Effect,
 	EffectDescription,
 	AfterEffect,
-	BranchConfig
+	BranchConfig,
+	RouteConfig,
+	DataChainConfiguration
 } from '../../interface/methodprops';
 import { check } from 'prettier';
 
@@ -233,6 +235,12 @@ function UpdateLambdaInsertArguments(
 		let lambdaInsertArguments = GetNodeProp(dataChain, NodeProperties.LambdaInsertArguments);
 		if (lambdaInsertArguments) {
 			let { checkExistence } = afterEffect.dataChainOptions;
+			updateRouteConfigFromDataChainOptions(
+				afterEffect,
+				routes,
+				collectedMountingDescriptions,
+				lambdaInsertArguments
+			);
 			if (checkExistence && checkExistence.enabled) {
 				let { ifFalse, ifTrue } = checkExistence;
 				if (ifFalse && ifFalse.enabled) {
@@ -251,8 +259,8 @@ function UpdateLambdaInsertArguments(
 						lambdaInsertArguments
 					);
 				}
-				updateComponentProperty(dataChain, NodeProperties.LambdaInsertArguments, lambdaInsertArguments);
 			}
+			updateComponentProperty(dataChain, NodeProperties.LambdaInsertArguments, lambdaInsertArguments);
 		}
 	}
 }
@@ -264,7 +272,27 @@ function updateBranchMethodDescriptionArgument(
 ) {
 	let { routeConfig } = branchConfig.dataChainOptions;
 
+	updateRouteConfig(routeConfig, routes, collectedMountingDescriptions, lambdaInsertArguments);
+}
+function updateRouteConfigFromDataChainOptions(
+	afterEffect: AfterEffect,
+	routes: AfterEffect[],
+	collectedMountingDescriptions: MountingDescription[],
+	lambdaInsertArguments: any
+) {
+	let { routeConfig } = afterEffect.dataChainOptions;
 	if (routeConfig) {
+		let temp: RouteConfig = { ...routeConfig, targetId: afterEffect.target };
+		updateRouteConfig(temp, routes, collectedMountingDescriptions, lambdaInsertArguments);
+	}
+}
+function updateRouteConfig(
+	routeConfig: RouteConfig | undefined,
+	routes: AfterEffect[],
+	collectedMountingDescriptions: MountingDescription[],
+	lambdaInsertArguments: any
+) {
+	if (routeConfig && routeConfig.pushChange) {
 		let { targetId } = routeConfig;
 		let route = routes.find((route: AfterEffect) => {
 			return route.id === targetId;
@@ -286,7 +314,9 @@ function SetupAfterEffects(mounting: MountingDescription, collectedMountingDescr
 		if (mounting && mounting.afterEffects && mounting.afterEffects.length) {
 			mounting.afterEffects.forEach((afterEffect: AfterEffect, index: number) => {
 				let newAfterEffect: Node;
-				if (index) {
+				if (!afterEffect.dataChainOptions.directExecute) {
+					// needs a better way to chain after a previous node.
+					// for now all after effect methods need to be direct execute.
 					newAfterEffect = createAfterEffect(
 						mounting.afterEffects[index - 1].afterEffectNode || '',
 						afterEffect.name

@@ -88,6 +88,7 @@ export default class ExecutionComponentItem extends Component<any, any> {
 				</TreeViewItemContainer>
 				{executionConfig && executionConfig.dataChain ? (
 					<DataChainOptions
+						onContext={this.props.onContext}
 						methods={this.props.methods}
 						methodDescription={this.props.methodDescription}
 						currentDescription={mountingItem}

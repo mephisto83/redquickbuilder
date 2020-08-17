@@ -75,7 +75,7 @@ export default class OneOfEnumerationComponent extends Component<any, any> {
 				>
 					{enumerations.map((enumer: { id: string; value: string }) => {
 						return (
-							<TreeViewItemContainer>
+							<TreeViewItemContainer key={`enumer-${enumer.id}`}>
 								<CheckBox
 									label={enumer.value}
 									value={enumerationConfig.enumerations.indexOf(enumer.id) !== -1}

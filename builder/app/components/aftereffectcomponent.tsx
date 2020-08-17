@@ -70,7 +70,7 @@ export default class AfterEffectComponent extends Component<any, any> {
 						}}
 					/>
 				</TreeViewItemContainer>
-				<TreeViewItemContainer>
+				{/* <TreeViewItemContainer>
 					<SelectInput
 						label={Titles.TargetType}
 						options={Object.values(TargetMethodType).map((v) => ({ title: v, value: v }))}
@@ -85,7 +85,7 @@ export default class AfterEffectComponent extends Component<any, any> {
 							}
 						}}
 					/>
-				</TreeViewItemContainer>
+				</TreeViewItemContainer> */}
 				<TreeViewItemContainer>
 					<SelectInput
 						label={Titles.Target}

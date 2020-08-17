@@ -27,7 +27,8 @@ import {
 	CheckSimpleValidation,
 	SimpleValidationConfig,
 	CreateSimpleValidation,
-	CreateOneOf
+	CreateOneOf,
+	SimpleValidationsConfiguration
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
@@ -47,6 +48,7 @@ import BooleanConfigComponent from './booleanconfigcomponent';
 import NumberConfigComponent from './numberconfigcomponent';
 import OneOfEnumerationComponent from './oneofenumeration';
 import SimpleValidationComponent from './simplevalidationconfig';
+import GraphComponent from './graphcomponent';
 
 export default class SimpleValidationsComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -72,11 +74,13 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 		let {
 			methodDescription,
 			simpleValidations,
+			simpleValidationConfiguration,
 			properties,
 			targetProperties
 		}: {
 			methodDescription: MethodDescription;
 			simpleValidations: SimpleValidationConfig[];
+			simpleValidationConfiguration: SimpleValidationsConfiguration;
 			properties: any[];
 			targetProperties: any[];
 		} = this.setupInstanceInfo(dataChainOptions);
@@ -98,6 +102,51 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 				greyed={!simpleValidations.some((v) => v.enabled)}
 				title={Titles.SimpleValidation}
 			>
+				<TreeViewItemContainer>
+					<CheckBox
+						title={Titles.EnableComposition}
+						label={Titles.EnableComposition}
+						value={simpleValidationConfiguration.enabled}
+						onChange={(val: boolean) => {
+							simpleValidationConfiguration.enabled = val;
+							this.setState({
+								turn: UIA.GUID()
+							});
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
+						}}
+					/>
+				</TreeViewItemContainer>
+				<TreeViewMenu
+					open={this.state.graph}
+					icon={'fa  fa-bar-chart'}
+					onClick={() => {
+						this.setState({ graph: !this.state.graph });
+						if (this.props.onContext) {
+							this.props.onContext({
+								largePlease: !this.state.graph
+							});
+						}
+					}}
+					active
+					greyed={!simpleValidations.some((v) => v.enabled)}
+					title={Titles.SimpleValidation}
+				>
+					<GraphComponent
+						onNodeClick={(nodeId, boundingBox) => {
+							this.setState({ selectedNodes: [ nodeId ] });
+						}}
+						onLinkClick={(linkId, boundingBox) => {
+							this.setState({ selectedLinks: [ linkId ] });
+						}}
+						selectedColor={UIA.Colors.SelectedNode}
+						markedColor={UIA.Colors.MarkedNode}
+						selectedLinks={this.state.selectedLinks || []}
+						selectedNodes={this.state.selectedNodes || []}
+						graph={simpleValidationConfiguration.composition.graph}
+					/>
+				</TreeViewMenu>
 				<TreeViewButtonGroup>
 					<TreeViewGroupButton
 						title={`${Titles.Add}`}
