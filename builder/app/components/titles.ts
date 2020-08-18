@@ -41,6 +41,7 @@ export const Dashboard = 'Dashboard';
 export const Management = 'Management';
 export const JobPath = 'Job Path';
 export const PricePerConnection = 'Connection cost';
+export const FilterModelItem = 'Filter Model Item';
 export const JobsFilePath = 'Jobs File Path';
 export const Host = 'Host';
 export const AddMountFunction = 'Add Mount Function';

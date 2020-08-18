@@ -55,22 +55,22 @@ export default function SetupViewTypeForCreate(args: any = {}) {
 			id: component.id,
 			link: LinkType.ListItem,
 			componentType: NodeTypes.ComponentNode
-		}).forEach((listItem: { id: any; }) => {
+		}).forEach((listItem: { id: any }) => {
 			GetNodesLinkedTo(null, {
 				id: listItem.id,
 				link: LinkType.Component,
 				componentType: NodeTypes.ComponentNode
-			}).forEach((subcomponent: { id: any; }) => {
+			}).forEach((subcomponent: { id: any }) => {
 				GetNodesLinkedTo(null, {
 					id: subcomponent.id,
 					link: LinkType.ComponentExternalApi,
 					componentType: NodeTypes.ComponentExternalApi
-				}).forEach((externalApi: { id: any; }) => {
+				}).forEach((externalApi: { id: any }) => {
 					GetNodesLinkedTo(null, {
 						id: externalApi.id,
 						link: LinkType.ComponentExternalConnection,
 						componentType: NodeTypes.ComponentApi
-					}).forEach((externalConnection: { id: any; }) => {
+					}).forEach((externalConnection: { id: any }) => {
 						const link = GetLinkBetween(externalApi.id, externalConnection.id, graph);
 						if (link) {
 							result.push({
@@ -112,7 +112,7 @@ export default function SetupViewTypeForCreate(args: any = {}) {
 		(v: any) => GetNodeProp(v, NodeProperties.ValueName) === ComponentApiKeys.ViewModel
 	);
 	result.push(
-		...externalNodes.map((externalNode: { id: any; }) => {
+		...externalNodes.map((externalNode: { id: any }) => {
 			const link = GetLinkBetween(node, externalNode.id, graph);
 			if (link) {
 				return {
@@ -132,7 +132,7 @@ export default function SetupViewTypeForCreate(args: any = {}) {
 			model: `${GetNodeTitle(node)} ${GetNodeTitle(property)}`,
 			modelId: model.id,
 			viewPackages,
-			callback: (modelKeyContext: { entry: any; }) => {
+			callback: (modelKeyContext: { entry: any }) => {
 				modelKeyDC = modelKeyContext.entry;
 			}
 		}),
@@ -160,7 +160,7 @@ export default function SetupViewTypeForCreate(args: any = {}) {
 			viewPackages,
 			propertyName: `${GetNodeTitle(node)}${GetNodeTitle(property.id)}`,
 			modelName: GetNodeTitle(propertyModel),
-			callback: (context: { entry: any; }) => {
+			callback: (context: { entry: any }) => {
 				temp = context.entry;
 			}
 		}),
@@ -267,6 +267,19 @@ export function GetViewTypeModelType(node: any) {
 			link: LinkType.PropertyLink,
 			componentType: NodeTypes.Model
 		});
+	}
+	if (!modelType) {
+		console.log(
+			JSON.stringify(
+				{
+					model,
+					property,
+					modelType
+				},
+				null,
+				4
+			)
+		);
 	}
 	return {
 		model,

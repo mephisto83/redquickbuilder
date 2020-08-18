@@ -87,6 +87,7 @@ export interface MountingDescription {
 	validations: ValidationConfig[];
 	permissions: PermissionConfig[];
 	filters: FilterConfig[];
+	filterItem: { [str: string]: FilterConfig };
 	executions: ExecutionConfig[];
 	excludeFromController: boolean;
 }
@@ -114,6 +115,15 @@ export interface DataChainConfiguration {
 export interface RouteConfig extends ConfigItem {
 	targetId: string;
 	pushChange: boolean;
+}
+export function CreateFilterConfig(): FilterConfig {
+	return {
+		enabled: true,
+		dataChain: '',
+		dataChainOptions: {},
+		id: GUID(),
+		name: ''
+	};
 }
 export function CreateRouteConfig(): RouteConfig {
 	return {
@@ -702,6 +712,7 @@ export interface ValidationConfig {
 	id: string;
 	name: string;
 	dataChain: string;
+	enabled: boolean;
 	dataChainOptions: DataChainConfiguration;
 }
 

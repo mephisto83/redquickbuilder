@@ -35,7 +35,7 @@ export default class ValidationComponentItem extends Component<any, any> {
 					this.setState({ open: !this.state.open });
 				}}
 				active
-				title={validationConfig.name || this.props.title || Titles.Validation}
+				title={this.props.otitle || validationConfig.name || this.props.title || Titles.Validation}
 			>
 				<TreeViewItemContainer>
 					<TextInput
@@ -59,6 +59,7 @@ export default class ValidationComponentItem extends Component<any, any> {
 						value={validationConfig.dataChain}
 						onChange={(value: string) => {
 							validationConfig.dataChain = value;
+							validationConfig.name = UIA.GetNodeTitle(value);
 							this.setState({
 								turn: UIA.GUID()
 							});
@@ -70,8 +71,8 @@ export default class ValidationComponentItem extends Component<any, any> {
 				</TreeViewItemContainer>
 				{validationConfig && validationConfig.dataChain ? (
 					<DataChainOptions
-            methods={this.props.methods}
-            onContext={this.props.onContext}
+						methods={this.props.methods}
+						onContext={this.props.onContext}
 						methodDescription={this.props.methodDescription}
 						currentDescription={mountingItem}
 						dataChainType={this.props.dataChainType || DataChainType.Validation}
@@ -107,7 +108,7 @@ export default class ValidationComponentItem extends Component<any, any> {
 												type: this.props.dataChainType || DataChainType.Validation,
 												afterEffectOptions: validationConfig.dataChainOptions,
 												methods: this.props.methods,
-                        routes: this.props.routes
+												routes: this.props.routes
 											},
 											(dataChain: Node) => {
 												validationConfig.dataChain = dataChain.id;
