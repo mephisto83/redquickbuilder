@@ -135,6 +135,7 @@ export default class RelativeTypeComponent extends Component<any, any> {
 									relations.agentProperty = value;
 									break;
 								case RelationType.Model:
+								case RelationType.ModelOuput:
 									relations.modelProperty = value;
 									break;
 							}

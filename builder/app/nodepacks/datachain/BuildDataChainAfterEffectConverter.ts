@@ -627,7 +627,11 @@ function GenerateSimpleValidations(
 	} else if (simpleValidationConfiguration && simpleValidationConfiguration.enabled) {
 		let { graph } = simpleValidationConfiguration.composition;
 		let res = ProductIfStatementComposition(graph, checks);
-		return `return ${res};`;
+    return `let result = ${res};
+      if(!result) {
+        return false;
+      }
+    `;
 	}
 	return '';
 }
