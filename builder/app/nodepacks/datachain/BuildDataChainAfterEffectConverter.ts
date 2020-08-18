@@ -398,6 +398,8 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
     {
         Func<#{{"key":"model_output"}}#, bool> func = (#{{"key":"model_output"}}# model) => {
             {{simplevalidation}}
+
+            return true;
         };
 
         return func;
