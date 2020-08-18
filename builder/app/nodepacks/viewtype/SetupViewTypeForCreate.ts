@@ -6,7 +6,8 @@ import {
 	ADD_LINK_BETWEEN_NODES,
 	ComponentApiKeys,
 	GetNodeByProperties,
-	UPDATE_LINK_PROPERTY
+	UPDATE_LINK_PROPERTY,
+  GetNodeById
 } from '../../actions/uiactions';
 import {
 	LinkType,
@@ -274,7 +275,8 @@ export function GetViewTypeModelType(node: any) {
 				{
 					model,
 					property,
-					modelType
+          modelType,
+          node: GetNodeById(node)
 				},
 				null,
 				4
