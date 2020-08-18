@@ -1677,21 +1677,22 @@ export function NodesByType(graph: any, nodeType: any, options: any = {}) {
 		if (!Array.isArray(nodeType)) {
 			nodeType = [ nodeType ];
 		}
-		if (AppCache && AppCache.Nodes) {
-			const temp: any = [];
-			nodeType.forEach((nt: any) => {
-				if (AppCache && AppCache.Nodes && AppCache.Nodes[nt]) {
-					temp.push(...Object.keys(AppCache.Nodes[nt]));
-				}
-			});
-			const res: any = [];
-			temp.forEach((x: any) => {
-				if (currentGraph.nodeLib[x]) {
-					res.push(currentGraph.nodeLib[x]);
-				}
-			});
-			return res;
-		}
+		if (!options || !options.skipCache)
+			if (AppCache && AppCache.Nodes) {
+				const temp: any = [];
+				nodeType.forEach((nt: any) => {
+					if (AppCache && AppCache.Nodes && AppCache.Nodes[nt]) {
+						temp.push(...Object.keys(AppCache.Nodes[nt]));
+					}
+				});
+				const res: any = [];
+				temp.forEach((x: any) => {
+					if (currentGraph.nodeLib[x]) {
+						res.push(currentGraph.nodeLib[x]);
+					}
+				});
+				return res;
+			}
 
 		return currentGraph.nodes
 			.filter(

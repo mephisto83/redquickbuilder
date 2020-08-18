@@ -29,7 +29,7 @@ import {
 	CreateSimpleValidation,
 	CreateOneOf,
 	CreateBoolean,
-  GetSimpleValidationId
+	GetSimpleValidationId
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
@@ -63,6 +63,7 @@ export default class SimpleValidationComponent extends Component<any, any> {
 		switch (this.props.dataChainType) {
 			case DataChainType.Validation:
 			case DataChainType.Permission:
+			case DataChainType.Filter:
 				isValidation = true;
 				ok = true;
 				break;

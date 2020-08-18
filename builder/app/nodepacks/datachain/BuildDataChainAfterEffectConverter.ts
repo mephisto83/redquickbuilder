@@ -30,7 +30,9 @@ import {
 	GetNodeById,
 	GetCodeName,
 	GetNodeTitle,
-	GetPropertyModel
+	GetPropertyModel,
+	GetNodeByProperties,
+	ensureRouteSource
 } from '../../actions/uiactions';
 import {
 	NodeProperties,
@@ -40,12 +42,20 @@ import {
 	ProgrammingLanguages
 } from '../../constants/nodetypes';
 import { DataChainFunctionKeys } from '../../constants/datachain';
-import { codeTypeWord, GetNodeProp } from '../../methods/graph_methods';
+import {
+	codeTypeWord,
+	GetNodeProp,
+	getNodesLinkedTo,
+	GetNodesLinkedTo,
+	SOURCE,
+	NodesByType
+} from '../../methods/graph_methods';
 import { ReferenceInsertType } from '../../components/lambda/BuildLambda';
 import { code } from '../../components/editor.main.css';
-import { SimpleValidation } from '../../components/titles';
+import { SimpleValidation, NodeType } from '../../components/titles';
 import SimpleValidationComponent from '../../components/simplevalidationconfig';
 import { equal } from 'assert';
+import { Node, Graph } from '../../methods/graph_types';
 
 export interface AfterEffectConvertArgs {
 	from: MethodDescription;
@@ -64,6 +74,7 @@ export interface AfterEffectConvertArgs {
 }
 export enum DataChainType {
 	Validation = 'Validation',
+	Filter = 'Filter',
 	Permission = 'Permission',
 	Execution = 'Execution',
 	AfterEffect = 'AfterEffect'
@@ -100,6 +111,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 	let tempLambdaInsertArgumentValues: any = {};
 	tempLambdaInsertArgumentValues.model = { model: from.properties.model };
 	tempLambdaInsertArgumentValues.agent = { model: from.properties.agent };
+	tempLambdaInsertArgumentValues.model_output = { model: from.properties.model_output || from.properties.model };
 	if (from.properties.model) arbiterModels.push(from.properties.model);
 	if (from.properties.agent) arbiterModels.push(from.properties.agent);
 	if (dataChainConfigOptions) {
@@ -367,15 +379,28 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		case DataChainType.Execution:
 			can_complete = true;
 			from_parameter_template = `
-    public static async Task<${outputType ||
-		'bool'}> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change)
+      public static async Task<${outputType ||
+			'bool'}> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change)
+      {
+          Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task<${outputType ||
+				'bool'}>> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# model, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
+              {{copy_config}}
+          };
+
+          return await func(model, agent, change);
+      }
+  `;
+			break;
+		case DataChainType.Filter:
+			can_complete = true;
+			from_parameter_template = `
+    public static async Task<#{{"key":"model"}}#, bool> Filter(#{{"key":"agent"}}# agent, #{{"key":"model"}}# model)
     {
-        Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task<${outputType ||
-			'bool'}>> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# model, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
-            {{copy_config}}
+        Func<#{{"key":"model_output"}}#, bool> func = (#{{"key":"model_output"}}# model) => {
+            {{simplevalidation}}
         };
 
-        return await func(model, agent, change);
+        return func;
     }
 `;
 			break;
@@ -505,75 +530,77 @@ function GenerateSimpleValidations(
 	let result: string = '';
 	let valuePropString = '';
 
-	let { simpleValidations } = dataChainConfigOptions;
-	let checks: string[] = [];
+	let { simpleValidations, simpleValidationConfiguration } = dataChainConfigOptions;
+	let checks: { template: string; id: string }[] = [];
 	if (simpleValidations) {
 		simpleValidations.forEach((simpleValidation) => {
 			let { relationType } = simpleValidation;
-			let temp = '';
-			switch (relationType) {
-				case RelationType.Agent:
-					temp = 'agent';
-					valuePropString = `agent.#{{"key":"agent.${GetCodeName(
-						simpleValidation.agentProperty
-					)}","type":"property","model":"agent"}}#`;
-					tempLambdaInsertArgumentValues[`agent.${GetCodeName(simpleValidation.agentProperty)}`] = {
-						property: simpleValidation.agentProperty
-					};
-					break;
-				case RelationType.Model:
-					temp = 'model';
-					tempLambdaInsertArgumentValues[`model.${GetCodeName(simpleValidation.modelProperty)}`] = {
-						property: simpleValidation.modelProperty
-					};
-					valuePropString = `model.#{{"key":"model.${GetCodeName(
-						simpleValidation.modelProperty
-					)}","type":"property","model":"model"}}#`;
-					break;
-			}
+			// let temp = '';
+			// switch (relationType) {
+			// 	case RelationType.Agent:
+			// 		temp = 'agent';
+			// 		valuePropString = `agent.#{{"key":"agent.${GetCodeName(
+			// 			simpleValidation.agentProperty
+			// 		)}","type":"property","model":"agent"}}#`;
+			// 		tempLambdaInsertArgumentValues[`agent.${GetCodeName(simpleValidation.agentProperty)}`] = {
+			// 			property: simpleValidation.agentProperty
+			// 		};
+			// 		break;
+			// 	case RelationType.Model:
+			// 		temp = 'model';
+			// 		tempLambdaInsertArgumentValues[`model.${GetCodeName(simpleValidation.modelProperty)}`] = {
+			// 			property: simpleValidation.modelProperty
+			// 		};
+			// 		valuePropString = `model.#{{"key":"model.${GetCodeName(
+			// 			simpleValidation.modelProperty
+			// 		)}","type":"property","model":"model"}}#`;
+			// 		break;
+			// }
+			SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, relationType, simpleValidation);
+			valuePropString = GetRelationTypeValuePropString(relationType, simpleValidation);
 			if (simpleValidation.areEqual && simpleValidation.areEqual.enabled) {
 				let equality = GenerateEqualityComparer(
 					simpleValidation,
 					simpleValidation.areEqual,
 					tempLambdaInsertArgumentValues
 				);
-				checks.push(equality);
+				checks.push({ template: equality, id: simpleValidation.id });
 			}
 			if (simpleValidation.oneOf && simpleValidation.oneOf.enabled) {
 				let oneOf = GenerateOneOf(valuePropString, simpleValidation.oneOf, tempLambdaInsertArgumentValues);
-				checks.push(oneOf);
+				checks.push({ template: oneOf, id: simpleValidation.id });
 			}
 			if (simpleValidation.isFalse && simpleValidation.isFalse.enabled) {
-				checks.push(`!${valuePropString}`);
+				checks.push({ template: `!${valuePropString}`, id: simpleValidation.id });
 			}
 			if (simpleValidation.isTrue && simpleValidation.isTrue.enabled) {
-				checks.push(`${valuePropString}`);
+				checks.push({ template: `${valuePropString}`, id: simpleValidation.id });
 			}
 			if (simpleValidation.alphaOnlyWithSpaces && simpleValidation.alphaOnlyWithSpaces.enabled) {
-				let oneOf = `await new AlphaOnlyWithSpacesAttribute().IsOk(${valuePropString});`;
-				checks.push(oneOf);
+				let oneOf = `await new AlphaOnlyWithSpacesAttribute().IsOk(${valuePropString})`;
+				checks.push({ template: oneOf, id: simpleValidation.id });
 			}
 			if (simpleValidation.isNotNull && simpleValidation.isNotNull.enabled) {
-				let oneOf = `await new IsNotNullAttribute().IsOk(${valuePropString});`;
-				checks.push(oneOf);
+				let oneOf = `await new IsNotNullAttribute().IsOk(${valuePropString})`;
+				checks.push({ template: oneOf, id: simpleValidation.id });
 			}
 			if (simpleValidation.isNull && simpleValidation.isNull.enabled) {
-				let oneOf = `await new IsNullAttribute().IsOk(${valuePropString});`;
-				checks.push(oneOf);
+				let oneOf = `await new IsNullAttribute().IsOk(${valuePropString})`;
+				checks.push({ template: oneOf, id: simpleValidation.id });
 			}
 			if (simpleValidation.maxLength && simpleValidation.maxLength.enabled) {
 				let oneOf = `await new MaxLengthAttribute(${simpleValidation.maxLength.value},${simpleValidation
 					.maxLength.equal
 					? 'true'
-					: 'false'}).IsOk(${valuePropString});`;
-				checks.push(oneOf);
+					: 'false'}).IsOk(${valuePropString})`;
+				checks.push({ template: oneOf, id: simpleValidation.id });
 			}
 			if (simpleValidation.minLength && simpleValidation.minLength.enabled) {
 				let oneOf = `await new MinLengthAttribute(${simpleValidation.minLength.value},${simpleValidation
 					.maxLength.equal
 					? 'true'
-					: 'false'}).IsOk(${valuePropString});`;
-				checks.push(oneOf);
+					: 'false'}).IsOk(${valuePropString})`;
+				checks.push({ template: oneOf, id: simpleValidation.id });
 			}
 			// if (simpleValidation.) {
 			// 	let oneOf = `await new MinLengthAttribute(${simpleValidation.minLength.value}).IsOk(${valuePropString});`;
@@ -581,20 +608,84 @@ function GenerateSimpleValidations(
 			// }
 		});
 	}
-	result = checks
-		.map((check: string, index: number) => {
-			if (!index) return `var test_${index} = ${check};`;
-			return `var test_${index} = test_${index - 1} && ${check};`;
-		})
-		.join(NEW_LINE);
+	if (!(simpleValidationConfiguration && simpleValidationConfiguration.enabled)) {
+		result = checks
+			.map((check: { template: string; id: string }, index: number) => {
+				if (!index) return `var test_${index} = ${check.template};`;
+				return `var test_${index} = test_${index - 1} && ${check.template};`;
+			})
+			.join(NEW_LINE);
 
-	if (checks.length)
-		return `${result}
+		if (checks.length)
+			return `${result}
     if(!test_${checks.length - 1}) {
       return false;
     }
   `;
+	} else if (simpleValidationConfiguration && simpleValidationConfiguration.enabled) {
+		let { graph } = simpleValidationConfiguration.composition;
+		let res = ProductIfStatementComposition(graph, checks);
+		return `return ${res};`;
+	}
 	return '';
+}
+
+function ProductIfStatementComposition(graph: Graph, checks: { template: string; id: string }[]) {
+	let root = NodesByType(graph, NodeTypes.RootNode, { skipCache: true }).find((v: Node) =>
+		GetNodeProp(v, NodeProperties.IsRoot)
+	);
+	if (!root) {
+		return 'return false; /* missing composition */';
+	}
+	return produceIfStatementComposition(root, graph, checks, []);
+}
+function produceIfStatementComposition(
+	root: Node,
+	graph: Graph,
+	checks: { template: string; id: string }[],
+	visitedNodes: string[]
+): string {
+	let clause = '';
+	let operation =
+		GetNodeProp(root, NodeProperties.IsRoot) || GetNodeProp(root, NodeProperties.NODEType) === NodeTypes.ANDNode
+			? '&&'
+			: '||';
+	let children: Node[] = GetNodesLinkedTo(graph, {
+		direction: SOURCE,
+		id: root.id
+	});
+	let unvisitedChildren = children.filter((node: Node) => visitedNodes.indexOf(node.id) === -1);
+	if (unvisitedChildren.length === children.length) {
+		let statements = unvisitedChildren.map((child: Node) => {
+			let nodeType: string = GetNodeProp(child, NodeProperties.NODEType);
+			switch (nodeType) {
+				case NodeTypes.ANDNode:
+				case NodeTypes.ORNode:
+					let orstatement = produceIfStatementComposition(
+						child,
+						graph,
+						checks,
+						[ ...visitedNodes, ...unvisitedChildren.map((v) => v.id) ].unique()
+					);
+					return `(${orstatement})`;
+				case NodeTypes.LeafNode:
+					let check = checks.find((v) => {
+						return v.id === GetNodeProp(child, NodeProperties.ValidationConfigurationItem);
+					});
+					if (check) {
+						return `(${check.template})`;
+					} else {
+						throw new Error('missing validation check');
+					}
+					break;
+			}
+			throw new Error('composition: unhandled node type: ' + nodeType);
+		});
+		return statements.join(` ${operation} `);
+	} else {
+		throw new Error('circular relation');
+	}
+	return clause;
 }
 function GenerateEqualityComparer(
 	simpleValidation: SimpleValidationConfig,
@@ -604,7 +695,7 @@ function GenerateEqualityComparer(
 ) {
 	let { relationType } = simpleValidation;
 	let valuePropString = GetRelationTypeValuePropString(relationType, simpleValidation);
-	let equalityTo = GetRelationTypeValuePropString(relationType, areEqual);
+	let equalityTo = GetRelationTypeValuePropString(areEqual.relationType, areEqual);
 	SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, relationType, simpleValidation);
 	SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, areEqual.relationType, areEqual);
 
@@ -627,6 +718,11 @@ function SetLambdaInsertArgumentValues(
 				property: simpleValidation.modelProperty
 			};
 			break;
+		case RelationType.ModelOuput:
+			tempLambdaInsertArgumentValues[`model_output.${GetCodeName(simpleValidation.modelProperty)}`] = {
+				property: simpleValidation.modelProperty
+			};
+			break;
 	}
 }
 function GetRelationTypeValuePropString(relationType: RelationType, simpleValidation: HalfRelation): string {
@@ -641,6 +737,11 @@ function GetRelationTypeValuePropString(relationType: RelationType, simpleValida
 			valuePropString = `model.#{{"key":"model.${GetCodeName(
 				simpleValidation.modelProperty
 			)}","type":"property","model":"model"}}#`;
+			break;
+		case RelationType.ModelOuput:
+			valuePropString = `model_output.#{{"key":"model_output.${GetCodeName(
+				simpleValidation.modelProperty
+			)}","type":"property","model":"model_output"}}#`;
 			break;
 	}
 	return valuePropString;

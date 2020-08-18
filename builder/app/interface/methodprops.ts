@@ -86,6 +86,7 @@ export interface MountingDescription {
 	autoSetup: AutoSetupConfiguration;
 	validations: ValidationConfig[];
 	permissions: PermissionConfig[];
+	filters: FilterConfig[];
 	executions: ExecutionConfig[];
 	excludeFromController: boolean;
 }
@@ -319,9 +320,7 @@ export function AddLinkBetweenCompositionNodes(graph: Graph, from: string, to: s
 	return graph;
 }
 export function RemoveLinkFromComposition(graph: Graph, linkId: string): Graph {
-	graph = removeLink(graph, {
-		id: linkId
-	});
+	graph = removeLink(graph, linkId);
 
 	return graph;
 }
@@ -377,7 +376,7 @@ export function AddNewSimpleValidationConfigToGraph(graph: Graph, validationId: 
 				[NodeProperties.IsRoot]: false,
 				[NodeProperties.IsCompositionLeaf]: false,
 				[NodeProperties.ValidationConfigurationItem]: validationId,
-				[NodeProperties.UIText]: name,
+				[NodeProperties.UIText]: name
 			}
 		},
 		NodeTypes.LeafNode
@@ -631,7 +630,8 @@ export interface GetExistingConfig extends AfterEffectRelations {}
  */
 export enum RelationType {
 	Agent = 'Agent',
-	Model = 'Model'
+	Model = 'Model',
+	ModelOuput = 'ModelOutput'
 }
 export interface ReturnSettingConfig extends ConfigItem {
 	setting: ReturnSetting;
@@ -697,7 +697,7 @@ export interface AfterEffect {
 
 export interface PermissionConfig extends ValidationConfig {}
 export interface ExecutionConfig extends ValidationConfig {}
-
+export interface FilterConfig extends ValidationConfig {}
 export interface ValidationConfig {
 	id: string;
 	name: string;

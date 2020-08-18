@@ -71,6 +71,7 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 		let isValidation = false;
 		switch (this.props.dataChainType) {
 			case DataChainType.Validation:
+			case DataChainType.Filter:
 			case DataChainType.Permission:
 				isValidation = true;
 				ok = true;
@@ -265,10 +266,10 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 							<TreeViewGroupButton
 								title={`${Titles.Remove} Link`}
 								onClick={() => {
-									if (this.state.selectedLink) {
+									if (this.state.selectedLink && this.state.selectedLink.id) {
 										simpleValidationConfiguration.composition.graph = RemoveLinkFromComposition(
 											simpleValidationConfiguration.composition.graph,
-											this.state.selectedLink
+											this.state.selectedLink.id
 										);
 										this.setState({ linkNext: false, turn: UIA.GUID() });
 									}
@@ -279,7 +280,8 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 					</TreeViewButtonGroup>
 					<TreeViewItemContainer>
 						<GraphComponent
-							linkDistance={100}
+							linkDistance={150}
+							minHeight={500}
 							onNodeClick={(nodeId: string, boundingBox: any) => {
 								let currentSelected = this.state.selectedNode ? this.state.selectedNode : null;
 								if (this.state.linkNext && currentSelected) {
@@ -295,7 +297,7 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 									this.setState({ selectedNode: nodeId });
 								}
 							}}
-							onLinkClick={(linkId: string, boundingBox: any) => {
+							onLinkClick={(linkId: any, boundingBox: any) => {
 								this.setState({ selectedLink: this.state.selectedLink === linkId ? null : linkId });
 							}}
 							selectedColor={UIA.Colors.SelectedNode}

@@ -56,6 +56,7 @@ export default class RelativeTypeComponent extends Component<any, any> {
 		switch (this.props.dataChainType) {
 			case DataChainType.Permission:
 			case DataChainType.Validation:
+			case DataChainType.Filter:
 			case DataChainType.Execution:
 				isValidation = true;
 				ok = true;
