@@ -42,6 +42,9 @@ table tbody tr th:first-child {
 	top: 36px;
 	z-index: 1000;
 }
+.tableFixHead.dashboard thead tr:last-child th {
+	top: 0px;
+}
 table.fixheader {
 	border-collapse: collapse;
 	width: 100%;

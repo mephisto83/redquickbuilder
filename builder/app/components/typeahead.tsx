@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import TextInput from './textinput';
+import { GetNodeById, GetNodeTitle } from '../actions/uiactions';
 
 export default class Typeahead extends Component<any, any> {
 	constructor(props: any) {
@@ -29,7 +30,12 @@ export default class Typeahead extends Component<any, any> {
 	disabled() {
 		return this.props.disabled ? 'disabled' : '';
 	}
-
+	nodeSelect(t: string) {
+		if (this.props.nodeSelect) {
+			return this.props.nodeSelect(t);
+		}
+		return t;
+	}
 	componentDidMount() {
 		if (!this.immediate()) {
 			this.setState({ value: this.props.value });
@@ -46,10 +52,30 @@ export default class Typeahead extends Component<any, any> {
 	}
 
 	render() {
+		let options = this.props.options
+			? this.props.options
+					.filter((v: any) => this.value() && (this.state.focus || this.state.hovering))
+					.filter((v: any) => {
+						const res =
+							`${v.title}  ${v.value}`.toLowerCase().indexOf(`${this.value()}`.toLowerCase()) !== -1;
+						return res;
+					})
+			: [];
 		return (
-			<div className={'typeahead'}>
+			<div
+				className={`typeahead  ${options.length && this.state.focus ? 'open' : ''}`}
+				style={{
+					['--container-height']: `${Math.max(5, Math.min(10, options.length ? options.length : 0)) * 30}px`
+				}}
+				onMouseOut={() => {
+					this.setState({ hovering: false });
+				}}
+				onMouseOver={() => {
+					if (this.state.focus) this.setState({ hovering: true });
+				}}
+			>
 				<TextInput
-					value={this.state.value}
+					value={this.nodeSelect(this.state.value)}
 					label={this.label()}
 					placeholder={this.placeholder()}
 					disabled={this.disabled()}
@@ -58,12 +84,15 @@ export default class Typeahead extends Component<any, any> {
 						this.setState({ focus: true });
 					}}
 					onBlur={() => {
-						this.setState({ focus: false });
-						if (!this.immediate()) {
-							if (this.props.onChange) {
-								if (this.state.value !== this.props.value) this.props.onChange(this.state.value || '');
+						setTimeout(() => {
+							this.setState({ focus: false });
+							if (this.immediate()) {
+								if (this.props.onChange) {
+									if (this.state.value !== this.props.value)
+										this.props.onChange(this.state.value || '');
+								}
 							}
-						}
+						}, 100);
 					}}
 					onChange={(value) => {
 						if (this.immediate()) {
@@ -83,47 +112,34 @@ export default class Typeahead extends Component<any, any> {
 						this.setState({ value });
 					}}
 				/>
-				{this.props.options && this.props.options.length ? (
-					<div
-						className={'typeaheadContainer'}
-						onMouseOut={() => {
-							this.setState({ hovering: false });
-						}}
-						onMouseOver={() => {
-							this.setState({ hovering: true });
-						}}
-					>
-						{this.props.options
-							.filter((v) => this.value() && (this.state.focus || this.state.hovering))
-							.filter((v) => {
-								const res = `${v.title}`.toLowerCase().indexOf(`${this.value()}`.toLowerCase()) !== -1;
-								return res;
-							})
-							.map((option, index) => {
-								let ops = (
-									<div
-										title={option.title}
-										key={`allowed-${index}`}
-										className="external-event"
-										style={{
-											cursor: 'pointer',
-											overflow: 'hidden',
-											whiteSpace: 'nowrap',
-											textOverflow: 'ellipsis'
-										}}
-										onClick={() => {
-											if (this.props.onChange) {
-												this.props.onChange(option.value);
-												this.setState({ value: option.value });
-											}
-										}}
-									>
-										{this.props.renderItem ? this.props.renderItem(option) : option.title}
-									</div>
-								);
+				{options && options.length ? (
+					<div className={`typeaheadContainer`}>
+						{options.map((option: { title: string; value: any }, index: number) => {
+							let ops = (
+								<div
+									title={option.title}
+									key={`allowed-${index}`}
+									className="external-event"
+									style={{
+										cursor: 'pointer',
+										overflow: 'hidden',
+										whiteSpace: 'nowrap',
+										textOverflow: 'ellipsis',
+										color: 'black'
+									}}
+									onMouseDown={() => {
+										if (this.props.onChange) {
+											this.props.onChange(option.value);
+											this.setState({ value: option.value, focus: false, hovering: false });
+										}
+									}}
+								>
+									{this.props.renderItem ? this.props.renderItem(option) : option.title}
+								</div>
+							);
 
-								return ops;
-							})}
+							return ops;
+						})}
 					</div>
 				) : null}
 			</div>

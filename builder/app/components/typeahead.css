@@ -4,10 +4,13 @@
 .typeaheadContainer {
 	position: absolute;
 	z-index: 10;
-	max-height: 150px;
+	max-height: 350px;
 	overflow: hidden;
   overflow-y: auto;
   top: 60px;
   width: 100%;
   background-color: #ffffff;
+}
+.typeahead.open {
+  height: var(--container-height);
 }

@@ -7,7 +7,7 @@ import TextInput from './textinput';
 import TreeViewMenu from './treeviewmenu';
 import { MountingDescription, ValidationConfig } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
-import { NodeTypes } from '../constants/nodetypes';
+import { NodeTypes, NodeProperties } from '../constants/nodetypes';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import { Node } from '../methods/graph_types';
@@ -15,6 +15,8 @@ import BuildDataChainAfterEffectConverter, {
 	DataChainType
 } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import DataChainOptions from './datachainoptions';
+import { GetNodeProp } from '../methods/graph_methods';
+import Typeahead from './typeahead';
 
 export default class ValidationComponentItem extends Component<any, any> {
 	constructor(props: any) {
@@ -26,6 +28,7 @@ export default class ValidationComponentItem extends Component<any, any> {
 		if (!validationConfig) {
 			return <span />;
 		}
+		let originalConfig = GetNodeProp(validationConfig.dataChain, NodeProperties.OriginalConfig);
 		let mountingItem: MountingDescription = this.props.mountingItem;
 		return (
 			<TreeViewMenu
@@ -53,7 +56,7 @@ export default class ValidationComponentItem extends Component<any, any> {
 					/>
 				</TreeViewItemContainer>
 				<TreeViewItemContainer>
-					<SelectInput
+					{/* <SelectInput
 						label={Titles.DataChain}
 						options={UIA.NodesByType(null, NodeTypes.DataChain).toNodeSelect()}
 						value={validationConfig.dataChain}
@@ -65,6 +68,31 @@ export default class ValidationComponentItem extends Component<any, any> {
 							});
 							if (this.props.onChange) {
 								this.props.onChange();
+							}
+						}}
+					/> */}
+					<Typeahead
+						label={Titles.DataChain}
+						nodeSelect={(v: string) => {
+							let node: Node = UIA.GetNodeById(v);
+							if (node) {
+								return UIA.GetNodeTitle(node);
+							}
+							return v;
+						}}
+						options={UIA.NodesByType(null, NodeTypes.DataChain).toNodeSelect()}
+						value={validationConfig.dataChain}
+						onChange={(value: string) => {
+							if (UIA.GetNodeById(value)) {
+								validationConfig.dataChain = value;
+								validationConfig.name = UIA.GetNodeTitle(value);
+
+								this.setState({
+									turn: UIA.GUID()
+								});
+								if (this.props.onChange) {
+									this.props.onChange();
+								}
 							}
 						}}
 					/>
@@ -93,36 +121,47 @@ export default class ValidationComponentItem extends Component<any, any> {
 						}}
 						icon="fa fa-minus"
 					/>
-					<TreeViewGroupButton
-						title={`Build Datachain`}
-						onClick={() => {
-							if (validationConfig) {
-								if (mountingItem) {
-									let { methodDescription } = mountingItem;
-									if (methodDescription) {
-										BuildDataChainAfterEffectConverter(
-											{
-												name: validationConfig.name,
-												from: methodDescription,
-												dataChain: validationConfig.dataChain,
-												type: this.props.dataChainType || DataChainType.Validation,
-												afterEffectOptions: validationConfig.dataChainOptions,
-												methods: this.props.methods,
-												routes: this.props.routes
-											},
-											(dataChain: Node) => {
-												validationConfig.dataChain = dataChain.id;
-												this.setState({
-													turn: UIA.GUID()
-												});
-											}
-										);
+					{originalConfig && originalConfig !== validationConfig.id ? null : (
+						<TreeViewGroupButton
+							title={`Build Datachain`}
+							onClick={() => {
+								if (validationConfig) {
+									if (mountingItem) {
+										let { methodDescription } = mountingItem;
+										if (methodDescription) {
+											BuildDataChainAfterEffectConverter(
+												{
+													name: validationConfig.name,
+													from: methodDescription,
+													dataChain: validationConfig.dataChain,
+													type: this.props.dataChainType || DataChainType.Validation,
+													afterEffectOptions: validationConfig.dataChainOptions,
+													methods: this.props.methods,
+													routes: this.props.routes
+												},
+												(dataChain: Node) => {
+													if (dataChain && UIA.GetNodeById(dataChain.id)) {
+														validationConfig.dataChain = dataChain.id;
+														if (!GetNodeProp(dataChain.id, NodeProperties.OriginalConfig)) {
+															UIA.updateComponentProperty(
+																dataChain.id,
+																NodeProperties.OriginalConfig,
+																validationConfig.id
+															);
+														}
+														this.setState({
+															turn: UIA.GUID()
+														});
+													}
+												}
+											);
+										}
 									}
 								}
-							}
-						}}
-						icon="fa fa-gears"
-					/>
+							}}
+							icon="fa fa-gears"
+						/>
+					)}
 				</TreeViewButtonGroup>
 			</TreeViewMenu>
 		);

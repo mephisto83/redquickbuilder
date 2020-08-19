@@ -478,6 +478,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				`AfterEffectChains.${codeTypeWord(afterEffectParent)}.${codeTypeWord(afterEffectChild)}`
 			);
 			updateComponentProperty(dataChain, NodeProperties.TargetProperty, target_property);
+			if (dataChain && callback) callback(GetNodeById(dataChain));
 		} else if (methodFunction) {
 			graphOperation(
 				CreateNewNode(
@@ -627,7 +628,7 @@ function GenerateSimpleValidations(
 	} else if (simpleValidationConfiguration && simpleValidationConfiguration.enabled) {
 		let { graph } = simpleValidationConfiguration.composition;
 		let res = ProductIfStatementComposition(graph, checks);
-    return `let result = ${res};
+		return `let result = ${res};
       if(!result) {
         return false;
       }

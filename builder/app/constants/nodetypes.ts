@@ -337,6 +337,7 @@ export const NodeProperties = {
 	IsFetchOutput: 'IsFetchOutput',
 	HideStyle: 'HideStyle',
 	IsFetchParameter: 'IsFetchParameter',
+	OriginalConfig: 'OriginalConfig',
 	ViewModelKey: 'ViewModelKey',
 	UserOfAgent: 'UserOfAgent',
 	StateKey: 'StateKey',

@@ -1,5 +1,5 @@
 import { Config } from 'electron';
-import { GetModelPropertyChildren, GUID } from '../actions/uiactions';
+import { GetModelPropertyChildren, GUID, setRouteSource } from '../actions/uiactions';
 import datachainactivitymenu from '../components/datachainactivitymenu';
 import SimpleValidationComponent from '../components/simplevalidationconfig';
 import { Graph } from '../methods/graph_types';
@@ -363,6 +363,7 @@ export function GetSimpleValidationId(simpleValidation: any, properties: any) {
 		simpleValidation &&
 		simpleValidation.enabled &&
 		((simpleValidation.relationType === RelationType.Agent && simpleValidation.agentProperty) ||
+			(simpleValidation.relationType === RelationType.ModelOuput && simpleValidation.modelProperty) ||
 			(simpleValidation.relationType === RelationType.Model && simpleValidation.modelProperty));
 	if (valid) {
 		switch (simpleValidation.relationType) {
@@ -374,10 +375,24 @@ export function GetSimpleValidationId(simpleValidation: any, properties: any) {
 				let prop2 = properties.find((v: any) => v.id === simpleValidation.modelProperty);
 				name = `model.${prop2.title}`;
 				break;
+			case RelationType.ModelOuput:
+				let prop3 = properties.find((v: any) => v.id === simpleValidation.modelProperty);
+				name = `model_output.${prop3.title}`;
+				break;
 		}
 	}
 	return name;
 }
+export function setDefaultRouteSource(mountingItem: MountingDescription, urlParameter: string, k: string) {
+	if (
+		!mountingItem.source &&
+		[ 'model', 'agent' ].indexOf(urlParameter) !== -1 &&
+		[ 'model', 'agent' ].indexOf(k) !== -1
+	) {
+		setRouteSource(mountingItem, urlParameter, k, RouteSourceType.UrlParameter);
+	}
+}
+
 export function AddNewSimpleValidationConfigToGraph(graph: Graph, validationId: string, name: string): Graph {
 	graph = addNewNodeOfType(
 		graph,

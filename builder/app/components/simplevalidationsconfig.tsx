@@ -135,6 +135,7 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 				</TreeViewItemContainer>
 				<TreeViewMenu
 					open={this.state.graph}
+					hide={!simpleValidationConfiguration.enabled}
 					icon={'fa  fa-bar-chart'}
 					onClick={() => {
 						this.setState({ graph: !this.state.graph });
@@ -335,6 +336,14 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 								this.setState({ turn: UIA.GUID() });
 								if (this.props.onChange) {
 									this.props.onChange();
+								}
+							}}
+							onDelete={() => {
+								if (dataChainOptions.simpleValidations) {
+									dataChainOptions.simpleValidations = dataChainOptions.simpleValidations.filter(
+										(v) => v.id !== simpleValidation.id
+									);
+                  this.setState({ turn: UIA.GUID() });
 								}
 							}}
 							dataChainType={this.props.dataChainType}

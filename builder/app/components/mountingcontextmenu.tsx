@@ -23,7 +23,8 @@ import {
 	RouteSource,
 	RouteSourceType,
 	ViewMounting,
-	MountingDescription
+	MountingDescription,
+	setDefaultRouteSource
 } from '../interface/methodprops';
 import SelectInput from './selectinput';
 import { ViewTypes } from '../constants/viewtypes';
@@ -151,6 +152,7 @@ class ContextMenu extends Component<any, any> {
 									// 		? mountingItem.source[urlParameter].model
 									// 		: null;
 									let value = UIA.ensureRouteSource(mountingItem, urlParameter);
+
 									let options = [
 										...[ urlParameter ]
 											.filter(
@@ -159,6 +161,8 @@ class ContextMenu extends Component<any, any> {
 													: () => false
 											)
 											.map((k: string) => {
+												setDefaultRouteSource(mountingItem, urlParameter, k);
+
 												return (
 													<TreeViewMenu
 														title={k}
@@ -334,6 +338,20 @@ class ContextMenu extends Component<any, any> {
 											methodDescription = methodDescription || defaultMethodDescription;
 											if (methodDescription) {
 												methodDescription.functionType = c;
+												if (
+													agent &&
+													mountingItem &&
+													model &&
+													MethodFunctions[c] &&
+													MethodFunctions[c].titleTemplate
+												) {
+													mountingItem.name =
+														mountingItem.name ||
+														`${MethodFunctions[c].titleTemplate(
+															UIA.GetNodeTitle(agent),
+															UIA.GetNodeTitle(model)
+														)} For ${viewType}`;
+												}
 											}
 											mountingItem.methodDescription = methodDescription;
 											this.setState({ turn: UIA.GUID() });

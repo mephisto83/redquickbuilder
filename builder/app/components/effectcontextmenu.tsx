@@ -26,7 +26,8 @@ import {
 	ViewMoutingProps,
 	MountingDescription,
 	Effect,
-	EffectDescription
+	EffectDescription,
+	setDefaultRouteSource
 } from '../interface/methodprops';
 import SelectInput from './selectinput';
 import { ViewTypes } from '../constants/viewtypes';
@@ -136,6 +137,7 @@ class EffectContextMenu extends Component<any, any> {
 														title={k}
 														icon={value !== k ? 'fa fa-square-o' : 'fa fa-square'}
 														onClick={() => {
+															setDefaultRouteSource(effectItem, urlParameter, k);
 															effectItem.source = effectItem.source || {};
 															effectItem.source[urlParameter] = {
 																model: k,
@@ -322,6 +324,20 @@ class EffectContextMenu extends Component<any, any> {
 											methodDescription = methodDescription || defaultMethodDescription;
 											if (methodDescription) {
 												methodDescription.functionType = c;
+												if (
+													agent &&
+													effectItem &&
+													model &&
+													MethodFunctions[c] &&
+													MethodFunctions[c].titleTemplate
+												) {
+													effectItem.name =
+														effectItem.name ||
+														`${MethodFunctions[c].titleTemplate(
+															UIA.GetNodeTitle(agent),
+															UIA.GetNodeTitle(model)
+														)} For ${viewType}`;
+												}
 											}
 											effectItem.methodDescription = methodDescription;
 											this.setState({ turn: UIA.GUID() });

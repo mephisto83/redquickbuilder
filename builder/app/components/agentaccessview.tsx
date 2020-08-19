@@ -792,7 +792,7 @@ class AgentAccessView extends Component<any, any> {
 										</div>
 									</Box>
 									<Box title={'Dashboard Access'} maxheight={500}>
-										<div className="tableFixHead" style={{ ['--tableheight']: table_height }}>
+										<div className="tableFixHead dashboard" style={{ ['--tableheight']: table_height }}>
 											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 												<thead>
 													<tr>
@@ -997,7 +997,7 @@ class AgentAccessView extends Component<any, any> {
 										</div>{' '}
 									</Box>
 									<Box maxheight={500} title={'Dashboard Mounting Methods'}>
-										<div className="tableFixHead" style={{ ['--tableheight']: table_height }}>
+										<div className="tableFixHead dashboard" style={{ ['--tableheight']: table_height }}>
 											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 												<thead>
 													<tr>
@@ -1192,7 +1192,7 @@ class AgentAccessView extends Component<any, any> {
 										</div>{' '}
 									</Box>
 									<Box maxheight={500} title={'Dashboard Effect Methods'}>
-										<div className="tableFixHead" style={{ ['--tableheight']: table_height }}>
+										<div className="tableFixHead dashboard" style={{ ['--tableheight']: table_height }}>
 											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 												<thead>
 													<tr>
@@ -1416,7 +1416,7 @@ class AgentAccessView extends Component<any, any> {
 										</div>
 									</Box>
 									<Box title={'Dashboard Routing'} maxheight={500}>
-										<div className="tableFixHead" style={{ ['--tableheight']: table_height }}>
+										<div className="tableFixHead dashboard" style={{ ['--tableheight']: table_height }}>
 											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 												<thead>
 													<tr>
@@ -1619,7 +1619,7 @@ class AgentAccessView extends Component<any, any> {
 										</div>
 									</Box>
 									<Box title={'Dashboard Screen Effects'} maxheight={500}>
-										<div className="tableFixHead" style={{ ['--tableheight']: table_height }}>
+										<div className="tableFixHead dashboard" style={{ ['--tableheight']: table_height }}>
 											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 												<thead>
 													<tr>

@@ -111,6 +111,7 @@ export default class SimpleValidationComponent extends Component<any, any> {
 					/>
 				</TreeViewItemContainer>
 				<TreeViewItem
+					hide={!simpleValidation.enabled}
 					icon={'fa fa-plus-square'}
 					title={Titles.AddValidationItem}
 					onClick={() => {
@@ -179,6 +180,20 @@ export default class SimpleValidationComponent extends Component<any, any> {
 					booleanConfig={simpleValidation.alphaOnlyWithSpaces}
 					title={Titles.AlphaOnlyWithSpaces}
 				/>
+				<TreeViewButtonGroup>
+					<TreeViewGroupButton
+						title={`${Titles.Delete}`}
+						onClick={() => {
+							if (this.props.onDelete) {
+								this.props.onDelete();
+								if (this.props.onChange) {
+									this.props.onChange();
+								}
+							}
+						}}
+						icon="fa fa-minus"
+					/>
+				</TreeViewButtonGroup>
 			</TreeViewMenu>
 		);
 	}

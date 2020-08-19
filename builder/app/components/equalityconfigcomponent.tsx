@@ -36,6 +36,7 @@ export default class EqualityConfigComponent extends Component<any, any> {
 		return (
 			<TreeViewMenu
 				open={this.state.open}
+				hide={!this.props.enabled}
 				icon={
 					areEqual.enabled && (areEqual.agentProperty || areEqual.modelProperty) ? (
 						'fa fa-check-circle-o'
