@@ -181,6 +181,7 @@ export const IsUrlParameter = 'Is Url Parameter';
 export const AsLocalContext = 'As local context';
 export const TitleService = 'Title Service';
 export const UseInView = 'Use In View';
+export const IgnoreInView = 'Ignore in View';
 export const InternalApiConnection = 'Internal Api Connection';
 export const Selector = 'Selector';
 export const SelectorInput = 'Selector Input';

@@ -472,6 +472,7 @@ export const NodeProperties = {
 	UseInView: 'UseInView',
 	Selected: 'Selected',
 	ExcludedFromList: 'excludedInList',
+	IgnoreInView: 'IgnoreInView',
 	UseEqual: 'UseEqual',
 	IsEqualTo: 'IsEqualTo',
 	CodeUser: 'codeUser',

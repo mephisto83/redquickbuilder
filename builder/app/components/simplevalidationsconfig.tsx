@@ -57,7 +57,7 @@ import NumberConfigComponent from './numberconfigcomponent';
 import OneOfEnumerationComponent from './oneofenumeration';
 import SimpleValidationComponent from './simplevalidationconfig';
 import GraphComponent from './graphcomponent';
-import { GetNodeProp } from '../methods/graph_methods';
+import { GetNodeProp, NodesByType } from '../methods/graph_methods';
 
 export default class SimpleValidationsComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -133,6 +133,7 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 						}}
 					/>
 				</TreeViewItemContainer>
+
 				<TreeViewMenu
 					open={this.state.graph}
 					hide={!simpleValidationConfiguration.enabled}
@@ -338,12 +339,34 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 									this.props.onChange();
 								}
 							}}
+							onChange={(id: string) => {
+								if (
+									simpleValidationConfiguration &&
+									simpleValidationConfiguration.composition &&
+									simpleValidationConfiguration.composition.graph
+								) {
+									let configNode: Node = NodesByType(
+										simpleValidationConfiguration.composition.graph,
+										[ NodeTypes.LeafNode ],
+										{ skipCache: true }
+									).find((node: Node) => {
+										return GetNodeProp(node, NodeProperties.ValidationConfigurationItem) === id;
+									});
+
+									UIA.updateComponentProperty(
+										configNode.id,
+										NodeProperties.UIText,
+										GetSimpleValidationId(simpleValidation, properties),
+										simpleValidationConfiguration.composition.graph
+									);
+								}
+							}}
 							onDelete={() => {
 								if (dataChainOptions.simpleValidations) {
 									dataChainOptions.simpleValidations = dataChainOptions.simpleValidations.filter(
 										(v) => v.id !== simpleValidation.id
 									);
-                  this.setState({ turn: UIA.GUID() });
+									this.setState({ turn: UIA.GUID() });
 								}
 							}}
 							dataChainType={this.props.dataChainType}

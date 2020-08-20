@@ -3,10 +3,7 @@ import React, { Component } from 'react';
 import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
 import TreeViewMenu from './treeviewmenu';
-import {
-	MountingDescription,
-	PermissionConfig
-} from '../interface/methodprops';
+import { MountingDescription, PermissionConfig } from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import ValidationComponentItem from './validationcomponentitem';
@@ -37,6 +34,7 @@ export default class PermissionComponent extends Component<any, any> {
 						onClick={() => {
 							permissions.push({
 								id: UIA.GUID(),
+								enabled: true,
 								name: '',
 								dataChain: '',
 								dataChainOptions: {}
@@ -51,7 +49,7 @@ export default class PermissionComponent extends Component<any, any> {
 					return (
 						<ValidationComponentItem
 							title={Titles.PermissionType}
-              onContext={this.props.onContext}
+							onContext={this.props.onContext}
 							key={permissionConfig.id}
 							methodDescription={index && mountingItem ? null : mountingItem.methodDescription}
 							mountingItem={mountingItem}

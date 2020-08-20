@@ -34,6 +34,7 @@ export default class ValidationComponent extends Component<any, any> {
 						onClick={() => {
 							validations.push({
 								id: UIA.GUID(),
+								enabled: true,
 								name: '',
 								dataChain: '',
 								dataChainOptions: {}

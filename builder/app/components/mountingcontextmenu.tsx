@@ -374,6 +374,7 @@ class ContextMenu extends Component<any, any> {
 								<MountingItemConfig mountingDescription={mountingItem} />
 								<TreeViewMenu
 									title={'Screen to API'}
+									hide={!parameterConnections || !parameterConnections.length}
 									open={this.state.screenToApi}
 									active
 									onClick={() => {

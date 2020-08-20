@@ -38,6 +38,7 @@ export default class ExecutionComponent extends Component<any, any> {
 								id: UIA.GUID(),
 								name: '',
 								dataChain: '',
+								enabled: true,
 								dataChainOptions: {}
 							});
 

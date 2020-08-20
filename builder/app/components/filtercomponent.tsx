@@ -34,6 +34,7 @@ export default class FilterComponent extends Component<any, any> {
 						title={`${Titles.AddModelItemFilter}`}
 						onClick={() => {
 							filters.push({
+								enabled: true,
 								id: UIA.GUID(),
 								name: '',
 								dataChain: '',

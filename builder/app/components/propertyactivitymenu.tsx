@@ -101,9 +101,21 @@ class PropertyActivityMenu extends Component<any, any> {
 							label={Titles.UseInView}
 							title={Titles.UseInView}
 							value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.UseInView)}
-							onChange={(value) => {
+							onChange={(value: boolean) => {
 								this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
 									prop: UIA.NodeProperties.UseInView,
+									id: currentNode.id,
+									value
+								});
+							}}
+						/>
+						<CheckBox
+							label={Titles.IgnoreInView}
+							title={Titles.IgnoreInView}
+							value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.IgnoreInView)}
+							onChange={(value: boolean) => {
+								this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+									prop: UIA.NodeProperties.IgnoreInView,
 									id: currentNode.id,
 									value
 								});
@@ -113,7 +125,7 @@ class PropertyActivityMenu extends Component<any, any> {
 							label={Titles.ManyToManyNexus}
 							title={Titles.ManyToManyNexusDescription}
 							value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.ManyToManyNexus)}
-							onChange={(value) => {
+							onChange={(value: boolean) => {
 								var id = currentNode.id;
 								this.props.graphOperation(
 									[

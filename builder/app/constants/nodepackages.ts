@@ -1872,6 +1872,8 @@ export const CreateDefaultView = {
 				}
 				const modelProperties = modelChildren.filter(
 					(x: any) => !GetNodeProp(x, NodeProperties.IsDefaultProperty)
+				).filter(
+					(x: any) => !GetNodeProp(x, NodeProperties.IgnoreInView)
 				);
 				childComponents = modelProperties.map(() => null);
 				const screenComponentEvents: any[] = [];

@@ -121,13 +121,21 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		}
 		if (compareEnumerations) {
 			compare_enumeration = compareEnumerations
+				.filter((v) => v.enabled)
 				.map((compareEnumeration: CompareEnumeration) => {
 					return CompareEnumerationFunc(compareEnumeration, tempLambdaInsertArgumentValues);
 				})
 				.join(NEW_LINE);
 		}
-		if (copyConfig) {
-			let { agentProperty, modelProperty, relationType, targetProperty } = copyConfig;
+		if (copyConfig && copyConfig.enabled) {
+			let {
+				agentProperty,
+				modelProperty,
+				relationType,
+				targetProperty,
+				modelOutput,
+				modelOutputProperty
+			} = copyConfig;
 			let props = agentProperty;
 			let relProp = 'agent';
 			let agentOrModel = from.properties.agent;
@@ -137,10 +145,18 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				agentOrModel = from.properties.model;
 			}
 			target_property = targetProperty;
-			setLambdaProperties(tempLambdaInsertArgumentValues, agentProperty, modelProperty, targetProperty, {
-				from,
-				to
-			});
+			setLambdaProperties(
+				tempLambdaInsertArgumentValues,
+				agentProperty,
+				modelProperty,
+				targetProperty,
+				{
+					from,
+					to
+				},
+				modelOutput,
+				modelOutputProperty
+			);
 			let attributeType = GetNodeProp(props, NodeProperties.UIAttributeType);
 			outputType = NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][attributeType];
 			tempLambdaInsertArgumentValues[`${relProp}.${GetJSCodeName(props)}`] = {
@@ -156,16 +172,26 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			let {
 				relationType,
 				modelProperty,
+				modelOutputProperty,
+				modelOutput,
 				agentProperty,
 				targetProperty,
 				skipSettings,
 				returnSetting
 			} = dataChainConfigOptions.checkExistence;
 
-			setLambdaProperties(tempLambdaInsertArgumentValues, agentProperty, modelProperty, targetProperty, {
-				from,
-				to
-			});
+			setLambdaProperties(
+				tempLambdaInsertArgumentValues,
+				agentProperty,
+				modelProperty,
+				targetProperty,
+				{
+					from,
+					to
+				},
+				modelOutputProperty,
+				modelOutput
+			);
 
 			let onTrue = '';
 			if (returnSetting && returnSetting.enabled) {
@@ -218,12 +244,27 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			if (dataChainConfigOptions.checkExistence && dataChainConfigOptions.checkExistence.enabled) {
 				get_existing = 'var value = checkModel.FirstOrDefault()';
 			} else {
-				let { relationType, modelProperty, agentProperty, targetProperty } = dataChainConfigOptions.getExisting;
+				let {
+					relationType,
+					modelProperty,
+					agentProperty,
+					targetProperty,
+					modelOutput,
+					modelOutputProperty
+				} = dataChainConfigOptions.getExisting;
 
-				setLambdaProperties(tempLambdaInsertArgumentValues, agentProperty, modelProperty, targetProperty, {
-					from,
-					to
-				});
+				setLambdaProperties(
+					tempLambdaInsertArgumentValues,
+					agentProperty,
+					modelProperty,
+					targetProperty,
+					{
+						from,
+						to
+					},
+					modelOutput,
+					modelOutputProperty
+				);
 
 				switch (relationType) {
 					case RelationType.Model:
@@ -318,7 +359,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				})
 				.join(NEW_LINE);
 		}
-		if (dataChainConfigOptions.simpleValidation) {
+		if (dataChainConfigOptions) {
 			simplevalidation = GenerateSimpleValidations(dataChainConfigOptions, tempLambdaInsertArgumentValues);
 		}
 	}
@@ -394,9 +435,9 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		case DataChainType.Filter:
 			can_complete = true;
 			from_parameter_template = `
-    public static async Task<#{{"key":"model"}}#, bool> Filter(#{{"key":"agent"}}# agent, #{{"key":"model"}}# model)
+    public static async Task<#{{"key":"model"}}#, bool> Filter(#{{"key":"agent"}}# agent = null, #{{"key":"model"}}# model = null)
     {
-        Func<#{{"key":"model_output"}}#, bool> func = (#{{"key":"model_output"}}# model) => {
+        Func<#{{"key":"model_output"}}#, bool> func = (#{{"key":"model_output"}}# model_output) => {
             {{simplevalidation}}
 
             return true;
@@ -536,7 +577,7 @@ function GenerateSimpleValidations(
 	let { simpleValidations, simpleValidationConfiguration } = dataChainConfigOptions;
 	let checks: { template: string; id: string }[] = [];
 	if (simpleValidations) {
-		simpleValidations.forEach((simpleValidation) => {
+		simpleValidations.filter((sv: SimpleValidationConfig) => sv.enabled).forEach((simpleValidation) => {
 			let { relationType } = simpleValidation;
 			// let temp = '';
 			// switch (relationType) {
@@ -717,17 +758,20 @@ function SetLambdaInsertArgumentValues(
 	switch (relationType) {
 		case RelationType.Agent:
 			tempLambdaInsertArgumentValues[`agent.${GetCodeName(simpleValidation.agentProperty)}`] = {
-				property: simpleValidation.agentProperty
+				property: simpleValidation.agentProperty,
+				model: simpleValidation.agent
 			};
 			break;
 		case RelationType.Model:
 			tempLambdaInsertArgumentValues[`model.${GetCodeName(simpleValidation.modelProperty)}`] = {
-				property: simpleValidation.modelProperty
+				property: simpleValidation.modelProperty,
+				model: simpleValidation.model
 			};
 			break;
 		case RelationType.ModelOuput:
 			tempLambdaInsertArgumentValues[`model_output.${GetCodeName(simpleValidation.modelProperty)}`] = {
-				property: simpleValidation.modelProperty
+				property: simpleValidation.modelOutputProperty || simpleValidation.modelProperty,
+				model: simpleValidation.modelOutput || simpleValidation.model
 			};
 			break;
 	}
@@ -1134,7 +1178,9 @@ function setLambdaProperties(
 	agentProperty: string,
 	modelProperty: string,
 	targetProperty: string,
-	ops: { from: any; to: any }
+	ops: { from: any; to: any },
+	modelOutputProperty: string,
+	modelOutput: string
 ) {
 	let agent = agentProperty ? GetPropertyModel(agentProperty) : null;
 	let model = modelProperty ? GetPropertyModel(modelProperty) : null;
@@ -1155,7 +1201,19 @@ function setLambdaProperties(
 		model: model ? model.id : null,
 		type: ReferenceInsertType.Property
 	};
-
+	if (modelOutputProperty) {
+		tempLambdaInsertArgumentValues['model_output.prop'] = {
+			property: modelOutputProperty,
+			model: modelOutput,
+			type: ReferenceInsertType.Property
+		};
+	}
+	if (modelOutput) {
+		tempLambdaInsertArgumentValues['model_output'] = {
+			model: modelOutput,
+			type: ReferenceInsertType.Model
+		};
+	}
 	if (model) {
 		tempLambdaInsertArgumentValues['model'] = {
 			model: model ? model.id : null,

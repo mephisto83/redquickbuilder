@@ -227,6 +227,10 @@ export function CreateCheckExistence(): CheckExistenceConfig {
 		relationType: RelationType.Agent,
 		agentProperty: '',
 		modelProperty: '',
+		agent: '',
+		model: '',
+		modelOutput: '',
+		modelOutputProperty: '',
 		targetProperty: '',
 		enabled: false,
 		id: GUID(),
@@ -275,6 +279,10 @@ export function CreateCopyConfig(): CopyConfig {
 		agentProperty: '',
 		enabled: false,
 		modelProperty: '',
+		agent: '',
+		model: '',
+		modelOutput: '',
+		modelOutputProperty: '',
 		id: GUID(),
 		relationType: RelationType.Model,
 		targetProperty: ''
@@ -285,6 +293,10 @@ export function CreateHalf(): HalfRelation {
 	return {
 		agentProperty: '',
 		enabled: false,
+		agent: '',
+		model: '',
+		modelOutput: '',
+		modelOutputProperty: '',
 		id: GUID(),
 		modelProperty: '',
 		relationType: RelationType.Agent
@@ -381,7 +393,7 @@ export function GetSimpleValidationId(simpleValidation: any, properties: any) {
 				break;
 		}
 	}
-	return name;
+	return simpleValidation.name || name;
 }
 export function setDefaultRouteSource(mountingItem: MountingDescription, urlParameter: string, k: string) {
 	if (
@@ -443,11 +455,47 @@ export function CreateGraphValidationComposition(): SimpleValidationComposition 
 
 	return { graph };
 }
+
+export function getRelationProperties(methodDescription: MethodDescription, halfRelation: HalfRelation): Node[] {
+	let properties: Node[] = [];
+	if (methodDescription && halfRelation && halfRelation.relationType) {
+		switch (halfRelation.relationType) {
+			case RelationType.Agent:
+				if (methodDescription.properties && methodDescription.properties.agent) {
+					properties = GetModelPropertyChildren(methodDescription.properties.agent).toNodeSelect();
+				}
+				break;
+			case RelationType.ModelOuput:
+				if (
+					methodDescription.properties &&
+					(methodDescription.properties.model_output || methodDescription.properties.model)
+				) {
+					properties = GetModelPropertyChildren(
+						methodDescription.properties.model_output || methodDescription.properties.model || ''
+					).toNodeSelect();
+				}
+				break;
+			case RelationType.Model:
+				if (methodDescription.properties && methodDescription.properties.model) {
+					properties = GetModelPropertyChildren(methodDescription.properties.model || '').toNodeSelect();
+				}
+				break;
+		}
+	}
+
+	return properties;
+}
+
 export function CreateSimpleValidation(): SimpleValidationConfig {
 	return {
 		relationType: RelationType.Agent,
 		agentProperty: '',
 		modelProperty: '',
+		agent: '',
+		model: '',
+		modelOutput: '',
+		modelOutputProperty: '',
+
 		id: GUID(),
 		targetProperty: '',
 		enabled: false,
@@ -488,6 +536,10 @@ export function CreateAreEqual(): AreEqualConfig {
 	return {
 		id: GUID(),
 		agentProperty: '',
+		agent: '',
+		model: '',
+		modelOutput: '',
+		modelOutputProperty: '',
 		enabled: false,
 		modelProperty: '',
 		relationType: RelationType.Agent,
@@ -521,7 +573,7 @@ export function SetupConfigInstanceInformation(
 					properties = GetModelPropertyChildren(methodDescription.properties.agent).toNodeSelect();
 				}
 				break;
-			case RelationType.Model:
+			case RelationType.ModelOuput:
 				if (
 					methodDescription.properties &&
 					(methodDescription.properties.model_output || methodDescription.properties.model)
@@ -529,6 +581,11 @@ export function SetupConfigInstanceInformation(
 					properties = GetModelPropertyChildren(
 						methodDescription.properties.model_output || methodDescription.properties.model || ''
 					).toNodeSelect();
+				}
+				break;
+			case RelationType.Model:
+				if (methodDescription.properties && methodDescription.properties.model) {
+					properties = GetModelPropertyChildren(methodDescription.properties.model || '').toNodeSelect();
 				}
 				break;
 		}
@@ -558,16 +615,24 @@ export function CreateGetExistence(): GetExistingConfig {
 	return {
 		relationType: RelationType.Agent,
 		id: GUID(),
+		agent: '',
+		model: '',
+		modelOutput: '',
 		agentProperty: '',
 		modelProperty: '',
+		modelOutputProperty: '',
 		targetProperty: '',
 		enabled: false
 	};
 }
 export interface HalfRelation extends ConfigItem {
 	relationType: RelationType;
+	agent: string;
+	model: string;
+	modelOutput: string;
 	agentProperty: string; // The property used to find the model.
 	modelProperty: string; // The property used to find the model
+	modelOutputProperty: string; // The property used to find the model
 }
 export interface AfterEffectRelations extends HalfRelation {
 	targetProperty: string;
@@ -679,6 +744,7 @@ export enum SkipSettings {
 	DontSkip = 'Dont Skip'
 }
 export interface ConfigItem {
+	name?: string;
 	enabled: boolean;
 	id: string;
 }

@@ -27,7 +27,10 @@ import {
 	CheckSimpleValidation,
 	SimpleValidationConfig,
 	AfterEffectRelations,
-	CreateStretchPath
+	CreateStretchPath,
+	SetProperty,
+	HalfRelation,
+	getRelationProperties
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
@@ -69,19 +72,37 @@ export default class RelativeTypeComponent extends Component<any, any> {
 		let {
 			methodDescription,
 			relations,
-			properties,
 			targetProperties
 		}: {
 			methodDescription: MethodDescription;
 			relations: AfterEffectRelations;
-			properties: any[];
 			targetProperties: any[];
 		} = props;
-		let startModel =
-			relations.relationType === RelationType.Agent
-				? methodDescription.properties.agent
-				: methodDescription.properties.model_output || methodDescription.properties.model;
-
+		// let startModel =
+		// 	relations.relationType === RelationType.Agent
+		// 		? methodDescription.properties.agent
+		// 		: methodDescription.properties.model_output || methodDescription.properties.model;
+		let title = '';
+		let property = '';
+		switch (relations.relationType) {
+			case RelationType.Agent:
+				title = UIA.GetNodeTitle(methodDescription.properties.agent);
+				property = relations.agentProperty;
+				break;
+			case RelationType.Model:
+				title = UIA.GetNodeTitle(
+					methodDescription.properties.model_output || methodDescription.properties.model
+				);
+				property = relations.modelProperty;
+				break;
+			case RelationType.ModelOuput:
+				title = UIA.GetNodeTitle(
+					methodDescription.properties.model_output || methodDescription.properties.model
+				);
+				property = relations.modelOutputProperty;
+				break;
+		}
+		let properties = getRelationProperties(methodDescription, relations);
 		return (
 			<TreeViewMenu
 				hide={!this.props.enabled}
@@ -96,15 +117,7 @@ export default class RelativeTypeComponent extends Component<any, any> {
 			>
 				<TreeViewItemContainer hide={this.props.hideModelAgent}>
 					<SelectInput
-						label={
-							relations.relationType === RelationType.Agent ? (
-								UIA.GetNodeTitle(methodDescription.properties.agent)
-							) : (
-								UIA.GetNodeTitle(
-									methodDescription.properties.model_output || methodDescription.properties.model
-								)
-							)
-						}
+						label={title}
 						options={Object.values(RelationType).map((v: RelationType) => ({ title: v, value: v }))}
 						value={relations.relationType}
 						onChange={(value: RelationType) => {
@@ -122,21 +135,23 @@ export default class RelativeTypeComponent extends Component<any, any> {
 					<SelectInput
 						label={Titles.Property}
 						options={properties}
-						value={
-							relations.relationType === RelationType.Agent ? (
-								relations.agentProperty
-							) : (
-								relations.modelProperty
-							)
-						}
+						value={property}
 						onChange={(value: string) => {
 							switch (relations.relationType) {
 								case RelationType.Agent:
 									relations.agentProperty = value;
+									if (methodDescription.properties.agent)
+										relations.agent = methodDescription.properties.agent;
 									break;
 								case RelationType.Model:
-								case RelationType.ModelOuput:
 									relations.modelProperty = value;
+									if (methodDescription.properties.model)
+										relations.model = methodDescription.properties.model;
+									break;
+								case RelationType.ModelOuput:
+									relations.modelOutputProperty = value;
+									if (methodDescription.properties.model_output)
+										relations.modelOutput = methodDescription.properties.model_output;
 									break;
 							}
 							this.setState({

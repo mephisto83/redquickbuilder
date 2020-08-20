@@ -71,8 +71,18 @@ export default class SimpleValidationComponent extends Component<any, any> {
 		if (!ok) {
 			return <span />;
 		}
-
-		let { methodDescription, simpleValidation, properties, targetProperties } = this.props;
+		let props: any = this.props;
+		let {
+			methodDescription,
+			simpleValidation,
+			properties,
+			targetProperties
+		}: {
+			simpleValidation: SimpleValidationConfig;
+			methodDescription: MethodDescription;
+			properties: any[];
+			targetProperties: any[];
+		} = props;
 		simpleValidation.oneOf = simpleValidation.oneOf || CreateOneOf();
 		simpleValidation.isTrue = simpleValidation.isTrue || CreateBoolean();
 		simpleValidation.isFalse = simpleValidation.isFalse || CreateBoolean();
@@ -106,6 +116,22 @@ export default class SimpleValidationComponent extends Component<any, any> {
 							});
 							if (this.props.onChange) {
 								this.props.onChange();
+							}
+						}}
+					/>
+				</TreeViewItemContainer>
+				<TreeViewItemContainer hide={!simpleValidation.enabled}>
+					<TextBox
+						title={Titles.Name}
+						label={Titles.Name}
+						value={simpleValidation.name}
+						onChange={(val: string) => {
+							simpleValidation.name = val;
+							this.setState({
+								turn: UIA.GUID()
+							});
+							if (this.props.onChange) {
+								this.props.onChange(simpleValidation.id);
 							}
 						}}
 					/>

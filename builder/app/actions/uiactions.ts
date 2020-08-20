@@ -4344,19 +4344,24 @@ export function executeGraphOperations(operations: any[]) {
 		});
 	};
 }
-export function updateComponentProperty(nodeId: string, prop: string, value: any) {
-	graphOperation([
-		{
-			operation: CHANGE_NODE_PROPERTY,
-			options() {
-				return {
-					prop: prop,
-					value: JSON.parse(JSON.stringify(value)),
-					id: nodeId
-				};
+export function updateComponentProperty(nodeId: string, prop: string, value: any, graph?: Graph) {
+	graphOperation(
+		[
+			{
+				operation: CHANGE_NODE_PROPERTY,
+				options() {
+					return {
+						prop: prop,
+						value: JSON.parse(JSON.stringify(value)),
+						id: nodeId
+					};
+				}
 			}
-		}
-	])(GetDispatchFunc(), GetStateFunc());
+		],
+		null,
+		null,
+		graph
+	)(GetDispatchFunc(), GetStateFunc());
 }
 export function selectAllConnected(id: string) {
 	return (dispatch: any, getState: Function) => {
@@ -4655,7 +4660,7 @@ export function setRouteSource(
 		type
 	};
 }
-export function graphOperation(operation: any, options?: any, stamp?: any) {
+export function graphOperation(operation: any, options?: any, stamp?: any, graph?: Graph) {
 	return (dispatch: Function, getState: Function) => {
 		if (stamp) {
 			const viewPackage = {
@@ -4666,17 +4671,17 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 		const state = getState();
 		let rootGraph: any = null;
 		let graphOperationOccurences: GraphMethods.VisualOperation[] = [];
-		let currentGraph = Application(state, CURRENT_GRAPH);
+		let currentGraph = graph || Application(state, CURRENT_GRAPH);
 		const scope = Application(state, GRAPH_SCOPE) || [];
 		if (!currentGraph) {
-			currentGraph = GraphMethods.createGraph();
+			currentGraph = graph || GraphMethods.createGraph();
 			SaveApplication(currentGraph.id, CURRENT_GRAPH, dispatch);
 			rootGraph = currentGraph;
 		} else {
-			currentGraph = Graphs(state, currentGraph);
+			currentGraph = graph || Graphs(state, currentGraph);
 			rootGraph = currentGraph;
 			if (scope.length) {
-				currentGraph = GraphMethods.getScopedGraph(currentGraph, { scope });
+				currentGraph = graph || GraphMethods.getScopedGraph(currentGraph, { scope });
 			}
 		}
 		let operations = operation;
@@ -4703,17 +4708,19 @@ export function graphOperation(operation: any, options?: any, stamp?: any) {
 		}
 		// rootGraph = GraphMethods.updateReferenceNodes(rootGraph);
 		if (stamp) setViewPackageStamp(null, stamp);
+		if (!graph) {
+			if (!GraphMethods.Paused()) {
+				let visualGraph = GetC(state, VISUAL_GRAPH, rootGraph.id);
+				graphOperationOccurences.forEach((op: GraphMethods.VisualOperation) => {
+					visualGraph = GraphMethods.UpdateVisualGrpah(visualGraph, rootGraph, op);
+				});
+			}
 
-		if (!GraphMethods.Paused()) {
-			let visualGraph = GetC(state, VISUAL_GRAPH, rootGraph.id);
-			graphOperationOccurences.forEach((op: GraphMethods.VisualOperation) => {
-				visualGraph = GraphMethods.UpdateVisualGrpah(visualGraph, rootGraph, op);
-			});
+			// if (visualGraph) dispatch(UIC(VISUAL_GRAPH, visualGraph.id, visualGraph));
+			rootGraph.nodeCount = (<Graph>rootGraph).nodes.length;
+			rootGraph.linkCount = (<Graph>rootGraph).links.length;
+			SaveGraph(rootGraph, dispatch);
 		}
-		// if (visualGraph) dispatch(UIC(VISUAL_GRAPH, visualGraph.id, visualGraph));
-		rootGraph.nodeCount = (<Graph>rootGraph).nodes.length;
-		rootGraph.linkCount = (<Graph>rootGraph).links.length;
-		SaveGraph(rootGraph, dispatch);
 	};
 }
 

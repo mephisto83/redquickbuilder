@@ -17,6 +17,7 @@ import BuildDataChainAfterEffectConverter, {
 import DataChainOptions from './datachainoptions';
 import { GetNodeProp } from '../methods/graph_methods';
 import Typeahead from './typeahead';
+import CheckBox from './checkbox';
 
 export default class ValidationComponentItem extends Component<any, any> {
 	constructor(props: any) {
@@ -56,21 +57,6 @@ export default class ValidationComponentItem extends Component<any, any> {
 					/>
 				</TreeViewItemContainer>
 				<TreeViewItemContainer>
-					{/* <SelectInput
-						label={Titles.DataChain}
-						options={UIA.NodesByType(null, NodeTypes.DataChain).toNodeSelect()}
-						value={validationConfig.dataChain}
-						onChange={(value: string) => {
-							validationConfig.dataChain = value;
-							validationConfig.name = UIA.GetNodeTitle(value);
-							this.setState({
-								turn: UIA.GUID()
-							});
-							if (this.props.onChange) {
-								this.props.onChange();
-							}
-						}}
-					/> */}
 					<Typeahead
 						label={Titles.DataChain}
 						nodeSelect={(v: string) => {
@@ -97,7 +83,8 @@ export default class ValidationComponentItem extends Component<any, any> {
 						}}
 					/>
 				</TreeViewItemContainer>
-				{validationConfig && validationConfig.dataChain ? (
+				{originalConfig && originalConfig !== validationConfig.id ? null : validationConfig &&
+				validationConfig.dataChain ? (
 					<DataChainOptions
 						methods={this.props.methods}
 						onContext={this.props.onContext}
@@ -137,7 +124,8 @@ export default class ValidationComponentItem extends Component<any, any> {
 													type: this.props.dataChainType || DataChainType.Validation,
 													afterEffectOptions: validationConfig.dataChainOptions,
 													methods: this.props.methods,
-													routes: this.props.routes
+													routes: this.props.routes,
+													override: this.state.override
 												},
 												(dataChain: Node) => {
 													if (dataChain && UIA.GetNodeById(dataChain.id)) {
@@ -162,6 +150,15 @@ export default class ValidationComponentItem extends Component<any, any> {
 							icon="fa fa-gears"
 						/>
 					)}
+					<TreeViewItemContainer>
+						<CheckBox
+							label={'Override'}
+							value={this.state.override}
+							onChange={(val: boolean) => {
+								this.setState({ override: val });
+							}}
+						/>
+					</TreeViewItemContainer>
 				</TreeViewButtonGroup>
 			</TreeViewMenu>
 		);
