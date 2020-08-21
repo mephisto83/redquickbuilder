@@ -23,7 +23,7 @@ import { MethodFunctions } from '../constants/functiontypes';
 export default class ValidationComponentItem extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
-		this.state = {};
+		this.state = { override: true };
 	}
 	render() {
 		let validationConfig: ValidationConfig = this.props.validationConfig;
