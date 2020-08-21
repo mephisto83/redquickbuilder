@@ -7,7 +7,7 @@ import TextInput from './textinput';
 import TreeViewMenu from './treeviewmenu';
 import { MountingDescription, ValidationConfig } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
-import { NodeTypes, NodeProperties } from '../constants/nodetypes';
+import { NodeTypes, NodeProperties, Methods } from '../constants/nodetypes';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import { Node } from '../methods/graph_types';
@@ -18,6 +18,7 @@ import DataChainOptions from './datachainoptions';
 import { GetNodeProp } from '../methods/graph_methods';
 import Typeahead from './typeahead';
 import CheckBox from './checkbox';
+import { MethodFunctions } from '../constants/functiontypes';
 
 export default class ValidationComponentItem extends Component<any, any> {
 	constructor(props: any) {
@@ -150,6 +151,46 @@ export default class ValidationComponentItem extends Component<any, any> {
 							icon="fa fa-gears"
 						/>
 					)}
+					<TreeViewGroupButton
+						title={`Auto Name`}
+						onClick={() => {
+							if (validationConfig) {
+								if (mountingItem) {
+									let { methodDescription, viewType } = mountingItem;
+									if (methodDescription && MethodFunctions[methodDescription.functionType]) {
+										let { method } = MethodFunctions[methodDescription.functionType];
+										switch (this.props.dataChainType || DataChainType.Validation) {
+											case DataChainType.Permission:
+												validationConfig.name = `Can ${MethodFunctions[
+													methodDescription.functionType
+												].titleTemplate(
+													UIA.GetNodeTitle(
+														methodDescription.properties.model_output ||
+															methodDescription.properties.model
+													),
+													UIA.GetNodeTitle(methodDescription.properties.agent)
+												)} Permission For ${viewType}`;
+												this.setState({ turn: UIA.GUID() });
+												break;
+											case DataChainType.Filter:
+												validationConfig.name = `${MethodFunctions[
+													methodDescription.functionType
+												].titleTemplate(
+													UIA.GetNodeTitle(
+														methodDescription.properties.model_output ||
+															methodDescription.properties.model
+													),
+													UIA.GetNodeTitle(methodDescription.properties.agent)
+												)} Filter For ${viewType}`;
+												this.setState({ turn: UIA.GUID() });
+												break;
+										}
+									}
+								}
+							}
+						}}
+						icon="fa fa-amazon"
+					/>
 					<TreeViewItemContainer>
 						<CheckBox
 							label={'Override'}

@@ -352,13 +352,14 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 									).find((node: Node) => {
 										return GetNodeProp(node, NodeProperties.ValidationConfigurationItem) === id;
 									});
-
-									UIA.updateComponentProperty(
-										configNode.id,
-										NodeProperties.UIText,
-										GetSimpleValidationId(simpleValidation, properties),
-										simpleValidationConfiguration.composition.graph
-									);
+									if (configNode) {
+										UIA.updateComponentProperty(
+											configNode.id,
+											NodeProperties.UIText,
+											GetSimpleValidationId(simpleValidation, properties),
+											simpleValidationConfiguration.composition.graph
+										);
+									}
 								}
 							}}
 							onDelete={() => {

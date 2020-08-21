@@ -381,15 +381,15 @@ export function GetSimpleValidationId(simpleValidation: any, properties: any) {
 		switch (simpleValidation.relationType) {
 			case RelationType.Agent:
 				let prop = properties.find((v: any) => v.id === simpleValidation.agentProperty);
-				name = `agent.${prop.title}`;
+				if (prop) name = `agent.${prop.title}`;
 				break;
 			case RelationType.Model:
 				let prop2 = properties.find((v: any) => v.id === simpleValidation.modelProperty);
-				name = `model.${prop2.title}`;
+				if (prop2) name = `model.${prop2.title}`;
 				break;
 			case RelationType.ModelOuput:
 				let prop3 = properties.find((v: any) => v.id === simpleValidation.modelProperty);
-				name = `model_output.${prop3.title}`;
+				if (prop3) name = `model_output.${prop3.title}`;
 				break;
 		}
 	}

@@ -348,8 +348,8 @@ class ContextMenu extends Component<any, any> {
 													mountingItem.name =
 														mountingItem.name ||
 														`${MethodFunctions[c].titleTemplate(
-															UIA.GetNodeTitle(agent),
-															UIA.GetNodeTitle(model)
+															UIA.GetNodeTitle(model),
+															UIA.GetNodeTitle(agent)
 														)} For ${viewType}`;
 												}
 											}

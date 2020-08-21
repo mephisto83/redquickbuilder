@@ -769,7 +769,9 @@ function SetLambdaInsertArgumentValues(
 			};
 			break;
 		case RelationType.ModelOuput:
-			tempLambdaInsertArgumentValues[`model_output.${GetCodeName(simpleValidation.modelProperty)}`] = {
+			tempLambdaInsertArgumentValues[
+				`model_output.${GetCodeName(simpleValidation.modelOutputProperty || simpleValidation.modelProperty)}`
+			] = {
 				property: simpleValidation.modelOutputProperty || simpleValidation.modelProperty,
 				model: simpleValidation.modelOutput || simpleValidation.model
 			};
@@ -791,7 +793,7 @@ function GetRelationTypeValuePropString(relationType: RelationType, simpleValida
 			break;
 		case RelationType.ModelOuput:
 			valuePropString = `model_output.#{{"key":"model_output.${GetCodeName(
-				simpleValidation.modelProperty
+				simpleValidation.modelOutputProperty || simpleValidation.modelProperty
 			)}","type":"property","model":"model_output"}}#`;
 			break;
 	}
