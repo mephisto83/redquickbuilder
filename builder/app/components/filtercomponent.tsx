@@ -3,7 +3,13 @@ import React, { Component } from 'react';
 import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
 import TreeViewMenu from './treeviewmenu';
-import { AfterEffect, TargetMethodType, MountingDescription, ValidationConfig, FilterConfig } from '../interface/methodprops';
+import {
+	AfterEffect,
+	TargetMethodType,
+	MountingDescription,
+	ValidationConfig,
+	FilterConfig
+} from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import AfterEffectComponent from './aftereffectcomponent';
@@ -24,6 +30,7 @@ export default class FilterComponent extends Component<any, any> {
 			<TreeViewMenu
 				open={this.state.open}
 				active
+				color={filters && filters.length ? '#DD4B39' : ''}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
@@ -51,10 +58,10 @@ export default class FilterComponent extends Component<any, any> {
 						<ValidationComponentItem
 							key={filterConfig.id}
 							methodDescription={index && mountingItem ? null : mountingItem.methodDescription}
-              mountingItem={mountingItem}
-              title={Titles.Filter}
+							mountingItem={mountingItem}
+							title={Titles.Filter}
 							dataChainType={DataChainType.Filter}
-              onContext={this.props.onContext}
+							onContext={this.props.onContext}
 							onChange={() => {
 								if (this.props.onChange) {
 									this.props.onChange();

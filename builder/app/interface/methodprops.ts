@@ -797,6 +797,18 @@ export interface ValidationConfig {
 	dataChainOptions: DataChainConfiguration;
 }
 
+export function duplicateValidationConfig(validationConfig: ValidationConfig): ValidationConfig {
+	let result = { ...validationConfig };
+	result.id = GUID();
+	result.dataChainOptions = duplicateDataChainOptions(result.dataChainOptions);
+	return result;
+}
+
+function duplicateDataChainOptions(dataChainOptions: DataChainConfiguration) {
+	let res = JSON.parse(JSON.stringify(dataChainOptions));
+	return res;
+}
+
 export enum TargetMethodType {
 	Mounting = 'Mounting',
 	Effect = 'Effect'

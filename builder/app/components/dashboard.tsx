@@ -1637,7 +1637,7 @@ class Dashboard extends Component<any, any> {
 			cost = (graph.linkCount || 0) * node_connection_cost + (graph.nodeCount || 0) * node_cost;
 		}
 		if (adjusted) {
-			return Dashboard.formatMoney(cost * 1000);
+			return Dashboard.formatMoney(cost * 500);
 		}
 		return Dashboard.formatMoney(cost);
 	}

@@ -3531,6 +3531,32 @@ export function setVisual(key: string, value: any) {
 		dispatch(UIC(VISUAL, key, value));
 	};
 }
+export const COPY_CONTEXT = 'COPY_CONTEXT';
+export interface CopyContext {
+	name: string;
+	model: string;
+	agent: string;
+	obj: any;
+	type: CopyType;
+	id: string;
+}
+export enum CopyType {
+	PermissionConfigs = 'PermissionConfigs'
+}
+export function addToCopyContext(context: CopyContext) {
+	return (dispatch: Function, getState: Function) => {
+		let copyContext = Visual(getState(), COPY_CONTEXT) || [];
+		copyContext.push(context);
+		dispatch(UIC(VISUAL, COPY_CONTEXT, copyContext));
+	};
+}
+export function removeFromCopyContext(id: string) {
+	return (dispatch: Function, getState: Function) => {
+		let copyContext: CopyContext[] = Visual(getState(), COPY_CONTEXT) || [];
+		copyContext = copyContext.filter((v) => v.id !== id);
+		dispatch(UIC(VISUAL, COPY_CONTEXT, copyContext));
+	};
+}
 export function setApplication(key: any, value: any) {
 	return (dispatch: Function, getState: Function) => {
 		dispatch(UIC(APPLICATION, key, value));

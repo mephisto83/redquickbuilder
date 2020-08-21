@@ -8,6 +8,7 @@ import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import ValidationComponentItem from './validationcomponentitem';
 import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
+import { NodeTypeColors, NodeTypes } from '../constants/nodetypes';
 
 export default class PermissionComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -22,6 +23,7 @@ export default class PermissionComponent extends Component<any, any> {
 		return (
 			<TreeViewMenu
 				open={this.state.open}
+				color={permissions && permissions.length ? '#DD4B39' : ''}
 				active
 				onClick={() => {
 					this.setState({ open: !this.state.open });
@@ -43,6 +45,13 @@ export default class PermissionComponent extends Component<any, any> {
 							this.setState({ turn: UIA.GUID() });
 						}}
 						icon="fa fa-plus"
+					/>
+					<TreeViewGroupButton
+						title={`${Titles.Copy}`}
+						onClick={() => {
+
+						}}
+						icon="fa fa-copy"
 					/>
 				</TreeViewButtonGroup>
 				{(permissions || []).map((permissionConfig: PermissionConfig, index: number) => {
