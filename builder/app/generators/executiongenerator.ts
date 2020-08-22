@@ -408,7 +408,7 @@ export default class ExecutorGenerator {
 						propertyValidationStatements +=
 							`result.${GetCodeName(targetProperty)} = await ${GetCodeName(
 								dataChain
-							)}.Execute(data, agent, change);` + NEW_LINE;
+							)}.Execute(data, agent, change, result);` + NEW_LINE;
 					}
 					return null;
 				});

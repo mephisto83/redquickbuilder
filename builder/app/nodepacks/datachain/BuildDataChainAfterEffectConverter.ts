@@ -112,8 +112,8 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 	let target_property = '';
 	let tempLambdaInsertArgumentValues: any = {};
 	tempLambdaInsertArgumentValues.model = { model: from.properties.model };
-  tempLambdaInsertArgumentValues.agent = { model: from.properties.agent };
-  tempLambdaInsertArgumentValues.parent = { model: from.properties.parent };
+	tempLambdaInsertArgumentValues.agent = { model: from.properties.agent };
+	tempLambdaInsertArgumentValues.parent = { model: from.properties.parent };
 	tempLambdaInsertArgumentValues.model_output = { model: from.properties.model_output || from.properties.model };
 	if (from.properties.model) arbiterModels.push(from.properties.model);
 	if (from.properties.agent) arbiterModels.push(from.properties.agent);
@@ -195,8 +195,8 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 					to
 				},
 				modelOutputProperty,
-        modelOutput,
-        dataChainConfigOptions.checkExistence
+				modelOutput,
+				dataChainConfigOptions.checkExistence
 			);
 
 			let onTrue = '';
@@ -269,8 +269,8 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 						to
 					},
 					modelOutput,
-          modelOutputProperty,
-          dataChainConfigOptions.getExisting
+					modelOutputProperty,
+					dataChainConfigOptions.getExisting
 				);
 
 				switch (relationType) {
@@ -367,7 +367,10 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				.join(NEW_LINE);
 		}
 		if (dataChainConfigOptions) {
-			simplevalidation = GenerateSimpleValidations(dataChainConfigOptions, tempLambdaInsertArgumentValues);
+			simplevalidation = GenerateSimpleValidations(dataChainConfigOptions, tempLambdaInsertArgumentValues, {
+				type,
+				targetProperty: target_property
+			});
 		}
 	}
 	let from_parameter_template = '';
@@ -428,10 +431,11 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			can_complete = true;
 			from_parameter_template = `
       public static async Task<${outputType ||
-			'bool'}> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change)
+			'bool'}> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change, #{{"key":"result"}}# result)
       {
           Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task<${outputType ||
 				'bool'}>> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# model, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
+              {{simplevalidation}}
               {{copy_config}}
           };
 
@@ -440,11 +444,11 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
   `;
 			break;
 		case DataChainType.Filter:
-      can_complete = true;
-      let parent_input = '';
-      if(from.properties.parent){
-        parent_input = ', #{{"key":"parent"}}# parent = null'
-      }
+			can_complete = true;
+			let parent_input = '';
+			if (from.properties.parent) {
+				parent_input = ', #{{"key":"parent"}}# parent = null';
+			}
 
 			from_parameter_template = `
     public static async Task<#{{"key":"model"}}#, bool> Filter(#{{"key":"agent"}}# agent = null, #{{"key":"model"}}# model = null${parent_input})
@@ -581,7 +585,8 @@ function fixLambdaInsertArguments(tempLambdaInsertArgumentValues: any, lambdaIns
 
 function GenerateSimpleValidations(
 	dataChainConfigOptions: DataChainConfiguration,
-	tempLambdaInsertArgumentValues: any
+	tempLambdaInsertArgumentValues: any,
+	ops: { type: DataChainType; targetProperty: string }
 ): string {
 	let result: string = '';
 	let valuePropString = '';
@@ -591,27 +596,6 @@ function GenerateSimpleValidations(
 	if (simpleValidations) {
 		simpleValidations.filter((sv: SimpleValidationConfig) => sv.enabled).forEach((simpleValidation) => {
 			let { relationType } = simpleValidation;
-			// let temp = '';
-			// switch (relationType) {
-			// 	case RelationType.Agent:
-			// 		temp = 'agent';
-			// 		valuePropString = `agent.#{{"key":"agent.${GetCodeName(
-			// 			simpleValidation.agentProperty
-			// 		)}","type":"property","model":"agent"}}#`;
-			// 		tempLambdaInsertArgumentValues[`agent.${GetCodeName(simpleValidation.agentProperty)}`] = {
-			// 			property: simpleValidation.agentProperty
-			// 		};
-			// 		break;
-			// 	case RelationType.Model:
-			// 		temp = 'model';
-			// 		tempLambdaInsertArgumentValues[`model.${GetCodeName(simpleValidation.modelProperty)}`] = {
-			// 			property: simpleValidation.modelProperty
-			// 		};
-			// 		valuePropString = `model.#{{"key":"model.${GetCodeName(
-			// 			simpleValidation.modelProperty
-			// 		)}","type":"property","model":"model"}}#`;
-			// 		break;
-			// }
 			SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, relationType, simpleValidation);
 			valuePropString = GetRelationTypeValuePropString(relationType, simpleValidation);
 			if (simpleValidation.areEqual && simpleValidation.areEqual.enabled) {
@@ -682,6 +666,24 @@ function GenerateSimpleValidations(
 			// }
 		});
 	}
+	let returnStatement = '';
+	switch (ops.type) {
+		case DataChainType.Execution:
+			let targetModel = GetPropertyModel(ops.targetProperty);
+			tempLambdaInsertArgumentValues[`result.${GetCodeName(ops.targetProperty)}`] = {
+				property: ops.targetProperty,
+				model: targetModel ? targetModel.id : ''
+      };
+      tempLambdaInsertArgumentValues[`result`] = {
+				model: targetModel ? targetModel.id : ''
+			};
+			returnStatement = `return result.#{{"key":"result.${GetCodeName(
+				ops.targetProperty
+			)}","type":"property","model":"result"}}#`;
+			break;
+		default:
+			returnStatement = 'result false';
+	}
 	if (!(simpleValidationConfiguration && simpleValidationConfiguration.enabled)) {
 		result = checks
 			.map((check: { template: string; id: string }, index: number) => {
@@ -693,7 +695,7 @@ function GenerateSimpleValidations(
 		if (checks.length)
 			return `${result}
     if(!test_${checks.length - 1}) {
-      return false;
+      ${returnStatement};
     }
   `;
 	} else if (simpleValidationConfiguration && simpleValidationConfiguration.enabled) {
@@ -701,7 +703,7 @@ function GenerateSimpleValidations(
 		let res = ProductIfStatementComposition(graph, checks);
 		return `let result = ${res};
       if(!result) {
-        return false;
+        ${returnStatement};
       }
     `;
 	}
@@ -1293,7 +1295,7 @@ function setLambdaProperties(
 		};
 	}
 
-	if (targetProperty) {
+	if (targetProperty && ops && ops.to && ops.to.properties) {
 		let target = targetProperty ? GetPropertyModel(targetProperty) : null;
 		tempLambdaInsertArgumentValues[`tomodel.prop`] = {
 			property: target && target.id ? target.id : null,

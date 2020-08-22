@@ -24,6 +24,7 @@ export default class ExecutionComponent extends Component<any, any> {
 		return (
 			<TreeViewMenu
 				open={this.state.open}
+				color={executions && executions.length ? '#F0386B' : ''}
 				active
 				onClick={() => {
 					this.setState({ open: !this.state.open });
@@ -45,6 +46,22 @@ export default class ExecutionComponent extends Component<any, any> {
 							this.setState({ turn: UIA.GUID() });
 						}}
 						icon="fa fa-plus"
+					/>
+					<TreeViewGroupButton
+						title={`${Titles.Paste}`}
+						onClick={() => {
+							let methodDescription = this.props.methodDescription;
+							if (methodDescription) {
+								let parts = UIA.GetSelectedCopyContext(
+									UIA.CopyType.ExecutionConfig,
+									methodDescription.properties.model,
+									methodDescription.properties.agent
+								);
+								executions.push(...parts.map((v) => v.obj));
+								this.setState({ turn: UIA.GUID() });
+							}
+						}}
+						icon="fa fa-paste"
 					/>
 				</TreeViewButtonGroup>
 				<TreeViewItemContainer>
@@ -68,7 +85,7 @@ export default class ExecutionComponent extends Component<any, any> {
 							key={executionConfig.id}
 							onContext={this.props.onContext}
 							title={Titles.Execution}
-							methodDescription={index && mountingItem ? null : mountingItem.methodDescription}
+							methodDescription={mountingItem.methodDescription}
 							mountingItem={mountingItem}
 							dataChainType={DataChainType.Execution}
 							onChange={() => {

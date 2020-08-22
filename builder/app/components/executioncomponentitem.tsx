@@ -33,11 +33,12 @@ import BuildDataChainAfterEffectConverter, {
 import { mount } from 'enzyme';
 import AfterEffectDataChainOptions from './aftereffectdatachainoptions';
 import DataChainOptions from './datachainoptions';
+import { MethodFunctions } from '../constants/functiontypes';
 
 export default class ExecutionComponentItem extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
-		this.state = {};
+		this.state = { override: true };
 	}
 	render() {
 		let executionConfig: ExecutionConfig = this.props.executionConfig;
@@ -113,35 +114,116 @@ export default class ExecutionComponentItem extends Component<any, any> {
 					<TreeViewGroupButton
 						title={`Build Datachain`}
 						onClick={() => {
+							this.buildDataChain(executionConfig, mountingItem);
+						}}
+						icon="fa fa-gears"
+					/>
+					<TreeViewGroupButton
+						title={`Auto Name`}
+						onClick={() => {
 							if (executionConfig) {
 								if (mountingItem) {
-									let { methodDescription } = mountingItem;
-									if (methodDescription) {
-										BuildDataChainAfterEffectConverter(
-											{
-												name: executionConfig.name,
-												routes: [],
-												from: methodDescription,
-												dataChain: executionConfig.dataChain,
-												type: DataChainType.Execution,
-												afterEffectOptions: executionConfig.dataChainOptions,
-												methods: this.props.methods
-											},
-											(dataChain: Node) => {
-												executionConfig.dataChain = dataChain.id;
-												this.setState({
-													turn: UIA.GUID()
-												});
-											}
-										);
+									let { methodDescription, viewType } = mountingItem;
+									if (methodDescription && MethodFunctions[methodDescription.functionType]) {
+										let { method } = MethodFunctions[methodDescription.functionType];
+										switch (this.props.dataChainType || DataChainType.Validation) {
+											case DataChainType.Execution:
+												let targetProp: string = '';
+												if (executionConfig.dataChain) {
+													targetProp = UIA.GetNodeProp(
+														executionConfig.dataChain,
+														NodeProperties.TargetProperty
+													);
+													if (targetProp) {
+														targetProp = UIA.GetNodeTitle(targetProp);
+														if (targetProp) {
+															targetProp = `Set ${targetProp}`;
+														}
+													}
+												}
+												executionConfig.name = `${MethodFunctions[
+													methodDescription.functionType
+												].titleTemplate(
+													UIA.GetNodeTitle(
+														methodDescription.properties.model_output ||
+															methodDescription.properties.model
+													),
+													UIA.GetNodeTitle(methodDescription.properties.agent)
+												)} Execute For ${viewType} ${targetProp}`;
+												this.buildDataChain(executionConfig, mountingItem);
+												this.setState({ turn: UIA.GUID() });
+												break;
+										}
 									}
 								}
 							}
 						}}
-						icon="fa fa-gears"
+						icon="fa fa-amazon"
 					/>
+
+					{this.props.methodDescription ? (
+						<TreeViewGroupButton
+							title={`${Titles.Copy}`}
+							onClick={() => {
+								UIA.CopyToContext(
+									executionConfig,
+									UIA.CopyType.ExecutionConfig,
+									this.props.methodDescription.properties.model,
+									this.props.methodDescription.properties.agent,
+									executionConfig.name
+								);
+								this.setState({ turn: UIA.GUID() });
+							}}
+							icon="fa fa-copy"
+						/>
+					) : null}
+					<TreeViewItemContainer>
+						<CheckBox
+							label={'Override'}
+							value={this.state.override}
+							onChange={(val: boolean) => {
+								this.setState({ override: val });
+							}}
+						/>
+					</TreeViewItemContainer>
+					{executionConfig.dataChain ? (
+						<TreeViewGroupButton
+							icon={'fa fa-hand-grab-o'}
+							onClick={() => {
+								UIA.SelectNode(executionConfig.dataChain, null)(UIA.GetDispatchFunc());
+							}}
+						/>
+					) : null}
 				</TreeViewButtonGroup>
 			</TreeViewMenu>
 		);
+	}
+
+	private buildDataChain(executionConfig: ExecutionConfig, mountingItem: MountingDescription) {
+		if (executionConfig) {
+			if (mountingItem) {
+				let { methodDescription } = mountingItem;
+				if (methodDescription) {
+					BuildDataChainAfterEffectConverter(
+						{
+							name: executionConfig.name,
+							routes: [],
+							from: methodDescription,
+							dataChain: executionConfig.dataChain,
+							type: DataChainType.Execution,
+							afterEffectOptions: executionConfig.dataChainOptions,
+							methods: this.props.methods,
+							override: this.state.override
+						},
+						(dataChain: Node) => {
+							executionConfig.dataChain = dataChain.id;
+							this.setState({
+								turn: UIA.GUID()
+							});
+						}
+					);
+				}
+			}
+		}
 	}
 }

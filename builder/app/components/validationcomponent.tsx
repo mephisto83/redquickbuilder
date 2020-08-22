@@ -23,6 +23,7 @@ export default class ValidationComponent extends Component<any, any> {
 		return (
 			<TreeViewMenu
 				open={this.state.open}
+				color={validations && validations.length ? '#39A0ED' : ''}
 				active
 				onClick={() => {
 					this.setState({ open: !this.state.open });

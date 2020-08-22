@@ -313,7 +313,6 @@ class EffectContextMenu extends Component<any, any> {
 										value={effectItem.name}
 									/>
 								</TreeViewItemContainer>
-								<MountingItemConfig mountingDescription={effectItem} />
 								<TreeViewItemContainer>
 									<SelectInput
 										onChange={(c: string) => {
@@ -347,8 +346,19 @@ class EffectContextMenu extends Component<any, any> {
 										options={GetFunctionTypeOptions()}
 									/>
 								</TreeViewItemContainer>
-								{bodyParameter}
-								{parameterConnections}
+								<MountingItemConfig mountingDescription={effectItem} />
+								<TreeViewMenu
+									title={'Screen to API'}
+									hide={(!parameterConnections || !parameterConnections.length) && !bodyParameter}
+									open={this.state.screenToApi}
+									active
+									onClick={() => {
+										this.setState({ screenToApi: !this.state.screenToApi });
+									}}
+								>
+									{bodyParameter}
+									{parameterConnections}
+								</TreeViewMenu>
 								<TreeViewMenu
 									active
 									title={'Method constraint values'}

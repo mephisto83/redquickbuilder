@@ -24,7 +24,13 @@ import { GraphLink, Graph } from '../methods/graph_types';
 import * as _ from '../methods/graph_types';
 import JobService, { Job, JobAssignment, JobFile, JobServiceConstants } from '../jobs/jobservice';
 import { AgentProject, CommandCenter } from '../jobs/interfaces';
-import { RouteSourceType, RouteSource, SimpleValidationConfig, ConfigItem } from '../interface/methodprops';
+import {
+	RouteSourceType,
+	RouteSource,
+	SimpleValidationConfig,
+	ConfigItem,
+	ExecutionConfig
+} from '../interface/methodprops';
 import {
 	ReferenceInsert,
 	GetJSONReferenceInserts,
@@ -3545,6 +3551,7 @@ export interface CopyContext {
 }
 export enum CopyType {
 	SimpleValidation = 'SimpleValidation',
+	ExecutionConfig = 'ExecutionConfig',
 	SimpleValidations = 'SimpleValidations',
 	PermissionConfigs = 'PermissionConfigs'
 }
@@ -3591,6 +3598,11 @@ export function GetSelectedCopyContext(
 							...v,
 							obj: copySimpleValidation(v.obj)
 						};
+					case CopyType.ExecutionConfig:
+						return {
+							...v,
+							obj: copyExecutionConfig(v.obj)
+						};
 					case CopyType.SimpleValidations:
 						return {
 							...v,
@@ -3616,6 +3628,24 @@ export function copySimpleValidation(simpleValidation: SimpleValidationConfig): 
 		let configItem: ConfigItem = temp[i];
 		if (configItem && configItem.id) configItem.id = GUID();
 	}
+	return temp;
+}
+export function copyExecutionConfig(executionConfig: ExecutionConfig): ExecutionConfig {
+	let temp: any = {
+		...JSON.parse(JSON.stringify(executionConfig)),
+		id: GUID()
+	};
+
+	temp.dataChain = '';
+	if (temp.dataChainOptions) {
+		temp.dataChainOptions = JSON.parse(JSON.stringify(executionConfig.dataChainOptions));
+	}
+	if (temp.dataChainOptions)
+		for (var i in temp.dataChainOptions) {
+			let configItem: ConfigItem = temp.dataChainOptions[i];
+			if (configItem && configItem.id) configItem.id = GUID();
+		}
+
 	return temp;
 }
 export function addToCopyContext(context: CopyContext) {

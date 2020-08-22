@@ -197,6 +197,12 @@ export default class RelativeTypeComponent extends Component<any, any> {
 							if (val) {
 								relations.stretchPath = relations.stretchPath || CreateStretchPath();
 							}
+							this.setState({
+								turn: UIA.GUID()
+							});
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
 						}}
 					/>
 				</TreeViewItemContainer>

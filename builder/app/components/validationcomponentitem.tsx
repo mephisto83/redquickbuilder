@@ -172,7 +172,19 @@ export default class ValidationComponentItem extends Component<any, any> {
 													UIA.GetNodeTitle(methodDescription.properties.agent)
 												)} Permission For ${viewType}`;
 												this.setState({ turn: UIA.GUID() });
-												break;
+                        break;
+                      case DataChainType.Validation:
+												validationConfig.name = `${MethodFunctions[
+													methodDescription.functionType
+												].titleTemplate(
+													UIA.GetNodeTitle(
+														methodDescription.properties.model_output ||
+															methodDescription.properties.model
+													),
+													UIA.GetNodeTitle(methodDescription.properties.agent)
+												)} Validation For ${viewType}`;
+												this.setState({ turn: UIA.GUID() });
+                        break;
 											case DataChainType.Filter:
 												validationConfig.name = `${MethodFunctions[
 													methodDescription.functionType

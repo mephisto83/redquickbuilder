@@ -73,6 +73,7 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 			case DataChainType.Validation:
 			case DataChainType.Filter:
 			case DataChainType.Permission:
+			case DataChainType.Execution:
 				isValidation = true;
 				ok = true;
 				break;
