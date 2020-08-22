@@ -227,8 +227,10 @@ export function CreateCheckExistence(): CheckExistenceConfig {
 		relationType: RelationType.Agent,
 		agentProperty: '',
 		modelProperty: '',
+		parentProperty: '',
 		agent: '',
 		model: '',
+		parent: '',
 		modelOutput: '',
 		modelOutputProperty: '',
 		targetProperty: '',
@@ -261,6 +263,9 @@ export function CheckCopyConfig(copyConfig: HalfRelation) {
 	if (copyConfig.modelProperty && copyConfig.relationType === RelationType.Model) {
 		return true;
 	}
+	if (copyConfig.modelProperty && copyConfig.relationType === RelationType.Parent) {
+		return true;
+	}
 	return false;
 }
 
@@ -279,9 +284,11 @@ export function CreateCopyConfig(): CopyConfig {
 		agentProperty: '',
 		enabled: false,
 		modelProperty: '',
+		parentProperty: '',
 		agent: '',
 		model: '',
 		modelOutput: '',
+		parent: '',
 		modelOutputProperty: '',
 		id: GUID(),
 		relationType: RelationType.Model,
@@ -295,6 +302,8 @@ export function CreateHalf(): HalfRelation {
 		enabled: false,
 		agent: '',
 		model: '',
+		parent: '',
+		parentProperty: '',
 		modelOutput: '',
 		modelOutputProperty: '',
 		id: GUID(),
@@ -480,6 +489,11 @@ export function getRelationProperties(methodDescription: MethodDescription, half
 					properties = GetModelPropertyChildren(methodDescription.properties.model || '').toNodeSelect();
 				}
 				break;
+			case RelationType.Parent:
+				if (methodDescription.properties && methodDescription.properties.parent) {
+					properties = GetModelPropertyChildren(methodDescription.properties.parent || '').toNodeSelect();
+				}
+				break;
 		}
 	}
 
@@ -491,8 +505,10 @@ export function CreateSimpleValidation(): SimpleValidationConfig {
 		relationType: RelationType.Agent,
 		agentProperty: '',
 		modelProperty: '',
+		parentProperty: '',
 		agent: '',
 		model: '',
+		parent: '',
 		modelOutput: '',
 		modelOutputProperty: '',
 
@@ -540,6 +556,8 @@ export function CreateAreEqual(): AreEqualConfig {
 		agentProperty: '',
 		agent: '',
 		model: '',
+		parent: '',
+		parentProperty: '',
 		modelOutput: '',
 		modelOutputProperty: '',
 		enabled: false,
@@ -597,6 +615,11 @@ export function SetupConfigInstanceInformation(
 					properties = GetModelPropertyChildren(methodDescription.properties.model || '').toNodeSelect();
 				}
 				break;
+			case RelationType.Parent:
+				if (methodDescription.properties && methodDescription.properties.parent) {
+					properties = GetModelPropertyChildren(methodDescription.properties.parent || '').toNodeSelect();
+				}
+				break;
 		}
 	}
 	if (methodDescription && methodDescription.properties && methodDescription.properties.model) {
@@ -625,10 +648,12 @@ export function CreateGetExistence(): GetExistingConfig {
 		relationType: RelationType.Agent,
 		id: GUID(),
 		agent: '',
+		parent: '',
 		model: '',
 		modelOutput: '',
 		agentProperty: '',
 		modelProperty: '',
+		parentProperty: '',
 		modelOutputProperty: '',
 		targetProperty: '',
 		enabled: false
@@ -638,9 +663,11 @@ export interface HalfRelation extends ConfigItem {
 	relationType: RelationType;
 	agent: string;
 	model: string;
+	parent: string;
 	modelOutput: string;
 	agentProperty: string; // The property used to find the model.
 	modelProperty: string; // The property used to find the model
+	parentProperty: string;
 	modelOutputProperty: string; // The property used to find the model
 }
 export interface AfterEffectRelations extends HalfRelation {
@@ -734,7 +761,8 @@ export interface GetExistingConfig extends AfterEffectRelations {}
 export enum RelationType {
 	Agent = 'Agent',
 	Model = 'Model',
-	ModelOuput = 'ModelOutput'
+	ModelOuput = 'ModelOutput',
+	Parent = 'Parent'
 }
 export interface ReturnSettingConfig extends ConfigItem {
 	setting: ReturnSetting;

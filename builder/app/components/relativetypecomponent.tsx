@@ -101,6 +101,10 @@ export default class RelativeTypeComponent extends Component<any, any> {
 				);
 				property = relations.modelOutputProperty;
 				break;
+			case RelationType.Parent:
+				title = UIA.GetNodeTitle(methodDescription.properties.parent);
+				property = relations.parentProperty;
+				break;
 		}
 		let properties = getRelationProperties(methodDescription, relations);
 		return (
@@ -152,6 +156,11 @@ export default class RelativeTypeComponent extends Component<any, any> {
 									relations.modelOutputProperty = value;
 									if (methodDescription.properties.model_output)
 										relations.modelOutput = methodDescription.properties.model_output;
+									break;
+								case RelationType.ModelOuput:
+									relations.parentProperty = value;
+									if (methodDescription.properties.parent)
+										relations.parent = methodDescription.properties.parent;
 									break;
 							}
 							this.setState({

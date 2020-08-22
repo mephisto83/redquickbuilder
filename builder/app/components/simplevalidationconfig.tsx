@@ -90,7 +90,8 @@ export default class SimpleValidationComponent extends Component<any, any> {
 			simpleValidation &&
 			simpleValidation.enabled &&
 			((simpleValidation.relationType === RelationType.Agent && simpleValidation.agentProperty) ||
-				(simpleValidation.relationType === RelationType.ModelOuput && simpleValidation.modelOutputProperty) ||
+      (simpleValidation.relationType === RelationType.ModelOuput && simpleValidation.modelOutputProperty) ||
+      (simpleValidation.relationType === RelationType.Parent && simpleValidation.parentProperty) ||
 				(simpleValidation.relationType === RelationType.Model && simpleValidation.modelProperty));
 
 		let name = GetSimpleValidationId(simpleValidation, properties);
