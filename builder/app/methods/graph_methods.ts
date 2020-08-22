@@ -1677,7 +1677,7 @@ export function NodesByType(graph: any, nodeType: any, options: any = {}) {
 		if (!Array.isArray(nodeType)) {
 			nodeType = [ nodeType ];
 		}
-		if (!options || !options.skipCache)
+		if (!options || !removeNode)
 			if (AppCache && AppCache.Nodes) {
 				const temp: any = [];
 				nodeType.forEach((nt: any) => {

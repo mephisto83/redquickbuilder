@@ -71,6 +71,9 @@ export default class FilterComponent extends Component<any, any> {
 							onDelete={() => {
 								let index: number = filters.findIndex((v) => v.id === filterConfig.id);
 								if (index !== -1 && filters) {
+                  if (filterConfig.dataChain) {
+                    UIA.removeNodeById(filterConfig.dataChain);
+									}
 									filters.splice(index, 1);
 									this.setState({ turn: UIA.GUID() });
 								}

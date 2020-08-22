@@ -157,7 +157,7 @@ export default class RelativeTypeComponent extends Component<any, any> {
 									if (methodDescription.properties.model_output)
 										relations.modelOutput = methodDescription.properties.model_output;
 									break;
-								case RelationType.ModelOuput:
+								case RelationType.Parent:
 									relations.parentProperty = value;
 									if (methodDescription.properties.parent)
 										relations.parent = methodDescription.properties.parent;

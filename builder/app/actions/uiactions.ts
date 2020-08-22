@@ -4011,6 +4011,9 @@ export function setInComponentMode() {
 export function removeCurrentNode() {
 	graphOperation(REMOVE_NODE, { id: Visual(_getState(), SELECTED_NODE) })(_dispatch, _getState);
 }
+export function removeNodeById(id: string) {
+	graphOperation(REMOVE_NODE, { id })(_dispatch, _getState);
+}
 export function togglePinned() {
 	const state = _getState();
 	const currentNode: _.Node = Node(state, Visual(state, SELECTED_NODE));

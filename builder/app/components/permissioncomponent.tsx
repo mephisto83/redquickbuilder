@@ -65,6 +65,9 @@ export default class PermissionComponent extends Component<any, any> {
 							onDelete={() => {
 								let index: number = permissions.findIndex((v) => v.id === permissionConfig.id);
 								if (index !== -1 && permissions) {
+                  if (permissionConfig.dataChain) {
+                    UIA.removeNodeById(permissionConfig.dataChain);
+									}
 									permissions.splice(index, 1);
 									this.setState({ turn: UIA.GUID() });
 								}

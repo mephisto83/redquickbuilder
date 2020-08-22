@@ -73,6 +73,9 @@ export default class AfterEffectsComponent extends Component<any, any> {
 							onDelete={() => {
 								let index: number = afterEffects.findIndex((v) => v.id === afterEffect.id);
 								if (index !== -1 && afterEffects) {
+                  if (afterEffect.dataChain) {
+										UIA.removeNodeById(afterEffect.dataChain);
+									}
 									afterEffects.splice(index, 1);
 									this.setState({ turn: UIA.GUID() });
 								}

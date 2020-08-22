@@ -65,8 +65,8 @@ export default class ExecutionComponent extends Component<any, any> {
 				{(executions || []).map((executionConfig: ExecutionConfig, index: number) => {
 					return (
 						<ExecutionComponentItem
-              key={executionConfig.id}
-              onContext={this.props.onContext}
+							key={executionConfig.id}
+							onContext={this.props.onContext}
 							title={Titles.Execution}
 							methodDescription={index && mountingItem ? null : mountingItem.methodDescription}
 							mountingItem={mountingItem}
@@ -80,6 +80,9 @@ export default class ExecutionComponent extends Component<any, any> {
 							onDelete={() => {
 								let index: number = executions.findIndex((v) => v.id === executionConfig.id);
 								if (index !== -1 && executions) {
+									if (executionConfig.dataChain) {
+										UIA.removeNodeById(executionConfig.dataChain);
+									}
 									executions.splice(index, 1);
 									this.setState({ turn: UIA.GUID() });
 								}
