@@ -61,12 +61,13 @@ export default class Typeahead extends Component<any, any> {
 						return res;
 					})
 			: [];
+		let emp: any = {
+			['--container-height']: `${Math.max(5, Math.min(10, options.length ? options.length : 0)) * 30}px`
+		};
 		return (
 			<div
 				className={`typeahead  ${options.length && this.state.focus ? 'open' : ''}`}
-				style={{
-					['--container-height']: `${Math.max(5, Math.min(10, options.length ? options.length : 0)) * 30}px`
-				}}
+				style={emp}
 				onMouseOut={() => {
 					this.setState({ hovering: false });
 				}}
