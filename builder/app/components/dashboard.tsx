@@ -99,6 +99,7 @@ import DashboardEffectContextMenu from './dashboardeffectcontextmenu';
 import RoutingContextMenu from './routingcontextmenu';
 import EffectContextMenu from './effectcontextmenu';
 import DashboardRoutingContextMenu from './dashboardroutingcontextmenu';
+import CopyContextComponent from './copycontextcomponent';
 import DashboardMountingContenxt from './dashboardmountingcontextmenu';
 import ScreenEffectContextMenu from './screeneffectcontextmenu';
 import DashboardScreenEffectContextMenu from './dashboardscreeneffectcontextmenu';
@@ -2654,6 +2655,7 @@ class Dashboard extends Component<any, any> {
 				<MountingContextMenu />
 				<EffectContextMenu />
 				<DashboardEffectContextMenu />
+        <CopyContextComponent />
 				<DashboardRoutingContextMenu />
 				<DashboardMountingContenxt />
 				<DashboardScreenEffectContextMenu />

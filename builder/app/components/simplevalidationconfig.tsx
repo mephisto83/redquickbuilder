@@ -176,6 +176,24 @@ export default class SimpleValidationComponent extends Component<any, any> {
 					config={simpleValidation.areEqual}
 					title={Titles.AreEqual}
 				/>
+				<EqualityConfigComponent
+					enabled={simpleValidation.enabled}
+					methodDescription={methodDescription}
+					dataChainType={this.props.dataChainType}
+					targetProperties={targetProperties}
+					properties={properties}
+					config={simpleValidation.isContained}
+					title={Titles.IsContained}
+				/>
+				<EqualityConfigComponent
+					enabled={simpleValidation.enabled}
+					methodDescription={methodDescription}
+					dataChainType={this.props.dataChainType}
+					targetProperties={targetProperties}
+					properties={properties}
+					config={simpleValidation.isNotContained}
+					title={Titles.IsNotContained}
+				/>
 				<BooleanConfigComponent
 					enabled={simpleValidation.enabled}
 					booleanConfig={simpleValidation.isNotNull}
@@ -219,6 +237,33 @@ export default class SimpleValidationComponent extends Component<any, any> {
 							}
 						}}
 						icon="fa fa-minus"
+					/>
+					<TreeViewGroupButton
+						title={`${Titles.Copy}`}
+						onClick={() => {
+							UIA.CopyToContext(
+								simpleValidation,
+								UIA.CopyType.SimpleValidation,
+								methodDescription.properties.model,
+								methodDescription.properties.agent,
+								simpleValidation.name
+							);
+						}}
+						icon="fa fa-copy"
+					/>
+					<TreeViewGroupButton
+						title={`${Titles.Paste}`}
+						onClick={() => {
+							let parts = UIA.GetSelectedCopyContext(
+								UIA.CopyType.SimpleValidation,
+								methodDescription.properties.model,
+								methodDescription.properties.agent
+							);
+							let dataChainOptions: DataChainConfiguration = this.props.dataChainOptions;
+							dataChainOptions.simpleValidations = dataChainOptions.simpleValidations || [];
+							dataChainOptions.simpleValidations.push(...parts.map((v) => v.obj));
+						}}
+						icon="fa fa-paste"
 					/>
 				</TreeViewButtonGroup>
 			</TreeViewMenu>

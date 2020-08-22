@@ -321,12 +321,42 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 							}
 						}}
 						icon="fa fa-plus"
+					/>{' '}
+					<TreeViewGroupButton
+						title={`${Titles.Copy}`}
+						onClick={() => {
+							UIA.CopyToContext(
+								simpleValidations,
+								UIA.CopyType.SimpleValidations,
+								methodDescription.properties.model,
+                methodDescription.properties.agent,
+                this.props.name
+							);
+						}}
+						icon="fa fa-copy"
+					/>
+					<TreeViewGroupButton
+						title={`${Titles.Paste}`}
+						onClick={() => {
+							let parts = UIA.GetSelectedCopyContext(
+								UIA.CopyType.SimpleValidations,
+								methodDescription.properties.model,
+								methodDescription.properties.agent
+							);
+							let dataChainOptions: DataChainConfiguration = this.props.dataChainOptions;
+							parts.map((v) => {
+								dataChainOptions.simpleValidations = dataChainOptions.simpleValidations || [];
+								dataChainOptions.simpleValidations.push(...v.obj);
+							});
+						}}
+						icon="fa fa-paste"
 					/>
 				</TreeViewButtonGroup>
 				{simpleValidations.map((simpleValidation: SimpleValidationConfig, index: number) => {
 					return (
 						<SimpleValidationComponent
-							key={`${index}-simple-validations`}
+              key={`${index}-simple-validations`}
+              name={this.props.name}
 							onValidationAdd={(validationId: string) => {
 								let name = GetSimpleValidationId(simpleValidation, properties);
 								simpleValidationConfiguration.composition.graph = AddNewSimpleValidationConfigToGraph(
@@ -372,6 +402,7 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 							}}
 							dataChainType={this.props.dataChainType}
 							simpleValidation={simpleValidation}
+							dataChainOptions={dataChainOptions}
 							methodDescription={methodDescription}
 							properties={properties}
 							targetProperties={targetProperties}

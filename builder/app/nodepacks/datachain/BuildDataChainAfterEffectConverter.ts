@@ -17,7 +17,8 @@ import {
 	StretchPathItem,
 	SimpleValidationConfig,
 	AreEqualConfig,
-	HalfRelation
+	HalfRelation,
+	IsContainedConfig
 } from '../../interface/methodprops';
 import { MethodFunctions, bindTemplate } from '../../constants/functiontypes';
 import {
@@ -610,6 +611,24 @@ function GenerateSimpleValidations(
 				);
 				checks.push({ template: equality, id: simpleValidation.id });
 			}
+			if (simpleValidation.isNotContained && simpleValidation.isNotContained.enabled) {
+				let equality = GenerateIsContainedComparer(
+					simpleValidation,
+					simpleValidation.isNotContained,
+					tempLambdaInsertArgumentValues,
+					true
+				);
+				checks.push({ template: equality, id: simpleValidation.id });
+			}
+			if (simpleValidation.isContained && simpleValidation.isContained.enabled) {
+				let equality = GenerateIsContainedComparer(
+					simpleValidation,
+					simpleValidation.isContained,
+					tempLambdaInsertArgumentValues,
+					false
+				);
+				checks.push({ template: equality, id: simpleValidation.id });
+			}
 			if (simpleValidation.oneOf && simpleValidation.oneOf.enabled) {
 				let oneOf = GenerateOneOf(valuePropString, simpleValidation.oneOf, tempLambdaInsertArgumentValues);
 				checks.push({ template: oneOf, id: simpleValidation.id });
@@ -748,6 +767,21 @@ function GenerateEqualityComparer(
 	SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, areEqual.relationType, areEqual);
 
 	return `${valuePropString} ${equal} ${equalityTo}`;
+}
+
+function GenerateIsContainedComparer(
+	simpleValidation: SimpleValidationConfig,
+	areEqual: IsContainedConfig,
+	tempLambdaInsertArgumentValues: any,
+	not: boolean
+) {
+	let { relationType } = simpleValidation;
+	let valuePropString = GetRelationTypeValuePropString(relationType, simpleValidation);
+	let equalityTo = GetRelationTypeValuePropString(areEqual.relationType, areEqual);
+	SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, relationType, simpleValidation);
+	SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, areEqual.relationType, areEqual);
+
+	return `${not ? '!' : ''}(${valuePropString} != null && ${valuePropString}.Contains(${equalityTo}))`;
 }
 
 function SetLambdaInsertArgumentValues(

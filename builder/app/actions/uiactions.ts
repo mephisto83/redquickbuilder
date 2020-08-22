@@ -24,7 +24,7 @@ import { GraphLink, Graph } from '../methods/graph_types';
 import * as _ from '../methods/graph_types';
 import JobService, { Job, JobAssignment, JobFile, JobServiceConstants } from '../jobs/jobservice';
 import { AgentProject, CommandCenter } from '../jobs/interfaces';
-import { RouteSourceType, RouteSource } from '../interface/methodprops';
+import { RouteSourceType, RouteSource, SimpleValidationConfig, ConfigItem } from '../interface/methodprops';
 import {
 	ReferenceInsert,
 	GetJSONReferenceInserts,
@@ -3536,12 +3536,82 @@ export interface CopyContext {
 	name: string;
 	model: string;
 	agent: string;
+	selected: boolean;
 	obj: any;
 	type: CopyType;
 	id: string;
 }
 export enum CopyType {
+	SimpleValidation = 'SimpleValidation',
+	SimpleValidations = 'SimpleValidations',
 	PermissionConfigs = 'PermissionConfigs'
+}
+export function CopyToContext(
+	obj: any,
+	copyType: CopyType,
+	model: string | undefined,
+	agent: string | undefined,
+	name?: string
+) {
+	let getState: Function = GetStateFunc();
+	let dispatch: Function = GetDispatchFunc();
+	if (model && agent && getState && dispatch) {
+		addToCopyContext({
+			id: GUID(),
+			model,
+			selected: false,
+			agent,
+			name: name || '',
+			type: copyType,
+			obj
+		})(dispatch, getState);
+		setVisual(COPY_CONTEXT_MENU, true)(dispatch, getState);
+	}
+}
+export function GetSelectedCopyContext(
+	copyType: CopyType,
+	model: string | undefined,
+	agent: string | undefined
+): any[] {
+	let getState: Function = GetStateFunc();
+	let dispatch: Function = GetDispatchFunc();
+	if (model && agent && getState && dispatch) {
+		let copyContext: CopyContext[] = Visual(getState(), COPY_CONTEXT) || [];
+		return copyContext
+			.filter((v) => v.agent === agent && v.model === model && v.type === copyType)
+			.map((v) => {
+				switch (copyType) {
+					case CopyType.SimpleValidation:
+						return {
+							...v,
+							obj: copySimpleValidation(v.obj)
+						};
+					case CopyType.SimpleValidations:
+						return {
+							...v,
+							obj: v.obj.map((t: any) => copySimpleValidation(t))
+						};
+				}
+				return null;
+			})
+			.filter((v: CopyContext | null) => {
+				return !!v;
+			})
+			.filter((v) => v && v.selected);
+	}
+	return [];
+}
+export function copySimpleValidation(simpleValidation: SimpleValidationConfig): SimpleValidationConfig {
+	let temp: any = {
+		...simpleValidation,
+		id: GUID()
+	};
+
+	for (var i in temp) {
+		let configItem: ConfigItem = temp[i];
+		if (configItem && configItem.id) configItem.id = GUID();
+	}
+	return temp;
 }
 export function addToCopyContext(context: CopyContext) {
 	return (dispatch: Function, getState: Function) => {
@@ -3554,6 +3624,12 @@ export function removeFromCopyContext(id: string) {
 	return (dispatch: Function, getState: Function) => {
 		let copyContext: CopyContext[] = Visual(getState(), COPY_CONTEXT) || [];
 		copyContext = copyContext.filter((v) => v.id !== id);
+		dispatch(UIC(VISUAL, COPY_CONTEXT, copyContext));
+	};
+}
+export function clearCopyContext() {
+	return (dispatch: Function) => {
+		let copyContext: CopyContext[] = [];
 		dispatch(UIC(VISUAL, COPY_CONTEXT, copyContext));
 	};
 }
@@ -3572,6 +3648,7 @@ export const DASHBOARD_ROUTING_CONTEXT_MENU = 'DASHBOARD_ROUTING_CONTEXT_MENU';
 export const DASHBOARD_SCREENEFFECT_CONTEXT_MENU = 'DASHBOARD_SCREENEFFECT_CONTEXT_MENU';
 export const AGENT_SCREENEFFECT_CONTEXT_MENU = 'AGENT_SCREENEFFECT_CONTEXT_MENU';
 export const MOUNTING_CONTEXT_MENU = 'MOUNTING_CONTEXT_MENU';
+export const COPY_CONTEXT_MENU = 'COPY_CONTEXT_MENU';
 export const DASHBOARD_MOUNTING_CONTEXT_MENU = 'DASHBOARD_MOUNTING_CONTEXT_MENU';
 export const EFFECT_CONTEXT_MENU = 'EFFECT_CONTEXT_MENU';
 export const DASHBOARD_EFFECT_CONTEXT_MENU = 'DASHBOARD_EFFECT_CONTEXT_MENU';

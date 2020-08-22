@@ -49,7 +49,7 @@ export default class EqualityConfigComponent extends Component<any, any> {
 				}}
 				active
 				greyed={!areEqual.enabled}
-				title={Titles.IsEqualTo}
+				title={this.props.title || Titles.IsEqualTo}
 			>
 				<TreeViewItemContainer>
 					<CheckBox

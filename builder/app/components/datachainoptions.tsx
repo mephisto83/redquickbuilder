@@ -112,6 +112,7 @@ export default class DataChainOptions extends Component<any, any> {
 					dataChainType={this.props.dataChainType}
           methodDescription={methodDescription}
           onContext={this.props.onContext}
+          name={this.props.name}
 					dataChainOptions={dataChainOptions}
 					onChange={onchange}
 				/>

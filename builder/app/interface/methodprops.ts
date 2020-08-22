@@ -515,6 +515,8 @@ export function CreateSimpleValidation(): SimpleValidationConfig {
 			value: '1'
 		},
 		areEqual: CreateAreEqual(),
+		isContained: CreateAreEqual(),
+		isNotContained: CreateAreEqual(),
 		oneOf: CreateOneOf()
 	};
 }
@@ -552,9 +554,16 @@ export function SetupConfigInstanceInformation(
 ) {
 	dataChainOptions.checkExistence = dataChainOptions.checkExistence || CreateCheckExistence();
 	dataChainOptions.simpleValidation = dataChainOptions.simpleValidation || CreateSimpleValidation();
+	dataChainOptions.simpleValidation.isContained = dataChainOptions.simpleValidation.isContained || CreateAreEqual();
+	dataChainOptions.simpleValidation.isNotContained =
+		dataChainOptions.simpleValidation.isNotContained || CreateAreEqual();
 	dataChainOptions.simpleValidationConfiguration =
 		dataChainOptions.simpleValidationConfiguration || CreateSimpleValidationComposition();
 	dataChainOptions.simpleValidations = dataChainOptions.simpleValidations || [];
+	dataChainOptions.simpleValidations.forEach((item) => {
+		item.isContained = item.isContained || CreateAreEqual();
+		item.isNotContained = item.isNotContained || CreateAreEqual();
+	});
 	dataChainOptions.copyConfig = dataChainOptions.copyConfig || CreateCopyConfig();
 	dataChainOptions.setInteger = dataChainOptions.setInteger || CreateSetInteger();
 	dataChainOptions.setBoolean = dataChainOptions.setBoolean || CreateSetBoolean();
@@ -680,6 +689,8 @@ export interface BranchConfig {
 }
 export interface CopyConfig extends AfterEffectRelations {}
 export interface AreEqualConfig extends AfterEffectRelations {}
+export interface IsContainedConfig extends AfterEffectRelations {}
+export interface IsNotContainedConfig extends AfterEffectRelations {}
 export interface Setter extends HalfRelation {
 	value: string;
 }
@@ -696,6 +707,8 @@ export interface SimpleValidationConfig extends AfterEffectRelations {
 	isTrue: BooleanConfig;
 	isFalse: BooleanConfig;
 	areEqual: AreEqualConfig;
+	isContained: IsContainedConfig;
+	isNotContained: IsNotContainedConfig;
 	isNull: BooleanConfig;
 	oneOf: EnumerationConfig;
 }

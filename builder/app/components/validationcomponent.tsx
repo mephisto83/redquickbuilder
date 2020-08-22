@@ -44,6 +44,8 @@ export default class ValidationComponent extends Component<any, any> {
 						}}
 						icon="fa fa-plus"
 					/>
+					<TreeViewGroupButton title={`${Titles.Copy}`} onClick={() => {}} icon="fa fa-copy" />
+					<TreeViewGroupButton title={`${Titles.Paste}`} onClick={() => {}} icon="fa fa-paste" />
 				</TreeViewButtonGroup>
 				{(validations || []).map((validationConfig: ValidationConfig, index: number) => {
 					return (
@@ -51,7 +53,7 @@ export default class ValidationComponent extends Component<any, any> {
 							key={validationConfig.id}
 							methodDescription={index && mountingItem ? null : mountingItem.methodDescription}
 							mountingItem={mountingItem}
-              onContext={this.props.onContext}
+							onContext={this.props.onContext}
 							onChange={() => {
 								if (this.props.onChange) {
 									this.props.onChange();

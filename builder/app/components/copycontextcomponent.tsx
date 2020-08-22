@@ -54,62 +54,87 @@ class CopyContextComponent extends Component<any, any> {
 		this.state = {};
 	}
 
-	getMenuMode(mode: any) {
-		const result: any = [];
-		let mounting: ViewMounting = mode.mounting;
-
-		let callback: any = mode.callback;
-		if (mounting) {
-			const exit = () => {
-				this.props.setVisual(UIA.MOUNTING_CONTEXT_MENU, null);
-			};
-
-			result.push(
+	getMenuItems() {
+		return [ this.contextMenuTypes(), ...this.contextCopies() ];
+	}
+	contextCopies() {
+		let { state } = this.props;
+		let copyContexts: UIA.CopyContext[] = UIA.Visual(state, UIA.COPY_CONTEXT) || [];
+		return copyContexts.filter((v) => UIA.Visual(state, v.type)).map((copyContext: UIA.CopyContext) => {
+			return (
 				<TreeViewMenu
-					key={'clear-screen'}
-					open={this.state.mountingProperties}
 					active
-					title={Titles.Properties}
-					toggle={() => {
-						this.setState({
-							mountingProperties: !this.state.mountingProperties
-						});
+					icon={copyContext.selected ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+					greyed={!copyContext.selected}
+					key={copyContext.id}
+					title={`${copyContext.name || copyContext.id} [${UIA.GetNodeTitle(
+						copyContext.model
+					)}/ ${UIA.GetNodeTitle(copyContext.agent)}]`}
+					onClick={() => {
+						copyContext.selected = !copyContext.selected;
+						this.setState({ [copyContext.id]: !this.state[copyContext.id] });
 					}}
 				>
 					<TreeViewItemContainer>
 						<CheckBox
-							label={'Clear Screen On Mount'}
-							value={mounting && mounting.clearScreen}
+							label={Titles.Selected}
+							value={copyContext.selected}
 							onChange={(value: boolean) => {
-								mounting.clearScreen = value;
-								this.setState({
-									turn: UIA.GUID()
-								});
+								copyContext.selected = value;
+								this.setState({ [copyContext.id]: false, turn: UIA.GUID() });
 							}}
+						/>
+					</TreeViewItemContainer>
+					<TreeViewItemContainer>
+						<TextInput
+							label={Titles.Name}
+							onChange={(value: string) => {
+								copyContext.name = value;
+								this.setState({ turn: UIA.GUID() });
+							}}
+							value={copyContext.name}
 						/>
 					</TreeViewItemContainer>
 				</TreeViewMenu>
 			);
-
-			let models = UIA.NodesByType(this.props.state, UIA.NodeTypes.Model).toNodeSelect();
-			switch (mode) {
-				default:
-					break;
-			}
-		}
-		return result;
+		});
 	}
-	getMenuItems() {
-		return [];
+	contextMenuTypes() {
+		let { state } = this.props;
+		return (
+			<TreeViewMenu
+				active
+				key={'context-menu-types'}
+				title={Titles.CopyContexts}
+				open={this.state.contextMenuTypesOpen}
+				onClick={() => {
+					this.setState({ contextMenuTypesOpen: !this.state.contextMenuTypesOpen });
+				}}
+			>
+				{Object.keys(UIA.CopyType).map((key: string) => {
+					return (
+						<TreeViewItemContainer key={key}>
+							<CheckBox
+								label={key}
+								value={UIA.Visual(state, key)}
+								onChange={(value: boolean) => {
+									this.props.setVisual(key, value);
+								}}
+							/>
+						</TreeViewItemContainer>
+					);
+				})}
+			</TreeViewMenu>
+		);
 	}
 	render() {
 		const { state } = this.props;
 		const exit = () => {
-			this.props.setVisual(UIA.MOUNTING_CONTEXT_MENU, null);
+			this.props.setVisual(UIA.COPY_CONTEXT_MENU, null);
 		};
 		const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-		const display = UIA.Visual(state, UIA.MOUNTING_CONTEXT_MENU) ? 'block' : 'none';
-		const nodeType = UIA.Visual(state, UIA.MOUNTING_CONTEXT_MENU)
+		const display = UIA.Visual(state, UIA.COPY_CONTEXT_MENU) ? 'block' : 'none';
+		const nodeType = UIA.Visual(state, UIA.COPY_CONTEXT_MENU)
 			? UIA.GetNodeProp(currentNode, NodeProperties.NODEType)
 			: null;
 		let menuitems = this.getMenuItems();
@@ -165,6 +190,16 @@ class CopyContextComponent extends Component<any, any> {
 								data-dismiss="modal"
 							>
 								Close
+							</button>
+							<button
+								type="button"
+								onClick={() => {
+									this.props.clearCopyContext();
+								}}
+								className="btn btn-outline pull-right"
+								data-dismiss="modal"
+							>
+								Clear
 							</button>
 						</div>
 					</div>

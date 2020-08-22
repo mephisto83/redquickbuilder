@@ -46,13 +46,6 @@ export default class PermissionComponent extends Component<any, any> {
 						}}
 						icon="fa fa-plus"
 					/>
-					<TreeViewGroupButton
-						title={`${Titles.Copy}`}
-						onClick={() => {
-
-						}}
-						icon="fa fa-copy"
-					/>
 				</TreeViewButtonGroup>
 				{(permissions || []).map((permissionConfig: PermissionConfig, index: number) => {
 					return (
