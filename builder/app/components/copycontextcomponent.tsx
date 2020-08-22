@@ -66,12 +66,16 @@ class CopyContextComponent extends Component<any, any> {
 					active
 					icon={copyContext.selected ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
 					greyed={!copyContext.selected}
+					open={this.state[copyContext.id]}
 					key={copyContext.id}
 					title={`${copyContext.name || copyContext.id} [${UIA.GetNodeTitle(
 						copyContext.model
 					)}/ ${UIA.GetNodeTitle(copyContext.agent)}]`}
 					onClick={() => {
 						copyContext.selected = !copyContext.selected;
+						this.setState({ turn: UIA.GUID() });
+					}}
+					onRightClick={() => {
 						this.setState({ [copyContext.id]: !this.state[copyContext.id] });
 					}}
 				>
@@ -81,7 +85,27 @@ class CopyContextComponent extends Component<any, any> {
 							value={copyContext.selected}
 							onChange={(value: boolean) => {
 								copyContext.selected = value;
-								this.setState({ [copyContext.id]: false, turn: UIA.GUID() });
+								this.setState({ turn: UIA.GUID() });
+							}}
+						/>
+					</TreeViewItemContainer>
+					<TreeViewItemContainer>
+						<CheckBox
+							label={Titles.IgnoreAgents}
+							value={copyContext.ignoreAgent}
+							onChange={(value: boolean) => {
+								copyContext.ignoreAgent = value;
+								this.setState({ turn: UIA.GUID() });
+							}}
+						/>
+					</TreeViewItemContainer>
+					<TreeViewItemContainer>
+						<CheckBox
+							label={Titles.IgnoreModels}
+							value={copyContext.ignoreModel}
+							onChange={(value: boolean) => {
+								copyContext.ignoreModel = value;
+								this.setState({ turn: UIA.GUID() });
 							}}
 						/>
 					</TreeViewItemContainer>

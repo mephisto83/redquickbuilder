@@ -3537,6 +3537,8 @@ export interface CopyContext {
 	model: string;
 	agent: string;
 	selected: boolean;
+	ignoreAgent?: boolean;
+	ignoreModel?: boolean;
 	obj: any;
 	type: CopyType;
 	id: string;
@@ -3578,7 +3580,10 @@ export function GetSelectedCopyContext(
 	if (model && agent && getState && dispatch) {
 		let copyContext: CopyContext[] = Visual(getState(), COPY_CONTEXT) || [];
 		return copyContext
-			.filter((v) => v.agent === agent && v.model === model && v.type === copyType)
+			.filter(
+				(v) =>
+					(v.agent === agent || v.ignoreAgent) && (v.model === model || v.ignoreModel) && v.type === copyType
+			)
 			.map((v) => {
 				switch (copyType) {
 					case CopyType.SimpleValidation:
@@ -3603,7 +3608,7 @@ export function GetSelectedCopyContext(
 }
 export function copySimpleValidation(simpleValidation: SimpleValidationConfig): SimpleValidationConfig {
 	let temp: any = {
-		...simpleValidation,
+		...JSON.parse(JSON.stringify(simpleValidation)),
 		id: GUID()
 	};
 

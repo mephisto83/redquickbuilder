@@ -329,8 +329,8 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 								simpleValidations,
 								UIA.CopyType.SimpleValidations,
 								methodDescription.properties.model,
-                methodDescription.properties.agent,
-                this.props.name
+								methodDescription.properties.agent,
+								this.props.name
 							);
 						}}
 						icon="fa fa-copy"
@@ -348,6 +348,9 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 								dataChainOptions.simpleValidations = dataChainOptions.simpleValidations || [];
 								dataChainOptions.simpleValidations.push(...v.obj);
 							});
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
 						}}
 						icon="fa fa-paste"
 					/>
@@ -355,8 +358,9 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 				{simpleValidations.map((simpleValidation: SimpleValidationConfig, index: number) => {
 					return (
 						<SimpleValidationComponent
-              key={`${index}-simple-validations`}
-              name={this.props.name}
+							key={`${index}-simple-validations`}
+							simpleValidationConfiguration={simpleValidationConfiguration}
+							name={this.props.name}
 							onValidationAdd={(validationId: string) => {
 								let name = GetSimpleValidationId(simpleValidation, properties);
 								simpleValidationConfiguration.composition.graph = AddNewSimpleValidationConfigToGraph(

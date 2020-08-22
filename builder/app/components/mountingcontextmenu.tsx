@@ -74,7 +74,7 @@ class ContextMenu extends Component<any, any> {
 							id: UIA.GUID(),
 							model,
 							agent,
-							name: '',
+              name: '',
 							viewType,
 							screenEffect: []
 						});
@@ -508,6 +508,7 @@ class ContextMenu extends Component<any, any> {
 								methodDescription.properties.model_output = mountingItem.model;
 							}
 							break;
+
 					}
 				});
 			}

@@ -29,7 +29,8 @@ import {
 	CreateSimpleValidation,
 	CreateOneOf,
 	CreateBoolean,
-	GetSimpleValidationId
+	GetSimpleValidationId,
+	SimpleValidationsConfiguration
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
@@ -90,12 +91,12 @@ export default class SimpleValidationComponent extends Component<any, any> {
 			simpleValidation &&
 			simpleValidation.enabled &&
 			((simpleValidation.relationType === RelationType.Agent && simpleValidation.agentProperty) ||
-      (simpleValidation.relationType === RelationType.ModelOuput && simpleValidation.modelOutputProperty) ||
-      (simpleValidation.relationType === RelationType.Parent && simpleValidation.parentProperty) ||
+				(simpleValidation.relationType === RelationType.ModelOuput && simpleValidation.modelOutputProperty) ||
+				(simpleValidation.relationType === RelationType.Parent && simpleValidation.parentProperty) ||
 				(simpleValidation.relationType === RelationType.Model && simpleValidation.modelProperty));
 
 		let name = GetSimpleValidationId(simpleValidation, properties);
-
+		let simpleValidationConfiguration: SimpleValidationsConfiguration = this.props.simpleValidationConfiguration;
 		return (
 			<TreeViewMenu
 				open={this.state.open}
@@ -139,7 +140,11 @@ export default class SimpleValidationComponent extends Component<any, any> {
 					/>
 				</TreeViewItemContainer>
 				<TreeViewItem
-					hide={!simpleValidation.enabled}
+					hide={
+						!simpleValidation.enabled ||
+						!simpleValidationConfiguration ||
+						!simpleValidationConfiguration.enabled
+					}
 					icon={'fa fa-plus-square'}
 					title={Titles.AddValidationItem}
 					onClick={() => {
