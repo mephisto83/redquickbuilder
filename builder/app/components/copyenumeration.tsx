@@ -60,9 +60,8 @@ export default class CopyEnumeration extends Component<any, any> {
 					this.setState({ open: !this.state.open });
 				}}
 				active
-				hide={!this.props.enabled}
 				greyed={!copyEnumeration.enabled}
-				title={this.props.title}
+				title={this.props.title || Titles.CopyEnumeration}
 			>
 				<TreeViewItemContainer>
 					<CheckBox
@@ -81,7 +80,7 @@ export default class CopyEnumeration extends Component<any, any> {
 				</TreeViewItemContainer>
 				<TreeViewItemContainer>
 					<SelectInput
-						label={Titles.Enumeration}
+						label={`${Titles.Enumeration} Type`}
 						options={NodesByType(UIA.GetCurrentGraph(), NodeTypes.Enumeration).toNodeSelect()}
 						value={copyEnumeration.enumerationType}
 						onChange={(val: string) => {
@@ -99,6 +98,7 @@ export default class CopyEnumeration extends Component<any, any> {
 					<SelectInput
 						options={enumerations.map((v) => ({ title: v.value, value: v.id }))}
 						value={copyEnumeration.enumeration}
+						label={Titles.Enumeration}
 						onChange={(val: string) => {
 							copyEnumeration.enumeration = val;
 							this.setState({
@@ -112,7 +112,7 @@ export default class CopyEnumeration extends Component<any, any> {
 				</TreeViewItemContainer>
 				<TreeViewItemContainer>
 					<SelectInput
-						label={UIA.GetNodeTitle(methodDescription.properties.model)}
+						label={Titles.Property}
 						options={targetProperties || []}
 						value={copyEnumeration.targetProperty}
 						onChange={(value: string) => {

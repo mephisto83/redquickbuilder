@@ -47,6 +47,7 @@ import ValidationComponent from './validationcomponent';
 import FilterComponent from './filtercomponent';
 import FilterItemsComponent from './filteritemscomponent';
 import PermissionComponent from './permissioncomponent';
+import StaticParametersComponent from './staticparameterscomponent';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -383,6 +384,7 @@ class ContextMenu extends Component<any, any> {
 								>
 									{parameterConnections}
 								</TreeViewMenu>
+								<StaticParametersComponent agent={agent} mountingItem={mountingItem} />
 								<TreeViewMenu
 									active
 									title={'Method constraint values'}

@@ -1139,6 +1139,9 @@ export function GetConditionSetup(condition: any) {
 export function GetDataChainEntryNodes(cs?: any) {
 	return GraphMethods.GetDataChainEntryNodes(_getState(), cs);
 }
+export function IsModel(id: string) {
+	return GetNodeProp(id, NodeProperties.NODEType) === NodeTypes.Model;
+}
 export function GetPropertyModel(propId: string): _.Node | null {
 	let nodes = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
 		id: propId,
@@ -3552,6 +3555,7 @@ export interface CopyContext {
 export enum CopyType {
 	SimpleValidation = 'SimpleValidation',
 	ExecutionConfig = 'ExecutionConfig',
+	ExecutionConfigs = 'ExecutionConfigs',
 	SimpleValidations = 'SimpleValidations',
 	PermissionConfigs = 'PermissionConfigs'
 }
@@ -3598,6 +3602,12 @@ export function GetSelectedCopyContext(
 							...v,
 							obj: copySimpleValidation(v.obj)
 						};
+					case CopyType.ExecutionConfigs:
+						return {
+							...v,
+							obj: v.obj.map((t: any) => copyExecutionConfig(t))
+						};
+
 					case CopyType.ExecutionConfig:
 						return {
 							...v,

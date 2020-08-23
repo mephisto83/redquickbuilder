@@ -34,6 +34,7 @@ import { Node } from '../methods/graph_types';
 import { MethodFunctions } from '../constants/functiontypes';
 import { GetNodesByProperties } from '../methods/graph_methods';
 import CheckBox from './checkbox';
+import StaticParametersComponent from './staticparameterscomponent';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -345,7 +346,6 @@ class ContextMenu extends Component<any, any> {
 									</TreeViewItemContainer>
 								)}
 
-
 								{route.isDashboard ? null : (
 									<TreeViewItemContainer>
 										<SelectInput
@@ -360,6 +360,7 @@ class ContextMenu extends Component<any, any> {
 									</TreeViewItemContainer>
 								)}
 								{parameterConnections}
+								<StaticParametersComponent agent={agent} mountingItem={route} />
 								<TreeViewButtonGroup>
 									<TreeViewGroupButton
 										onClick={() => {

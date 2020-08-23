@@ -1,5 +1,5 @@
 import { Config } from 'electron';
-import { GetModelPropertyChildren, GUID, setRouteSource } from '../actions/uiactions';
+import { GetModelPropertyChildren, GUID, setRouteSource, GetModelCodeProperties } from '../actions/uiactions';
 import datachainactivitymenu from '../components/datachainactivitymenu';
 import SimpleValidationComponent from '../components/simplevalidationconfig';
 import { Graph } from '../methods/graph_types';
@@ -78,6 +78,7 @@ export interface MountingDescription {
 	agent: string;
 	// ------
 	id: string;
+	staticParameters?: StaticParameters;
 	name: string;
 	methodDescription?: MethodDescription;
 	source?: { [key: string]: RouteSource }; // This is what the button will use to populate the parameter for navigating to the next page.
@@ -414,6 +415,25 @@ export function GetSimpleValidationId(simpleValidation: any, properties: any) {
 	}
 	return simpleValidation.name || name;
 }
+
+export function createStaticParameters(): StaticParameters {
+	return {
+		parameters: [],
+		name: '',
+		id: GUID(),
+		enabled: false
+	};
+}
+export function createStaticParameter(): StaticParameter {
+	return {
+		id: GUID(),
+		enabled: false,
+		enumeration: '',
+		enumerationType: '',
+		name: '',
+		purpose: StaticParameterPurpose.Routing
+	};
+}
 export function setDefaultRouteSource(mountingItem: MountingDescription, urlParameter: string, k: string) {
 	if (
 		!mountingItem.source &&
@@ -481,7 +501,7 @@ export function getRelationProperties(methodDescription: MethodDescription, half
 		switch (halfRelation.relationType) {
 			case RelationType.Agent:
 				if (methodDescription.properties && methodDescription.properties.agent) {
-					properties = GetModelPropertyChildren(methodDescription.properties.agent).toNodeSelect();
+					properties = GetModelCodeProperties(methodDescription.properties.agent).toNodeSelect();
 				}
 				break;
 			case RelationType.ModelOuput:
@@ -489,19 +509,19 @@ export function getRelationProperties(methodDescription: MethodDescription, half
 					methodDescription.properties &&
 					(methodDescription.properties.model_output || methodDescription.properties.model)
 				) {
-					properties = GetModelPropertyChildren(
+					properties = GetModelCodeProperties(
 						methodDescription.properties.model_output || methodDescription.properties.model || ''
 					).toNodeSelect();
 				}
 				break;
 			case RelationType.Model:
 				if (methodDescription.properties && methodDescription.properties.model) {
-					properties = GetModelPropertyChildren(methodDescription.properties.model || '').toNodeSelect();
+					properties = GetModelCodeProperties(methodDescription.properties.model || '').toNodeSelect();
 				}
 				break;
 			case RelationType.Parent:
 				if (methodDescription.properties && methodDescription.properties.parent) {
-					properties = GetModelPropertyChildren(methodDescription.properties.parent || '').toNodeSelect();
+					properties = GetModelCodeProperties(methodDescription.properties.parent || '').toNodeSelect();
 				}
 				break;
 		}
@@ -624,7 +644,7 @@ export function SetupConfigInstanceInformation(
 		switch (checkExistence.relationType) {
 			case RelationType.Agent:
 				if (methodDescription.properties && methodDescription.properties.agent) {
-					properties = GetModelPropertyChildren(methodDescription.properties.agent).toNodeSelect();
+					properties = GetModelCodeProperties(methodDescription.properties.agent).toNodeSelect();
 				}
 				break;
 			case RelationType.ModelOuput:
@@ -632,25 +652,25 @@ export function SetupConfigInstanceInformation(
 					methodDescription.properties &&
 					(methodDescription.properties.model_output || methodDescription.properties.model)
 				) {
-					properties = GetModelPropertyChildren(
+					properties = GetModelCodeProperties(
 						methodDescription.properties.model_output || methodDescription.properties.model || ''
 					).toNodeSelect();
 				}
 				break;
 			case RelationType.Model:
 				if (methodDescription.properties && methodDescription.properties.model) {
-					properties = GetModelPropertyChildren(methodDescription.properties.model || '').toNodeSelect();
+					properties = GetModelCodeProperties(methodDescription.properties.model || '').toNodeSelect();
 				}
 				break;
 			case RelationType.Parent:
 				if (methodDescription.properties && methodDescription.properties.parent) {
-					properties = GetModelPropertyChildren(methodDescription.properties.parent || '').toNodeSelect();
+					properties = GetModelCodeProperties(methodDescription.properties.parent || '').toNodeSelect();
 				}
 				break;
 		}
 	}
 	if (methodDescription && methodDescription.properties && methodDescription.properties.model) {
-		targetProperties = GetModelPropertyChildren(methodDescription.properties.model).toNodeSelect();
+		targetProperties = GetModelCodeProperties(methodDescription.properties.model).toNodeSelect();
 	}
 	return {
 		checkExistence,
@@ -886,7 +906,17 @@ export interface ValidationConfig {
 	enabled: boolean;
 	dataChainOptions: DataChainConfiguration;
 }
-
+export interface StaticParameters extends ConfigItem {
+	parameters: StaticParameter[];
+}
+export interface StaticParameter extends ConfigItem {
+	enumeration: string;
+	enumerationType: string;
+	purpose: StaticParameterPurpose;
+}
+export enum StaticParameterPurpose {
+	Routing = 'Routing'
+}
 export function duplicateValidationConfig(validationConfig: ValidationConfig): ValidationConfig {
 	let result = { ...validationConfig };
 	result.id = GUID();
@@ -926,6 +956,7 @@ export interface RouteDescription {
 	isDashboard?: boolean;
 	isItemized?: boolean;
 	dashboard?: string;
+	staticParameters?: StaticParameters;
 	viewType: string;
 	model: string;
 	agent: string;

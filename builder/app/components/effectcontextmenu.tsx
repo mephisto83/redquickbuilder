@@ -42,6 +42,7 @@ import ValidationComponent from './validationcomponent';
 import PermissionComponent from './permissioncomponent';
 import ExecutionComponent from './executioncomponent';
 import FilterComponent from './filtercomponent';
+import StaticParametersComponent from './staticparameterscomponent';
 import FilterItemsComponent from './filteritemscomponent';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
@@ -335,8 +336,8 @@ class EffectContextMenu extends Component<any, any> {
 													effectItem.name =
 														effectItem.name ||
 														`${MethodFunctions[c].titleTemplate(
-															UIA.GetNodeTitle(agent),
-															UIA.GetNodeTitle(model)
+															UIA.GetNodeTitle(model),
+															UIA.GetNodeTitle(agent)
 														)} For ${viewType}`;
 												}
 											}
@@ -361,6 +362,7 @@ class EffectContextMenu extends Component<any, any> {
 									{bodyParameter}
 									{parameterConnections}
 								</TreeViewMenu>
+								<StaticParametersComponent agent={agent} mountingItem={effectItem} />
 								<TreeViewMenu
 									active
 									title={'Method constraint values'}

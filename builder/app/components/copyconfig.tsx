@@ -57,7 +57,7 @@ export default class CopyConfigComponent extends Component<any, any> {
 					this.setState({ open: !this.state.open });
 				}}
 				active
-				greyed={copyConfig.enabled}
+				greyed={!copyConfig.enabled}
 				title={Titles.Copy}
 			>
 				<TreeViewItemContainer>

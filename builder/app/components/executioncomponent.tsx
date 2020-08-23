@@ -47,6 +47,22 @@ export default class ExecutionComponent extends Component<any, any> {
 						}}
 						icon="fa fa-plus"
 					/>
+					{this.props.methodDescription ? (
+						<TreeViewGroupButton
+							title={`${Titles.Copy}`}
+							onClick={() => {
+								UIA.CopyToContext(
+									executions,
+									UIA.CopyType.ExecutionConfigs,
+									this.props.methodDescription.properties.model,
+									this.props.methodDescription.properties.agent,
+									mountingItem.name
+								);
+								this.setState({ turn: UIA.GUID() });
+							}}
+							icon="fa fa-copy"
+						/>
+					) : null}
 					<TreeViewGroupButton
 						title={`${Titles.Paste}`}
 						onClick={() => {
@@ -57,7 +73,18 @@ export default class ExecutionComponent extends Component<any, any> {
 									methodDescription.properties.model,
 									methodDescription.properties.agent
 								);
-								executions.push(...parts.map((v) => v.obj));
+								parts.push(
+									...UIA.GetSelectedCopyContext(
+										UIA.CopyType.ExecutionConfigs,
+										methodDescription.properties.model,
+										methodDescription.properties.agent
+									)
+								);
+								parts.map((v) => {
+									if (Array.isArray(v.obj)) {
+										executions.push(...v.obj);
+									} else executions.push(v.obj);
+								});
 								this.setState({ turn: UIA.GUID() });
 							}
 						}}

@@ -19,7 +19,8 @@ import {
 	AreEqualConfig,
 	HalfRelation,
 	IsContainedConfig,
-	CopyConfig
+	CopyConfig,
+	CopyEnumerationConfig
 } from '../../interface/methodprops';
 import { MethodFunctions, bindTemplate } from '../../constants/functiontypes';
 import {
@@ -34,7 +35,8 @@ import {
 	GetNodeTitle,
 	GetPropertyModel,
 	GetNodeByProperties,
-	ensureRouteSource
+	ensureRouteSource,
+	IsModel
 } from '../../actions/uiactions';
 import {
 	NodeProperties,
@@ -119,7 +121,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 	if (from.properties.agent) arbiterModels.push(from.properties.agent);
 	if (from.properties.parent) arbiterModels.push(from.properties.parent);
 	if (dataChainConfigOptions) {
-		let { compareEnumeration, compareEnumerations, copyConfig } = dataChainConfigOptions;
+		let { compareEnumeration, compareEnumerations, copyConfig, copyEnumeration } = dataChainConfigOptions;
 		if (compareEnumeration) {
 			compare_enumeration = CompareEnumerationFunc(compareEnumeration, tempLambdaInsertArgumentValues);
 		}
@@ -132,45 +134,26 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				.join(NEW_LINE);
 		}
 		if (copyConfig && copyConfig.enabled) {
-			let {
-				agentProperty,
-				modelProperty,
-				relationType,
-				targetProperty,
-				modelOutput,
-				modelOutputProperty
-			} = copyConfig;
-			let props = agentProperty;
-			let relProp = 'agent';
-			let agentOrModel = from.properties.agent;
-			if (relationType === RelationType.Model) {
-				props = modelProperty;
-				relProp = 'model';
-				agentOrModel = from.properties.model;
-			}
-			target_property = targetProperty;
-			setLambdaProperties(
+			({ target_property, outputType, copy_config } = setupCopyConfig(
+				copyConfig,
+				from,
+				target_property,
 				tempLambdaInsertArgumentValues,
-				agentProperty,
-				modelProperty,
-				targetProperty,
-				{
-					from,
-					to
-				},
-				modelOutput,
-				modelOutputProperty,
-				copyConfig
-			);
-			let attributeType = GetNodeProp(props, NodeProperties.UIAttributeType);
-			outputType = NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][attributeType];
-			tempLambdaInsertArgumentValues[`${relProp}.${GetJSCodeName(props)}`] = {
-				[ReferenceInsertType.Property]: props,
-				[ReferenceInsertType.Model]: agentOrModel
-			};
-			copy_config = `return ${relProp}.#{{"key":"${relProp}.${GetJSCodeName(
-				props
-			)}","type":"property","model":"${relProp}"}}#;`;
+				to,
+				outputType,
+				copy_config
+			));
+		}
+		if (copyEnumeration && copyEnumeration.enabled) {
+			({ target_property, outputType, copy_config } = setupCopyEnumeration(
+				copyEnumeration,
+				from,
+				target_property,
+				tempLambdaInsertArgumentValues,
+				to,
+				outputType,
+				copy_config
+			));
 		}
 
 		if (dataChainConfigOptions.checkExistence && dataChainConfigOptions.checkExistence.enabled) {
@@ -563,6 +546,83 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		}
 	}
 }
+function setupCopyConfig(
+	copyConfig: CopyConfig,
+	from: MethodDescription,
+	target_property: string,
+	tempLambdaInsertArgumentValues: any,
+	to: MethodDescription | undefined,
+	outputType: string,
+	copy_config: string
+) {
+	let { agentProperty, modelProperty, relationType, targetProperty, modelOutput, modelOutputProperty } = copyConfig;
+	let props = agentProperty;
+	let relProp = 'agent';
+	let agentOrModel = from.properties.agent;
+	if (relationType === RelationType.Model) {
+		props = modelProperty;
+		relProp = 'model';
+		agentOrModel = from.properties.model;
+	}
+	target_property = targetProperty;
+	setLambdaProperties(
+		tempLambdaInsertArgumentValues,
+		agentProperty,
+		modelProperty,
+		targetProperty,
+		{
+			from,
+			to
+		},
+		modelOutput,
+		modelOutputProperty,
+		copyConfig
+	);
+	let attributeType = GetNodeProp(props, NodeProperties.UIAttributeType);
+	outputType = NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][attributeType];
+	tempLambdaInsertArgumentValues[`${relProp}.${GetJSCodeName(props)}`] = {
+		[ReferenceInsertType.Property]: props,
+		[ReferenceInsertType.Model]: agentOrModel
+	};
+	copy_config = `return ${relProp}.#{{"key":"${relProp}.${GetJSCodeName(
+		props
+	)}","type":"property","model":"${relProp}"}}#;`;
+	return { target_property, outputType, copy_config };
+}
+function setupCopyEnumeration(
+	copyEnumeration: CopyEnumerationConfig,
+	from: MethodDescription,
+	target_property: string,
+	tempLambdaInsertArgumentValues: any,
+	to: MethodDescription | undefined,
+	outputType: string,
+	copy_config: string
+) {
+	let { targetProperty } = copyEnumeration;
+	let enumeration = copyEnumeration.enumerationType;
+	tempLambdaInsertArgumentValues[GetJSCodeName(enumeration)] = { enumeration: enumeration };
+	let enumertions: { id: string; value: string }[] = GetNodeProp(enumeration, NodeProperties.Enumeration) || [];
+	let enum_set: string = '';
+	let enumProp = enumertions.find((e) => e.id == copyEnumeration.enumeration);
+	if (enumProp) {
+		tempLambdaInsertArgumentValues[`${GetJSCodeName(enumeration)}.${enumProp.value}`] = {
+			enumeration,
+			enumerationvalue: copyEnumeration.enumeration
+		};
+		copy_config = `return #{{"key":"${GetJSCodeName(
+			enumeration
+		)}","type":"enumeration" }}#.#{{"key":"${GetJSCodeName(
+			enumeration
+		)}.${enumProp.value}","type":"enumerationvalue"}}#`;
+	}
+
+	let attributeType = GetNodeProp(targetProperty, NodeProperties.UIAttributeType);
+	outputType = NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][attributeType];
+	target_property = targetProperty;
+
+	return { target_property, outputType, copy_config };
+}
+
 function fixLambdaInsertArguments(tempLambdaInsertArgumentValues: any, lambdaInsert: any) {
 	Object.keys(tempLambdaInsertArgumentValues).map((key: string) => {
 		if (tempLambdaInsertArgumentValues[key]) {
@@ -669,14 +729,23 @@ function GenerateSimpleValidations(
 	let returnStatement = '';
 	switch (ops.type) {
 		case DataChainType.Execution:
-			let targetModel = GetPropertyModel(ops.targetProperty);
-			tempLambdaInsertArgumentValues[`result.${GetCodeName(ops.targetProperty)}`] = {
-				property: ops.targetProperty,
-				model: targetModel ? targetModel.id : ''
-      };
-      tempLambdaInsertArgumentValues[`result`] = {
-				model: targetModel ? targetModel.id : ''
-			};
+			let targetModel = IsModel(ops.targetProperty)
+				? GetNodeById(ops.targetProperty)
+				: GetPropertyModel(ops.targetProperty);
+			if (IsModel(ops.targetProperty)) {
+				tempLambdaInsertArgumentValues[`result.${GetCodeName(ops.targetProperty)}`] = {
+					model: targetModel ? targetModel.id : ''
+				};
+				tempLambdaInsertArgumentValues[`result`] = tempLambdaInsertArgumentValues['model'];
+			} else {
+				tempLambdaInsertArgumentValues[`result.${GetCodeName(ops.targetProperty)}`] = {
+					property: ops.targetProperty,
+					model: targetModel ? targetModel.id : ''
+				};
+				tempLambdaInsertArgumentValues[`result`] = {
+					model: targetModel ? targetModel.id : ''
+				};
+			}
 			returnStatement = `return result.#{{"key":"result.${GetCodeName(
 				ops.targetProperty
 			)}","type":"property","model":"result"}}#`;
@@ -860,7 +929,6 @@ function GetRelationTypeValuePropString(relationType: RelationType, simpleValida
 function GenerateOneOf(valuePropString: string, oneOf: EnumerationConfig, tempLambdaInsertArgumentValues: any): string {
 	let result: string = '';
 	if (oneOf.enabled) {
-		oneOf.enumerationType;
 		let enumeration = oneOf.enumerationType;
 		tempLambdaInsertArgumentValues[GetJSCodeName(enumeration)] = { enumeration: enumeration };
 		let enumertions: { id: string; value: string }[] = GetNodeProp(enumeration, NodeProperties.Enumeration) || [];

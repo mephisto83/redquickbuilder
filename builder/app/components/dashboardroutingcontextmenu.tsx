@@ -34,6 +34,7 @@ import { Node } from '../methods/graph_types';
 import { MethodFunctions } from '../constants/functiontypes';
 import { GetNodesByProperties, NodesByType } from '../methods/graph_methods';
 import CheckBox from './checkbox';
+import StaticParametersComponent from './staticparameterscomponent';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class DashboardRoutingContextMenu extends Component<any, any> {
@@ -363,6 +364,8 @@ class DashboardRoutingContextMenu extends Component<any, any> {
 									</TreeViewItemContainer>
 								)}
 								{parameterConnections}
+
+								<StaticParametersComponent agent={agent} mountingItem={route} />
 								<TreeViewButtonGroup>
 									<TreeViewGroupButton
 										onClick={() => {
