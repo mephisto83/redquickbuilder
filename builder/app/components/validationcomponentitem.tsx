@@ -88,8 +88,8 @@ export default class ValidationComponentItem extends Component<any, any> {
 				validationConfig.dataChain ? (
 					<DataChainOptions
 						methods={this.props.methods}
-            onContext={this.props.onContext}
-            name={validationConfig.name}
+						onContext={this.props.onContext}
+						name={validationConfig.name}
 						methodDescription={this.props.methodDescription}
 						currentDescription={mountingItem}
 						dataChainType={this.props.dataChainType || DataChainType.Validation}
@@ -172,8 +172,8 @@ export default class ValidationComponentItem extends Component<any, any> {
 													UIA.GetNodeTitle(methodDescription.properties.agent)
 												)} Permission For ${viewType}`;
 												this.setState({ turn: UIA.GUID() });
-                        break;
-                      case DataChainType.Validation:
+												break;
+											case DataChainType.Validation:
 												validationConfig.name = `${MethodFunctions[
 													methodDescription.functionType
 												].titleTemplate(
@@ -184,7 +184,7 @@ export default class ValidationComponentItem extends Component<any, any> {
 													UIA.GetNodeTitle(methodDescription.properties.agent)
 												)} Validation For ${viewType}`;
 												this.setState({ turn: UIA.GUID() });
-                        break;
+												break;
 											case DataChainType.Filter:
 												validationConfig.name = `${MethodFunctions[
 													methodDescription.functionType
@@ -204,6 +204,14 @@ export default class ValidationComponentItem extends Component<any, any> {
 						}}
 						icon="fa fa-amazon"
 					/>
+					{validationConfig.dataChain ? (
+						<TreeViewGroupButton
+							icon={'fa fa-hand-grab-o'}
+							onClick={() => {
+								UIA.SelectNode(validationConfig.dataChain, null)(UIA.GetDispatchFunc());
+							}}
+						/>
+					) : null}
 					<TreeViewItemContainer>
 						<CheckBox
 							label={'Override'}

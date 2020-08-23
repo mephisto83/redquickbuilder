@@ -41,6 +41,8 @@ import MountingItemConfig from './mountingitemconfig';
 import ValidationComponent from './validationcomponent';
 import PermissionComponent from './permissioncomponent';
 import ExecutionComponent from './executioncomponent';
+import FilterComponent from './filtercomponent';
+import FilterItemsComponent from './filteritemscomponent';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class EffectContextMenu extends Component<any, any> {
@@ -379,6 +381,24 @@ class EffectContextMenu extends Component<any, any> {
 									methodDescription={effectItem.methodDescription}
 								/>
 								<ValidationComponent
+									agent={agent}
+									mountingItem={effectItem}
+									onContext={(msg: { largerPlease: boolean }) => {
+										if (msg) this.setState({ vLarger: msg.largerPlease });
+									}}
+									methods={mode.methods}
+									methodDescription={effectItem.methodDescription}
+								/>
+								<FilterComponent
+									agent={agent}
+									mountingItem={effectItem}
+									onContext={(msg: { largerPlease: boolean }) => {
+										if (msg) this.setState({ vLarger: msg.largerPlease });
+									}}
+									methods={mode.methods}
+									methodDescription={effectItem.methodDescription}
+								/>
+								<FilterItemsComponent
 									agent={agent}
 									mountingItem={effectItem}
 									onContext={(msg: { largerPlease: boolean }) => {

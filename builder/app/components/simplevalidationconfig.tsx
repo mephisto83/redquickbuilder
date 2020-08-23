@@ -217,6 +217,78 @@ export default class SimpleValidationComponent extends Component<any, any> {
 					title={Titles.IsFalse}
 				/>
 
+				<BooleanConfigComponent
+					enabled={simpleValidation.enabled}
+					booleanConfig={simpleValidation.alphaNumeric}
+					title={Titles.AlphaNumeric}
+				/>
+
+				<BooleanConfigComponent
+					enabled={simpleValidation.enabled}
+					booleanConfig={simpleValidation.alphaOnly}
+					title={Titles.AlphaOnly}
+				/>
+				<BooleanConfigComponent
+					enabled={simpleValidation.enabled}
+					booleanConfig={simpleValidation.creditCard}
+					title={Titles.CreditCard}
+				/>
+				<BooleanConfigComponent
+					enabled={simpleValidation.enabled}
+					booleanConfig={simpleValidation.email}
+					title={Titles.Email}
+				/>
+				<BooleanConfigComponent
+					enabled={simpleValidation.enabled}
+					booleanConfig={simpleValidation.emailEmpty}
+					title={Titles.EmailEmpty}
+				/>
+				<BooleanConfigComponent
+					enabled={simpleValidation.enabled}
+					booleanConfig={simpleValidation.numericInt}
+					title={Titles.NumericInteger}
+				/>
+				<BooleanConfigComponent
+					enabled={simpleValidation.enabled}
+					booleanConfig={simpleValidation.requireLowercase}
+					title={Titles.RequireLowercase}
+				/>
+				<BooleanConfigComponent
+					enabled={simpleValidation.enabled}
+					booleanConfig={simpleValidation.requireNonAlphanumeric}
+					title={Titles.RequireNonAlphaNumeric}
+				/>
+				<BooleanConfigComponent
+					enabled={simpleValidation.enabled}
+					booleanConfig={simpleValidation.requireUppercase}
+					title={Titles.RequireUppercase}
+				/>
+				<BooleanConfigComponent
+					enabled={simpleValidation.enabled}
+					booleanConfig={simpleValidation.socialSecurity}
+					title={Titles.SocialSecurity}
+				/>
+				<BooleanConfigComponent
+					enabled={simpleValidation.enabled}
+					booleanConfig={simpleValidation.url}
+					title={Titles.Url}
+				/>
+				<BooleanConfigComponent
+					enabled={simpleValidation.enabled}
+					booleanConfig={simpleValidation.urlEmpty}
+					title={Titles.UrlEmpty}
+				/>
+				<BooleanConfigComponent
+					enabled={simpleValidation.enabled}
+					booleanConfig={simpleValidation.zip}
+					title={Titles.Zip}
+				/>
+				<BooleanConfigComponent
+					enabled={simpleValidation.enabled}
+					booleanConfig={simpleValidation.zipEmpty}
+					title={Titles.ZipEmpty}
+				/>
+
 				<OneOfEnumerationComponent
 					enabled={simpleValidation.enabled}
 					enumerationConfig={simpleValidation.oneOf}

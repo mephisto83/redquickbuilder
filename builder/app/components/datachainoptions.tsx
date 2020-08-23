@@ -20,6 +20,7 @@ import SetBooleanComponent from './setbooleancomponent';
 import IncrementIntegerComponent from './incrementinteger';
 import IncrementDoubleComponent from './incrementdouble';
 import CompareEnumeration from './compareenumeration';
+import CopyEnumeration from './copyenumeration';
 import CompareEnumerations from './compareenumerations';
 import SimpleValidationsComponent from './simplevalidationsconfig';
 
@@ -72,6 +73,12 @@ export default class DataChainOptions extends Component<any, any> {
 					dataChainOptions={dataChainOptions}
 					onChange={onchange}
 				/>
+				<CopyEnumeration
+					dataChainType={this.props.dataChainType}
+					methodDescription={methodDescription}
+					dataChainOptions={dataChainOptions}
+					onChange={onchange}
+				/>
 				<SetIntegerComponent
 					dataChainType={this.props.dataChainType}
 					methodDescription={methodDescription}
@@ -110,9 +117,9 @@ export default class DataChainOptions extends Component<any, any> {
 				/>
 				<SimpleValidationsComponent
 					dataChainType={this.props.dataChainType}
-          methodDescription={methodDescription}
-          onContext={this.props.onContext}
-          name={this.props.name}
+					methodDescription={methodDescription}
+					onContext={this.props.onContext}
+					name={this.props.name}
 					dataChainOptions={dataChainOptions}
 					onChange={onchange}
 				/>

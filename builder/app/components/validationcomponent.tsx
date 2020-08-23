@@ -46,8 +46,6 @@ export default class ValidationComponent extends Component<any, any> {
 						}}
 						icon="fa fa-plus"
 					/>
-					<TreeViewGroupButton title={`${Titles.Copy}`} onClick={() => {}} icon="fa fa-copy" />
-					<TreeViewGroupButton title={`${Titles.Paste}`} onClick={() => {}} icon="fa fa-paste" />
 				</TreeViewButtonGroup>
 				{(validations || []).map((validationConfig: ValidationConfig, index: number) => {
 					return (

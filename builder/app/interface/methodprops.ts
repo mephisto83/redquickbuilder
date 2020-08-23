@@ -100,6 +100,7 @@ export interface DataChainConfiguration {
 	simpleValidationConfiguration?: SimpleValidationsConfiguration;
 	simpleValidations?: SimpleValidationConfig[];
 	copyConfig?: CopyConfig;
+	copyEnumeration?: CopyEnumerationConfig;
 	setBoolean?: SetBoolean;
 	setInteger?: SetInteger;
 	incrementInteger?: IncrementInteger;
@@ -295,7 +296,16 @@ export function CreateCopyConfig(): CopyConfig {
 		targetProperty: ''
 	};
 }
-
+export function CreateCopyEnumerationConfig(): CopyEnumerationConfig {
+	return {
+		enabled: false,
+		enumeration: '',
+		enumerationType: '',
+		id: GUID(),
+		targetProperty: '',
+		name: ''
+	};
+}
 export function CreateHalf(): HalfRelation {
 	return {
 		agentProperty: '',
@@ -520,6 +530,20 @@ export function CreateSimpleValidation(): SimpleValidationConfig {
 		isNull: CreateBoolean(),
 		isTrue: CreateBoolean(),
 		isFalse: CreateBoolean(),
+		alphaNumeric: CreateBoolean(),
+		alphaOnly: CreateBoolean(),
+		creditCard: CreateBoolean(),
+		email: CreateBoolean(),
+		emailEmpty: CreateBoolean(),
+		numericInt: CreateBoolean(),
+		requireLowercase: CreateBoolean(),
+		requireNonAlphanumeric: CreateBoolean(),
+		requireUppercase: CreateBoolean(),
+		socialSecurity: CreateBoolean(),
+		url: CreateBoolean(),
+		urlEmpty: CreateBoolean(),
+		zip: CreateBoolean(),
+		zipEmpty: CreateBoolean(),
 		maxLength: {
 			id: GUID(),
 			enabled: false,
@@ -581,8 +605,11 @@ export function SetupConfigInstanceInformation(
 	dataChainOptions.simpleValidations.forEach((item) => {
 		item.isContained = item.isContained || CreateAreEqual();
 		item.isNotContained = item.isNotContained || CreateAreEqual();
+		let temp = { ...CreateSimpleValidation(), ...item };
+		Object.assign(item, temp);
 	});
 	dataChainOptions.copyConfig = dataChainOptions.copyConfig || CreateCopyConfig();
+	dataChainOptions.copyEnumeration = dataChainOptions.copyEnumeration || CreateCopyEnumerationConfig();
 	dataChainOptions.setInteger = dataChainOptions.setInteger || CreateSetInteger();
 	dataChainOptions.setBoolean = dataChainOptions.setBoolean || CreateSetBoolean();
 	dataChainOptions.incrementDouble = dataChainOptions.incrementDouble || CreateIncrementDouble();
@@ -631,6 +658,7 @@ export function SetupConfigInstanceInformation(
 		properties,
 		targetProperties,
 		copyConfig: dataChainOptions.copyConfig,
+		copyEnumeration: dataChainOptions.copyEnumeration,
 		simpleValidation: dataChainOptions.simpleValidation,
 		incrementDouble: dataChainOptions.incrementDouble,
 		incrementInteger: dataChainOptions.incrementInteger,
@@ -730,6 +758,20 @@ export interface SimpleValidationConfig extends AfterEffectRelations {
 	minLength: NumberConfig;
 	maxLength: NumberConfig;
 	alphaOnlyWithSpaces: BooleanConfig;
+	alphaNumeric: BooleanConfig;
+	alphaOnly: BooleanConfig;
+	creditCard: BooleanConfig;
+	email: BooleanConfig;
+	emailEmpty: BooleanConfig;
+	numericInt: BooleanConfig;
+	requireLowercase: BooleanConfig;
+	requireNonAlphanumeric: BooleanConfig;
+	requireUppercase: BooleanConfig;
+	socialSecurity: BooleanConfig;
+	url: BooleanConfig;
+	urlEmpty: BooleanConfig;
+	zip: BooleanConfig;
+	zipEmpty: BooleanConfig;
 	isNotNull: BooleanConfig;
 	isTrue: BooleanConfig;
 	isFalse: BooleanConfig;
@@ -749,6 +791,13 @@ export interface EnumerationConfig extends ConfigItem {
 	enumerations: string[];
 	enumerationType: string;
 }
+
+export interface CopyEnumerationConfig extends ConfigItem {
+	enumeration: string;
+	enumerationType: string;
+	targetProperty: string;
+}
+
 export interface BooleanConfig extends ConfigItem {}
 export interface NumberConfig extends ConfigItem {
 	value: string;
