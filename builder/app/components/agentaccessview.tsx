@@ -2013,8 +2013,10 @@ class AgentAccessView extends Component<any, any> {
 			<div className="btn-group">
 				<button
 					className={hasEffects ? 'btn btn-info' : 'btn btn-default'}
+					style={this.getSelectedButtonStyle(`${onlyAgents[agentIndex].id} ${model} ${v}`)}
 					type="button"
 					onClick={() => {
+						this.setState({ selectedButton: `${onlyAgents[agentIndex].id} ${model} ${v}` });
 						this.props.setVisual(EFFECT_CONTEXT_MENU, {
 							agentIndex,
 							agent: onlyAgents[agentIndex].id,

@@ -4037,6 +4037,26 @@ export function togglePinnedConnectedNodesByLinkType(model: any, linkType: any) 
 		)(dispatch, getState);
 	};
 }
+export function pinConnectedNodesByLinkType(model: any, linkType: any) {
+	return (dispatch: any, getState: Function) => {
+		const state = getState();
+		const graph = GetRootGraph(state);
+		const nodes = GraphMethods.GetNodesLinkedTo(graph, {
+			id: model,
+			link: linkType
+		});
+		graphOperation(
+			nodes.map((t: { id: any }) => ({
+				operation: CHANGE_NODE_PROPERTY,
+				options: {
+					prop: NodeProperties.Pinned,
+					id: t.id,
+					value: true
+				}
+			}))
+		)(dispatch, getState);
+	};
+}
 export function toggleNodeMark() {
 	const state = _getState();
 	const currentNode: _.Node = Node(state, Visual(state, SELECTED_NODE));
@@ -4068,6 +4088,17 @@ export function togglePinned() {
 				prop: NodeProperties.Pinned,
 				id: currentNode.id,
 				value: !GetNodeProp(currentNode, NodeProperties.Pinned)
+			})
+		);
+	}
+}
+export function setPinned(id: string, pinned: boolean = false) {
+	if (id) {
+		_dispatch(
+			graphOperation(CHANGE_NODE_PROPERTY, {
+				prop: NodeProperties.Pinned,
+				id: id,
+				value: pinned
 			})
 		);
 	}

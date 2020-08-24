@@ -5,7 +5,10 @@ import {
 	updateWorkSpace,
 	updateGraphTitle,
 	updateGraphProperty,
-	setupCache
+	setupCache,
+	getNodeLinks,
+	SOURCE,
+	NodesByType
 } from '../methods/graph_methods';
 import {
 	SaveApplication,
@@ -23,7 +26,13 @@ import {
 	ApplicationConfig,
 	clearPinned,
 	VISUAL_GRAPH,
-	UIC
+	UIC,
+	setPinned,
+	GetLinkProperty,
+	GetLink,
+	GetCssName,
+	GetState,
+  pinConnectedNodesByLinkType
 } from './uiactions';
 import { processRecording } from '../utils/utilservice';
 import prune from '../methods/prune';
@@ -33,8 +42,11 @@ const path = require('path');
 import fs from 'fs';
 import JobService, { ensureDirectory, JobServiceConstants } from '../jobs/jobservice';
 import StoreGraph, { LoadGraph } from '../methods/storeGraph';
-import { Graph } from '../methods/graph_types';
-import { NodeProperties } from '../constants/nodetypes';
+import { Graph, GraphLink, Node } from '../methods/graph_types';
+import { NodeProperties, LinkType, LinkPropertyKeys } from '../constants/nodetypes';
+import { Link } from 'react-router-dom';
+import { IfFalse } from '../components/titles';
+import { platform } from 'os';
 const { ipcRenderer } = require('electron');
 const remote = require('electron').remote;
 
@@ -225,6 +237,135 @@ export function saveGraphToFile(pruneGraph?: boolean) {
 				});
 		}
 	};
+}
+
+export function dashboardShot(folder) {
+	return (dispatch: Function, getState: Function) => {
+		takeDashboardShot(folder);
+	};
+}
+
+export async function takeDashboardShot(folder: any, name?: string) {
+	const remote = require('electron').remote;
+	let win = remote.BrowserWindow.getFocusedWindow();
+	if (win) {
+		let svg = document.querySelector('.content-wrapper svg');
+		if (svg) {
+			let bbox = svg.getBoundingClientRect();
+			await win.webContents
+				.capturePage({
+					x: bbox.x || 0,
+					y: bbox.y || 0,
+					width: bbox.width || 800,
+					height: bbox.height || 600
+				})
+				.then(async (img: any) => {
+					console.log('image captured');
+					await ensureDirectory(path.join(folder));
+					fs.writeFileSync(path.join(folder, name || 'image.jpeg'), img.toPNG(), 'base64');
+				});
+		}
+	}
+}
+export function getMindMapBounds() {
+	let svgs = document.querySelectorAll('.content-wrapper svg rect');
+	let bounds = { xmax: -10000000000000, xmin: 10000000000000, ymax: -10000000000000, ymin: 10000000000000 };
+	for (var i = 0; i < svgs.length; i++) {
+		let bbox = svgs[i].getBoundingClientRect();
+		bounds.xmin = Math.min(bounds.xmin, bbox.left);
+		bounds.xmax = Math.max(bounds.xmax, bbox.right);
+		bounds.ymin = Math.min(bounds.ymin, bbox.top);
+		bounds.ymax = Math.max(bounds.ymax, bbox.bottom);
+	}
+
+	return bounds;
+}
+export async function runSequence(nodeType: string) {
+	let nodes: Node[] = NodesByType(GetCurrentGraph(), nodeType);
+
+	await nodes.forEachAsync(async (node: Node) => {
+		await startSequence(node.id);
+	});
+}
+export async function startSequence(modelId: string) {
+	const root = GetCurrentGraph();
+	const workspace = root.workspaces ? root.workspaces[platform()] || root.workspace : root.workspace;
+	let doesntfit = true;
+	const maxi = 3;
+	let maxattempts = maxi;
+	do {
+		setVisual('LINK_DISTANCE', 200 - (maxi - maxattempts) * 50)(GetDispatchFunc(), GetStateFunc());
+		clearPinned();
+		setPinned(modelId, true);
+		await populate(modelId);
+		let bounds = getMindMapBounds();
+		doesntfit = !doesItFit(bounds);
+		console.log(bounds);
+		maxattempts--;
+	} while (doesntfit && maxattempts);
+	await takeDashboardShot(path.join(workspace, root.title, 'mindmaps'), `${GetCssName(modelId)}.jpeg`);
+}
+export function doesItFit(bounds: { xmax: number; xmin: number; ymin: number; ymax: number }) {
+	let svg = document.querySelector('.content-wrapper svg');
+	if (svg) {
+		let bbox = svg.getBoundingClientRect();
+		if (bbox.top < bounds.ymin)
+			if (bbox.bottom > bounds.ymax)
+				if (bbox.left < bounds.xmin)
+					if (bbox.right > bounds.xmax)
+						if (bbox.height > bounds.ymax - bounds.ymin) {
+							if (bbox.width > bounds.xmax - bounds.xmin) {
+								return true;
+							}
+						}
+	}
+	return false;
+}
+export async function populate(modelId: string) {
+	let links: GraphLink[] = getNodeLinks(GetCurrentGraph(), modelId);
+	let typesToSkip: string[] = [ LinkType.PropertyLink ];
+	let sorted = links
+		.unique((link: GraphLink) => GetLinkProperty(link, LinkPropertyKeys.TYPE))
+		.filter((link: GraphLink) => typesToSkip.indexOf(GetLinkProperty(link, LinkPropertyKeys.TYPE)) === -1)
+		.sort((a: GraphLink, b: GraphLink) => {
+			if (GetLinkProperty(a, LinkPropertyKeys.TYPE) === LinkType.GeneralLink) {
+				return 1;
+			}
+			if (GetLinkProperty(b, LinkPropertyKeys.TYPE) === LinkType.GeneralLink) {
+				return -1;
+			}
+			return 0;
+		});
+	await sorted.forEachAsync(async (link: GraphLink) => {
+		pinConnectedNodesByLinkType(modelId, GetLinkProperty(link, LinkPropertyKeys.TYPE))(
+			GetDispatchFunc(),
+			GetStateFunc()
+		);
+		await wait(4500);
+		if (GetLinkProperty(link, LinkPropertyKeys.TYPE) === LinkType.ModelTypeLink) {
+			await getNodeLinks(GetCurrentGraph(), modelId)
+				.filter((v) => GetLinkProperty(v, LinkPropertyKeys.TYPE) === LinkType.ModelTypeLink)
+				.forEachAsync(async (c) => {
+					if (c.target === modelId) {
+						pinConnectedNodesByLinkType(c.source, LinkType.PropertyLink)(
+							GetDispatchFunc(),
+							GetStateFunc()
+						);
+						await wait(4500);
+					}
+				});
+		}
+	});
+}
+
+export async function wait(time: number) {
+	return Promise.resolve().then(() => {
+		return new Promise((resolve) => {
+			setTimeout(() => {
+				resolve();
+			}, time);
+		});
+	});
 }
 
 export function setJobFolder(key: string) {

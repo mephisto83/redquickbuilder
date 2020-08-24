@@ -123,9 +123,8 @@ export default class MindMap extends Component<any, any> {
 	}
 
 	draw(options = { once: false }) {
-		const me = this;
+		const me: any = this;
 		const domObj = document.querySelector(`#${this.state.id}`);
-
 		domObj.innerHTML = '';
 		const bb = domObj.getBoundingClientRect();
 		const force = Cola.d3adaptor(d3);
@@ -199,6 +198,31 @@ export default class MindMap extends Component<any, any> {
 					)}deg)`
 				);
 			}
+			function reset() {
+				const { x = 0, y = 0 } = {};
+				me.mapScale = 1;
+				me.mapTranslate.x = 0;
+				me.mapTranslate.y = 0;
+				const ang = angle(1, 0, me.mapTranslate.x + x, me.mapTranslate.y + y);
+				vis.attr(
+					'transform',
+					` scale(${me.mapScale || 1}) translate(${me.mapTranslate.x + x}, ${me.mapTranslate.y + y})`
+				);
+				body.attr(
+					'data-transform',
+					`(${me.mapScale || 1})  (${me.mapTranslate.x + x}x, ${me.mapTranslate.y + y})y`
+				);
+				centerGuid.attr(
+					'style',
+					`position:absolute; top: 10px; left:330px; height: 20px; width:3px; background-color: red; transform:rotate(${Math.abs(
+						ang
+					)}deg)`
+				);
+			}
+			resetFunc = () => {
+				reset();
+			};
+
 			outer.on('mousemove', (x, v) => {
 				if (me.panning) {
 					redraw();
@@ -636,11 +660,15 @@ export default class MindMap extends Component<any, any> {
 		this.$_nodes = temp;
 	}
 
-	applyNodeVisualData(nn) {
+	applyNodeVisualData(nn: any, count: number) {
 		nn.width = 40;
 		nn.height = 40;
 		nn.name = nn.id;
+		let max = 5000;
+		let maxx = max * (1920 / 1080);
 		nn.fixed = false;
+		if (count > 1) nn.x = Math.random() * maxx - maxx / 2;
+		nn.y = Math.random() * max - max /  2;
 		return nn;
 	}
 
@@ -696,7 +724,10 @@ export default class MindMap extends Component<any, any> {
 
 					newNodes.map((nn) => {
 						this.state.graph.nodes.push(
-							this.applyNodeVisualData(GraphMethods.duplicateNode(graph.nodeLib[nn]))
+							this.applyNodeVisualData(
+								GraphMethods.duplicateNode(graph.nodeLib[nn]),
+								this.state.graph.nodes.length
+							)
 						);
 					});
 					if (props.markedNodes) {
@@ -937,3 +968,8 @@ var Vector = (function() {
 	};
 	return Vector;
 })();
+
+let resetFunc: Function = () => {};
+export function resetMindMap() {
+	if (resetFunc) resetFunc();
+}

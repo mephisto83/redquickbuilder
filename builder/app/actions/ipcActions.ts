@@ -63,7 +63,7 @@ ipcRenderer.on('message-reply', (event, arg) => {
 	console.log(arg); // prints "pong"
 	const reply = JSON.parse(arg);
 	if (hub[reply.id]) {
-		hub[reply.id].resolve(reply.msg);
+		hub[reply.id].resolve(reply.msg || reply.body);
 	}
 	delete hub[reply.id];
 });

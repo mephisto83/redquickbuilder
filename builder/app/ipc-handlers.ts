@@ -228,12 +228,19 @@ function handle(msg: any) {
 				return scaffoldProject(msg.body, 'ElectronIO');
 			});
 			console.log('handle electrion scaffolding');
+			break;
 		default:
 			console.log('did nothing');
 			break;
 	}
 
-	return result;
+	return result.catch((e) => {
+		console.log(e);
+		return {
+			error: true,
+			errormessage: e
+		};
+	});
 }
 
 function scaffoldProject(body: any, target?: any): any {

@@ -38,7 +38,7 @@ import NavBarButton from './navbarbutton';
 import ConditionFilterMenu from './conditionfiltermenu';
 import CheckBox from './checkbox';
 import * as VC from '../constants/visual';
-import MindMap from './mindmap';
+import MindMap, { resetMindMap } from './mindmap';
 import ModelActivityMenu from './modelactivitymenu';
 import FunctionActivityMenu from './functionactivitymenu';
 import PropertyActivityMenu from './propertyactivitymenu';
@@ -160,6 +160,7 @@ import { Graph, Node } from '../methods/graph_types';
 import DashboardScreenNavigation from '../nodepacks/DashboardScreenNavigation';
 import CheckBoxProperty from './checkboxproperty';
 import AddShouldShowDataChain from '../nodepacks/screens/menus/AddShouldShowDataChain';
+import { startSequence, runSequence } from '../actions/remoteActions';
 
 const { clipboard } = require('electron');
 
@@ -2068,6 +2069,38 @@ class Dashboard extends Component<any, any> {
 										}}
 									/>
 									<TreeViewMenu
+										hideArrow
+										title={'Screen Shot'}
+										icon="fa fa-camera"
+										onClick={() => {
+											this.props.dashboardShot(
+												applicationConfig
+													? applicationConfig[JobServiceConstants.JOBS_FILE_PATH] ||
+														Titles.JobsFilePath
+													: Titles.JobsFilePath
+											);
+										}}
+									/>
+									<TreeViewMenu
+										hideArrow
+										title={'Start Sequence'}
+										icon="fa fa-list-ol"
+										onClick={() => {
+											resetMindMap();
+											startSequence(currentNode.id);
+										}}
+									/>
+									<TreeViewMenu
+										hideArrow
+										title={'All Model Sequence'}
+										icon="fa fa-outdent"
+										onClick={() => {
+											resetMindMap();
+											runSequence(NodeTypes.Model);
+										}}
+									/>
+
+									<TreeViewMenu
 										open={UIA.Visual(state, 'job configs')}
 										active={UIA.Visual(state, 'job configs')}
 										title={Titles.JobConfigs}
@@ -2655,7 +2688,7 @@ class Dashboard extends Component<any, any> {
 				<MountingContextMenu />
 				<EffectContextMenu />
 				<DashboardEffectContextMenu />
-        <CopyContextComponent />
+				<CopyContextComponent />
 				<DashboardRoutingContextMenu />
 				<DashboardMountingContenxt />
 				<DashboardScreenEffectContextMenu />

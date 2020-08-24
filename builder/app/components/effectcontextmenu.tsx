@@ -27,7 +27,11 @@ import {
 	MountingDescription,
 	Effect,
 	EffectDescription,
-	setDefaultRouteSource
+	setDefaultRouteSource,
+	PermissionConfig,
+	ValidationConfig,
+	FilterConfig,
+	ExecutionConfig
 } from '../interface/methodprops';
 import SelectInput from './selectinput';
 import { ViewTypes } from '../constants/viewtypes';
@@ -44,6 +48,9 @@ import ExecutionComponent from './executioncomponent';
 import FilterComponent from './filtercomponent';
 import StaticParametersComponent from './staticparameterscomponent';
 import FilterItemsComponent from './filteritemscomponent';
+import { autoNameGenerateDataChain } from './validationcomponentitem';
+import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
+import { autoNameExecutionConfig } from './executioncomponentitem';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class EffectContextMenu extends Component<any, any> {
@@ -349,6 +356,81 @@ class EffectContextMenu extends Component<any, any> {
 										options={GetFunctionTypeOptions()}
 									/>
 								</TreeViewItemContainer>
+								<TreeViewButtonGroup>
+									<TreeViewGroupButton
+										icon="fa fa-amazon"
+										onClick={() => {
+											if (methodDescription) {
+												effectItem.name = `${MethodFunctions[
+													methodDescription.functionType
+												].titleTemplate(
+													UIA.GetNodeTitle(model),
+													UIA.GetNodeTitle(agent)
+												)} For ${viewType}`;
+
+												this.setState({ turn: UIA.GUID() });
+											}
+										}}
+									/>
+									<TreeViewGroupButton
+										icon="fa fa-sitemap"
+										title={'Auto generate, permissions, validations, filters'}
+										onClick={() => {
+											if (effectItem.permissions) {
+												effectItem.permissions.forEach((permission: PermissionConfig) => {
+													autoNameGenerateDataChain(
+														permission,
+														effectItem,
+														DataChainType.Permission,
+														mode.methods,
+														null,
+														true
+													);
+												});
+											}
+											if (effectItem.validations) {
+												effectItem.validations.forEach((validation: ValidationConfig) => {
+													autoNameGenerateDataChain(
+														validation,
+														effectItem,
+														DataChainType.Validation,
+														mode.methods,
+														null,
+														true
+													);
+												});
+											}
+											if (effectItem.filters) {
+												effectItem.filters.forEach((filter: FilterConfig) => {
+													autoNameGenerateDataChain(
+														filter,
+														effectItem,
+														DataChainType.Filter,
+														mode.methods,
+														null,
+														true
+													);
+												});
+											}
+											if (effectItem.executions) {
+												effectItem.executions.forEach((executionConfig: ExecutionConfig) => {
+													if (methodDescription) {
+														autoNameExecutionConfig(
+															executionConfig,
+															viewType,
+															effectItem,
+															methodDescription,
+															effectItem.name,
+															mode.methods,
+															true
+														);
+													}
+												});
+											}
+											this.setState({ turn: UIA.GUID() });
+										}}
+									/>
+								</TreeViewButtonGroup>
 								<MountingItemConfig mountingDescription={effectItem} />
 								<TreeViewMenu
 									title={'Screen to API'}
