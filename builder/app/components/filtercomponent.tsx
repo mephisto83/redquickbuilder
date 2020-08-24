@@ -15,6 +15,7 @@ import TreeViewGroupButton from './treeviewgroupbutton';
 import AfterEffectComponent from './aftereffectcomponent';
 import ValidationComponentItem from './validationcomponentitem';
 import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
+import { NodeProperties } from '../constants/nodetypes';
 
 export default class FilterComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -71,8 +72,13 @@ export default class FilterComponent extends Component<any, any> {
 							onDelete={() => {
 								let index: number = filters.findIndex((v) => v.id === filterConfig.id);
 								if (index !== -1 && filters) {
-                  if (filterConfig.dataChain) {
-                    UIA.removeNodeById(filterConfig.dataChain);
+									if (filterConfig.dataChain) {
+										let originalConfig = UIA.GetNodeProp(
+											filterConfig.dataChain,
+											NodeProperties.OriginalConfig
+										);
+										if (originalConfig === filterConfig.id)
+											UIA.removeNodeById(filterConfig.dataChain);
 									}
 									filters.splice(index, 1);
 									this.setState({ turn: UIA.GUID() });

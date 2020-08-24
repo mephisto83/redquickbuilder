@@ -114,49 +114,14 @@ export default class ExecutionComponentItem extends Component<any, any> {
 					<TreeViewGroupButton
 						title={`Build Datachain`}
 						onClick={() => {
-							this.buildDataChain(executionConfig, mountingItem);
+							buildDataChain(executionConfig, mountingItem, this.props.methods, this.state.override);
 						}}
 						icon="fa fa-gears"
 					/>
 					<TreeViewGroupButton
 						title={`Auto Name`}
 						onClick={() => {
-							if (executionConfig) {
-								if (mountingItem) {
-									let { methodDescription, viewType } = mountingItem;
-									if (methodDescription && MethodFunctions[methodDescription.functionType]) {
-										let { method } = MethodFunctions[methodDescription.functionType];
-										switch (this.props.dataChainType || DataChainType.Validation) {
-											case DataChainType.Execution:
-												let targetProp: string = '';
-												if (executionConfig.dataChain) {
-													targetProp = UIA.GetNodeProp(
-														executionConfig.dataChain,
-														NodeProperties.TargetProperty
-													);
-													if (targetProp) {
-														targetProp = UIA.GetNodeTitle(targetProp);
-														if (targetProp) {
-															targetProp = `Set ${targetProp}`;
-														}
-													}
-												}
-												executionConfig.name = `${MethodFunctions[
-													methodDescription.functionType
-												].titleTemplate(
-													UIA.GetNodeTitle(
-														methodDescription.properties.model_output ||
-															methodDescription.properties.model
-													),
-													UIA.GetNodeTitle(methodDescription.properties.agent)
-												)} Execute For ${viewType} ${targetProp}`;
-												this.buildDataChain(executionConfig, mountingItem);
-												this.setState({ turn: UIA.GUID() });
-												break;
-										}
-									}
-								}
-							}
+							this.autoName(executionConfig, mountingItem);
 						}}
 						icon="fa fa-amazon"
 					/>
@@ -199,30 +164,93 @@ export default class ExecutionComponentItem extends Component<any, any> {
 		);
 	}
 
-	private buildDataChain(executionConfig: ExecutionConfig, mountingItem: MountingDescription) {
+	private autoName(executionConfig: ExecutionConfig, mountingItem: MountingDescription) {
 		if (executionConfig) {
 			if (mountingItem) {
-				let { methodDescription } = mountingItem;
-				if (methodDescription) {
-					BuildDataChainAfterEffectConverter(
-						{
-							name: executionConfig.name,
-							routes: [],
-							from: methodDescription,
-							dataChain: executionConfig.dataChain,
-							type: DataChainType.Execution,
-							afterEffectOptions: executionConfig.dataChainOptions,
-							methods: this.props.methods,
-							override: this.state.override
-						},
-						(dataChain: Node) => {
-							executionConfig.dataChain = dataChain.id;
-							this.setState({
-								turn: UIA.GUID()
-							});
-						}
-					);
+				let { methodDescription, viewType } = mountingItem;
+				if (methodDescription && MethodFunctions[methodDescription.functionType]) {
+					switch (this.props.dataChainType || DataChainType.Validation) {
+						case DataChainType.Execution:
+							autoNameExecutionConfig(
+								executionConfig,
+								viewType,
+								mountingItem,
+								methodDescription,
+								this.props.functionName,
+								this.props.methods,
+								this.state.override
+							);
+							this.setState({ turn: UIA.GUID() });
+							break;
+					}
 				}
+			}
+		}
+	}
+}
+export function autoNameExecutionConfig(
+	executionConfig: ExecutionConfig,
+	viewType: string,
+	mountingItem: MountingDescription,
+	methodDescription: MethodDescription,
+	functionName: string,
+	methods: any,
+	override: any
+) {
+	setExecutionConfigName(executionConfig, viewType, methodDescription, functionName);
+	buildDataChain(executionConfig, mountingItem, methods, override);
+}
+export function setExecutionConfigName(
+	executionConfig: ExecutionConfig,
+	viewType: string,
+	methodDescription: MethodDescription,
+	functionName: string
+) {
+	let targetProp: string = '';
+	if (executionConfig.dataChain) {
+		targetProp = UIA.GetNodeProp(executionConfig.dataChain, NodeProperties.TargetProperty);
+		if (targetProp) {
+			targetProp = UIA.GetNodeTitle(targetProp);
+			if (targetProp) {
+				targetProp = `Set ${targetProp}`;
+			}
+		}
+	}
+	if (functionName) {
+		executionConfig.name = `${functionName} Execute For ${viewType} ${targetProp}`;
+	} else {
+		executionConfig.name = `${MethodFunctions[methodDescription.functionType].titleTemplate(
+			UIA.GetNodeTitle(methodDescription.properties.model_output || methodDescription.properties.model),
+			UIA.GetNodeTitle(methodDescription.properties.agent)
+		)} Execute For ${viewType} ${targetProp}`;
+	}
+}
+
+export function buildDataChain(
+	executionConfig: ExecutionConfig,
+	mountingItem: MountingDescription,
+	methods: any,
+	override: any
+) {
+	if (executionConfig) {
+		if (mountingItem) {
+			let { methodDescription } = mountingItem;
+			if (methodDescription) {
+				BuildDataChainAfterEffectConverter(
+					{
+						name: executionConfig.name,
+						routes: [],
+						from: methodDescription,
+						dataChain: executionConfig.dataChain,
+						type: DataChainType.Execution,
+						afterEffectOptions: executionConfig.dataChainOptions,
+						methods,
+						override
+					},
+					(dataChain: Node) => {
+						executionConfig.dataChain = dataChain.id;
+					}
+				);
 			}
 		}
 	}

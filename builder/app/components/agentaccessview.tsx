@@ -792,7 +792,10 @@ class AgentAccessView extends Component<any, any> {
 										</div>
 									</Box>
 									<Box title={'Dashboard Access'} maxheight={500}>
-										<div className="tableFixHead dashboard" style={{ ['--tableheight']: table_height }}>
+										<div
+											className="tableFixHead dashboard"
+											style={{ ['--tableheight']: table_height }}
+										>
 											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 												<thead>
 													<tr>
@@ -997,7 +1000,10 @@ class AgentAccessView extends Component<any, any> {
 										</div>{' '}
 									</Box>
 									<Box maxheight={500} title={'Dashboard Mounting Methods'}>
-										<div className="tableFixHead dashboard" style={{ ['--tableheight']: table_height }}>
+										<div
+											className="tableFixHead dashboard"
+											style={{ ['--tableheight']: table_height }}
+										>
 											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 												<thead>
 													<tr>
@@ -1192,7 +1198,10 @@ class AgentAccessView extends Component<any, any> {
 										</div>{' '}
 									</Box>
 									<Box maxheight={500} title={'Dashboard Effect Methods'}>
-										<div className="tableFixHead dashboard" style={{ ['--tableheight']: table_height }}>
+										<div
+											className="tableFixHead dashboard"
+											style={{ ['--tableheight']: table_height }}
+										>
 											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 												<thead>
 													<tr>
@@ -1416,7 +1425,10 @@ class AgentAccessView extends Component<any, any> {
 										</div>
 									</Box>
 									<Box title={'Dashboard Routing'} maxheight={500}>
-										<div className="tableFixHead dashboard" style={{ ['--tableheight']: table_height }}>
+										<div
+											className="tableFixHead dashboard"
+											style={{ ['--tableheight']: table_height }}
+										>
 											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 												<thead>
 													<tr>
@@ -1619,7 +1631,10 @@ class AgentAccessView extends Component<any, any> {
 										</div>
 									</Box>
 									<Box title={'Dashboard Screen Effects'} maxheight={500}>
-										<div className="tableFixHead dashboard" style={{ ['--tableheight']: table_height }}>
+										<div
+											className="tableFixHead dashboard"
+											style={{ ['--tableheight']: table_height }}
+										>
 											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 												<thead>
 													<tr>
@@ -1854,7 +1869,9 @@ class AgentAccessView extends Component<any, any> {
 			</div>
 		);
 	}
-
+	getSelectedButtonStyle(name: string) {
+		return this.state.selectedButton === name ? { border: 'solid 2px blue' } : {};
+	}
 	private createMountingDescriptionButton(
 		agentIndex: number,
 		onlyAgents: any[],
@@ -1882,8 +1899,10 @@ class AgentAccessView extends Component<any, any> {
 			<div className="btn-group">
 				<button
 					className={hasMountings ? 'btn btn-danger' : 'btn btn-default'}
+					style={this.getSelectedButtonStyle(`${onlyAgents[agentIndex].id} ${model} ${v}`)}
 					type="button"
 					onClick={() => {
+						this.setState({ selectedButton: `${onlyAgents[agentIndex].id} ${model} ${v}` });
 						this.props.setVisual(MOUNTING_CONTEXT_MENU, {
 							agentIndex,
 							agent: onlyAgents[agentIndex].id,
@@ -2028,12 +2047,16 @@ class AgentAccessView extends Component<any, any> {
 				this.collectMethods(index, methods);
 			});
 		}
+		let name = `${agent} ${dashboard}`;
+
 		return (
 			<div className="btn-group">
 				<button
 					className={hasEffects ? 'btn btn-info' : 'btn btn-default'}
 					type="button"
+					style={this.state.selectedButton === name ? { border: 'solid 1px blue' } : {}}
 					onClick={() => {
+						this.setState({ selectedButton: name });
 						this.props.setVisual(DASHBOARD_EFFECT_CONTEXT_MENU, {
 							agent,
 							methods,

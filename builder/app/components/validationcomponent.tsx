@@ -9,6 +9,7 @@ import TreeViewGroupButton from './treeviewgroupbutton';
 import AfterEffectComponent from './aftereffectcomponent';
 import ValidationComponentItem from './validationcomponentitem';
 import { removeNode } from '../methods/graph_methods';
+import { NodeProperties } from '../constants/nodetypes';
 
 export default class ValidationComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -64,7 +65,12 @@ export default class ValidationComponent extends Component<any, any> {
 								let index: number = validations.findIndex((v) => v.id === validationConfig.id);
 								if (index !== -1 && validations) {
 									if (validationConfig.dataChain) {
-										UIA.removeNodeById(validationConfig.dataChain);
+										let originalConfig = UIA.GetNodeProp(
+											validationConfig.dataChain,
+											NodeProperties.OriginalConfig
+										);
+										if (originalConfig === validationConfig.id)
+											UIA.removeNodeById(validationConfig.dataChain);
 									}
 									validations.splice(index, 1);
 									this.setState({ turn: UIA.GUID() });

@@ -6,10 +6,11 @@ import TreeViewMenu from './treeviewmenu';
 import { MountingDescription, ExecutionConfig } from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
-import ExecutionComponentItem from './executioncomponentitem';
+import ExecutionComponentItem, { autoNameExecutionConfig } from './executioncomponentitem';
 import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import CheckBox from './checkbox';
+import { NodeProperties } from '../constants/nodetypes';
 
 export default class ExecutionComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -64,6 +65,29 @@ export default class ExecutionComponent extends Component<any, any> {
 						/>
 					) : null}
 					<TreeViewGroupButton
+						title={`Auto Name`}
+						onClick={() => {
+							let { methodDescription, viewType } = mountingItem;
+							if (methodDescription) {
+								executions.forEach((executionConfig: ExecutionConfig) => {
+									if (methodDescription) {
+										autoNameExecutionConfig(
+											executionConfig,
+											viewType,
+											mountingItem,
+											methodDescription,
+											mountingItem.name,
+											this.props.methods,
+											true
+										);
+									}
+								});
+								this.setState({ turn: UIA.GUID() });
+							}
+						}}
+						icon="fa fa-amazon"
+					/>
+					<TreeViewGroupButton
 						title={`${Titles.Paste}`}
 						onClick={() => {
 							let methodDescription = this.props.methodDescription;
@@ -115,6 +139,7 @@ export default class ExecutionComponent extends Component<any, any> {
 							methodDescription={mountingItem.methodDescription}
 							mountingItem={mountingItem}
 							dataChainType={DataChainType.Execution}
+							functionName={mountingItem.name}
 							onChange={() => {
 								if (this.props.onChange) {
 									this.props.onChange();
@@ -125,7 +150,13 @@ export default class ExecutionComponent extends Component<any, any> {
 								let index: number = executions.findIndex((v) => v.id === executionConfig.id);
 								if (index !== -1 && executions) {
 									if (executionConfig.dataChain) {
-										UIA.removeNodeById(executionConfig.dataChain);
+										let originalConfig = UIA.GetNodeProp(
+											executionConfig.dataChain,
+											NodeProperties.OriginalConfig
+										);
+										if (originalConfig === executionConfig.dataChain) {
+											UIA.removeNodeById(executionConfig.dataChain);
+										}
 									}
 									executions.splice(index, 1);
 									this.setState({ turn: UIA.GUID() });

@@ -8,7 +8,7 @@ import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import ValidationComponentItem from './validationcomponentitem';
 import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
-import { NodeTypeColors, NodeTypes } from '../constants/nodetypes';
+import { NodeTypeColors, NodeTypes, NodeProperties } from '../constants/nodetypes';
 
 export default class PermissionComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -65,8 +65,14 @@ export default class PermissionComponent extends Component<any, any> {
 							onDelete={() => {
 								let index: number = permissions.findIndex((v) => v.id === permissionConfig.id);
 								if (index !== -1 && permissions) {
-                  if (permissionConfig.dataChain) {
-                    UIA.removeNodeById(permissionConfig.dataChain);
+									if (permissionConfig.dataChain) {
+										let originalConfig = UIA.GetNodeProp(
+											permissionConfig.dataChain,
+											NodeProperties.OriginalConfig
+										);
+										if (originalConfig == permissionConfig.id) {
+											UIA.removeNodeById(permissionConfig.dataChain);
+										}
 									}
 									permissions.splice(index, 1);
 									this.setState({ turn: UIA.GUID() });

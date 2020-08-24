@@ -560,8 +560,15 @@ class EffectContextMenu extends Component<any, any> {
 		const currentInfo = this.getCurrentInfo(menuMode);
 		const menuitems = this.getMenuMode(menuMode);
 		const defaultMenus = this.getDefaultMenu(menuMode);
-		const menu_width =
-			this.state.pLarger || this.state.vLarger || this.state.aLarger || this.state.eLarger ? 650 : 350;
+		const large =
+			this.state.large || this.state.pLarger || this.state.vLarger || this.state.aLarger || this.state.eLarger;
+		const menu_width = large ? 755 : 350;
+		let icon_expando: any = {
+			fontSize: `1.4rem`,
+			paddingLeft: 5,
+			top: -2,
+			position: 'relative'
+		};
 		return (
 			<Draggable handle=".draggable-header,.draggable-footer">
 				<div
@@ -572,7 +579,8 @@ class EffectContextMenu extends Component<any, any> {
 						width: this.state.secondaryMenu ? 500 : menu_width,
 						display,
 						top: 250,
-						left: 500
+						left: 500,
+						transition: `width 1s ease 0s`
 					}}
 				>
 					<div className="modal-content">
@@ -587,6 +595,19 @@ class EffectContextMenu extends Component<any, any> {
 								aria-label="Close"
 							>
 								<span aria-hidden="true">×</span>
+							</button>
+							<button
+								type="button"
+								onClick={() => {
+									this.setState({ large: !this.state.large });
+								}}
+								className="close"
+								data-dismiss="modal"
+								aria-label="Expand"
+							>
+								<span aria-hidden="true">
+									<i className={large ? 'fa  fa-compress' : 'fa  fa-expand'} style={icon_expando} />
+								</span>
 							</button>
 						</div>
 						<div className="modal-body" style={{ padding: 0 }}>

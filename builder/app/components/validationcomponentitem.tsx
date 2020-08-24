@@ -114,40 +114,21 @@ export default class ValidationComponentItem extends Component<any, any> {
 						<TreeViewGroupButton
 							title={`Build Datachain`}
 							onClick={() => {
-								if (validationConfig) {
-									if (mountingItem) {
-										let { methodDescription } = mountingItem;
-										if (methodDescription) {
-											BuildDataChainAfterEffectConverter(
-												{
-													name: validationConfig.name,
-													from: methodDescription,
-													dataChain: validationConfig.dataChain,
-													type: this.props.dataChainType || DataChainType.Validation,
-													afterEffectOptions: validationConfig.dataChainOptions,
-													methods: this.props.methods,
-													routes: this.props.routes,
-													override: this.state.override
-												},
-												(dataChain: Node) => {
-													if (dataChain && UIA.GetNodeById(dataChain.id)) {
-														validationConfig.dataChain = dataChain.id;
-														if (!GetNodeProp(dataChain.id, NodeProperties.OriginalConfig)) {
-															UIA.updateComponentProperty(
-																dataChain.id,
-																NodeProperties.OriginalConfig,
-																validationConfig.id
-															);
-														}
-														this.setState({
-															turn: UIA.GUID()
-														});
-													}
-												}
-											);
-										}
-									}
-								}
+								let methods = this.props.methods;
+								let routes = this.props.routes;
+								let dataChainType = this.props.dataChainType;
+								let override = this.state.override;
+								validationDataChain(
+									validationConfig,
+									mountingItem,
+									dataChainType,
+									methods,
+									routes,
+									override
+								);
+								this.setState({
+									turn: UIA.GUID()
+								});
 							}}
 							icon="fa fa-gears"
 						/>
@@ -155,52 +136,19 @@ export default class ValidationComponentItem extends Component<any, any> {
 					<TreeViewGroupButton
 						title={`Auto Name`}
 						onClick={() => {
-							if (validationConfig) {
-								if (mountingItem) {
-									let { methodDescription, viewType } = mountingItem;
-									if (methodDescription && MethodFunctions[methodDescription.functionType]) {
-										let { method } = MethodFunctions[methodDescription.functionType];
-										switch (this.props.dataChainType || DataChainType.Validation) {
-											case DataChainType.Permission:
-												validationConfig.name = `Can ${MethodFunctions[
-													methodDescription.functionType
-												].titleTemplate(
-													UIA.GetNodeTitle(
-														methodDescription.properties.model_output ||
-															methodDescription.properties.model
-													),
-													UIA.GetNodeTitle(methodDescription.properties.agent)
-												)} Permission For ${viewType}`;
-												this.setState({ turn: UIA.GUID() });
-												break;
-											case DataChainType.Validation:
-												validationConfig.name = `${MethodFunctions[
-													methodDescription.functionType
-												].titleTemplate(
-													UIA.GetNodeTitle(
-														methodDescription.properties.model_output ||
-															methodDescription.properties.model
-													),
-													UIA.GetNodeTitle(methodDescription.properties.agent)
-												)} Validation For ${viewType}`;
-												this.setState({ turn: UIA.GUID() });
-												break;
-											case DataChainType.Filter:
-												validationConfig.name = `${MethodFunctions[
-													methodDescription.functionType
-												].titleTemplate(
-													UIA.GetNodeTitle(
-														methodDescription.properties.model_output ||
-															methodDescription.properties.model
-													),
-													UIA.GetNodeTitle(methodDescription.properties.agent)
-												)} Filter For ${viewType}`;
-												this.setState({ turn: UIA.GUID() });
-												break;
-										}
-									}
-								}
-							}
+							let methods = this.props.methods;
+							let routes = this.props.routes;
+							let dataChainType = this.props.dataChainType;
+							let override = this.state.override;
+							autoNameGenerateDataChain(
+								validationConfig,
+								mountingItem,
+								dataChainType,
+								methods,
+								routes,
+								override
+							);
+							this.setState({ turn: UIA.GUID() });
 						}}
 						icon="fa fa-amazon"
 					/>
@@ -224,5 +172,121 @@ export default class ValidationComponentItem extends Component<any, any> {
 				</TreeViewButtonGroup>
 			</TreeViewMenu>
 		);
+	}
+}
+
+export function autoNameGenerateDataChain(
+	validationConfig: ValidationConfig,
+	mountingItem: MountingDescription,
+	dataChainType: any,
+	methods: any,
+	routes: any,
+	override: any
+) {
+	autoName(validationConfig, mountingItem, {
+		dataChainType: dataChainType,
+		functionName: mountingItem.name
+	});
+	validationDataChain(validationConfig, mountingItem, dataChainType, methods, routes, override);
+}
+
+export function validationDataChain(
+	validationConfig: ValidationConfig,
+	mountingItem: MountingDescription,
+	dataChainType: any,
+	methods: any,
+	routes: any,
+	override: any
+) {
+	if (validationConfig) {
+		if (mountingItem) {
+			let { methodDescription } = mountingItem;
+			if (methodDescription) {
+				BuildDataChainAfterEffectConverter(
+					{
+						name: validationConfig.name,
+						from: methodDescription,
+						dataChain: validationConfig.dataChain,
+						type: dataChainType || DataChainType.Validation,
+						afterEffectOptions: validationConfig.dataChainOptions,
+						methods: methods,
+						routes: routes,
+						override: override
+					},
+					(dataChain: Node) => {
+						if (dataChain && UIA.GetNodeById(dataChain.id)) {
+							validationConfig.dataChain = dataChain.id;
+							if (!GetNodeProp(dataChain.id, NodeProperties.OriginalConfig)) {
+								UIA.updateComponentProperty(
+									dataChain.id,
+									NodeProperties.OriginalConfig,
+									validationConfig.id
+								);
+							}
+						}
+					}
+				);
+			}
+		}
+	}
+}
+
+export function autoName(
+	validationConfig: ValidationConfig,
+	mountingItem: MountingDescription,
+	props: {
+		dataChainType: DataChainType;
+		functionName: string;
+	}
+) {
+	let { functionName } = props;
+	if (validationConfig) {
+		if (mountingItem) {
+			let { methodDescription, viewType } = mountingItem;
+			if (methodDescription && MethodFunctions[methodDescription.functionType]) {
+				let { method } = MethodFunctions[methodDescription.functionType];
+
+				switch (props.dataChainType || DataChainType.Validation) {
+					case DataChainType.Permission:
+						if (functionName) {
+							validationConfig.name = `Can ${functionName} Permission For ${viewType}`;
+						} else {
+							validationConfig.name = `Can ${MethodFunctions[
+								methodDescription.functionType
+							].titleTemplate(
+								UIA.GetNodeTitle(
+									methodDescription.properties.model_output || methodDescription.properties.model
+								),
+								UIA.GetNodeTitle(methodDescription.properties.agent)
+							)} Permission For ${viewType}`;
+						}
+						break;
+					case DataChainType.Validation:
+						if (functionName) {
+							validationConfig.name = `${functionName} Validation For ${viewType}`;
+						} else {
+							validationConfig.name = `${MethodFunctions[methodDescription.functionType].titleTemplate(
+								UIA.GetNodeTitle(
+									methodDescription.properties.model_output || methodDescription.properties.model
+								),
+								UIA.GetNodeTitle(methodDescription.properties.agent)
+							)} Validation For ${viewType}`;
+						}
+						break;
+					case DataChainType.Filter:
+						if (functionName) {
+							validationConfig.name = `${functionName} Filter For ${viewType}`;
+						} else {
+							validationConfig.name = `${MethodFunctions[methodDescription.functionType].titleTemplate(
+								UIA.GetNodeTitle(
+									methodDescription.properties.model_output || methodDescription.properties.model
+								),
+								UIA.GetNodeTitle(methodDescription.properties.agent)
+							)} Filter For ${viewType}`;
+						}
+						break;
+				}
+			}
+		}
 	}
 }

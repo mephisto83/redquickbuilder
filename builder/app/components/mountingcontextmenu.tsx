@@ -24,7 +24,10 @@ import {
 	RouteSourceType,
 	ViewMounting,
 	MountingDescription,
-	setDefaultRouteSource
+	setDefaultRouteSource,
+	PermissionConfig,
+	ValidationConfig,
+	FilterConfig
 } from '../interface/methodprops';
 import SelectInput from './selectinput';
 import { ViewTypes } from '../constants/viewtypes';
@@ -48,6 +51,9 @@ import FilterComponent from './filtercomponent';
 import FilterItemsComponent from './filteritemscomponent';
 import PermissionComponent from './permissioncomponent';
 import StaticParametersComponent from './staticparameterscomponent';
+import { autoNameGenerateDataChain } from './validationcomponentitem';
+import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
+import { mount } from 'enzyme';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -75,7 +81,7 @@ class ContextMenu extends Component<any, any> {
 							id: UIA.GUID(),
 							model,
 							agent,
-              name: '',
+							name: '',
 							viewType,
 							screenEffect: []
 						});
@@ -321,7 +327,7 @@ class ContextMenu extends Component<any, any> {
 						result.push(
 							<TreeViewMenu
 								key={routeKey}
-								innerStyle={{ maxHeight: `calc(100vh - 325px)`, overflowY: 'auto' }}
+								innerStyle={{ maxHeight: `calc(100vh - 375px)`, overflowY: 'auto' }}
 								open={this.state[routeKey]}
 								active
 								title={name}
@@ -332,28 +338,14 @@ class ContextMenu extends Component<any, any> {
 								<TreeViewItemContainer>
 									<SelectInput
 										onChange={(c: string) => {
-											let defaultMethodDescription: any = {
-												functionType: c,
-												properties: {}
-											};
-											methodDescription = methodDescription || defaultMethodDescription;
-											if (methodDescription) {
-												methodDescription.functionType = c;
-												if (
-													agent &&
-													mountingItem &&
-													model &&
-													MethodFunctions[c] &&
-													MethodFunctions[c].titleTemplate
-												) {
-													mountingItem.name =
-														mountingItem.name ||
-														`${MethodFunctions[c].titleTemplate(
-															UIA.GetNodeTitle(model),
-															UIA.GetNodeTitle(agent)
-														)} For ${viewType}`;
-												}
-											}
+											methodDescription = autoName(
+												c,
+												methodDescription,
+												agent,
+												mountingItem,
+												model,
+												viewType
+											);
 											mountingItem.methodDescription = methodDescription;
 											this.setState({ turn: UIA.GUID() });
 										}}
@@ -361,7 +353,7 @@ class ContextMenu extends Component<any, any> {
 										value={methodDescription ? methodDescription.functionType : null}
 										options={GetFunctionTypeOptions()}
 									/>
-								</TreeViewItemContainer>
+								</TreeViewItemContainer>{' '}
 								<TreeViewItemContainer>
 									<TextInput
 										label={Titles.Name}
@@ -372,6 +364,66 @@ class ContextMenu extends Component<any, any> {
 										value={mountingItem.name}
 									/>
 								</TreeViewItemContainer>
+								<TreeViewButtonGroup>
+									<TreeViewGroupButton
+										icon="fa fa-amazon"
+										onClick={() => {
+											if (methodDescription) {
+												mountingItem.name = `${MethodFunctions[
+													methodDescription.functionType
+												].titleTemplate(
+													UIA.GetNodeTitle(model),
+													UIA.GetNodeTitle(agent)
+												)} For ${viewType}`;
+
+												this.setState({ turn: UIA.GUID() });
+											}
+										}}
+									/>
+									<TreeViewGroupButton
+										icon="fa fa-sitemap"
+										title={'Auto generate, permissions, validations, filters'}
+										onClick={() => {
+											if (mountingItem.permissions) {
+												mountingItem.permissions.forEach((permission: PermissionConfig) => {
+													autoNameGenerateDataChain(
+														permission,
+														mountingItem,
+														DataChainType.Permission,
+														mode.methods,
+														null,
+														true
+													);
+												});
+											}
+											if (mountingItem.validations) {
+												mountingItem.validations.forEach((validation: ValidationConfig) => {
+													autoNameGenerateDataChain(
+														validation,
+														mountingItem,
+														DataChainType.Validation,
+														mode.methods,
+														null,
+														true
+													);
+												});
+											}
+											if (mountingItem.filters) {
+												mountingItem.filters.forEach((filter: FilterConfig) => {
+													autoNameGenerateDataChain(
+														filter,
+														mountingItem,
+														DataChainType.Filter,
+														mode.methods,
+														null,
+														true
+													);
+												});
+											}
+											this.setState({ turn: UIA.GUID() });
+										}}
+									/>
+								</TreeViewButtonGroup>
 								<MountingItemConfig mountingDescription={mountingItem} />
 								<TreeViewMenu
 									title={'Screen to API'}
@@ -510,7 +562,6 @@ class ContextMenu extends Component<any, any> {
 								methodDescription.properties.model_output = mountingItem.model;
 							}
 							break;
-
 					}
 				});
 			}
@@ -577,8 +628,16 @@ class ContextMenu extends Component<any, any> {
 		const currentInfo = this.getCurrentInfo(menuMode);
 		const menuitems = this.getMenuMode(menuMode);
 		const defaultMenus = this.getDefaultMenu(menuMode);
-		const menu_width =
-			this.state.pLarger || this.state.vLarger || this.state.aLarger || this.state.eLarger ? 650 : 350;
+		const large =
+			this.state.large || this.state.pLarger || this.state.vLarger || this.state.aLarger || this.state.eLarger;
+		const menu_width = large ? 755 : 350;
+		let icon_expando: any = {
+			fontSize: `1.4rem`,
+			paddingLeft: 5,
+			top: -2,
+			position: 'relative'
+		};
+
 		return (
 			<Draggable handle=".draggable-header,.draggable-footer">
 				<div
@@ -604,6 +663,19 @@ class ContextMenu extends Component<any, any> {
 								aria-label="Close"
 							>
 								<span aria-hidden="true">×</span>
+							</button>
+							<button
+								type="button"
+								onClick={() => {
+									this.setState({ large: !this.state.large });
+								}}
+								className="close"
+								data-dismiss="modal"
+								aria-label="Expand"
+							>
+								<span aria-hidden="true">
+									<i className={large ? 'fa  fa-compress' : 'fa  fa-expand'} style={icon_expando} />
+								</span>
 							</button>
 						</div>
 						<div className="modal-body" style={{ padding: 0 }}>
@@ -656,3 +728,26 @@ class ContextMenu extends Component<any, any> {
 }
 
 export default UIConnect(ContextMenu);
+function autoName(
+	c: string,
+	methodDescription: MethodDescription | undefined,
+	agent: string,
+	mountingItem: MountingDescription,
+	model: string,
+	viewType: string
+) {
+	let defaultMethodDescription: any = {
+		functionType: c,
+		properties: {}
+	};
+	methodDescription = methodDescription || defaultMethodDescription;
+	if (methodDescription) {
+		methodDescription.functionType = c;
+		if (agent && mountingItem && model && MethodFunctions[c] && MethodFunctions[c].titleTemplate) {
+			mountingItem.name =
+				mountingItem.name ||
+				`${MethodFunctions[c].titleTemplate(UIA.GetNodeTitle(model), UIA.GetNodeTitle(agent))} For ${viewType}`;
+		}
+	}
+	return methodDescription;
+}
