@@ -170,6 +170,7 @@ export function scaffoldProject(options: any = {}) {
 					appName: root[GraphKeys.PROJECTNAME] || '',
 					workspace: path.join(workspace, root.title, 'netcore')
 				}))
+			.then(errorHandler())
 			.then(
 				() =>
 					filesOnly
@@ -180,6 +181,7 @@ export function scaffoldProject(options: any = {}) {
 								workspace: path.join(workspace, root.title, 'reactnative')
 							})
 			)
+			.then(errorHandler())
 			.then(
 				() =>
 					filesOnly
@@ -190,6 +192,7 @@ export function scaffoldProject(options: any = {}) {
 								workspace: path.join(workspace, root.title, 'reactweb')
 							})
 			)
+			.then(errorHandler())
 			.then(
 				() =>
 					filesOnly
@@ -200,6 +203,7 @@ export function scaffoldProject(options: any = {}) {
 								workspace: path.join(workspace, root.title, 'electronio')
 							})
 			)
+			.then(errorHandler())
 			.then(() => {
 				console.log('Finished Scaffolding.');
 				return generateFiles(path.join(workspace, root.title, 'netcore'), solutionName, state);
@@ -499,6 +503,15 @@ ${interfaceFunctions.join(NEW_LINE)}
 			});
 	};
 }
+function errorHandler(): ((value: unknown) => void | PromiseLike<void>) | null | undefined {
+	return (res: any) => {
+		if (res && res.error) {
+			console.log(JSON.stringify(res, null, 4));
+			throw new Error(res.errorMessage || 'something when wrong');
+		}
+	};
+}
+
 function generateFolderStructure(
 	dir: any,
 	lib: {
