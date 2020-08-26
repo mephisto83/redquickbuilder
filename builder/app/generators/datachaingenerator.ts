@@ -87,38 +87,36 @@ export default class DataChainGenerator {
 			.join(NEW_LINE);
 		let tests = null;
 		const collectionNodes = NodesByType(null, NodeTypes.DataChainCollection);
-		collectionNodes
-			.map((nc: any) => {
-				const isInLanguage = CollectionIsInLanguage(graph, nc.id, language);
-				const cfunc = isInLanguage ? GenerateChainFunctions({ language, collection: nc.id }) : null;
-				const collectionsInLanguage = isInLanguage
-					? GetDataChainCollections({
-							language,
-							collection: nc.id
-						})
-					: null;
-				if (!isInLanguage) {
-					return false;
-				}
-				const chainPath = GetRelativeDataChainPath(nc);
-				return {
-					template: dcTemplate(
-						collectionsInLanguage,
-						cfunc,
-						[].interpolate(0, chainPath.length + 1).map(() => '../').join(''),
-						enumerations,
-						graph
-					),
-					relative: `./src/actions/datachains/${chainPath.join('/')}${chainPath.length ? '/' : ''}`,
-					relativeFilePath: `./${GetJSCodeName(nc)}${fileEnding}`,
-					name: `${chainPath.join('_')}${nc.id}`
-				};
-			})
-			.map((t: any) => {
-				let res: any = {};
-				res[t.name] = t;
-				options.writer(res);
-			});
+		collectionNodes.map((nc: any) => {
+			const isInLanguage = CollectionIsInLanguage(graph, nc.id, language);
+			const cfunc = isInLanguage ? GenerateChainFunctions({ language, collection: nc.id }) : null;
+			const collectionsInLanguage = isInLanguage
+				? GetDataChainCollections({
+						language,
+						collection: nc.id
+					})
+				: null;
+			if (!isInLanguage) {
+				return false;
+			}
+			const chainPath = GetRelativeDataChainPath(nc);
+			let t = {
+				template: dcTemplate(
+					collectionsInLanguage,
+					cfunc,
+					[].interpolate(0, chainPath.length + 1).map(() => '../').join(''),
+					enumerations,
+					graph
+				),
+				relative: `./src/actions/datachains/${chainPath.join('/')}${chainPath.length ? '/' : ''}`,
+				relativeFilePath: `./${GetJSCodeName(nc)}${fileEnding}`,
+				name: `${chainPath.join('_')}${nc.id}`
+			};
+			let res: any = {};
+			res[t.name] = t;
+			options.writer(res);
+		});
+
 		const temps = [
 			{
 				template: dcTemplate(collections, funcs, '', enumerations, graph),
