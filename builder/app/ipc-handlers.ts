@@ -64,15 +64,19 @@ export default class IPCHandlers {
 		ipcMain.on('message', (event, arg) => {
 			console.log(arg); // prints "ping"
 			let msg = JSON.parse(arg);
-			handle(msg).then((res) => {
-				event.sender.send(
-					'message-reply',
-					JSON.stringify({
-						id: msg.id,
-						body: res
-					})
-				);
-			});
+			handle(msg)
+				.then((res) => {
+					event.sender.send(
+						'message-reply',
+						JSON.stringify({
+							id: msg.id,
+							body: res
+						})
+					);
+				})
+				.catch((v) => {
+					console.log(v);
+				});
 		});
 		let submenu2 = new Menu();
 		letters.map((x) => {

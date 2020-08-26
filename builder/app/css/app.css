@@ -59,6 +59,9 @@
   cursor: move;
   overflow: visible;
 }
+.small .mindmap .label {
+  font-size: 12px;
+}
 
 .mindmap .axis path {
   display: none;

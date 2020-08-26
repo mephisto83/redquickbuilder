@@ -30,10 +30,13 @@ import {
 	DashboardRouting,
 	Routing,
 	RouteDescription,
-	RoutingProps
+	RoutingProps,
+	EffectDescription
 } from '../interface/methodprops';
-import { GraphLink, Graph } from '../methods/graph_types';
+import { GraphLink, Graph, Node } from '../methods/graph_types';
 import { ViewTypes } from '../constants/viewtypes';
+import { EffectProps, ViewMoutingProps, Effect } from '../interface/methodprops';
+import { MethodFunctions } from '../constants/functiontypes';
 
 export default function BuildAgentAccessWeb(args: any) {
 	const {
@@ -60,13 +63,17 @@ export default function BuildAgentAccessWeb(args: any) {
 	const navigationScreens = NodesByType(graph, NodeTypes.NavigationScreen).filter(
 		(x: Node) => !GetNodeProp(x, NodeProperties.IsDashboard)
 	);
+	const generatedConcepts = NodesByType(graph, NodeTypes.Concept).filter((x: Node) =>
+		GetNodeProp(x, NodeProperties.GeneratedConcept)
+	);
 	let screenEffects = NodesByType(graph, NodeTypes.ScreenEffectApi);
 	let links = LinksByType(graph, LinkType.NavigationScreen);
 	const result: any[] = [
 		...navigationScreens,
 		...contextParams,
 		...agentAccesss,
-		...screenEffects
+		...screenEffects,
+		...generatedConcepts
 	].map((v: any) => ({
 		operation: REMOVE_NODE,
 		options() {
@@ -157,7 +164,7 @@ export default function BuildAgentAccessWeb(args: any) {
 					agentViewMount[agentIndex] && agentViewMount[agentIndex][modelIndex]
 						? agentViewMount[agentIndex][modelIndex] || {}
 						: {};
-				const effects =
+				const effects: EffectProps =
 					agentEffect[agentIndex] && agentEffect[agentIndex][modelIndex]
 						? agentEffect[agentIndex][modelIndex] || {}
 						: {};
@@ -178,6 +185,12 @@ export default function BuildAgentAccessWeb(args: any) {
 								agentAccessContext = $;
 							}
 						}),
+						() => {
+							return BuildConcepts(agentAccessContext, effects);
+						},
+						() => {
+							return BuildConceptsMounting(agentAccessContext, mounting);
+						},
 						() => {
 							return Object.keys(screenEffect).filter((d) => screenEffect[d]).map((key: string) => {
 								let urlParametersForMounting = mounting[key]
@@ -218,7 +231,7 @@ export default function BuildAgentAccessWeb(args: any) {
 						() => {
 							let result: any[] = [];
 							Object.keys(effects).filter((d) => effects[d]).forEach((key) => {
-								let _effects = effects[key];
+								let _effects: any = effects[key];
 								if (_effects && _effects.length) {
 									_effects.forEach((_ef: ScreenEffectApi) => {
 										let newnode: any;
@@ -533,4 +546,131 @@ function getUrlParametersForMounting(mounting: any) {
 	}
 	urlParametersForMounting = urlParametersForMounting.unique();
 	return urlParametersForMounting;
+}
+
+function BuildConcepts(agentAccessContext: { entry: string }, effects: EffectProps) {
+	let results = [];
+	if (effects.Create) {
+		results.push(BuildMethodConcept(agentAccessContext, effects.Create, ViewTypes.Create));
+	}
+	if (effects.Get) {
+		results.push(BuildMethodConcept(agentAccessContext, effects.Get, ViewTypes.Get));
+	}
+	if (effects.GetAll) {
+		results.push(BuildMethodConcept(agentAccessContext, effects.GetAll, ViewTypes.GetAll));
+	}
+	if (effects.Update) {
+		results.push(BuildMethodConcept(agentAccessContext, effects.Update, ViewTypes.Update));
+	}
+	return results;
+}
+function BuildConceptsMounting(agentAccessContext: { entry: string }, viewMount: ViewMoutingProps) {
+	let results = [];
+	if (viewMount.Create) {
+		results.push(BuildMethodConceptMounting(agentAccessContext, viewMount.Create, ViewTypes.Create));
+	}
+	if (viewMount.Get) {
+		results.push(BuildMethodConceptMounting(agentAccessContext, viewMount.Get, ViewTypes.Get));
+	}
+	if (viewMount.GetAll) {
+		results.push(BuildMethodConceptMounting(agentAccessContext, viewMount.GetAll, ViewTypes.GetAll));
+	}
+	if (viewMount.Update) {
+		results.push(BuildMethodConceptMounting(agentAccessContext, viewMount.Update, ViewTypes.Update));
+	}
+	return results;
+}
+
+function BuildMethodConcept(agentAccessContext: { entry: string }, effect: Effect, viewType?: string): any {
+	let newnode: Node;
+	return [
+		() => {
+			if (!effect.effects) {
+				return [];
+			}
+			return effect.effects.map((efffect: EffectDescription) => {
+				let description = '';
+				let functionType: string = '';
+				if (efffect.methodDescription) {
+					functionType = efffect.methodDescription.functionType;
+					let descriptionTemplate =
+						MethodFunctions[efffect.methodDescription.functionType].descriptionTemplate;
+					if (descriptionTemplate && efffect.methodDescription.properties) {
+						description = descriptionTemplate(
+							GetNodeTitle(efffect.methodDescription.properties.model),
+							GetNodeTitle(efffect.methodDescription.properties.agent)
+						);
+					}
+				}
+				let createNewNode = CreateNewNode(
+					{
+						[NodeProperties.NODEType]: NodeTypes.Concept,
+						[NodeProperties.GeneratedConcept]: true,
+						[NodeProperties.Description]: description,
+						[NodeProperties.FunctionType]: functionType,
+						[NodeProperties.ViewType]: viewType,
+						[NodeProperties.UIText]: `${efffect.name}`
+					},
+					(node: any) => {
+						newnode = node;
+					}
+				);
+				return [
+					createNewNode,
+					() => {
+						return AddLinkBetweenNodes(agentAccessContext.entry, newnode.id, LinkProperties.GeneralLink);
+					}
+				];
+			});
+		}
+	];
+}
+
+function BuildMethodConceptMounting(
+	agentAccessContext: { entry: string },
+	effect: ViewMounting,
+	viewType?: string
+): any {
+	let newnode: Node;
+	return [
+		() => {
+			if (!effect.mountings) {
+				return [];
+			}
+			return effect.mountings.map((mountingDescription: MountingDescription) => {
+				let description = '';
+				let functionType: string = '';
+				if (mountingDescription.methodDescription) {
+					functionType = mountingDescription.methodDescription.functionType;
+					let descriptionTemplate =
+						MethodFunctions[mountingDescription.methodDescription.functionType].descriptionTemplate;
+					if (descriptionTemplate && mountingDescription.methodDescription.properties) {
+						description = descriptionTemplate(
+							GetNodeTitle(mountingDescription.methodDescription.properties.model),
+							GetNodeTitle(mountingDescription.methodDescription.properties.agent)
+						);
+					}
+				}
+				let createNewNode = CreateNewNode(
+					{
+						[NodeProperties.NODEType]: NodeTypes.Concept,
+						[NodeProperties.GeneratedConcept]: true,
+						[NodeProperties.Description]: description,
+						[NodeProperties.FunctionType]: functionType,
+						[NodeProperties.ViewType]: viewType,
+						[NodeProperties.UIText]: `${mountingDescription.name}`
+					},
+					(node: any) => {
+						newnode = node;
+					}
+				);
+				return [
+					createNewNode,
+					() => {
+						return AddLinkBetweenNodes(agentAccessContext.entry, newnode.id, LinkProperties.GeneralLink);
+					}
+				];
+			});
+		}
+	];
 }

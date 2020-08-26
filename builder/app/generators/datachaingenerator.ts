@@ -87,8 +87,8 @@ export default class DataChainGenerator {
 			.join(NEW_LINE);
 		let tests = null;
 		const collectionNodes = NodesByType(null, NodeTypes.DataChainCollection);
-		const temps = [
-			...collectionNodes.map((nc: any) => {
+		collectionNodes
+			.map((nc: any) => {
 				const isInLanguage = CollectionIsInLanguage(graph, nc.id, language);
 				const cfunc = isInLanguage ? GenerateChainFunctions({ language, collection: nc.id }) : null;
 				const collectionsInLanguage = isInLanguage
@@ -113,7 +113,13 @@ export default class DataChainGenerator {
 					relativeFilePath: `./${GetJSCodeName(nc)}${fileEnding}`,
 					name: `${chainPath.join('_')}${nc.id}`
 				};
-			}),
+			})
+			.map((t: any) => {
+				let res: any = {};
+				res[t.name] = t;
+				options.writer(res);
+			});
+		const temps = [
 			{
 				template: dcTemplate(collections, funcs, '', enumerations, graph),
 				relative: './src/actions',

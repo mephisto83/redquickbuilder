@@ -711,7 +711,10 @@ export const MethodFunctions: any = {
 		title: Titles.Get_Unique_Object_To_Agent,
 		titleTemplate: function(t: any, a: any) {
 			return `Get Unique ${t} by ${a}`;
-		},
+    },
+    descriptionTemplate:function(t: any, a: any) {
+			return `Gets a unique ${t} model. The ${a} agent will execute this function.`;
+    },
 		working: true,
 		template: './app/templates/standard/unique_model_to_agent.tpl',
 		interface: './app/templates/standard/unique_model_to_agent_interface.tpl',
@@ -764,7 +767,10 @@ export const MethodFunctions: any = {
 		title: Titles.Create_Object__Object,
 		titleTemplate: function(t: any, a: any) {
 			return `Create ${t} Object by ${a}`;
-		},
+    },
+    descriptionTemplate:function(t: any, a: any) {
+			return `Creates a new ${t} model. The ${a} agent will execute this function.`;
+    },
 		working: true,
 		template: './app/templates/standard/create_model_agent_object.tpl',
 		interface: './app/templates/standard/create_model_agent_object_interface.tpl',
@@ -802,6 +808,9 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Update ${t} Object by ${a}`;
 		},
+    descriptionTemplate:function(t: any, a: any) {
+			return `Updates a new ${t} model. The ${a} agent will execute this function.`;
+    },
 		template: './app/templates/standard/update_model_user_object.tpl',
 		interface: './app/templates/standard/update_model_user_object_interface.tpl',
 		templates: {},
@@ -830,6 +839,9 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Get ${t} Objects With IdList by ${a}`;
 		},
+    descriptionTemplate:function(t: any, a: any) {
+			return `Gets a list of ${t} model with a list of ids. The ${a} agent will execute this function.`;
+    },
 		working: true,
 		template: './app/templates/standard/get_agent_listobject_with_id_list.tpl',
 		interface: './app/templates/standard/get_agent_listobject_with_id_list_interface.tpl',
@@ -874,6 +886,9 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Create ${t} by ${a} User`;
 		},
+    descriptionTemplate:function(t: any, a: any) {
+			return `Creates a ${t} model with the  ${a} user.`;
+    },
 		working: true,
 		template: './app/templates/standard/create_model_user_object.tpl',
 		interface: './app/templates/standard/create_model_user_object_interface.tpl',
@@ -1027,6 +1042,9 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Update ${t} Object by ${a}`;
 		},
+    descriptionTemplate:function(t: any, a: any) {
+			return `Updates an existing a ${t} model with the ${a} user.`;
+    },
 		working: true,
 		template: './app/templates/standard/update_model_agent_object.tpl',
 		interface: './app/templates/standard/update_model_agent_object_interface.tpl',
@@ -1053,7 +1071,11 @@ export const MethodFunctions: any = {
 		title: Titles.Update_Object_Agent_Value__Object_With_Object,
 		titleTemplate: function(t: any, a: any) {
 			return `Update ${t} Object by ${a} with Update Model`;
-		},
+    },
+
+    descriptionTemplate:function(t: any, a: any) {
+			return `Updates a ${t} model as a ${a} agent.`;
+    },
 		template: './app/templates/standard/update_model_agent_object_with_model.tpl',
 		interface: './app/templates/standard/update_model_agent_object_with_model_interface.tpl',
 		permission: {
@@ -1132,6 +1154,9 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Get ${t}s by ${a} Return List`;
 		},
+    descriptionTemplate:function(t: any, a: any) {
+			return `Gets a list of ${t} models as a ${a} agent, then filters and pages the results.`;
+    },
 		working: true,
 		template: './app/templates/standard/get_model_agent_listobject.tpl',
 		interface: './app/templates/standard/get_model_agent_listobject_interface.tpl',
@@ -1164,6 +1189,9 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Get Default ${t} by ${a}`;
 		},
+    descriptionTemplate:function(t: any, a: any) {
+			return `Gets a default version of the ${t} model, as an agent of ${a} type.`;
+    },
 		template: './app/templates/standard/get_default_model_agent_object.tpl',
 		interface: './app/templates/standard/get_default_model_agent_object_interface.tpl',
 		controller: './app/templates/standard/get_default_model_agent_controller.tpl',
@@ -1222,6 +1250,9 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Get Default ${t} by ${a} with Parent`;
 		},
+    descriptionTemplate:function(t: any, a: any) {
+			return `Gets a default version of the ${t} model, and will use the parent model type to configure. This is called by an agent of ${a} type.`;
+    },
 		working: true,
 		template: './app/templates/standard/get_default_model_agent_object_with_parent.tpl',
 		interface: './app/templates/standard/get_default_model_agent_object_with_parent_interface.tpl',
@@ -1287,6 +1318,9 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Get Default ${t} by ${a} with Parent And ${a}`;
 		},
+    descriptionTemplate:function(t: any, a: any) {
+			return `Returns a default model of ${t} type, with the parent and ${a} agent set as properties.`;
+    },
 		template: './app/templates/standard/get_default_model_agent_object_with_parentagent.tpl',
 		interface: './app/templates/standard/get_default_model_agent_object_with_parentagent_interface.tpl',
 		controller: './app/templates/standard/get_default_model_agent_object_with_parent_controller.tpl',
@@ -1349,7 +1383,10 @@ export const MethodFunctions: any = {
 		title: Titles.Get_Agent_Value__IListObject,
 		titleTemplate: function(t: any, a: any) {
 			return `Get ${t}s List by ${a}`;
-		},
+    },
+    descriptionTemplate:function(t: any, a: any) {
+			return `Gets a list of models of ${t} type, for an agent of ${a} type.`;
+    },
 		working: true,
 		template: './app/templates/standard/get_agent_listobject.tpl',
 		interface: './app/templates/standard/get_agent_listobject_interface.tpl',
@@ -1727,6 +1764,9 @@ export const MethodFunctions: any = {
 		titleTemplate: function(t: any, a: any) {
 			return `Get ${a} Self`;
 		},
+    descriptionTemplate:function(t: any, a: any) {
+			return `Gets the users information. This should be the reference identifications for the user's agent.`;
+    },
 		working: true,
 		template: './app/templates/standard/get_agent_self.tpl',
 		interface: './app/templates/standard/get_agent_self_interface.tpl',

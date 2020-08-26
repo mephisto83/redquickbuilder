@@ -555,7 +555,20 @@ function generateReactNative(workspace: string, state: any) {
 		const temp = Generator.generate({
 			type: code_type,
 			language: UITypes.ReactNative,
-			state
+			state,
+			writer: (temp: any) => {
+				Object.keys(temp).map((fileName) => {
+					let { relative } = temp[fileName];
+					relative = relative.replace('app', 'src');
+					let dirname = path.dirname(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`));
+					ensureDirectory(dirname);
+					console.log(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`));
+					writeFileSync(
+						path.join(workspace, relative, `${temp[fileName].relativeFilePath}`),
+						temp[fileName].template
+					);
+				});
+			}
 		});
 
 		for (const fileName in temp) {
@@ -576,7 +589,20 @@ function generateElectronIO(workspace: string, state: any) {
 		const temp = Generator.generate({
 			type: codeType,
 			language: UITypes.ElectronIO,
-			state
+			state,
+			writer: (temp: any) => {
+				Object.keys(temp).map((fileName) => {
+					let { relative } = temp[fileName];
+					relative = relative.replace('app', 'src');
+					let dirname = path.dirname(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`));
+					ensureDirectory(dirname);
+					console.log(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`));
+					writeFileSync(
+						path.join(workspace, relative, `${temp[fileName].relativeFilePath}`),
+						temp[fileName].template
+					);
+				});
+			}
 		});
 
 		Object.keys(temp).map((fileName) => {
@@ -599,7 +625,20 @@ function generateReactWeb(workspace: string, state: any) {
 		const temp = Generator.generate({
 			type: codeType,
 			language: UITypes.ReactWeb,
-			state
+			state,
+			writer: (temp: any) => {
+				Object.keys(temp).map((fileName) => {
+					let { relative } = temp[fileName];
+					relative = relative.replace('app', 'src');
+					let dirname = path.dirname(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`));
+					ensureDirectory(dirname);
+					console.log(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`));
+					writeFileSync(
+						path.join(workspace, relative, `${temp[fileName].relativeFilePath}`),
+						temp[fileName].template
+					);
+				});
+			}
 		});
 
 		Object.keys(temp).map((fileName) => {

@@ -58,7 +58,7 @@ export default function AddAgentAccess(args: any = {}) {
 					operation: 'CHANGE_NODE_TEXT',
 					options: {
 						id: context.node0,
-						value: `Access ${args.model} by ${args.agent}`
+						value: `[Access] ${args.model} by ${args.agent}`
 					}
 				}
 			];

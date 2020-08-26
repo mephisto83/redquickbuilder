@@ -1538,7 +1538,7 @@ export function GenerateChainFunctions(options: { cs?: any; language: any; colle
 	const graph = GetCurrentGraph();
 	const entryNodes = GetDataChainEntryNodes(cs)
 		.unique((x: { id: string }) => x.id)
-		.filter((x: any) => {
+		.filter((x: any, index: number) => {
 			const languageAgnostic = GetNodeProp(x, NodeProperties.UIAgnostic);
 			if (languageAgnostic) {
 				return true;
@@ -1549,8 +1549,8 @@ export function GenerateChainFunctions(options: { cs?: any; language: any; colle
 			}
 			return true;
 		})
-		.map((x: { id: any }) => x.id)
-		.filter((ct: any) => {
+		.map((x: { id: any }, index: number) => x.id)
+		.filter((ct: any, index: number) => {
 			const collections = GraphMethods.GetNodesLinkedTo(graph, {
 				id: ct,
 				link: NodeConstants.LinkType.DataChainCollection
@@ -1561,8 +1561,11 @@ export function GenerateChainFunctions(options: { cs?: any; language: any; colle
 			return !collections || !collections.length;
 		});
 	const temp = entryNodes
-		.map((v: any) => (cs ? { node: v, class: GenerateCSChainFunction(v) } : GenerateChainFunction(v, options)))
-		.unique((x: any) => x);
+		.map(
+			(v: any, index: number) =>
+				cs ? { node: v, class: GenerateCSChainFunction(v) } : GenerateChainFunction(v, options)
+		)
+		.unique((x: any, index: number) => x);
 	// sorry this is bad.
 	if (cs) {
 		return temp;
@@ -4041,10 +4044,26 @@ export function pinConnectedNodesByLinkType(model: any, linkType: any) {
 	return (dispatch: any, getState: Function) => {
 		const state = getState();
 		const graph = GetRootGraph(state);
-		const nodes = GraphMethods.GetNodesLinkedTo(graph, {
-			id: model,
-			link: linkType
-		});
+		const nodes: any[] = [];
+		if (Array.isArray(linkType)) {
+			linkType.forEach((_linkType: string) => {
+				nodes.push(
+					...GraphMethods.GetNodesLinkedTo(graph, {
+						id: model,
+						link: _linkType
+					})
+				);
+			});
+		} else {
+			nodes.push(
+				...GraphMethods.GetNodesLinkedTo(graph, {
+					id: model,
+					link: linkType
+				})
+			);
+		}
+		const pinned: string[] = [];
+		pinned.push(...nodes.map((v: { id: any }) => v.id));
 		graphOperation(
 			nodes.map((t: { id: any }) => ({
 				operation: CHANGE_NODE_PROPERTY,
@@ -4055,7 +4074,29 @@ export function pinConnectedNodesByLinkType(model: any, linkType: any) {
 				}
 			}))
 		)(dispatch, getState);
+		return pinned;
 	};
+}
+export function setPinned(id: string | string[], pinned: boolean = false) {
+	if (!Array.isArray(id)) {
+		id = [ id ];
+	}
+	if (id) {
+		_dispatch(
+			graphOperation(
+				id.map((i) => {
+					return {
+						operation: CHANGE_NODE_PROPERTY,
+						options: {
+							prop: NodeProperties.Pinned,
+							id: i,
+							value: pinned
+						}
+					};
+				})
+			)
+		);
+	}
 }
 export function toggleNodeMark() {
 	const state = _getState();
@@ -4088,17 +4129,6 @@ export function togglePinned() {
 				prop: NodeProperties.Pinned,
 				id: currentNode.id,
 				value: !GetNodeProp(currentNode, NodeProperties.Pinned)
-			})
-		);
-	}
-}
-export function setPinned(id: string, pinned: boolean = false) {
-	if (id) {
-		_dispatch(
-			graphOperation(CHANGE_NODE_PROPERTY, {
-				prop: NodeProperties.Pinned,
-				id: id,
-				value: pinned
 			})
 		);
 	}

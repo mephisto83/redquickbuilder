@@ -38,7 +38,7 @@ import NavBarButton from './navbarbutton';
 import ConditionFilterMenu from './conditionfiltermenu';
 import CheckBox from './checkbox';
 import * as VC from '../constants/visual';
-import MindMap, { resetMindMap } from './mindmap';
+import MindMap, { resetMindMap, requestNodes, centerMindMap, MapControls } from './mindmap';
 import ModelActivityMenu from './modelactivitymenu';
 import FunctionActivityMenu from './functionactivitymenu';
 import PropertyActivityMenu from './propertyactivitymenu';
@@ -169,6 +169,10 @@ const NODE_MENU = 'NODE_MENU';
 const CONNECTING_NODE = 'CONNECTING_NODE';
 const LINK_DISTANCE = 'LINK_DISTANCE';
 class Dashboard extends Component<any, any> {
+	constructor(props) {
+		super(props);
+		this.state = {};
+	}
 	componentDidMount() {
 		this.props.setState();
 		this.props.setRemoteState();
@@ -1627,7 +1631,20 @@ class Dashboard extends Component<any, any> {
 
 		return result;
 	}
-
+	getCalculatedCost() {
+		const { state } = this.props;
+		let cost = 0;
+		const graph: Graph = UIA.GetCurrentGraph(state);
+		const node_cost = UIA.Visual(state, UIA.NODE_COST) || 0;
+		const node_connection_cost = UIA.Visual(state, UIA.NODE_CONNECTION_COST) || 0;
+		let conceptNodes = NodesByType(graph, NodeTypes.Concept);
+		if (graph) {
+			cost =
+				(graph.linkCount || 0) * node_connection_cost +
+				((graph.nodeCount || 0) - conceptNodes.length) * node_cost;
+		}
+		return Dashboard.formatMoney(cost * 500);
+	}
 	getCost(adjusted = false) {
 		const { state } = this.props;
 		let cost = 0;
@@ -1681,7 +1698,7 @@ class Dashboard extends Component<any, any> {
 
 		return (
 			<div
-				className={`skin-red sidebar-mini skin-red ${this.minified()}`}
+				className={`skin-red sidebar-mini skin-red ${this.minified()} ${this.state.small ? 'small' : ''}`}
 				style={{
 					height: 'auto',
 					minHeight: '100vh'
@@ -2041,8 +2058,13 @@ class Dashboard extends Component<any, any> {
 								{hoveredLink && hoveredLink.properties ? (
 									<SideBarHeader title={hoveredLink.properties.type} />
 								) : null}
-								<SideBarHeader title={<h4>{cost}</h4>} onClick={() => {}} />
-								<SideBarHeader title={<span>{adjusted_cost}</span>} onClick={() => {}} />
+								<SideBarHeader
+									title={<h4>{cost}</h4>}
+									onClick={() => {
+										this.setState({ calculatedCost: this.getCalculatedCost() });
+									}}
+								/>
+								<SideBarHeader title={<span>{this.state.calculatedCost}</span>} onClick={() => {}} />
 
 								<TreeViewMenu
 									open={UIA.Visual(state, VC.ApplicationMenu)}
@@ -2086,8 +2108,16 @@ class Dashboard extends Component<any, any> {
 										title={'Start Sequence'}
 										icon="fa fa-list-ol"
 										onClick={() => {
+											this.setState({ small: true });
 											resetMindMap();
-											startSequence(currentNode.id);
+											startSequence(currentNode.id, requestNodes, {
+												exclusiveLinkTypes: [],
+												centerMindMap: centerMindMap,
+												prefix: 'temp',
+												reset: () => {
+													resetMindMap();
+												}
+											});
 										}}
 									/>
 									<TreeViewMenu
@@ -2096,7 +2126,53 @@ class Dashboard extends Component<any, any> {
 										icon="fa fa-outdent"
 										onClick={() => {
 											resetMindMap();
-											runSequence(NodeTypes.Model);
+											this.setState({ small: true, nonBlock: true });
+											// this.props.setVisual(LINK_DISTANCE, 75);
+											Promise.resolve()
+												.then(() => {
+													return runSequence(NodeTypes.AgentAccessDescription, requestNodes, {
+														exclusiveLinkTypes: [],
+														prefix: 'agent-acceess-description',
+														centerMindMap: (args: any) => {
+															centerMindMap(args);
+														},
+														reset: () => {
+															resetMindMap();
+														},
+														MapControls: MapControls
+													});
+												})
+												.then(() => {
+													return runSequence(NodeTypes.Model, requestNodes, {
+														exclusiveLinkTypes: [ LinkType.PropertyLink ],
+														level1: LinkType.PropertyLink,
+														level2: [ LinkType.AttributeLink, LinkType.Enumeration ],
+														prefix: 'model-property',
+														centerMindMap: (args: any) => {
+															centerMindMap(args);
+														},
+														reset: () => {
+															resetMindMap();
+														},
+														MapControls: MapControls
+													})
+														.then(() => {
+															return runSequence(NodeTypes.Model, requestNodes, {
+																exclusiveLinkTypes: [],
+																prefix: 'model',
+																centerMindMap: (args: any) => {
+																	centerMindMap(args);
+																},
+																reset: () => {
+																	resetMindMap();
+																},
+																MapControls: MapControls
+															});
+														})
+														.then(() => {
+															this.setState({ small: false, nonBlock: false });
+														});
+												});
 										}}
 									/>
 
@@ -2235,6 +2311,8 @@ class Dashboard extends Component<any, any> {
 							/>
 							{mainContent === MIND_MAP ? (
 								<MindMap
+									small={this.state.small}
+									nonBlock={this.state.nonBlock}
 									linkDistance={UIA.Visual(state, LINK_DISTANCE)}
 									onNodeClick={(nodeId, boundingBox) => {
 										if (UIA.Visual(state, CONNECTING_NODE)) {

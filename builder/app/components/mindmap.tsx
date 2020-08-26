@@ -16,6 +16,7 @@ import {
 	NodeProperties,
 	UITypeColors
 } from '../constants/nodetypes';
+import { constants } from 'os';
 
 const MIN_DIMENSIONAL_SIZE = 20;
 const iconSize = 30;
@@ -27,8 +28,8 @@ export default class MindMap extends Component<any, any> {
 	mapScale: number;
 	mapTranslate: any;
 	textSize: any;
-	constructor() {
-		super();
+	constructor(props: any) {
+		super(props);
 		this.textSize = {};
 		this.hasStarted = false;
 		this.mapScale = 1;
@@ -199,7 +200,12 @@ export default class MindMap extends Component<any, any> {
 				);
 			}
 			function reset() {
-				const { x = 0, y = 0 } = {};
+				center({ x: 0, y: 0 });
+			}
+			stopFunc = () => me.$force.stop();
+			startFunc = () => force.start();
+			function center(args: any) {
+				const { x = 0, y = 0 } = args;
 				me.mapScale = 1;
 				me.mapTranslate.x = 0;
 				me.mapTranslate.y = 0;
@@ -219,8 +225,18 @@ export default class MindMap extends Component<any, any> {
 					)}deg)`
 				);
 			}
+			let nodes = me.state.graph.nodes;
+			function getNodes() {
+				return nodes;
+			}
+			getNodesFunc = () => {
+				return getNodes();
+			};
 			resetFunc = () => {
 				reset();
+			};
+			centerFunc = (args: any) => {
+				center(args);
 			};
 
 			outer.on('mousemove', (x, v) => {
@@ -440,6 +456,7 @@ export default class MindMap extends Component<any, any> {
 			.style('text-align', 'start')
 			// .style('word-break', 'break-all')
 			.style('height', (x) => `${x.height - pad / 2}px`)
+			.attr('data-id', (d) => d.id)
 			.text((d) => `${getLabelText(d)}`)
 			.call(force.drag);
 
@@ -666,9 +683,11 @@ export default class MindMap extends Component<any, any> {
 		nn.name = nn.id;
 		let max = 5000;
 		let maxx = max * (1920 / 1080);
-		nn.fixed = false;
+		if (!this.props.nonBlock || this.state.graph.nodes.length === 1) {
+			nn.fixed = false;
+		}
 		if (count > 1) nn.x = Math.random() * maxx - maxx / 2;
-		nn.y = Math.random() * max - max /  2;
+		nn.y = Math.random() * max - max / 2;
 		return nn;
 	}
 
@@ -714,14 +733,15 @@ export default class MindMap extends Component<any, any> {
 							};
 						});
 					}
-					this.state.graph.nodes.forEach((v) => {
-						if (!unanchored[v.id]) {
-							v.fixed = true;
-						} else {
-							v.fixed = false;
-						}
-					});
-
+					if (!this.props.nonBlock || this.state.graph.nodes.length === 1) {
+						this.state.graph.nodes.forEach((v) => {
+							if (!unanchored[v.id]) {
+								v.fixed = true;
+							} else {
+								v.fixed = false;
+							}
+						});
+					}
 					newNodes.map((nn) => {
 						this.state.graph.nodes.push(
 							this.applyNodeVisualData(
@@ -827,7 +847,7 @@ export default class MindMap extends Component<any, any> {
 	}
 
 	render() {
-		return <div id={this.state.id} className="mindmap" style={{ minHeight: 946 }} />;
+		return <div id={this.state.id} className={`mindmap`} style={{ minHeight: 946 }} />;
 	}
 }
 
@@ -969,7 +989,29 @@ var Vector = (function() {
 	return Vector;
 })();
 
+let startFunc: Function = () => {};
+let stopFunc: Function = () => {};
 let resetFunc: Function = () => {};
+let centerFunc: Function = () => {};
+let getNodesFunc: Function = () => {};
+export function requestNodes() {
+	return getNodesFunc ? getNodesFunc() : null;
+}
+export function centerMindMap(args: any) {
+	if (centerFunc) {
+		centerFunc(args);
+	}
+}
+export function startMap() {
+	/// startFunc();
+}
+export function stopMap() {
+	//	stopFunc();
+}
+export const MapControls = {
+	startMap,
+	stopMap
+};
 export function resetMindMap() {
 	if (resetFunc) resetFunc();
 }

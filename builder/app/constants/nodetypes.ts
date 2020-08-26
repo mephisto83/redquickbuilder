@@ -210,6 +210,7 @@ export const NodeTypeColors = {
 	[NodeTypes.Method]: '#BE95C4',
 	[NodeTypes.Permission]: '#383F51',
 	[NodeTypes.Function]: '#553D36',
+	[NodeTypes.AgentAccessDescription]: '#2B59C3',
 	[NodeTypes.Parameter]: '#684A52',
 	[NodeTypes.FunctionOutput]: '#857885',
 	[NodeTypes.Services]: '#59FFA0',
@@ -360,6 +361,7 @@ export const NodeProperties = {
 	AfterEffectMethodChain: 'AfterEffectMethodChain',
 	IsHomeView: 'IsHomeView',
 	AsLocalContext: 'AsLocalContext',
+	GeneratedConcept: 'GeneratedConcept',
 	DataChainName: 'DataChainName',
 	ActiveStyle: ':active',
 	Themes: 'Themes',
@@ -525,6 +527,7 @@ export const NodeProperties = {
 
 	IsReferenceList: 'isReferenceList',
 	UseHttps: 'UseHttps',
+	Description: 'description',
 
 	UISingular: 'uiSingular',
 	UIChoice: 'uiChoice',

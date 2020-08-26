@@ -32,7 +32,7 @@ import {
 	GetLink,
 	GetCssName,
 	GetState,
-  pinConnectedNodesByLinkType
+	pinConnectedNodesByLinkType
 } from './uiactions';
 import { processRecording } from '../utils/utilservice';
 import prune from '../methods/prune';
@@ -47,6 +47,7 @@ import { NodeProperties, LinkType, LinkPropertyKeys } from '../constants/nodetyp
 import { Link } from 'react-router-dom';
 import { IfFalse } from '../components/titles';
 import { platform } from 'os';
+import { NodeTypeColors } from '../../visi_blend/dist/app/constants/nodetypes';
 const { ipcRenderer } = require('electron');
 const remote = require('electron').remote;
 
@@ -244,14 +245,18 @@ export function dashboardShot(folder) {
 		takeDashboardShot(folder);
 	};
 }
-
-export async function takeDashboardShot(folder: any, name?: string) {
+let browserWindow: Electron.BrowserView;
+export async function takeDashboardShot(folder: any, name?: string, getNodes?: any, ops?:any) {
 	const remote = require('electron').remote;
-	let win = remote.BrowserWindow.getFocusedWindow();
+	let win = browserWindow || remote.BrowserWindow.getFocusedWindow();
 	if (win) {
+		// browserWindow = win;
 		let svg = document.querySelector('.content-wrapper svg');
 		if (svg) {
-			let bbox = svg.getBoundingClientRect();
+      let bbox = svg.getBoundingClientRect();
+      if(ops){
+        ops.MapControls.stopMap();
+      }
 			await win.webContents
 				.capturePage({
 					x: bbox.x || 0,
@@ -264,11 +269,32 @@ export async function takeDashboardShot(folder: any, name?: string) {
 					await ensureDirectory(path.join(folder));
 					fs.writeFileSync(path.join(folder, name || 'image.jpeg'), img.toPNG(), 'base64');
 				});
+			let nodese = getNodes ? getNodes() : null;
+			await wait(5000);
+			if (nodese) {
+				let projectJson: any = {};
+				let temppath = path.join(folder, 'project.json');
+				if (fs.existsSync(temppath)) {
+					projectJson = JSON.parse(fs.readFileSync(temppath, 'utf8'));
+				}
+				if (name) {
+					projectJson[name] = nodese.map((v: any) => ({
+						bounds: v.bounds,
+						properties: v.properties,
+						color: NodeTypeColors[v.properties.nodeType],
+						id: v.id
+					}));
+					fs.writeFileSync(temppath, JSON.stringify(projectJson), 'utf8');
+				}
+      }
+      if(ops){
+        ops.MapControls.startMap();
+      }
 		}
 	}
 }
 export function getMindMapBounds() {
-	let svgs = document.querySelectorAll('.content-wrapper svg rect');
+	let svgs = document.querySelectorAll('.content-wrapper svg div[data-id]');
 	let bounds = { xmax: -10000000000000, xmin: 10000000000000, ymax: -10000000000000, ymin: 10000000000000 };
 	for (var i = 0; i < svgs.length; i++) {
 		let bbox = svgs[i].getBoundingClientRect();
@@ -280,53 +306,102 @@ export function getMindMapBounds() {
 
 	return bounds;
 }
-export async function runSequence(nodeType: string) {
+export async function runSequence(
+	nodeType: string | string[],
+	getNodes: Function,
+	ops: {
+		exclusiveLinkTypes: string[];
+		centerMindMap?: Function;
+		level1?: string;
+		reset: Function;
+		level2?: string[];
+		prefix: string;
+		MapControls?: any;
+	}
+) {
 	let nodes: Node[] = NodesByType(GetCurrentGraph(), nodeType);
 
 	await nodes.forEachAsync(async (node: Node) => {
-		await startSequence(node.id);
+		await startSequence(node.id, getNodes, ops);
 	});
 }
-export async function startSequence(modelId: string) {
+export async function startSequence(
+	modelId: string,
+	getNodes: Function,
+	ops: {
+		exclusiveLinkTypes: string[];
+		level1?: string;
+		level2?: string[];
+		reset: Function;
+		centerMindMap?: Function;
+		prefix: string;
+	}
+) {
 	const root = GetCurrentGraph();
 	const workspace = root.workspaces ? root.workspaces[platform()] || root.workspace : root.workspace;
 	let doesntfit = true;
 	const maxi = 3;
 	let maxattempts = maxi;
 	do {
-		setVisual('LINK_DISTANCE', 200 - (maxi - maxattempts) * 50)(GetDispatchFunc(), GetStateFunc());
+		setVisual('LINK_DISTANCE', 125)(GetDispatchFunc(), GetStateFunc());
 		clearPinned();
 		setPinned(modelId, true);
-		await populate(modelId);
+		await populate(modelId, ops);
 		let bounds = getMindMapBounds();
-		doesntfit = !doesItFit(bounds);
+		doesntfit = !doesItFit(bounds, ops.centerMindMap || (() => {}));
 		console.log(bounds);
 		maxattempts--;
 	} while (doesntfit && maxattempts);
-	await takeDashboardShot(path.join(workspace, root.title, 'mindmaps'), `${GetCssName(modelId)}.jpeg`);
+	await takeDashboardShot(
+		path.join(workspace, root.title, 'mindmaps'),
+		`${ops.prefix}-${GetCssName(modelId)}.jpeg`,
+		getNodes,
+		ops
+	);
+	ops.reset();
 }
-export function doesItFit(bounds: { xmax: number; xmin: number; ymin: number; ymax: number }) {
+export function doesItFit(bounds: { xmax: number; xmin: number; ymin: number; ymax: number }, centerMindMap: Function) {
 	let svg = document.querySelector('.content-wrapper svg');
 	if (svg) {
 		let bbox = svg.getBoundingClientRect();
-		if (bbox.top < bounds.ymin)
-			if (bbox.bottom > bounds.ymax)
-				if (bbox.left < bounds.xmin)
-					if (bbox.right > bounds.xmax)
-						if (bbox.height > bounds.ymax - bounds.ymin) {
-							if (bbox.width > bounds.xmax - bounds.xmin) {
-								return true;
-							}
-						}
+		if (bbox.height >= bounds.ymax - bounds.ymin) {
+			if (bbox.width >= bounds.xmax - bounds.xmin) {
+				if (
+					bbox.top <= bounds.ymin &&
+					bbox.bottom >= bounds.ymax &&
+					bbox.left <= bounds.xmin &&
+					bbox.right >= bounds.xmax
+				) {
+					return true;
+				} else {
+					let centerY = (bounds.ymax - bounds.ymin) / 2;
+					let centerX = (bounds.xmax - bounds.xmin) / 2;
+					if (false && centerMindMap) {
+						centerMindMap({ x: -centerX, y: -centerY });
+						return true;
+					}
+				}
+			}
+		}
 	}
 	return false;
 }
-export async function populate(modelId: string) {
+export async function populate(
+	modelId: string,
+	ops: { exclusiveLinkTypes: string[]; level1?: string; level2?: string[] }
+) {
 	let links: GraphLink[] = getNodeLinks(GetCurrentGraph(), modelId);
-	let typesToSkip: string[] = [ LinkType.PropertyLink ];
+	let typesToSkip: string[] = ops && ops.exclusiveLinkTypes.length ? [] : [ LinkType.PropertyLink ];
+	let doesntfit = false;
 	let sorted = links
 		.unique((link: GraphLink) => GetLinkProperty(link, LinkPropertyKeys.TYPE))
 		.filter((link: GraphLink) => typesToSkip.indexOf(GetLinkProperty(link, LinkPropertyKeys.TYPE)) === -1)
+		.filter(
+			(link: GraphLink) =>
+				ops && ops.exclusiveLinkTypes.length
+					? ops.exclusiveLinkTypes.indexOf(GetLinkProperty(link, LinkPropertyKeys.TYPE)) !== -1
+					: true
+		)
 		.sort((a: GraphLink, b: GraphLink) => {
 			if (GetLinkProperty(a, LinkPropertyKeys.TYPE) === LinkType.GeneralLink) {
 				return 1;
@@ -337,25 +412,54 @@ export async function populate(modelId: string) {
 			return 0;
 		});
 	await sorted.forEachAsync(async (link: GraphLink) => {
-		pinConnectedNodesByLinkType(modelId, GetLinkProperty(link, LinkPropertyKeys.TYPE))(
-			GetDispatchFunc(),
-			GetStateFunc()
-		);
-		await wait(4500);
-		if (GetLinkProperty(link, LinkPropertyKeys.TYPE) === LinkType.ModelTypeLink) {
+		let maxtimes = 5;
+		do {
+			let pinned: string[] = [];
+			let added = pinConnectedNodesByLinkType(modelId, GetLinkProperty(link, LinkPropertyKeys.TYPE))(
+				GetDispatchFunc(),
+				GetStateFunc()
+			);
+			pinned.push(...added);
+			await wait(4500);
+			added = await nextLevel(
+				link,
+				added,
+				pinned,
+				ops.level1 || LinkType.ModelTypeLink,
+				ops.level2 || LinkType.PropertyLink
+			);
+			let bounds = getMindMapBounds();
+			doesntfit = !doesItFit(bounds);
+			maxtimes--;
+			if (doesntfit) {
+				setPinned(pinned, false);
+			}
+		} while (doesntfit && maxtimes);
+	});
+
+	async function nextLevel(
+		link: GraphLink,
+		added: string[],
+		pinned: string[],
+		level1: string,
+		level2: string | string[]
+	) {
+		if (GetLinkProperty(link, LinkPropertyKeys.TYPE) === level1) {
 			await getNodeLinks(GetCurrentGraph(), modelId)
-				.filter((v) => GetLinkProperty(v, LinkPropertyKeys.TYPE) === LinkType.ModelTypeLink)
-				.forEachAsync(async (c) => {
-					if (c.target === modelId) {
-						pinConnectedNodesByLinkType(c.source, LinkType.PropertyLink)(
+				.filter((v) => GetLinkProperty(v, LinkPropertyKeys.TYPE) === level1)
+				.forEachAsync(async (c: GraphLink) => {
+					if ((c.target === modelId || ops.level1) && ops && (!ops.exclusiveLinkTypes.length || ops.level1)) {
+						added = pinConnectedNodesByLinkType(c.target === modelId ? c.source : c.target, level2)(
 							GetDispatchFunc(),
 							GetStateFunc()
 						);
-						await wait(4500);
+						pinned.push(...added);
+						if (added.length) await wait(4500);
 					}
 				});
 		}
-	});
+		return added;
+	}
 }
 
 export async function wait(time: number) {
