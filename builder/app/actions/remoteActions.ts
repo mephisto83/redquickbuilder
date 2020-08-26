@@ -47,7 +47,7 @@ import { NodeProperties, LinkType, LinkPropertyKeys } from '../constants/nodetyp
 import { Link } from 'react-router-dom';
 import { IfFalse } from '../components/titles';
 import { platform } from 'os';
-import { NodeTypeColors } from '../../visi_blend/dist/app/constants/nodetypes';
+import { NodeTypeColors } from '../constants/nodetypes';
 const { ipcRenderer } = require('electron');
 const remote = require('electron').remote;
 
