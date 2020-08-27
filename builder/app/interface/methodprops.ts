@@ -12,6 +12,7 @@ import {
 	updateNodeProperty
 } from '../methods/graph_methods';
 import { NodeTypes, NodeProperties, LinkProperties } from '../constants/nodetypes';
+import SwaggerCallConfig from '../components/swaggercallconfig';
 
 export interface DashboardAccessProps {
 	access: false;
@@ -104,6 +105,7 @@ export interface DataChainConfiguration {
 	copyEnumeration?: CopyEnumerationConfig;
 	setBoolean?: SetBoolean;
 	setInteger?: SetInteger;
+	swaggerCall?: SwaggerCall;
 	incrementInteger?: IncrementInteger;
 	incrementDouble?: IncrementDouble;
 	compareEnumeration?: CompareEnumeration;
@@ -636,7 +638,7 @@ export function SetupConfigInstanceInformation(
 	dataChainOptions.incrementInteger = dataChainOptions.incrementInteger || CreateIncrementInteger();
 	dataChainOptions.compareEnumeration = dataChainOptions.compareEnumeration || CreateCompareEnumeration();
 	dataChainOptions.compareEnumerations = dataChainOptions.compareEnumerations || [ CreateCompareEnumeration() ];
-
+	dataChainOptions.swaggerCall = dataChainOptions.swaggerCall || CreateSwaggerCall();
 	let checkExistence = dataChainOptions.checkExistence;
 	let properties: any[] = [];
 	let targetProperties: any[] = [];
@@ -686,6 +688,7 @@ export function SetupConfigInstanceInformation(
 		setBoolean: dataChainOptions.setBoolean,
 		simpleValidations: dataChainOptions.simpleValidations,
 		setInteger: dataChainOptions.setInteger,
+		swaggerCall: dataChainOptions.swaggerCall,
 		compareEnumeration: dataChainOptions.compareEnumeration,
 		compareEnumerations: dataChainOptions.compareEnumerations
 	};
@@ -773,7 +776,21 @@ export interface SetBoolean extends Setter {}
 export interface SetInteger extends Setter {}
 export interface IncrementInteger extends Setter {}
 export interface IncrementDouble extends Setter {}
-
+export interface SwaggerCall extends ConfigItem {
+	swagger: string;
+	swaggerApiPath: string;
+	swaggerApiDescription: string;
+}
+export function CreateSwaggerCall(): SwaggerCall {
+	return {
+		swagger: '',
+		swaggerApiDescription: '',
+		enabled: false,
+		id: '',
+		swaggerApiPath: '',
+		name: ''
+	};
+}
 export interface SimpleValidationConfig extends AfterEffectRelations {
 	minLength: NumberConfig;
 	maxLength: NumberConfig;

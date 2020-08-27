@@ -13,6 +13,7 @@ import TreeViewButtonGroup from './treeviewbuttongroup';
 import CheckExistanceConfig from './checkexistenceconfig';
 import GetExistanceConfig from './getexistenceconfig';
 import SetPropertiesConfig from './setpropertiesconfig';
+import SwaggerCallConfig from './swaggercallconfig';
 import SimpleValidationComponent from './simplevalidationconfig';
 import CopyConfigComponent from './copyconfig';
 import SetIntegerComponent from './setinteger';
@@ -135,6 +136,11 @@ export default class DataChainOptions extends Component<any, any> {
 					dataChainOptions={dataChainOptions}
 					onChange={onchange}
 				/>
+        <SwaggerCallConfig
+					dataChainType={this.props.dataChainType}
+					methodDescription={methodDescription}
+					dataChainOptions={dataChainOptions}
+					onChange={onchange}/>
 				<TreeViewButtonGroup />
 			</TreeViewMenu>
 		);

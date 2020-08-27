@@ -14,6 +14,9 @@ export const NodeTypes = {
 	ComponentApiConnector: 'component-api-connector',
 	ScreenContainer: 'screen-container',
 	ScreenEffect: 'ScreenEffect',
+	Swagger: 'Swagger',
+	SwaggerApiPath: 'SwaggerApiPath',
+	SwaggerApiDescription: 'SwaggerApiDescription',
 	ScreenEffectApi: 'ScreenEffectApi',
 	RootNode: 'composition-rootNode',
 	LeafNode: 'composition-leafNode',
@@ -216,6 +219,9 @@ export const NodeTypeColors = {
 	[NodeTypes.Services]: '#59FFA0',
 	[NodeTypes.ClassNode]: '#C3BAAA',
 	[NodeTypes.Maestro]: '#780116',
+	[NodeTypes.Swagger]: '#E952DE',
+	[NodeTypes.SwaggerApiPath]: '#B24C63',
+	[NodeTypes.SwaggerApiDescription]: '#386641',
 	[NodeTypes.Condition]: '#CAFE48',
 	[NodeTypes.Validator]: '#151522',
 	[NodeTypes.ModelFilter]: '#312313',
@@ -344,6 +350,8 @@ export const NodeProperties = {
 	StateKey: 'StateKey',
 	DefaultPropertyValueType: 'DefaultPropertyValueType',
 	DefaultPropertyValue: 'DefaultPropertyValue',
+	SwaggerNode: 'SwaggerNode',
+	SwaggerClassName: 'SwaggerClassName',
 	GridPlacement: 'GridPlacement',
 	CompleteFunction: 'CompleteFunction',
 	ArbiterModels: 'ArbiterModels',
@@ -519,6 +527,7 @@ export const NodeProperties = {
 	IsDataChainPagingTake: 'IsDataChainPagingTake',
 	UIText: 'text',
 	Target: 'Target',
+	SwaggerPath: 'SwaggerPath',
 	UseAsValue: 'UseAsValue',
 	IsUrlParameter: 'IsUrlParameter',
 	NavigationAction: 'NavigationAction',
@@ -528,7 +537,9 @@ export const NodeProperties = {
 	IsReferenceList: 'isReferenceList',
 	UseHttps: 'UseHttps',
 	Description: 'description',
-
+	IsSwagger: 'IsSwagger',
+	SwaggerMethodDefinition: 'SwaggerMethodDefinition',
+	SwaggerEndpoint: 'SwaggerEndpoint',
 	UISingular: 'uiSingular',
 	UIChoice: 'uiChoice',
 	UIChoiceType: 'uiChoiceType',
@@ -718,6 +729,9 @@ export const LinkType = {
 	ExecutionDataChain: 'ExecutionDataChain',
 	DataChainIsDisabled: 'DataChainIsDisabled',
 	Composition: 'Composition',
+	SwaggerClass: 'SwaggerClass',
+	SwaggerMethodDescription: 'SwaggerMethodDescription',
+	SwaggerPaths: 'SwaggerPaths',
 	StateKey: 'StateKey',
 	DataChainScreenEffect: 'DataChainScreenEffect',
 	DataChainScreenEffectImpl: 'DataChainScreenEffectImpl',
@@ -1001,6 +1015,12 @@ export const LinkProperties = {
 	UserOfAgentType: {
 		type: LinkType.UserOfAgentType
 	},
+	SwaggerClass: {
+		type: LinkType.SwaggerClass
+	},
+	SwaggerPaths: {
+		type: LinkType.SwaggerPaths
+	},
 	Composition: {
 		type: LinkType.Composition
 	},
@@ -1012,6 +1032,9 @@ export const LinkProperties = {
 	},
 	ValidationDataChain: {
 		type: LinkType.ValidationDataChain
+	},
+	SwaggerMethodDescription: {
+		type: LinkType.SwaggerMethodDescription
 	},
 	ExecutionDataChain: {
 		type: LinkType.ExecutionDataChain
@@ -1512,8 +1535,11 @@ export const NodePropertyTypes = {
 	INT: 'INT',
 	FLOAT: 'FLOAT',
 	DOUBLE: 'DOUBLE',
+	LONG: 'LONG',
 	BOOLEAN: 'BOOLEAN',
 	EMAIL: 'EMAIL',
+	REFERENCE: 'REFERENCE',
+	OBJECT: 'OBJECT',
 	PHONENUMBER: 'PHONENUMBER'
 };
 export const NEW_LINE = `
