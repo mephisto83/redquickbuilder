@@ -13,6 +13,7 @@ import {
 } from '../methods/graph_methods';
 import { NodeTypes, NodeProperties, LinkProperties } from '../constants/nodetypes';
 import SwaggerCallConfig from '../components/swaggercallconfig';
+import { SwaggerPathDescription, SwaggerParameters, SwaggerEndpointDescription } from '../service/swagger';
 
 export interface DashboardAccessProps {
 	access: false;
@@ -780,6 +781,45 @@ export interface SwaggerCall extends ConfigItem {
 	swagger: string;
 	swaggerApiPath: string;
 	swaggerApiDescription: string;
+	swaggerParameters: SwaggerParameterConfig[];
+}
+export interface SwaggerParameterConfig extends AfterEffectRelations {
+	swaggerParameterName: string;
+	swaggerParameterType: string;
+	swaggerParameterFormat?: string;
+	swaggerParameterRequired: boolean;
+}
+export function CreateAfterEffectRelations(): AfterEffectRelations {
+	return {
+		agent: '',
+		agentProperty: '',
+		enabled: false,
+		id: GUID(),
+		model: '',
+		modelOutput: '',
+		modelOutputProperty: '',
+		modelProperty: '',
+		parent: '',
+		parentProperty: '',
+		relationType: RelationType.Agent,
+		targetProperty: ''
+	};
+}
+export function CreateSwaggerParameters(
+	endpointDescription: SwaggerEndpointDescription,
+	params: SwaggerParameterConfig[]
+): SwaggerParameterConfig[] {
+	let result: SwaggerParameterConfig[] = [];
+	return result;
+}
+export function CreateSwaggerParameter(param: SwaggerParameters): SwaggerParameterConfig {
+	return {
+		...CreateAfterEffectRelations(),
+		swaggerParameterFormat: param.format,
+		swaggerParameterName: param.name,
+		swaggerParameterRequired: param.required,
+		swaggerParameterType: param.type
+	};
 }
 export function CreateSwaggerCall(): SwaggerCall {
 	return {
@@ -788,6 +828,7 @@ export function CreateSwaggerCall(): SwaggerCall {
 		enabled: false,
 		id: '',
 		swaggerApiPath: '',
+		swaggerParameters: [],
 		name: ''
 	};
 }

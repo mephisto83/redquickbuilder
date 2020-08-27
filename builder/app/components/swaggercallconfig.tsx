@@ -15,6 +15,7 @@ import SelectInput from './selectinput';
 import { NodeTypes, LinkType } from '..//constants/nodetypes';
 import { GetCurrentGraph } from '../../visi_blend/dist/app/actions/uiactions';
 import { GetNodesLinkedTo } from '../methods/graph_methods';
+import SwaggerCallParameters from './swaggercallparameters';
 
 export default class SwaggerCallConfig extends Component<any, any> {
 	constructor(props: any) {
@@ -41,7 +42,7 @@ export default class SwaggerCallConfig extends Component<any, any> {
 			>
 				<TreeViewItemContainer>
 					<TextInput
-						label={Titles.Value}
+						label={Titles.Name}
 						value={swaggerCall.name}
 						onChange={(value: string) => {
 							swaggerCall.name = value;
@@ -108,6 +109,13 @@ export default class SwaggerCallConfig extends Component<any, any> {
 						}}
 					/>
 				</TreeViewItemContainer>
+				<SwaggerCallParameters
+          swaggerCall={swaggerCall}
+					dataChainType={this.props.dataChainType}
+					methodDescription={this.props.methodDescription}
+					dataChainOptions={dataChainOptions}
+					onChange={onchange}
+				/>
 			</SetterComponent>
 		);
 	}
