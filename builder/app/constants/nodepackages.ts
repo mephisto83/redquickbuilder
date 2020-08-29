@@ -25,6 +25,7 @@ import {
 	SelectorPropertyKeys,
 	ApiNodeKeys
 } from './nodetypes';
+import * as _ from '../methods/graph_types';
 import {
 	ADD_NEW_NODE,
 	GetAgentNodes,
@@ -1783,11 +1784,13 @@ export const CreateDefaultView = {
 			if (typeof model === 'string') {
 				model = GetNodeById(model);
 			}
+
 			if (connectedModel) {
 				if (GetNodeProp(connectedModel, NodeProperties.NODEType) === NodeTypes.Model) {
 					isPluralComponent = true;
 				}
 			}
+
 			const currentNode = model || Node(state, Visual(state, SELECTED_NODE));
 			let screenNodeId: any = null;
 			let screenComponentId: any = null;
@@ -1863,18 +1866,16 @@ export const CreateDefaultView = {
 			const isModel = modelType === NodeTypes.Model;
 
 			if (isModel) {
-				let modelChildren = GetModelPropertyChildren(currentNode.id);
+				let modelChildren: _.Node[] = GetModelPropertyChildren(currentNode.id);
 				newItems.currentNode = currentNode.id;
 				if (chosenChildren && chosenChildren.length) {
 					modelChildren = modelChildren.filter((x: { id: any }) =>
 						chosenChildren.some((v: any) => v === x.id)
 					);
 				}
-				const modelProperties = modelChildren.filter(
-					(x: any) => !GetNodeProp(x, NodeProperties.IsDefaultProperty)
-				).filter(
-					(x: any) => !GetNodeProp(x, NodeProperties.IgnoreInView)
-				);
+				const modelProperties = modelChildren
+					.filter((x: any) => !GetNodeProp(x, NodeProperties.IsDefaultProperty))
+					.filter((x: any) => !GetNodeProp(x, NodeProperties.IgnoreInView));
 				childComponents = modelProperties.map(() => null);
 				const screenComponentEvents: any[] = [];
 				if (isList) {
