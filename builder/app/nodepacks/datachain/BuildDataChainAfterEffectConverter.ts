@@ -675,6 +675,15 @@ function GenerateSimpleValidations(
 				);
 				checks.push({ template: equality, id: simpleValidation.id });
 			}
+			if (simpleValidation.isIntersecting && simpleValidation.isIntersecting.enabled) {
+				let equality = GenerateIsIntersectingComparer(
+					simpleValidation,
+					simpleValidation.isIntersecting,
+					tempLambdaInsertArgumentValues,
+					true
+				);
+				checks.push({ template: equality, id: simpleValidation.id });
+			}
 			if (simpleValidation.isContained && simpleValidation.isContained.enabled) {
 				let equality = GenerateIsContainedComparer(
 					simpleValidation,
@@ -864,6 +873,21 @@ function GenerateIsContainedComparer(
 	SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, areEqual.relationType, areEqual);
 
 	return `${not ? '!' : ''}(${valuePropString} != null && ${valuePropString}.Contains(${equalityTo}))`;
+}
+
+function GenerateIsIntersectingComparer(
+	simpleValidation: SimpleValidationConfig,
+	areEqual: IsContainedConfig,
+	tempLambdaInsertArgumentValues: any,
+	not: boolean
+) {
+	let { relationType } = simpleValidation;
+	let valuePropString = GetRelationTypeValuePropString(relationType, simpleValidation);
+	let equalityTo = GetRelationTypeValuePropString(areEqual.relationType, areEqual);
+	SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, relationType, simpleValidation);
+	SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, areEqual.relationType, areEqual);
+
+	return `${not ? '!' : ''}(${valuePropString} != null && ${valuePropString}.AsQueryable().Intersect(${equalityTo}))`;
 }
 
 function SetLambdaInsertArgumentValues(

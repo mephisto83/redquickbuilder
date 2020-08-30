@@ -13,7 +13,7 @@ import {
 	isAccessNode,
 	GetCurrentGraph,
 	GetLinkProperty,
-  hasAccessNode
+	hasAccessNode
 } from '../../actions/uiactions';
 import { CreateDefaultView } from '../../constants/nodepackages';
 import { GetViewTypeModelType } from '../viewtype/SetupViewTypeForCreate';
@@ -52,8 +52,7 @@ export default async function CreateComponentAll(progressFunc: any, filter?: any
 			if (filter && !filter(model)) {
 				return;
 			}
-			console.log(`Creating shared components for : ${GetNodeTitle(model)}`);
-
+			console.log(`Creating shared components for : ${GetNodeTitle(model)} ${GetNodeTitle(agent)}`);
 			CreateComponentModel({
 				model: model.id,
 				viewTypeModelId: viewType.id,
@@ -105,7 +104,7 @@ export function CreateComponentModel(args: any = {}) {
 	const result: any = [];
 	const graph = GetCurrentGraph();
 	viewTypes.forEach((viewType: string) => {
-		const viewName = `${args.isSharedComponent ? 'Shared' : ''} ${GetNodeTitle(model)} ${viewType}`;
+		const viewName = `${args.isSharedComponent ? '' : ''} ${GetNodeTitle(model)} ${viewType}`;
 		const properties = GetModelPropertyChildren(model).filter(
 			(x: any) => !GetNodeProp(x, NodeProperties.IsDefaultProperty)
 		);

@@ -239,16 +239,20 @@ export function GetGroupProp(id: any, prop: any) {
 }
 
 export function GetSharedComponentFor(
-	viewType: any,
-	modelProperty: any,
-	currentNodeId: any,
+	viewType: string,
+	modelProperty: _.Node,
+	targetModel: any,
 	isSharedProperty: any,
-	agentId: any
+	uiType: string
 ) {
+	if (!uiType) {
+		throw new Error('no ui type set in GetSharedComponentFor');
+	}
 	const graph = GetCurrentGraph(GetState());
 	let viewTypeNodes = GraphMethods.GetNodesLinkedTo(graph, {
-		id: typeof modelProperty === 'string' ? modelProperty : modelProperty.id
-	});
+		id: modelProperty.id
+	})
+	// let viewTypeNodes:any = NodesByType(null, NodeTypes.ViewType);
 	// viewTypeNodes = viewTypeNodes.filter((x: any) => {
 	// 	let componentNodes = GraphMethods.GetNodesLinkedTo(graph, {
 	// 		id: x.id,
@@ -267,23 +271,23 @@ export function GetSharedComponentFor(
 	if (isSharedProperty) {
 		viewType = isPluralComponent ? ViewTypes.GetAll : ViewTypes.Get;
 	}
-	viewTypeNodes = viewTypeNodes.filter((x: any) => {
+	viewTypeNodes = viewTypeNodes.filter((x: _.Node) => {
 		let result = GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ViewType;
 
 		result = result && !!GetNodeProp(x, NodeProperties.IsPluralComponent) === !!isPluralComponent;
 		return result;
 	});
-	viewTypeNodes = viewTypeNodes.find((x: { id: any }) => {
+	viewTypeNodes = viewTypeNodes.find((x: _.Node) => {
 		if (
 			GraphMethods.existsLinkBetween(graph, {
 				source: x.id,
-				target: currentNodeId,
+				target: targetModel,
 				type: NodeConstants.LinkType.DefaultViewType
 			})
 		) {
 			const link = GraphMethods.findLink(graph, {
 				source: x.id,
-				target: currentNodeId
+				target: targetModel
 			});
 			if (GetLinkProperty(link, NodeConstants.LinkPropertyKeys.ViewType) === viewType) {
 				return true;
@@ -305,6 +309,8 @@ export function GetSharedComponentFor(
 			return GetNodeProp(modelProperty, NodeProperties.DefaultViewTypeGetAll);
 		case ViewTypes.Update:
 			return GetNodeProp(modelProperty, NodeProperties.DefaultViewTypeUpdate);
+		default:
+			throw new Error('unhandled case for getting shared component');
 	}
 }
 

@@ -2328,7 +2328,7 @@ class Dashboard extends Component<any, any> {
 									small={this.state.small}
 									nonBlock={this.state.nonBlock}
 									linkDistance={UIA.Visual(state, LINK_DISTANCE)}
-									onNodeClick={(nodeId, boundingBox) => {
+									onNodeClick={(nodeId: string, boundingBox: any) => {
 										if (UIA.Visual(state, CONNECTING_NODE)) {
 											const selectedId = UIA.Visual(state, UIA.SELECTED_NODE);
 											console.log(`selectedId:${selectedId} => nodeId:${nodeId}`);
@@ -2574,7 +2574,7 @@ class Dashboard extends Component<any, any> {
 										<ChoiceListItemActivityMenu />
 										{/* <ConditionActivityMenu /> */}
 										<DataChainActvityMenu />
-                    <SwaggerActivity />
+										<SwaggerActivity />
 										<TextInput
 											label={Titles.NodeLabel}
 											value={currentNode.properties ? currentNode.properties.text : ''}

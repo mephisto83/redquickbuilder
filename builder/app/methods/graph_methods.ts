@@ -3664,7 +3664,7 @@ export function UpdateVisualGrpah(visualGraph: Graph | null, graph: Graph, visua
 			break;
 		case VisualCommand.ADD_CONNECTION:
 			let link: GraphLink = getLink(graph, { id: visualCommand.linkId });
-			visualGraph = addLink(visualGraph, link, link);
+			if (link) visualGraph = addLink(visualGraph, link, link);
 			break;
 		case VisualCommand.REMOVE_LINK:
 			visualGraph = removeLink(visualGraph, visualCommand.linkId);

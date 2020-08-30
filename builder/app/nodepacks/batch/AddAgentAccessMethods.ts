@@ -317,12 +317,14 @@ function SetupAfterEffects(mounting: MountingDescription, collectedMountingDescr
 				if (!afterEffect.dataChainOptions.directExecute) {
 					// needs a better way to chain after a previous node.
 					// for now all after effect methods need to be direct execute.
-					newAfterEffect = createAfterEffect(
-						mounting.afterEffects[index - 1].afterEffectNode || '',
-						afterEffect.name
-					);
+					if (mounting.afterEffects[index - 1]) {
+						newAfterEffect = createAfterEffect(
+							mounting.afterEffects[index - 1].afterEffectNode || '',
+							afterEffect.name
+						);
 
-					afterEffect.afterEffectNode = newAfterEffect.id;
+						afterEffect.afterEffectNode = newAfterEffect.id;
+					} else return;
 				} else {
 					newAfterEffect = createAfterEffect(methodDescription.methodId);
 					afterEffect.afterEffectNode = newAfterEffect.id;

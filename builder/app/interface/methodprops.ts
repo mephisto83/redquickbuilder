@@ -580,6 +580,7 @@ export function CreateSimpleValidation(): SimpleValidationConfig {
 		areEqual: CreateAreEqual(),
 		isContained: CreateAreEqual(),
 		isNotContained: CreateAreEqual(),
+		isIntersecting: CreateAreEqual(),
 		oneOf: CreateOneOf()
 	};
 }
@@ -627,7 +628,8 @@ export function SetupConfigInstanceInformation(
 	dataChainOptions.simpleValidations = dataChainOptions.simpleValidations || [];
 	dataChainOptions.simpleValidations.forEach((item) => {
 		item.isContained = item.isContained || CreateAreEqual();
-		item.isNotContained = item.isNotContained || CreateAreEqual();
+    item.isNotContained = item.isNotContained || CreateAreEqual();
+    item.isIntersecting = item.isIntersecting || CreateAreEqual();
 		let temp = { ...CreateSimpleValidation(), ...item };
 		Object.assign(item, temp);
 	});
@@ -769,6 +771,7 @@ export interface BranchConfig {
 export interface CopyConfig extends AfterEffectRelations {}
 export interface AreEqualConfig extends AfterEffectRelations {}
 export interface IsContainedConfig extends AfterEffectRelations {}
+export interface IsIntersectingConfig extends AfterEffectRelations {}
 export interface IsNotContainedConfig extends AfterEffectRelations {}
 export interface Setter extends HalfRelation {
 	value: string;
@@ -855,6 +858,7 @@ export interface SimpleValidationConfig extends AfterEffectRelations {
 	isFalse: BooleanConfig;
 	areEqual: AreEqualConfig;
 	isContained: IsContainedConfig;
+	isIntersecting: IsIntersectingConfig;
 	isNotContained: IsNotContainedConfig;
 	isNull: BooleanConfig;
 	oneOf: EnumerationConfig;

@@ -602,6 +602,7 @@ export const Stretch = 'Stretch';
 export const OneOf = 'One of';
 export const Filter = 'Filter';
 export const Double = 'Double';
+export const AreIntersecting = 'Are Intersecting';
 export const IsContained = 'Is contained';
 export const IsNotContained = 'Is not contained';
 export const EnableComposition = 'Enable composition';
