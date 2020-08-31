@@ -12,7 +12,7 @@ import { NodeProperties, NodeTypes } from '../constants/nodetypes';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import CheckBox from './checkbox';
 import SelectInput from './selectinput';
-import { NodesByType, GetNodesByProperties } from '../methods/graph_methods';
+import { NodesByType, GetNodesByProperties, GetNodeProp } from '../methods/graph_methods';
 
 const NODE_MANAGEMENT_MENU = 'NODE_MANAGEMENT_MENU';
 const NODE_MANAGEMENT = 'NODE_MANAGEMENT';
@@ -43,12 +43,14 @@ class NodeManagement extends Component<any, any> {
 			args[NodeProperties.NODEType] = this.state.nodeType;
 		}
 
-
 		let nodes_ = this.state.searchByProperties
 			? GetNodesByProperties(args, graph).filter(
 					(x) => UIA.GetNodeProp(x, NodeProperties.IsDashboard) === this.state.isDashboard
 				)
 			: UIA.GetNodes(state);
+		if (this.state.isShared) {
+			nodes_ = nodes_.filter((nod: any) => GetNodeProp(nod, NodeProperties.SharedComponent));
+		}
 		let groups = nodes_
 			.filter((x) => {
 				if (!filter || !x) {
@@ -208,6 +210,16 @@ class NodeManagement extends Component<any, any> {
 						/>
 					</TreeViewItemContainer>
 				)}
+				<TreeViewItemContainer>
+					<CheckBox
+						title={'Is Shared'}
+						label={'Is Shared'}
+						onChange={(val: boolean) => {
+							this.setState({ isShared: val });
+						}}
+						value={this.state.isShared}
+					/>
+				</TreeViewItemContainer>
 				<FormControl sidebarform={true}>
 					<TextInput
 						value={this.state.filter}

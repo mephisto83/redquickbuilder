@@ -20,6 +20,51 @@ import { GetViewTypeModelType } from '../viewtype/SetupViewTypeForCreate';
 import { findLink } from '../../methods/graph_methods';
 import { Node } from '../../methods/graph_types';
 
+export async function CreateComponentSharedAll(progressFunc: any, filter?: any, filterViewTypes?: any) {
+	console.log('Create Component All');
+	const result: any = [];
+	debugger;
+	const navigableScreens = GetNodesByProperties({
+		[NodeProperties.NODEType]: NodeTypes.NavigationScreen
+	});
+	const models = GetNodesByProperties({
+		[NodeProperties.NODEType]: NodeTypes.Model
+	})
+		.filter((v) => !GetNodeProp(v, NodeProperties.IsViewModel))
+		.filter((x) => !GetNodeProp(x, NodeProperties.IsUser));
+	const agents = GetNodesByProperties({
+		[NodeProperties.NODEType]: NodeTypes.Model,
+		[NodeProperties.IsAgent]: (v: any) => v
+	}).filter((x) => !GetNodeProp(x, NodeProperties.IsUser));
+	console.log('----------------- agents ---------------------------');
+	agents.map((v) => console.log(GetNodeTitle(v)));
+	console.log('----------------- end agents -----------------------');
+	console.log('----------------- model ---------------------------');
+	models.map((v) => console.log(GetNodeTitle(v)));
+	console.log('----------------- end models -----------------------');
+	const defaultViewTypes = NodesByType(null, NodeTypes.ViewType);
+	await defaultViewTypes
+		.filter((v: any) => (filterViewTypes ? filterViewTypes(v) : true))
+		.forEachAsync(async (viewType: any, viewTypeIndex: any, viewTypeCount: any) => {
+			const { model, property } = GetViewTypeModelType(viewType.id);
+			if (filter && !filter(model)) {
+				return;
+			}
+			console.log(`Creating shared components for : ${GetNodeTitle(model)}.${GetNodeTitle(property)}`);
+			CreateComponentModel({
+				model: model.id,
+				viewTypeModelId: viewType.id,
+				viewTypes: [ GetNodeProp(viewType, NodeProperties.ViewType) ],
+				connectedModel: property.id,
+				isSharedComponent: true,
+				isDefaultComponent: true
+			});
+			if (progressFunc) await progressFunc(0);
+		});
+
+	return result;
+}
+
 export default async function CreateComponentAll(progressFunc: any, filter?: any) {
 	console.log('Create Component All');
 	const result: any = [];
@@ -42,32 +87,12 @@ export default async function CreateComponentAll(progressFunc: any, filter?: any
 	console.log('----------------- model ---------------------------');
 	models.map((v) => console.log(GetNodeTitle(v)));
 	console.log('----------------- end models -----------------------');
+
 	await agents.forEachAsync(async (agent: any, agentIndex: any, agentCount: any) => {
 		if (progressFunc) {
 			await progressFunc((agentIndex + 0.25) / agentCount);
 		}
-		const defaultViewTypes = NodesByType(null, NodeTypes.ViewType);
-		await defaultViewTypes.forEachAsync(async (viewType: any, viewTypeIndex: any, viewTypeCount: any) => {
-			const { model, property } = GetViewTypeModelType(viewType.id);
-			if (filter && !filter(model)) {
-				return;
-			}
-			console.log(`Creating shared components for : ${GetNodeTitle(model)} ${GetNodeTitle(agent)}`);
-			CreateComponentModel({
-				model: model.id,
-				viewTypeModelId: viewType.id,
-				agentId: agent.id,
-				viewTypes: [ GetNodeProp(viewType, NodeProperties.ViewType) ],
-				connectedModel: property.id,
-				isSharedComponent: true,
-				isDefaultComponent: true
-			});
-			if (progressFunc)
-				await progressFunc(
-					(agentIndex * viewTypeIndex + viewTypeIndex) /
-						(agentCount * viewTypeCount + agentCount * models.length)
-				);
-		});
+
 		if (progressFunc) {
 			await progressFunc((agentIndex + 0.5) / agentCount);
 		}
@@ -75,7 +100,7 @@ export default async function CreateComponentAll(progressFunc: any, filter?: any
 			if (filter && !filter(model)) {
 				return;
 			}
-			console.log(`Creating components for : ${GetNodeTitle(model.id)}`);
+			console.log(`Creating components for : ${GetNodeTitle(model.id)} / ${GetNodeTitle(agent.id)}`);
 			CreateComponentModel({
 				agentId: agent.id,
 				model: model.id,
@@ -108,11 +133,16 @@ export function CreateComponentModel(args: any = {}) {
 		const properties = GetModelPropertyChildren(model).filter(
 			(x: any) => !GetNodeProp(x, NodeProperties.IsDefaultProperty)
 		);
-		const agentAccess = agentAccesses.find((aa: Node) =>
-			hasAccessNode(GetNodeById(args.agentId), GetNodeById(model), aa, viewType)
-		);
+		const agentAccess = args.isSharedComponent
+			? true
+			: agentAccesses.find((aa: Node) =>
+					hasAccessNode(GetNodeById(args.agentId), GetNodeById(model), aa, viewType)
+				);
 		if (agentAccess || args.isSharedComponent) {
-			const agentCreds = agentAccess ? findLink(graph, { target: agentAccess.id, source: args.agentId }) : null;
+			const agentCreds =
+				agentAccess && !args.isSharedComponent
+					? findLink(graph, { target: agentAccess.id, source: args.agentId })
+					: null;
 
 			// if (!args.isSharedComponent && navigableScreens.length) {
 			// 	let naviScreen = navigableScreens.find((navigableScreen: Node) => {

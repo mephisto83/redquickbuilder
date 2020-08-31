@@ -44,7 +44,7 @@ import ApplyValidationFromProperties from '../nodepacks/permission/ApplyValidati
 import AddAgentMethods from '../nodepacks/batch/AddAgentMethods';
 import BuildDashboards from '../nodepacks/screens/dashboard/BuildDashboards';
 import ConnectDashboards from '../nodepacks/screens/dashboard/ConnectDashboards';
-import CreateComponentAll from '../nodepacks/batch/CreateComponentAll';
+import CreateComponentAll, { CreateComponentSharedAll } from '../nodepacks/batch/CreateComponentAll';
 import MenuGenerator from '../generators/menugenerator';
 import AddUserRequirements from '../nodepacks/batch/AddUserRequirements';
 import ChangeInputToSelect from '../nodepacks/screens/ChangeInputToSelect';
@@ -220,6 +220,19 @@ class QuickMethods extends Component<any, any, any> {
 										graphOperation(res)(GetDispatchFunc(), GetStateFunc());
 									}}
 								/>
+
+								<TreeViewMenu
+									title="Create Component Shared All"
+									onClick={() => {
+										SetPause(true);
+										CreateComponentSharedAll(() => {}, null, (v:Node)=>{
+                      return v.id === currentNode.id;
+                    }).then(() => {
+											SetPause(false);
+										});
+									}}
+								/>
+
 								<TreeViewMenu
 									title="Create Component All"
 									onClick={() => {

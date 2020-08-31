@@ -55,7 +55,6 @@ import {
 	NodesByType
 } from '../../methods/graph_methods';
 import { ReferenceInsertType } from '../../components/lambda/BuildLambda';
-import { code } from '../../components/editor.main.css';
 import { SimpleValidation, NodeType } from '../../components/titles';
 import SimpleValidationComponent from '../../components/simplevalidationconfig';
 import { equal } from 'assert';

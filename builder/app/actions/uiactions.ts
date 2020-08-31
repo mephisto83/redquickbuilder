@@ -251,7 +251,7 @@ export function GetSharedComponentFor(
 	const graph = GetCurrentGraph(GetState());
 	let viewTypeNodes = GraphMethods.GetNodesLinkedTo(graph, {
 		id: modelProperty.id
-	})
+	});
 	// let viewTypeNodes:any = NodesByType(null, NodeTypes.ViewType);
 	// viewTypeNodes = viewTypeNodes.filter((x: any) => {
 	// 	let componentNodes = GraphMethods.GetNodesLinkedTo(graph, {
@@ -448,17 +448,18 @@ export function SetSharedComponent(args: any) {
 	) {
 		const connectionsAll = GraphMethods.GetConnectedNodesByType(GetState(), source, NodeTypes.ComponentNode);
 
-		const connections = connectionsAll
-			.filter((x: any) => GetNodeProp(x, NodeProperties.ViewType) === viewType)
-			.filter((x: any) => GetNodeProp(x, NodeProperties.UIType) === uiType)
-			.filter((x: any) => GetNodeProp(x, NodeProperties.IsPluralComponent) === isPluralComponent)
-			.map((x: any) => ({
-				operation: REMOVE_LINK_BETWEEN_NODES,
-				options: {
-					source,
-					target: x.id
-				}
-			}));
+		const connections: any[] = [];
+		//  connectionsAll
+		// 	.filter((x: any) => GetNodeProp(x, NodeProperties.ViewType) === viewType)
+		// 	.filter((x: any) => GetNodeProp(x, NodeProperties.UIType) === uiType)
+		// 	.filter((x: any) => GetNodeProp(x, NodeProperties.IsPluralComponent) === isPluralComponent)
+		// 	.map((x: any) => ({
+		// 		operation: REMOVE_LINK_BETWEEN_NODES,
+		// 		options: {
+		// 			source,
+		// 			target: x.id
+		// 		}
+		// 	}));
 
 		return [
 			...connections,

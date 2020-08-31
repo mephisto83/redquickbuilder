@@ -2237,63 +2237,10 @@ export const CreateDefaultView = {
 										};
 										const componentProps = null;
 
-										let connectto: any[] = [];
-										if (isDefaultComponent) {
-											if (viewTypeModelId) {
-												connectto = [ GetNodeById(viewTypeModelId, currentGraph) ];
-											} else {
-												connectto = getViewTypeEndpointsForDefaults(
-													viewType,
-													currentGraph,
-													currentNode.id
-												);
-											}
-										}
 										return {
 											callback: (listComponent: { id: any }, graph: any) => {
 												listComponentId = listComponent.id;
 												newItems.listComponentId = listComponentId;
-												connectto.forEach((ct) => {
-													createListConnections.push(
-														() =>
-															SetSharedComponent({
-																properties: {
-																	...LinkProperties.DefaultViewType,
-																	viewType,
-																	uiType,
-																	isPluralComponent
-																},
-																graph,
-																viewType,
-																uiType,
-																isPluralComponent,
-																source: ct.id,
-																target: listComponentId
-															}),
-														//  () => ([
-														...[
-															'value',
-															ApiNodeKeys.ViewModel,
-															'label',
-															'placeholder',
-															'error',
-															'success'
-														].map(
-															(v) =>
-																function() {
-																	const graph = GetCurrentGraph(GetStateFunc()());
-																	return addComponentApiToForm({
-																		newItems,
-																		text: v,
-																		parent: ct.id,
-																		isSingular: true,
-																		graph
-																	});
-																}
-														)
-														// ])
-													);
-												});
 											},
 											parent: screenNodeOptionId,
 											properties: {
@@ -2320,6 +2267,61 @@ export const CreateDefaultView = {
 											}
 										};
 									}
+								}
+							: false,
+						isList
+							? (currentGraph: any) => {
+									let connectto: any[] = [];
+									if (isDefaultComponent) {
+										if (viewTypeModelId) {
+											connectto = [ GetNodeById(viewTypeModelId, currentGraph) ];
+										} else {
+											connectto = getViewTypeEndpointsForDefaults(
+												viewType,
+												currentGraph,
+												currentNode.id
+											);
+										}
+									}
+									return connectto.map((ct) => {
+										return [
+											(graph: _.Graph) =>
+												SetSharedComponent({
+													properties: {
+														...LinkProperties.DefaultViewType,
+														viewType,
+														uiType,
+														isPluralComponent
+													},
+													graph,
+													viewType,
+													uiType,
+													isPluralComponent,
+													source: ct.id,
+													target: listComponentId
+												}),
+											[
+												'value',
+												ApiNodeKeys.ViewModel,
+												'label',
+												'placeholder',
+												'error',
+												'success'
+											].map(
+												(v) =>
+													function() {
+														const graph = GetCurrentGraph(GetStateFunc()());
+														return addComponentApiToForm({
+															newItems,
+															text: v,
+															parent: ct.id,
+															isSingular: true,
+															graph
+														});
+													}
+											)
+										];
+									});
 								}
 							: false,
 						isList
@@ -2829,7 +2831,9 @@ export const CreateDefaultView = {
 														sharedComponent || componentTypeToUse,
 													[NodeProperties.UsingSharedComponent]: !!sharedComponent,
 													[NodeProperties.Pinned]: false,
-													...agentId ? { [NodeProperties.Agent]: agentId } : {},
+													...agentId && !isSharedComponent
+														? { [NodeProperties.Agent]: agentId }
+														: {},
 													[NodeProperties.InstanceType]: useModelInstance
 														? InstanceTypes.ModelInstance
 														: InstanceTypes.ScreenInstance
@@ -3054,7 +3058,7 @@ export const CreateDefaultView = {
 										[NodeProperties.Pinned]: false,
 										[NodeProperties.CancelButton]: true,
 										[NodeProperties.Label]: `${Titles.Cancel} ${viewName} Button`,
-										...agentId ? { [NodeProperties.Agent]: agentId } : {},
+										...agentId && !isSharedComponent ? { [NodeProperties.Agent]: agentId } : {},
 										[NodeProperties.ComponentType]: ComponentTypes[uiType].Button.key,
 										[NodeProperties.InstanceType]: useModelInstance
 											? InstanceTypes.ModelInstance
