@@ -206,9 +206,16 @@ export function scaffoldProject(options: any = {}) {
 			.then(errorHandler())
 			.then(() => {
 				console.log('Finished Scaffolding.');
+				if (options.exclusive && !options.netcore) {
+					return Promise.resolve();
+				}
 				return generateFiles(path.join(workspace, root.title, 'netcore'), solutionName, state);
 			})
 			.then(() => {
+        console.log('generating react native');
+				if (options.exclusive && !options.reactnative) {
+					return Promise.resolve();
+				}
 				console.log('generate react-native files');
 				return generateReactNative(
 					path.join(workspace, root.title, 'reactnative', root[GraphKeys.PROJECTNAME]),
@@ -216,6 +223,10 @@ export function scaffoldProject(options: any = {}) {
 				);
 			})
 			.then(() => {
+        console.log('generating electrion io');
+				if (options.exclusive && !options.electronio) {
+					return Promise.resolve();
+				}
 				console.log('generate electron io files');
 				return generateElectronIO(
 					path.join(workspace, root.title, 'electronio', root[GraphKeys.PROJECTNAME]),
@@ -223,10 +234,15 @@ export function scaffoldProject(options: any = {}) {
 				);
 			})
 			.then(() => {
+        console.log('generating react web');
+				if (options.exclusive && !options.reactweb) {
+					return Promise.resolve();
+				}
 				console.log('generate react web files');
 				return generateReactWeb(path.join(workspace, root.title, REACTWEB, root[GraphKeys.PROJECTNAME]), state);
 			})
 			.then(() => {
+        console.log('generating net core identity');
 				const namespace = root ? root[GraphKeys.NAMESPACE] : null;
 				const server_side_setup = root ? root[GraphKeys.SERVER_SIDE_SETUP] : null;
 				const graph = root;
@@ -436,6 +452,10 @@ ${interfaceFunctions.join(NEW_LINE)}
 				}
 			})
 			.then(() => {
+        console.log('generating react native');
+				if (options.exclusive && !options.reactnative) {
+					return Promise.resolve();
+				}
 				console.log('Write react-native files');
 				const appName = root[GraphKeys.PROJECTNAME];
 				const version = 'v1';
@@ -450,6 +470,10 @@ ${interfaceFunctions.join(NEW_LINE)}
 				console.warn('No app name given');
 			})
 			.then(() => {
+        console.log('generating election io');
+				if (options.exclusive && !options.electronio) {
+					return Promise.resolve();
+				}
 				console.log('Clear electron theme');
 				return clearElectronIOTheme(
 					path.join(workspace, root.title, 'electronio', root[GraphKeys.PROJECTNAME]),
@@ -457,10 +481,18 @@ ${interfaceFunctions.join(NEW_LINE)}
 				);
 			})
 			.then(() => {
+        console.log('generating react web');
+				if (options.exclusive && !options.reactweb) {
+					return Promise.resolve();
+				}
 				console.log('Create react web theme');
 				return clearReactWebTheme(path.join(workspace, root.title, REACTWEB, root[GraphKeys.PROJECTNAME]));
 			})
 			.then(() => {
+        console.log('generating election io');
+				if (options.exclusive && !options.electrionio) {
+					return Promise.resolve();
+				}
 				console.log('Write electron files');
 				const appName = root[GraphKeys.PROJECTNAME];
 				const version = 'v1';
@@ -475,6 +507,10 @@ ${interfaceFunctions.join(NEW_LINE)}
 				console.warn('No app name given');
 			})
 			.then(() => {
+        console.log('generating react web');
+				if (options.exclusive && !options.reactweb) {
+					return Promise.resolve();
+				}
 				console.log('Write reactweb files');
 				const appName = root[GraphKeys.PROJECTNAME];
 				const version = 'v1';
@@ -489,6 +525,10 @@ ${interfaceFunctions.join(NEW_LINE)}
 				console.warn('No app name given');
 			})
 			.then(() => {
+        console.log('generating election io');
+				if (options.exclusive && !options.electrionio) {
+					return Promise.resolve();
+				}
 				console.log('Write electron theme');
 				return generateElectronIOTheme(
 					path.join(workspace, root.title, 'electronio', root[GraphKeys.PROJECTNAME]),
@@ -496,10 +536,17 @@ ${interfaceFunctions.join(NEW_LINE)}
 				);
 			})
 			.then(() => {
+        console.log('generating react web');
+				if (options.exclusive && !options.reactweb) {
+					return Promise.resolve();
+				}
 				return generateReactWebTheme(
 					path.join(workspace, root.title, 'reactweb', root[GraphKeys.PROJECTNAME]),
 					state
 				);
+			})
+			.then(() => {
+				console.log('Scaffold complete');
 			});
 	};
 }

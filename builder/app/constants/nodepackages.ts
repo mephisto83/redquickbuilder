@@ -1901,7 +1901,7 @@ export const CreateDefaultView = {
 													: InstanceTypes.ScreenInstance,
 												[NodeProperties.UIText]: `${viewName} ${agentId
 													? GetNodeTitle(agentId)
-													: ''} Form`,
+													: ''}`,
 												[NodeProperties.ViewType]: viewType,
 												[NodeProperties.NODEType]: NodeTypes.Screen,
 												[NodeProperties.Model]: currentNode.id,
@@ -1935,12 +1935,12 @@ export const CreateDefaultView = {
 													? InstanceTypes.ModelInstance
 													: InstanceTypes.ScreenInstance,
 												[NodeProperties.Screen]: GraphMethods.convertToURLRoute(
-													`${viewName} ${agentId ? GetNodeTitle(agentId) : ''} Form`
+													`${viewName} ${agentId ? GetNodeTitle(agentId) : ''}`
 												),
 												[NodeProperties.ViewType]: viewType,
 												[NodeProperties.UIText]: `${viewName} ${agentId
 													? GetNodeTitle(agentId)
-													: ''} Form`,
+													: ''}`,
 												[NodeProperties.Model]: currentNode.id,
 												...agentId ? { [NodeProperties.Agent]: agentId } : {}
 											}

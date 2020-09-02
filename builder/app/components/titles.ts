@@ -610,3 +610,4 @@ export const Float = 'Float';
 export const Integer = 'Integer';
 export const String = 'String';
 export const SetPropertyType = 'Set Property type';
+export const ScaffoldTargets = 'Scaffold Targets';

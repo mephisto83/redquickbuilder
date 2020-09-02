@@ -2676,17 +2676,19 @@ export function GetCombinedCondition(id: any, language = NodeConstants.Programmi
 				if (!validationParameters) {
 					throw new Error('missing permission parameters: GetCombinedCondition');
 				}
-				clauses.push(
-					`var {{result}} = await ${GetCodeName(dataChain)}.Execute(${validationParameters
-						.map((v: any) => {
-							// return `${v.paramName}: ${v.value}`;
-							if (v && v.value && v.value.key) {
-								return v.value.key;
-							}
-							return `${v.value}`;
-						})
-						.join()});`
-				);
+				if (language === NodeConstants.ProgrammingLanguages.CSHARP) {
+					clauses.push(
+						`var {{result}} = await ${GetCodeName(dataChain)}.Execute(${validationParameters
+							.map((v: any) => {
+								// return `${v.paramName}: ${v.value}`;
+								if (v && v.value && v.value.key) {
+									return v.value.key;
+								}
+								return `${v.value}: ${v.value}`;
+							})
+							.join()});`
+					);
+				}
 			});
 			break;
 		case NodeTypes.Permission:
@@ -2708,7 +2710,7 @@ export function GetCombinedCondition(id: any, language = NodeConstants.Programmi
 					`var {{result}} = await ${GetCodeName(dataChain)}.Execute(${permissionParameters
 						.map((v: any) => {
 							// return `${v.paramName}: ${v.value}`;
-							return `${v.value}`;
+							return `${v.value}: ${v.value}`;
 						})
 						.join()});`
 				);

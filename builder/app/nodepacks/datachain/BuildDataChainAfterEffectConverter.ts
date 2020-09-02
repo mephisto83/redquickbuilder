@@ -360,7 +360,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		case DataChainType.Permission:
 			can_complete = true;
 			from_parameter_template = `
-      public static async Task<bool> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent)
+      public static async Task<bool> Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null)
       {
 
         Func<#{{"key":"model"}}#, #{{"key":"agent"}}#, Task<bool>> func = async (#{{"key":"model"}}# model, #{{"key":"agent"}}# agent) => {
@@ -391,7 +391,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				}
 			}
 			from_parameter_template = `
-      public static async Task<bool> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change_parameter)
+      public static async Task<bool> Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change_parameter = null)
       {
         Func<#{{"key":"model"}}#, #{{"key":"agent"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task<bool>> func = async (#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change_parameter) => {
 
@@ -413,7 +413,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			can_complete = true;
 			from_parameter_template = `
       public static async Task<${outputType ||
-			'bool'}> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change, #{{"key":"result"}}# result)
+			'bool'}> Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change = null, #{{"key":"result"}}# result = null)
       {
           Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task<${outputType ||
 				'bool'}>> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# model, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
@@ -433,7 +433,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			}
 
 			from_parameter_template = `
-    public static async Task<#{{"key":"model"}}#, bool> Filter(#{{"key":"agent"}}# agent = null, #{{"key":"model"}}# model = null${parent_input})
+    public static async Task<Func<#{{"key":"model"}}#, bool>> Filter(#{{"key":"agent"}}# agent = null, #{{"key":"model"}}# model = null${parent_input})
     {
         Func<#{{"key":"model_output"}}#, bool> func = (#{{"key":"model_output"}}# model_output) => {
             {{simplevalidation}}
@@ -453,7 +453,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				}
 			}
 			from_parameter_template = `
-      public static async Task Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change)
+      public static async Task Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change = null)
       {
           Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# fromModel, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
 
@@ -759,7 +759,7 @@ function GenerateSimpleValidations(
 			)}","type":"property","model":"result"}}#`;
 			break;
 		default:
-			returnStatement = 'result false';
+			returnStatement = 'return false';
 	}
 	if (!(simpleValidationConfiguration && simpleValidationConfiguration.enabled)) {
 		result = checks
@@ -886,7 +886,7 @@ function GenerateIsIntersectingComparer(
 	SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, relationType, simpleValidation);
 	SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, areEqual.relationType, areEqual);
 
-	return `${not ? '!' : ''}(${valuePropString} != null && ${valuePropString}.AsQueryable().Intersect(${equalityTo}))`;
+	return `${not ? '!' : ''}(${valuePropString} != null && ${valuePropString}.AsQueryable().Intersect(${equalityTo}).Any())`;
 }
 
 function SetLambdaInsertArgumentValues(
