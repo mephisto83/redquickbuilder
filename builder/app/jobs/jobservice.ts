@@ -22,6 +22,7 @@ import { AgentProject, AgentProjects } from './interfaces';
 import CommunicationTower, { RedQuickDistributionCommand } from './communicationTower';
 import StoreGraph, { LoadGraph, LoadBrokenGraph, SplitIntoFiles, CheckBrokenGraph } from '../methods/storeGraph';
 import { mergeStreamGraph } from '../methods/mergeGraph';
+import { getAppConfigPathSync, getApplicationConfig } from '../actions/remoteActions';
 
 export default class JobService {
 	static communicationTower: CommunicationTower;
@@ -889,15 +890,18 @@ export default class JobService {
 	}
 }
 function getAppConfig() {
-	let application = 'applicationConfig.json';
-	let applicationPath = path_join('./', application);
-	let applicationConfiguration: any = JSON.parse(fs.readFileSync(applicationPath, 'utf8'));
+	let applicationConfiguration: any = getApplicationConfig();
 	return applicationConfiguration;
 }
+
 function JobPath() {
-	let applicationConfig = getAppConfig();
-	if (applicationConfig && applicationConfig[JOB_PATH]) {
-		return applicationConfig[JOB_PATH];
+	try {
+		let applicationConfig = getAppConfig();
+		if (applicationConfig && applicationConfig[JOB_PATH]) {
+			return applicationConfig[JOB_PATH];
+		}
+	} catch (e) {
+		console.log(e);
 	}
 	return JOB_PATH;
 }
@@ -1015,6 +1019,25 @@ export const getDirectories = (source: any) =>
 export const getFiles = (source: any) => fs.readdirSync(source).filter((name) => !isDirectory(path_join(source, name)));
 
 export async function ensureDirectory(dir: any) {
+	if (!fs.existsSync(dir)) {
+		console.log(`doesnt exist : ${dir}`);
+	} else {
+	}
+	const _dir_parts = dir.split(path.sep);
+	_dir_parts.map((_: any, i: number) => {
+		if (i > 1 || _dir_parts.length - 1 === i) {
+			let tempDir = path_join(..._dir_parts.subset(0, i + 1));
+			if (dir.startsWith(path.sep)) {
+				tempDir = `${path.sep}${tempDir}`;
+			}
+			if (!fs.existsSync(tempDir)) {
+				fs.mkdirSync(tempDir);
+			}
+		}
+	});
+}
+
+export function ensureDirectorySync(dir: any) {
 	if (!fs.existsSync(dir)) {
 		console.log(`doesnt exist : ${dir}`);
 	} else {

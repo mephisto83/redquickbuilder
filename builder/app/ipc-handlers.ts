@@ -78,13 +78,38 @@ export default class IPCHandlers {
 					console.log(v);
 				});
 		});
+		ipcMain.on('load-configs', (event, args) => {
+			console.log('load-configs');
+			console.log(args);
+			let res = loadApplicationConfig();
+			event.sender.send(
+				'load-configs-reply',
+				JSON.stringify({
+					body: res,
+					folder: getAppConfigPath()
+				})
+			);
+		});
+		ipcMain.on('save-config', (event, arg) => {
+			console.log('save-config');
+			console.log(arg);
+			let { folder, key } = JSON.parse(arg);
+			storeApplicationConfig(folder, key).then((res) => {
+				console.log('config update');
+				event.sender.send('config-update', JSON.stringify({ body: res }));
+			});
+		});
 		let submenu2 = new Menu();
 		letters.map((x) => {
 			let handler = throttle(
 				() => {
-					mainWindow.webContents.send('commands', {
-						args: x
-					});
+					console.log('send command ' + x);
+					mainWindow.webContents.send(
+						'commands',
+						JSON.stringify({
+							args: x
+						})
+					);
 				},
 				undefined,
 				this
@@ -97,6 +122,7 @@ export default class IPCHandlers {
 							? 'CmdOrCtrl+Shift+' + x.toUpperCase()
 							: 'CmdOrCtrl+' + x.toUpperCase(),
 					click: () => {
+						console.log('command execute');
 						handler();
 					}
 				})
@@ -115,6 +141,74 @@ export default class IPCHandlers {
 		Menu.setApplicationMenu(menu2);
 	}
 	static tearDown() {}
+}
+
+export function ensureDirectorySync(dir: any) {
+	if (!fs.existsSync(dir)) {
+		console.log(`doesnt exist : ${dir}`);
+	} else {
+	}
+	const _dir_parts = dir.split(path.sep);
+	_dir_parts.map((_: any, i: number) => {
+		if (i > 1 || _dir_parts.length - 1 === i) {
+			let tempDir = path.join(..._dir_parts.subset(0, i + 1));
+			if (dir.startsWith(path.sep)) {
+				tempDir = `${path.sep}${tempDir}`;
+			}
+			if (!fs.existsSync(tempDir)) {
+				fs.mkdirSync(tempDir);
+			}
+		}
+	});
+}
+
+export function getAppConfigPath($folder?: string) {
+	const app = require('electron').app;
+	const homedir = app.getPath('home');
+	const folder = $folder ? path.join(homedir, '.rqb', $folder) : path.join(homedir, '.rqb');
+	ensureDirectorySync(folder);
+	return folder;
+}
+export function getAppConfigPathSync($folder?: string) {
+	const app = require('electron').app;
+	const homedir = app.getPath('home');
+	const folder = $folder ? path.join(homedir, '.rqb', $folder) : path.join(homedir, '.rqb');
+	return folder;
+}
+async function storeApplicationConfig(folder: string, key: string) {
+	console.log('store application config');
+	// let application = 'applicationConfig.json';
+	// let applicationPathReq = path.join(getAppConfigPath('reqthread'), application);
+	// let applicationPath = path.join(getAppConfigPath(), application);
+	// if (!fs.existsSync(applicationPath)) {
+	// 	fs.writeFileSync(applicationPath, JSON.stringify({}), 'utf8');
+	// }
+	// let file_contents = fs.readFileSync(applicationPath, 'utf8');
+	// let applicationConfiguration: any = JSON.parse(file_contents);
+	// if (applicationConfiguration) {
+	// 	applicationConfiguration[key] = folder;
+	// }
+
+	// fs.writeFileSync(applicationPathReq, JSON.stringify(applicationConfiguration), 'utf8');
+	// fs.writeFileSync(applicationPath, JSON.stringify(applicationConfiguration), 'utf8');
+
+	// return applicationConfiguration;
+	// setVisual(ApplicationConfig, applicationConfiguration)(dispatch, getState);
+}
+
+export function loadApplicationConfig() {
+	console.log('load application config');
+	let application = 'applicationConfig.json';
+	let applicationPath = path.join(getAppConfigPath(), application);
+	if (fs.existsSync(applicationPath)) {
+		let applicationConfiguration: any = JSON.parse(fs.readFileSync(applicationPath, 'utf8'));
+
+		fs.writeFileSync(applicationPath, JSON.stringify(applicationConfiguration), 'utf8');
+
+		return applicationConfiguration;
+  }
+  return {};
+	// setVisual(ApplicationConfig, applicationConfiguration)(dispatch, getState);
 }
 
 const throttle: any = (func: any, limit: any, context: any) => {

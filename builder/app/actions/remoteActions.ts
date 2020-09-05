@@ -40,7 +40,7 @@ import unprune from '../methods/unprune';
 const BUILDER_BACK_UP = '.builder';
 const path = require('path');
 import fs from 'fs';
-import JobService, { ensureDirectory, JobServiceConstants } from '../jobs/jobservice';
+import JobService, { ensureDirectory, JobServiceConstants, ensureDirectorySync } from '../jobs/jobservice';
 import StoreGraph, { LoadGraph } from '../methods/storeGraph';
 import { Graph, GraphLink, Node } from '../methods/graph_types';
 import { NodeProperties, LinkType, LinkPropertyKeys } from '../constants/nodetypes';
@@ -48,7 +48,7 @@ import { Link } from 'react-router-dom';
 import { IfFalse } from '../components/titles';
 import { platform } from 'os';
 import { NodeTypeColors } from '../constants/nodetypes';
-const { ipcRenderer } = require('electron');
+const ipcRenderer = require('electron').ipcRenderer;
 const remote = require('electron').remote;
 
 export function openGraph() {
@@ -197,9 +197,7 @@ export function newRedQuickBuilderGraph() {
 export function newGraph() {
 	newRedQuickBuilderGraph()(GetDispatchFunc(), GetStateFunc());
 }
-ipcRenderer.on('save-graph-to-file-reply', (event, arg) => {
-	console.log(arg); // prints "pong"
-});
+
 export const RED_QUICK_FILE_EXT = '.rqb';
 export const RED_QUICK_FILE_EXT$ = 'rqb';
 export const RED_QUICK_FILE_RECORDING_EXT = '.js';
@@ -474,61 +472,66 @@ export async function wait(time: number) {
 
 export function setJobFolder(key: string) {
 	return (dispatch: Function, getState: () => any) => {
-		let currentGraph = GetRootGraph(getState());
+		// let currentGraph = GetRootGraph(getState());
 		// You can obviously give a direct path without use the dialog (C:/Program Files/path/myfileexample.txt)
-		if (currentGraph) {
-			const remote = require('electron').remote;
-			const dialog = remote.dialog;
+		// if (currentGraph) {
+		const remote = require('electron').remote;
+		const dialog = remote.dialog;
 
-			dialog
-				.showOpenDialog(remote.getCurrentWindow(), {
-					properties: [ 'openDirectory' ]
-				})
-				.then((opts) => {
-					let fileName = opts.filePaths.find((x) => x);
-					if (fileName === undefined) {
-						console.log("You didn't save the file");
-						return;
-					}
+		dialog
+			.showOpenDialog(remote.getCurrentWindow(), {
+				properties: [ 'openDirectory' ]
+			})
+			.then((opts) => {
+				let fileName = opts.filePaths.find((x) => x);
+				if (fileName === undefined) {
+					console.log("You didn't save the file");
+					return;
+				}
 
-					console.log(fileName);
-					return storeApplicationConfig(fileName, key, dispatch, getState);
-				});
-		}
+				console.log(fileName);
+				return storeApplicationConfig(fileName, key, dispatch, getState);
+			});
+		// }
 	};
 }
 
+let contextConfig: any = { $path: '', $applicationConfig: {} };
+export function setAppConfigPath($path: string, $applicationConfig: any) {
+	contextConfig.$path = $path;
+	contextConfig.$applicationConfig = $applicationConfig;
+}
+export function getApplicationConfig() {
+	return contextConfig.$applicationConfig;
+}
+export function getAppConfigPath($folder?: string) {
+	// const app = require('electron').app;
+	// const homedir = app.getPath('home');
+	// const folder = $folder ? path.join(homedir, '.rqb', $folder) : path.join(homedir, '.rqb');
+	// ensureDirectorySync(folder);
+	return contextConfig.$path;
+}
+export function getAppConfigPathSync($folder?: string) {
+	// const app = require('electron').app;
+	// const homedir = app.getPath('home');
+	// const folder = $folder ? path.join(homedir, '.rqb', $folder) : path.join(homedir, '.rqb');
+	// return folder;
+	return contextConfig.$path;
+}
 async function storeApplicationConfig(folder: string, key: string, dispatch: any, getState: any) {
-	if (!fs.existsSync(folder)) {
-		await ensureDirectory(folder);
-	}
-	let application = 'applicationConfig.json';
-	let applicationPathReq = path.join('./reqthread', application);
-	let applicationPath = path.join('./', application);
-	if (!fs.existsSync(applicationPath)) {
-		fs.writeFileSync(applicationPath, JSON.stringify({}), 'utf8');
-	}
 
-	let applicationConfiguration: any = JSON.parse(fs.readFileSync(applicationPath, 'utf8'));
-	if (applicationConfiguration) {
-		applicationConfiguration[key] = folder;
-	}
-
-	fs.writeFileSync(applicationPathReq, JSON.stringify(applicationConfiguration), 'utf8');
-	fs.writeFileSync(applicationPath, JSON.stringify(applicationConfiguration), 'utf8');
-
-	setVisual(ApplicationConfig, applicationConfiguration)(dispatch, getState);
+	const { ipcRenderer } = require('electron');
+	ipcRenderer.send('save-config', JSON.stringify({ folder, key }));
+	// setVisual(ApplicationConfig, applicationConfiguration)(dispatch, getState);
+}
+export function updateConfig(applicationConfiguration: any) {
+	if (GetDispatchFunc()) setVisual(ApplicationConfig, applicationConfiguration)(GetDispatchFunc(), GetStateFunc());
 }
 
 export function loadApplicationConfig() {
 	return (dispatch: any, getState: any) => {
-		let application = 'applicationConfig.json';
-		let applicationPath = path.join('./', application);
-		let applicationConfiguration: any = JSON.parse(fs.readFileSync(applicationPath, 'utf8'));
-
-		fs.writeFileSync(applicationPath, JSON.stringify(applicationConfiguration), 'utf8');
-
-		setVisual(ApplicationConfig, applicationConfiguration)(dispatch, getState);
+		Promise.resolve().then(async () => {
+		});
 	};
 }
 

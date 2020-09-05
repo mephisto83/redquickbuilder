@@ -51,7 +51,9 @@ import {
 	toggleContextMenu,
 	setRightMenuTab,
 	newGraph,
-	toggleVisualKey
+	toggleVisualKey,
+	setAppConfigPath,
+  updateConfig
 } from './remoteActions';
 import ThemeServiceGenerator from '../generators/themeservicegenerator';
 import ModelGenerator from '../generators/modelgenerators';
@@ -75,60 +77,80 @@ ipcRenderer.on('update-jobs', (event, arg) => {
 			break;
 	}
 });
-
-ipcRenderer.on('commands', (event, arg) => {
+ipcRenderer.on('config-update', (event, targ) => {
+  let arg = JSON.parse(targ);
+  if(arg && arg.body){
+    updateConfig(arg.body);
+  }
+});
+ipcRenderer.on('commands', (event, targ) => {
 	console.log(event);
+	let arg = JSON.parse(targ);
 	console.log(arg);
-	switch (arg.args) {
-		case 'w':
-			clearPinned();
-			break;
-		case 'p':
-			togglePinned();
-			break;
-		case 'y':
-			publishFiles();
-			break;
-		case 's':
-			saveCurrentGraph();
-			break;
-		case 'e':
-			setInComponentMode();
-			break;
-		case 'o':
-			openGraph();
-			break;
-		case 'n':
-			newGraph();
-			break;
-		case 'm':
-			newNode();
-			break;
-		case 'l':
-			toggleContextMenu('layout');
-			break;
-		case 'g':
-			toggleVisualKey('GROUPS_ENABLED');
-			break;
-		case 'k':
-			toggleContextMenu('context');
-			break;
-		case 'x':
-			removeCurrentNode();
-			break;
-		case 'q':
-			toggleNodeMark();
-			break;
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-			setRightMenuTab(arg.args);
-			break;
-		default:
-			break;
+	try {
+		switch (arg.args) {
+			case 'w':
+				clearPinned();
+				break;
+			case 'p':
+				togglePinned();
+				break;
+			case 'y':
+				publishFiles();
+				break;
+			case 's':
+				saveCurrentGraph();
+				break;
+			case 'e':
+				setInComponentMode();
+				break;
+			case 'o':
+				openGraph();
+				break;
+			case 'n':
+				newGraph();
+				break;
+			case 'm':
+				newNode();
+				break;
+			case 'l':
+				toggleContextMenu('layout');
+				break;
+			case 'g':
+				toggleVisualKey('GROUPS_ENABLED');
+				break;
+			case 'k':
+				toggleContextMenu('context');
+				break;
+			case 'x':
+				removeCurrentNode();
+				break;
+			case 'q':
+				toggleNodeMark();
+				break;
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+				setRightMenuTab(arg.args);
+				break;
+			default:
+				break;
+		}
+	} catch (e) {
+		console.log('error while calling remote command');
+		console.log(e);
 	}
 });
+
+ipcRenderer.on('load-configs-reply', (event, arg) => {
+	console.log(arg); // prints "pong"
+	let temp = JSON.parse(arg);
+	if (temp && temp.body) {
+		setAppConfigPath(temp.folder, temp.body);
+	}
+});
+ipcRenderer.send('load-configs', 'ok');
 
 function message(msg: any, body: any) {
 	return {
@@ -212,7 +234,7 @@ export function scaffoldProject(options: any = {}) {
 				return generateFiles(path.join(workspace, root.title, 'netcore'), solutionName, state);
 			})
 			.then(() => {
-        console.log('generating react native');
+				console.log('generating react native');
 				if (options.exclusive && !options.reactnative) {
 					return Promise.resolve();
 				}
@@ -223,7 +245,7 @@ export function scaffoldProject(options: any = {}) {
 				);
 			})
 			.then(() => {
-        console.log('generating electrion io');
+				console.log('generating electrion io');
 				if (options.exclusive && !options.electronio) {
 					return Promise.resolve();
 				}
@@ -234,7 +256,7 @@ export function scaffoldProject(options: any = {}) {
 				);
 			})
 			.then(() => {
-        console.log('generating react web');
+				console.log('generating react web');
 				if (options.exclusive && !options.reactweb) {
 					return Promise.resolve();
 				}
@@ -242,7 +264,7 @@ export function scaffoldProject(options: any = {}) {
 				return generateReactWeb(path.join(workspace, root.title, REACTWEB, root[GraphKeys.PROJECTNAME]), state);
 			})
 			.then(() => {
-        console.log('generating net core identity');
+				console.log('generating net core identity');
 				const namespace = root ? root[GraphKeys.NAMESPACE] : null;
 				const server_side_setup = root ? root[GraphKeys.SERVER_SIDE_SETUP] : null;
 				const graph = root;
@@ -452,7 +474,7 @@ ${interfaceFunctions.join(NEW_LINE)}
 				}
 			})
 			.then(() => {
-        console.log('generating react native');
+				console.log('generating react native');
 				if (options.exclusive && !options.reactnative) {
 					return Promise.resolve();
 				}
@@ -470,7 +492,7 @@ ${interfaceFunctions.join(NEW_LINE)}
 				console.warn('No app name given');
 			})
 			.then(() => {
-        console.log('generating election io');
+				console.log('generating election io');
 				if (options.exclusive && !options.electronio) {
 					return Promise.resolve();
 				}
@@ -481,7 +503,7 @@ ${interfaceFunctions.join(NEW_LINE)}
 				);
 			})
 			.then(() => {
-        console.log('generating react web');
+				console.log('generating react web');
 				if (options.exclusive && !options.reactweb) {
 					return Promise.resolve();
 				}
@@ -489,7 +511,7 @@ ${interfaceFunctions.join(NEW_LINE)}
 				return clearReactWebTheme(path.join(workspace, root.title, REACTWEB, root[GraphKeys.PROJECTNAME]));
 			})
 			.then(() => {
-        console.log('generating election io');
+				console.log('generating election io');
 				if (options.exclusive && !options.electrionio) {
 					return Promise.resolve();
 				}
@@ -507,7 +529,7 @@ ${interfaceFunctions.join(NEW_LINE)}
 				console.warn('No app name given');
 			})
 			.then(() => {
-        console.log('generating react web');
+				console.log('generating react web');
 				if (options.exclusive && !options.reactweb) {
 					return Promise.resolve();
 				}
@@ -525,7 +547,7 @@ ${interfaceFunctions.join(NEW_LINE)}
 				console.warn('No app name given');
 			})
 			.then(() => {
-        console.log('generating election io');
+				console.log('generating election io');
 				if (options.exclusive && !options.electrionio) {
 					return Promise.resolve();
 				}
@@ -536,7 +558,7 @@ ${interfaceFunctions.join(NEW_LINE)}
 				);
 			})
 			.then(() => {
-        console.log('generating react web');
+				console.log('generating react web');
 				if (options.exclusive && !options.reactweb) {
 					return Promise.resolve();
 				}
