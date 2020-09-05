@@ -20,7 +20,8 @@ import {
 	HalfRelation,
 	IsContainedConfig,
 	CopyConfig,
-	CopyEnumerationConfig
+	CopyEnumerationConfig,
+	ValidationConfig
 } from '../../interface/methodprops';
 import { MethodFunctions, bindTemplate } from '../../constants/functiontypes';
 import {
@@ -69,6 +70,7 @@ export interface AfterEffectConvertArgs {
 	afterEffect?: AfterEffect;
 	override?: boolean;
 	currentDescription?: MountingDescription;
+	validationConfig?: ValidationConfig;
 	name: string;
 	routes: AfterEffect[];
 	methods: MountingDescription[];
@@ -93,6 +95,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		afterEffectOptions: dataChainConfigOptions,
 		routes,
 		methods,
+		validationConfig,
 		afterEffectParent,
 		override,
 		afterEffectChild,
@@ -496,6 +499,9 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		let methodFunction = MethodFunctions[from.functionType];
 		const lambdaInsertArgumentValues = GetNodeProp(dataChain, NodeProperties.LambdaInsertArguments) || {};
 
+		let autoCalculate = afterEffect
+			? afterEffect.autoCalculate
+			: false || validationConfig ? validationConfig.autoCalculate : false;
 		if (dataChain) {
 			let lambdaInsert = {
 				...tempLambdaInsertArgumentValues,
@@ -511,6 +517,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			updateComponentProperty(dataChain, NodeProperties.CompleteFunction, true);
 			updateComponentProperty(dataChain, NodeProperties.ArbiterModels, arbiterModels);
 			updateComponentProperty(dataChain, NodeProperties.UIText, name);
+			updateComponentProperty(dataChain, NodeProperties.AutoCalculate, autoCalculate);
 			updateComponentProperty(
 				dataChain,
 				NodeProperties.AfterEffectKey,
@@ -524,6 +531,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 					{
 						[NodeProperties.UIText]: name,
 						[NodeProperties.NODEType]: NodeTypes.DataChain,
+						[NodeProperties.AutoCalculate]: autoCalculate,
 						[NodeProperties.CS]: true,
 						[NodeProperties.CSEntryPoint]: true,
 						[NodeProperties.DataChainTypeCategory]: type,
@@ -886,7 +894,9 @@ function GenerateIsIntersectingComparer(
 	SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, relationType, simpleValidation);
 	SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, areEqual.relationType, areEqual);
 
-	return `${not ? '!' : ''}(${valuePropString} != null && ${valuePropString}.AsQueryable().Intersect(${equalityTo}).Any())`;
+	return `${not
+		? '!'
+		: ''}(${valuePropString} != null && ${valuePropString}.AsQueryable().Intersect(${equalityTo}).Any())`;
 }
 
 function SetLambdaInsertArgumentValues(

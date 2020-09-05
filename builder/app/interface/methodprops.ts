@@ -126,6 +126,7 @@ export function CreateFilterConfig(): FilterConfig {
 		enabled: true,
 		dataChain: '',
 		dataChainOptions: {},
+		autoCalculate: true,
 		id: GUID(),
 		name: ''
 	};
@@ -628,8 +629,8 @@ export function SetupConfigInstanceInformation(
 	dataChainOptions.simpleValidations = dataChainOptions.simpleValidations || [];
 	dataChainOptions.simpleValidations.forEach((item) => {
 		item.isContained = item.isContained || CreateAreEqual();
-    item.isNotContained = item.isNotContained || CreateAreEqual();
-    item.isIntersecting = item.isIntersecting || CreateAreEqual();
+		item.isNotContained = item.isNotContained || CreateAreEqual();
+		item.isIntersecting = item.isIntersecting || CreateAreEqual();
 		let temp = { ...CreateSimpleValidation(), ...item };
 		Object.assign(item, temp);
 	});
@@ -952,6 +953,7 @@ export interface AfterEffect {
 	dataChainOptions: DataChainConfiguration;
 	id: string;
 	name: string;
+	autoCalculate: boolean;
 	dataChain: string;
 	targetType: TargetMethodType;
 	target: string;
@@ -966,6 +968,7 @@ export interface ValidationConfig {
 	name: string;
 	dataChain: string;
 	enabled: boolean;
+	autoCalculate: boolean;
 	dataChainOptions: DataChainConfiguration;
 }
 export interface StaticParameters extends ConfigItem {

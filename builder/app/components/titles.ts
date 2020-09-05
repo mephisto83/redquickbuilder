@@ -608,6 +608,7 @@ export const IsNotContained = 'Is not contained';
 export const EnableComposition = 'Enable composition';
 export const Float = 'Float';
 export const Integer = 'Integer';
+export const AutoCalculate = 'Auto calculate';
 export const String = 'String';
 export const SetPropertyType = 'Set Property type';
 export const ScaffoldTargets = 'Scaffold Targets';

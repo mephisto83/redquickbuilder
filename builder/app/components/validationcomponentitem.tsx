@@ -32,6 +32,9 @@ export default class ValidationComponentItem extends Component<any, any> {
 		}
 		let originalConfig = GetNodeProp(validationConfig.dataChain, NodeProperties.OriginalConfig);
 		let mountingItem: MountingDescription = this.props.mountingItem;
+		if (validationConfig.autoCalculate === undefined) {
+			validationConfig.autoCalculate = true;
+		}
 		return (
 			<TreeViewMenu
 				open={this.state.open}
@@ -82,6 +85,15 @@ export default class ValidationComponentItem extends Component<any, any> {
 								}
 							}
 						}}
+					/>
+				</TreeViewItemContainer>
+				<TreeViewItemContainer>
+					<CheckBox
+						label={Titles.AutoCalculate}
+						onChange={(val: boolean) => {
+							validationConfig.autoCalculate = val;
+						}}
+						value={validationConfig.autoCalculate}
 					/>
 				</TreeViewItemContainer>
 				{originalConfig && originalConfig !== validationConfig.id ? null : validationConfig &&
@@ -211,7 +223,8 @@ export function validationDataChain(
 						afterEffectOptions: validationConfig.dataChainOptions,
 						methods: methods,
 						routes: routes,
-						override: override
+            override: override,
+            validationConfig
 					},
 					(dataChain: Node) => {
 						if (dataChain && UIA.GetNodeById(dataChain.id)) {
