@@ -20,7 +20,8 @@ import {
 	HalfRelation,
 	IsContainedConfig,
 	CopyConfig,
-	CopyEnumerationConfig
+	CopyEnumerationConfig,
+	ValidationConfig
 } from '../../interface/methodprops';
 import { MethodFunctions, bindTemplate } from '../../constants/functiontypes';
 import {
@@ -55,7 +56,6 @@ import {
 	NodesByType
 } from '../../methods/graph_methods';
 import { ReferenceInsertType } from '../../components/lambda/BuildLambda';
-import { code } from '../../components/editor.main.css';
 import { SimpleValidation, NodeType } from '../../components/titles';
 import SimpleValidationComponent from '../../components/simplevalidationconfig';
 import { equal } from 'assert';
@@ -70,6 +70,7 @@ export interface AfterEffectConvertArgs {
 	afterEffect?: AfterEffect;
 	override?: boolean;
 	currentDescription?: MountingDescription;
+	validationConfig?: ValidationConfig;
 	name: string;
 	routes: AfterEffect[];
 	methods: MountingDescription[];
@@ -94,6 +95,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		afterEffectOptions: dataChainConfigOptions,
 		routes,
 		methods,
+		validationConfig,
 		afterEffectParent,
 		override,
 		afterEffectChild,
@@ -361,7 +363,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		case DataChainType.Permission:
 			can_complete = true;
 			from_parameter_template = `
-      public static async Task<bool> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent)
+      public static async Task<bool> Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null)
       {
 
         Func<#{{"key":"model"}}#, #{{"key":"agent"}}#, Task<bool>> func = async (#{{"key":"model"}}# model, #{{"key":"agent"}}# agent) => {
@@ -392,7 +394,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				}
 			}
 			from_parameter_template = `
-      public static async Task<bool> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change_parameter)
+      public static async Task<bool> Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change_parameter = null)
       {
         Func<#{{"key":"model"}}#, #{{"key":"agent"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task<bool>> func = async (#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change_parameter) => {
 
@@ -414,7 +416,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			can_complete = true;
 			from_parameter_template = `
       public static async Task<${outputType ||
-			'bool'}> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change, #{{"key":"result"}}# result)
+			'bool'}> Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change = null, #{{"key":"result"}}# result = null)
       {
           Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task<${outputType ||
 				'bool'}>> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# model, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
@@ -434,7 +436,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			}
 
 			from_parameter_template = `
-    public static async Task<#{{"key":"model"}}#, bool> Filter(#{{"key":"agent"}}# agent = null, #{{"key":"model"}}# model = null${parent_input})
+    public static async Task<Func<#{{"key":"model"}}#, bool>> Filter(#{{"key":"agent"}}# agent = null, #{{"key":"model"}}# model = null${parent_input})
     {
         Func<#{{"key":"model_output"}}#, bool> func = (#{{"key":"model_output"}}# model_output) => {
             {{simplevalidation}}
@@ -454,7 +456,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				}
 			}
 			from_parameter_template = `
-      public static async Task Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change)
+      public static async Task Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change = null)
       {
           Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# fromModel, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
 
@@ -497,6 +499,9 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		let methodFunction = MethodFunctions[from.functionType];
 		const lambdaInsertArgumentValues = GetNodeProp(dataChain, NodeProperties.LambdaInsertArguments) || {};
 
+		let autoCalculate = afterEffect
+			? afterEffect.autoCalculate
+			: false || validationConfig ? validationConfig.autoCalculate : false;
 		if (dataChain) {
 			let lambdaInsert = {
 				...tempLambdaInsertArgumentValues,
@@ -512,6 +517,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			updateComponentProperty(dataChain, NodeProperties.CompleteFunction, true);
 			updateComponentProperty(dataChain, NodeProperties.ArbiterModels, arbiterModels);
 			updateComponentProperty(dataChain, NodeProperties.UIText, name);
+			updateComponentProperty(dataChain, NodeProperties.AutoCalculate, autoCalculate);
 			updateComponentProperty(
 				dataChain,
 				NodeProperties.AfterEffectKey,
@@ -525,6 +531,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 					{
 						[NodeProperties.UIText]: name,
 						[NodeProperties.NODEType]: NodeTypes.DataChain,
+						[NodeProperties.AutoCalculate]: autoCalculate,
 						[NodeProperties.CS]: true,
 						[NodeProperties.CSEntryPoint]: true,
 						[NodeProperties.DataChainTypeCategory]: type,
@@ -675,6 +682,15 @@ function GenerateSimpleValidations(
 				);
 				checks.push({ template: equality, id: simpleValidation.id });
 			}
+			if (simpleValidation.isIntersecting && simpleValidation.isIntersecting.enabled) {
+				let equality = GenerateIsIntersectingComparer(
+					simpleValidation,
+					simpleValidation.isIntersecting,
+					tempLambdaInsertArgumentValues,
+					true
+				);
+				checks.push({ template: equality, id: simpleValidation.id });
+			}
 			if (simpleValidation.isContained && simpleValidation.isContained.enabled) {
 				let equality = GenerateIsContainedComparer(
 					simpleValidation,
@@ -751,7 +767,7 @@ function GenerateSimpleValidations(
 			)}","type":"property","model":"result"}}#`;
 			break;
 		default:
-			returnStatement = 'result false';
+			returnStatement = 'return false';
 	}
 	if (!(simpleValidationConfiguration && simpleValidationConfiguration.enabled)) {
 		result = checks
@@ -864,6 +880,23 @@ function GenerateIsContainedComparer(
 	SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, areEqual.relationType, areEqual);
 
 	return `${not ? '!' : ''}(${valuePropString} != null && ${valuePropString}.Contains(${equalityTo}))`;
+}
+
+function GenerateIsIntersectingComparer(
+	simpleValidation: SimpleValidationConfig,
+	areEqual: IsContainedConfig,
+	tempLambdaInsertArgumentValues: any,
+	not: boolean
+) {
+	let { relationType } = simpleValidation;
+	let valuePropString = GetRelationTypeValuePropString(relationType, simpleValidation);
+	let equalityTo = GetRelationTypeValuePropString(areEqual.relationType, areEqual);
+	SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, relationType, simpleValidation);
+	SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, areEqual.relationType, areEqual);
+
+	return `${not
+		? '!'
+		: ''}(${valuePropString} != null && ${valuePropString}.AsQueryable().Intersect(${equalityTo}).Any())`;
 }
 
 function SetLambdaInsertArgumentValues(

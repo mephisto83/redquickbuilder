@@ -81,6 +81,7 @@ import SelectInput from './selectinput';
 import DataChainOperator from './datachainoperator';
 import ThemeProperties from './themeproperties';
 import CurrentNodeProperties from './currentnodeproperties';
+import ScaffoldProject from './scaffoldproject';
 import Slider from './slider';
 import SideMenuContainer from './sidemenucontainer';
 import ExtensionDefinitionMenu from './extensiondefinitionmenu';
@@ -2328,7 +2329,7 @@ class Dashboard extends Component<any, any> {
 									small={this.state.small}
 									nonBlock={this.state.nonBlock}
 									linkDistance={UIA.Visual(state, LINK_DISTANCE)}
-									onNodeClick={(nodeId, boundingBox) => {
+									onNodeClick={(nodeId: string, boundingBox: any) => {
 										if (UIA.Visual(state, CONNECTING_NODE)) {
 											const selectedId = UIA.Visual(state, UIA.SELECTED_NODE);
 											console.log(`selectedId:${selectedId} => nodeId:${nodeId}`);
@@ -2574,7 +2575,7 @@ class Dashboard extends Component<any, any> {
 										<ChoiceListItemActivityMenu />
 										{/* <ConditionActivityMenu /> */}
 										<DataChainActvityMenu />
-                    <SwaggerActivity />
+										<SwaggerActivity />
 										<TextInput
 											label={Titles.NodeLabel}
 											value={currentNode.properties ? currentNode.properties.text : ''}
@@ -2771,6 +2772,7 @@ class Dashboard extends Component<any, any> {
 							{UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? <MethodParameterMenu /> : null}
 							{UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? <QuickMethods /> : null}
 							{UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? <CurrentNodeProperties /> : null}
+							{UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? <ScaffoldProject /> : null}
 							{UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? <ThemeProperties /> : null}
 							{UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? <RedQuickConfigurationComponent /> : null}
 						</SideBar>

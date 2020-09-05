@@ -70,22 +70,6 @@ export default class AfterEffectComponent extends Component<any, any> {
 						}}
 					/>
 				</TreeViewItemContainer>
-				{/* <TreeViewItemContainer>
-					<SelectInput
-						label={Titles.TargetType}
-						options={Object.values(TargetMethodType).map((v) => ({ title: v, value: v }))}
-						value={afterEffect.targetType}
-						onChange={(value: TargetMethodType) => {
-							afterEffect.targetType = value;
-							this.setState({
-								turn: UIA.GUID()
-							});
-							if (this.props.onChange) {
-								this.props.onChange();
-							}
-						}}
-					/>
-				</TreeViewItemContainer> */}
 				<TreeViewItemContainer>
 					<SelectInput
 						label={Titles.Target}

@@ -3204,7 +3204,8 @@ export function updateNodeProperty(graph: any, options: any) {
 			});
 
 		if (NodePropertiesDirtyChain[prop]) {
-			const temps = NodePropertiesDirtyChain[prop];
+      console.log(prop);
+      const temps = NodePropertiesDirtyChain[prop];
 			temps.forEach((temp: any) => {
 				if (!graph.nodeLib[id].dirty[temp.chainProp]) {
 					additionalChange[temp.chainProp] = temp.chainFunc(value, graph.nodeLib[id]);
@@ -3664,7 +3665,7 @@ export function UpdateVisualGrpah(visualGraph: Graph | null, graph: Graph, visua
 			break;
 		case VisualCommand.ADD_CONNECTION:
 			let link: GraphLink = getLink(graph, { id: visualCommand.linkId });
-			visualGraph = addLink(visualGraph, link, link);
+			if (link) visualGraph = addLink(visualGraph, link, link);
 			break;
 		case VisualCommand.REMOVE_LINK:
 			visualGraph = removeLink(visualGraph, visualCommand.linkId);

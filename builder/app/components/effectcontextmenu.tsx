@@ -85,6 +85,8 @@ class EffectContextMenu extends Component<any, any> {
 							excludeFromController: false,
 							executions: [],
 							permissions: [],
+							filterItem: {},
+							filters: [],
 							autoSetup: { executionAutoCopy: true }
 						});
 						if (callback) {
@@ -377,55 +379,63 @@ class EffectContextMenu extends Component<any, any> {
 										title={'Auto generate, permissions, validations, filters'}
 										onClick={() => {
 											if (effectItem.permissions) {
-												effectItem.permissions.forEach((permission: PermissionConfig) => {
-													autoNameGenerateDataChain(
-														permission,
-														effectItem,
-														DataChainType.Permission,
-														mode.methods,
-														null,
-														true
-													);
-												});
-											}
-											if (effectItem.validations) {
-												effectItem.validations.forEach((validation: ValidationConfig) => {
-													autoNameGenerateDataChain(
-														validation,
-														effectItem,
-														DataChainType.Validation,
-														mode.methods,
-														null,
-														true
-													);
-												});
-											}
-											if (effectItem.filters) {
-												effectItem.filters.forEach((filter: FilterConfig) => {
-													autoNameGenerateDataChain(
-														filter,
-														effectItem,
-														DataChainType.Filter,
-														mode.methods,
-														null,
-														true
-													);
-												});
-											}
-											if (effectItem.executions) {
-												effectItem.executions.forEach((executionConfig: ExecutionConfig) => {
-													if (methodDescription) {
-														autoNameExecutionConfig(
-															executionConfig,
-															viewType,
+												effectItem.permissions
+													.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
+													.forEach((permission: PermissionConfig) => {
+														autoNameGenerateDataChain(
+															permission,
 															effectItem,
-															methodDescription,
-															effectItem.name,
+															DataChainType.Permission,
 															mode.methods,
+															null,
 															true
 														);
-													}
-												});
+													});
+											}
+											if (effectItem.validations) {
+												effectItem.validations
+													.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
+													.forEach((validation: ValidationConfig) => {
+														autoNameGenerateDataChain(
+															validation,
+															effectItem,
+															DataChainType.Validation,
+															mode.methods,
+															null,
+															true
+														);
+													});
+											}
+											if (effectItem.filters) {
+												effectItem.filters
+													.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
+													.forEach((filter: FilterConfig) => {
+														autoNameGenerateDataChain(
+															filter,
+															effectItem,
+															DataChainType.Filter,
+															mode.methods,
+															null,
+															true
+														);
+													});
+											}
+											if (effectItem.executions) {
+												effectItem.executions
+													.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
+													.forEach((executionConfig: ExecutionConfig) => {
+														if (methodDescription) {
+															autoNameExecutionConfig(
+																executionConfig,
+																viewType,
+																effectItem,
+																methodDescription,
+																effectItem.name,
+																mode.methods,
+																true
+															);
+														}
+													});
 											}
 											this.setState({ turn: UIA.GUID() });
 										}}

@@ -246,17 +246,17 @@ export function dashboardShot(folder) {
 	};
 }
 let browserWindow: Electron.BrowserView;
-export async function takeDashboardShot(folder: any, name?: string, getNodes?: any, ops?:any) {
+export async function takeDashboardShot(folder: any, name?: string, getNodes?: any, ops?: any) {
 	const remote = require('electron').remote;
 	let win = browserWindow || remote.BrowserWindow.getFocusedWindow();
 	if (win) {
 		// browserWindow = win;
 		let svg = document.querySelector('.content-wrapper svg');
 		if (svg) {
-      let bbox = svg.getBoundingClientRect();
-      if(ops){
-        ops.MapControls.stopMap();
-      }
+			let bbox = svg.getBoundingClientRect();
+			if (ops) {
+				ops.MapControls.stopMap();
+			}
 			await win.webContents
 				.capturePage({
 					x: bbox.x || 0,
@@ -286,10 +286,10 @@ export async function takeDashboardShot(folder: any, name?: string, getNodes?: a
 					}));
 					fs.writeFileSync(temppath, JSON.stringify(projectJson), 'utf8');
 				}
-      }
-      if(ops){
-        ops.MapControls.startMap();
-      }
+			}
+			if (ops) {
+				ops.MapControls.startMap();
+			}
 		}
 	}
 }
@@ -429,7 +429,7 @@ export async function populate(
 				ops.level2 || LinkType.PropertyLink
 			);
 			let bounds = getMindMapBounds();
-			doesntfit = !doesItFit(bounds);
+			doesntfit = !doesItFit(bounds, () => {});
 			maxtimes--;
 			if (doesntfit) {
 				setPinned(pinned, false);

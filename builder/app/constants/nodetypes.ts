@@ -348,6 +348,7 @@ export const NodeProperties = {
 	ViewModelKey: 'ViewModelKey',
 	UserOfAgent: 'UserOfAgent',
 	StateKey: 'StateKey',
+	AutoCalculate: 'AutoCalculate',
 	DefaultPropertyValueType: 'DefaultPropertyValueType',
 	DefaultPropertyValue: 'DefaultPropertyValue',
 	SwaggerNode: 'SwaggerNode',

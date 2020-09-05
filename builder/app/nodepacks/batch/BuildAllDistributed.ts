@@ -162,6 +162,7 @@ const Update_Screen_Parameters = 'Update Screen Paramters';
 const Modify_Agent_Methods = 'Modify Agent Methods';
 const Add_Agent_Access_Methods = 'Add Agent Access Methods';
 export const Create_Component_All = 'Create Component All';
+export const Create_Component_Shared_All = 'Create Component Shared All';
 const Wait_For_Create_Component_All_Completion = 'Wait_For_Create_Component_All_Completion';
 const Select_All_On_Model_Filters = 'Select All On Model Filters';
 const Add_Filters_To_Get_All = 'Add Filters to Get All';
@@ -209,9 +210,10 @@ const buildAllProgress = [
 	{ name: Modify_Agent_Methods },
 	{ name: Add_Agent_Access_Methods },
 	{ name: ListRequiredModelTitles },
-	{ name: Create_Component_All },
-	{ name: Wait_For_Create_Component_All_Completion },
-	{ name: Collect_Into_Graph },
+	...waiting(Create_Component_Shared_All),
+	...waiting(Create_Component_All),
+	// { name: Create_Component_All },
+	// { name: Collect_Into_Graph },
 	{ name: Update_Screen_Parameters },
 	{ name: Select_All_On_Model_Filters },
 	{ name: Add_Filters_To_Get_All },
@@ -317,17 +319,22 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 			AddUserRequirements();
 		});
 
-		await run(buildAllProgress, Create_Component_All, async (progresFunc: (arg0: number) => any) => {
-			await JobService.StartJob(Create_Component_All, currentJobFile, 1, NodeTypes.Model);
-		});
+		await threadRun(buildAllProgress, Create_Component_Shared_All, currentJobFile, NodeTypes.Model, 10000);
 
-		await run(
-			buildAllProgress,
-			Wait_For_Create_Component_All_Completion,
-			async (progresFunc: (arg0: number) => any) => {
-				await JobService.WaitForJob(Create_Component_All, currentJobFile);
-			}
-		);
+		// await run(buildAllProgress, Create_Component_Shared_All, async (progresFunc: (arg0: number) => any) => {
+		// 	await JobService.StartJob(Create_Component_Shared_All, currentJobFile, 1, NodeTypes.Model);
+		// });
+
+		await threadRun(buildAllProgress, Create_Component_All, currentJobFile, NodeTypes.Model, 1);
+
+		// await run(
+		// 	buildAllProgress,
+		// 	Wait_For_Create_Component_All_Completion,
+		// 	async (progresFunc: (arg0: number) => any) => {
+		// 		await JobService.WaitForJob(Create_Component_All, currentJobFile);
+		// 	}
+    // );
+
 		await run(buildAllProgress, Update_Screen_Parameters, async (progressFunc: any) => {
 			await UpdateScreenParameters(progressFunc);
 		});
@@ -341,15 +348,15 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 
 		await run(buildAllProgress, APPLY_PERMISSION_CHAINS, async (progressFunc) => {
 			await ApplyPermissionChains();
-    });
+		});
 
 		await run(buildAllProgress, APPLY_EXECUTION_CHAINS, async (progressFunc) => {
 			await ApplyExecutionChains();
-    });
+		});
 
 		await run(buildAllProgress, APPLY_VALIDATION_CHAINS, async (progressFunc) => {
 			await ApplyValidationChains();
-    });
+		});
 
 		await run(buildAllProgress, Add_Filters_To_Get_All, async (progresFunc: any) => {
 			await AddFiltersToGetAll(progresFunc);

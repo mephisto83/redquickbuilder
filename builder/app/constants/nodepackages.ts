@@ -136,6 +136,7 @@ import HomeViewContinueAsButtonStyle from '../nodepacks/HomeViewContinueAsButton
 import Anonymous from '../nodepacks/screens/Anonymous';
 import AnonymousGuest from '../nodepacks/screens/AnonymousGuest';
 import PostRegister from '../nodepacks/PostRegister';
+import SetupApiBetweenComponents from '../nodepacks/SetupApiBetweenComponents';
 
 export const GetSpecificModels = {
 	type: 'get-specific-models',
@@ -1873,7 +1874,7 @@ export const CreateDefaultView = {
 						chosenChildren.some((v: any) => v === x.id)
 					);
 				}
-				const modelProperties = modelChildren
+				const modelProperties: _.Node[] = modelChildren
 					.filter((x: any) => !GetNodeProp(x, NodeProperties.IsDefaultProperty))
 					.filter((x: any) => !GetNodeProp(x, NodeProperties.IgnoreInView));
 				childComponents = modelProperties.map(() => null);
@@ -1900,7 +1901,7 @@ export const CreateDefaultView = {
 													: InstanceTypes.ScreenInstance,
 												[NodeProperties.UIText]: `${viewName} ${agentId
 													? GetNodeTitle(agentId)
-													: ''} Form`,
+													: ''}`,
 												[NodeProperties.ViewType]: viewType,
 												[NodeProperties.NODEType]: NodeTypes.Screen,
 												[NodeProperties.Model]: currentNode.id,
@@ -1934,12 +1935,12 @@ export const CreateDefaultView = {
 													? InstanceTypes.ModelInstance
 													: InstanceTypes.ScreenInstance,
 												[NodeProperties.Screen]: GraphMethods.convertToURLRoute(
-													`${viewName} ${agentId ? GetNodeTitle(agentId) : ''} Form`
+													`${viewName} ${agentId ? GetNodeTitle(agentId) : ''}`
 												),
 												[NodeProperties.ViewType]: viewType,
 												[NodeProperties.UIText]: `${viewName} ${agentId
 													? GetNodeTitle(agentId)
-													: ''} Form`,
+													: ''}`,
 												[NodeProperties.Model]: currentNode.id,
 												...agentId ? { [NodeProperties.Agent]: agentId } : {}
 											}
@@ -2109,7 +2110,7 @@ export const CreateDefaultView = {
 												...viewPackage,
 												[NodeProperties.UIText]: `${viewName} ${agentId
 													? GetNodeTitle(agentId)
-													: ''} ${uiType} Form`,
+													: ''} Form`,
 												[NodeProperties.UIType]: uiType,
 												[NodeProperties.ComponentType]: ComponentTypes[uiType].Generic.key,
 												[NodeProperties.ComponentApi]: componentProps,
@@ -2202,7 +2203,6 @@ export const CreateDefaultView = {
 									};
 								})
 							: []),
-
 						...(needsLoadToScreenState && false
 							? ConnectLifecycleMethodToDataChain({
 									lifeCycleMethod: (graph: any) => {
@@ -2237,77 +2237,24 @@ export const CreateDefaultView = {
 										};
 										const componentProps = null;
 
-										let connectto: any[] = [];
-										if (isDefaultComponent) {
-											if (viewTypeModelId) {
-												connectto = [ GetNodeById(viewTypeModelId, currentGraph) ];
-											} else {
-												connectto = getViewTypeEndpointsForDefaults(
-													viewType,
-													currentGraph,
-													currentNode.id
-												);
-											}
-										}
 										return {
 											callback: (listComponent: { id: any }, graph: any) => {
 												listComponentId = listComponent.id;
 												newItems.listComponentId = listComponentId;
-												connectto.forEach((ct) => {
-													createListConnections.push(
-														() =>
-															SetSharedComponent({
-																properties: {
-																	...LinkProperties.DefaultViewType,
-																	viewType,
-																	uiType,
-																	isPluralComponent
-																},
-																graph,
-																viewType,
-																uiType,
-																isPluralComponent,
-																source: ct.id,
-																target: listComponentId
-															}),
-														//  () => ([
-														...[
-															'value',
-															ApiNodeKeys.ViewModel,
-															'label',
-															'placeholder',
-															'error',
-															'success'
-														].map(
-															(v) =>
-																function() {
-																	const graph = GetCurrentGraph(GetStateFunc()());
-																	return addComponentApiToForm({
-																		newItems,
-																		text: v,
-																		parent: ct.id,
-																		isSingular: true,
-																		graph
-																	});
-																}
-														)
-														// ])
-													);
-												});
 											},
 											parent: screenNodeOptionId,
 											properties: {
 												...viewPackage,
-												[NodeProperties.UIText]: `${viewName} ${multi_item_component} ${agentId
-													? GetNodeTitle(agentId)
-													: ''}`,
+												[NodeProperties.UIText]: `${viewName} ${multi_item_component}`,
 												[NodeProperties.UIType]: uiType,
 												[NodeProperties.ViewType]: viewType,
 												[NodeProperties.IsPluralComponent]: isPluralComponent,
 												[NodeProperties.Pinned]: false,
 												[NodeProperties.SharedComponent]: isSharedComponent,
 												[NodeProperties.ComponentType]: multi_item_component,
-												...agentId ? { [NodeProperties.Agent]: agentId } : {},
+												...agentId && !isSharedComponent
+													? { [NodeProperties.Agent]: agentId }
+													: {},
 												[NodeProperties.InstanceType]: useModelInstance
 													? InstanceTypes.ModelInstance
 													: InstanceTypes.ScreenInstance,
@@ -2320,6 +2267,61 @@ export const CreateDefaultView = {
 											}
 										};
 									}
+								}
+							: false,
+						isList
+							? (currentGraph: any) => {
+									let connectto: any[] = [];
+									if (isDefaultComponent) {
+										if (viewTypeModelId) {
+											connectto = [ GetNodeById(viewTypeModelId, currentGraph) ];
+										} else {
+											connectto = getViewTypeEndpointsForDefaults(
+												viewType,
+												currentGraph,
+												currentNode.id
+											);
+										}
+									}
+									return connectto.map((ct) => {
+										return [
+											(graph: _.Graph) =>
+												SetSharedComponent({
+													properties: {
+														...LinkProperties.DefaultViewType,
+														viewType,
+														uiType,
+														isPluralComponent
+													},
+													graph,
+													viewType,
+													uiType,
+													isPluralComponent,
+													source: ct.id,
+													target: listComponentId
+												}),
+											[
+												'value',
+												ApiNodeKeys.ViewModel,
+												'label',
+												'placeholder',
+												'error',
+												'success'
+											].map(
+												(v) =>
+													function() {
+														const graph = GetCurrentGraph(GetStateFunc()());
+														return addComponentApiToForm({
+															newItems,
+															text: v,
+															parent: ct.id,
+															isSingular: true,
+															graph
+														});
+													}
+											)
+										];
+									});
 								}
 							: false,
 						isList
@@ -2473,7 +2475,7 @@ export const CreateDefaultView = {
 									...cellProperties.style,
 									flexDirection: 'column'
 								};
-								const propertyCount = modelProperties.length + 2;
+								const propertyCount = modelProperties.length + 2; //TODO: // THIS NEEDS TO CHANGE.
 								const componentProps = null;
 								if (isList) {
 									addComponentTags(ComponentTags.List, cellProperties);
@@ -2518,7 +2520,7 @@ export const CreateDefaultView = {
 										[NodeProperties.ViewType]: viewType,
 										[NodeProperties.SharedComponent]: isSharedComponent,
 										[NodeProperties.Pinned]: false,
-										...agentId ? { [NodeProperties.Agent]: agentId } : {},
+										...agentId && !isSharedComponent ? { [NodeProperties.Agent]: agentId } : {},
 										[NodeProperties.ComponentType]: isList
 											? ComponentTypes[uiType].ListItem.key
 											: ComponentTypes[uiType].Form.key,
@@ -2537,7 +2539,6 @@ export const CreateDefaultView = {
 								};
 							}
 						},
-
 						function() {
 							return addListItemComponentApi(
 								newItems,
@@ -2761,13 +2762,13 @@ export const CreateDefaultView = {
 								}
 							: false,
 						...modelProperties
-							.map((modelProperty: any, modelIndex: string | number) => {
+							.map((modelProperty: _.Node, modelIndex: number) => {
 								const sharedComponent = GetSharedComponentFor(
 									viewType,
 									modelProperty,
 									currentNode.id,
 									isSharedComponent,
-									agentId
+									uiType
 								);
 								if (!sharedComponent) {
 									switch (GetNodeProp(modelProperty, NodeProperties.NODEType)) {
@@ -2806,7 +2807,6 @@ export const CreateDefaultView = {
 												}
 										)
 									];
-									return {};
 								}
 
 								return [
@@ -2831,7 +2831,9 @@ export const CreateDefaultView = {
 														sharedComponent || componentTypeToUse,
 													[NodeProperties.UsingSharedComponent]: !!sharedComponent,
 													[NodeProperties.Pinned]: false,
-													...agentId ? { [NodeProperties.Agent]: agentId } : {},
+													...agentId && !isSharedComponent
+														? { [NodeProperties.Agent]: agentId }
+														: {},
 													[NodeProperties.InstanceType]: useModelInstance
 														? InstanceTypes.ModelInstance
 														: InstanceTypes.ScreenInstance
@@ -2987,7 +2989,7 @@ export const CreateDefaultView = {
 										modelProperty,
 										currentNode.id,
 										isSharedComponent,
-										agentId /* todo */
+										uiType
 									);
 									if (
 										screenComponentId &&
@@ -3009,6 +3011,40 @@ export const CreateDefaultView = {
 								}
 							};
 						}),
+						// {
+						// 	operation: NEW_COMPONENT_NODE,
+						// 	options() {
+						// 		return {
+						// 			parent: screenComponentId,
+						// 			groupProperties: {},
+						// 			properties: {
+						// 				...viewPackage,
+						// 				[NodeProperties.UIText]: `${agentId && !isSharedComponent
+						// 					? GetNodeTitle(agentId)
+						// 					: ''} ${Titles.Execute} ${viewName} Button`,
+						// 				[NodeProperties.UIType]: uiType,
+						// 				...agentId ? { [NodeProperties.Agent]: agentId } : {},
+						// 				[NodeProperties.Pinned]: false,
+						// 				[NodeProperties.Label]: `${Titles.Execute} Button`,
+						// 				[NodeProperties.ExecuteButton]: true,
+						// 				[NodeProperties.ComponentType]: ComponentTypes[uiType].Button.key,
+						// 				[NodeProperties.InstanceType]: useModelInstance
+						// 					? InstanceTypes.ModelInstance
+						// 					: InstanceTypes.ScreenInstance
+						// 			},
+						// 			linkProperties: {
+						// 				properties: { ...LinkProperties.ComponentLink }
+						// 			},
+						// 			callback: (component: { id: any }) => {
+						// 				childComponents.push(component.id);
+						// 				newItems.button = component.id;
+						// 				method_result.formButton = component.id;
+						// 				method_result.uiTypes[args.uiType] = method_result.uiTypes[args.uiType] || {};
+						// 				method_result.uiTypes[args.uiType].formButton = component.id;
+						// 			}
+						// 		};
+						// 	}
+						// },
 						{
 							operation: NEW_COMPONENT_NODE,
 							options() {
@@ -3017,52 +3053,12 @@ export const CreateDefaultView = {
 									groupProperties: {},
 									properties: {
 										...viewPackage,
-										[NodeProperties.UIText]: `${agentId
-											? GetNodeTitle(agentId)
-											: ''} ${Titles.Execute} Button ${viewName} Component`,
-										[NodeProperties.UIType]: uiType,
-										...agentId ? { [NodeProperties.Agent]: agentId } : {},
-										[NodeProperties.Pinned]: false,
-										[NodeProperties.Label]: `${agentId
-											? GetNodeTitle(agentId)
-											: ''} ${Titles.Execute} Button ${viewName} Component`,
-										[NodeProperties.ExecuteButton]: true,
-										[NodeProperties.ComponentType]: ComponentTypes[uiType].Button.key,
-										[NodeProperties.InstanceType]: useModelInstance
-											? InstanceTypes.ModelInstance
-											: InstanceTypes.ScreenInstance
-									},
-									linkProperties: {
-										properties: { ...LinkProperties.ComponentLink }
-									},
-									callback: (component: { id: any }) => {
-										childComponents.push(component.id);
-										newItems.button = component.id;
-										method_result.formButton = component.id;
-										method_result.uiTypes[args.uiType] = method_result.uiTypes[args.uiType] || {};
-										method_result.uiTypes[args.uiType].formButton = component.id;
-									}
-								};
-							}
-						},
-						{
-							operation: NEW_COMPONENT_NODE,
-							options() {
-								return {
-									parent: screenComponentId,
-									groupProperties: {},
-									properties: {
-										...viewPackage,
-										[NodeProperties.UIText]: `${agentId
-											? GetNodeTitle(agentId)
-											: ''} ${Titles.Cancel} Button ${viewName} Component`,
+										[NodeProperties.UIText]: `${Titles.Cancel} ${viewName} Button`,
 										[NodeProperties.UIType]: uiType,
 										[NodeProperties.Pinned]: false,
 										[NodeProperties.CancelButton]: true,
-										[NodeProperties.Label]: `${agentId
-											? GetNodeTitle(agentId)
-											: ''} ${Titles.Cancel} Button ${viewName} Component`,
-										...agentId ? { [NodeProperties.Agent]: agentId } : {},
+										[NodeProperties.Label]: `${Titles.Cancel} ${viewName} Button`,
+										...agentId && !isSharedComponent ? { [NodeProperties.Agent]: agentId } : {},
 										[NodeProperties.ComponentType]: ComponentTypes[uiType].Button.key,
 										[NodeProperties.InstanceType]: useModelInstance
 											? InstanceTypes.ModelInstance
@@ -3090,62 +3086,101 @@ export const CreateDefaultView = {
 						{
 							operation: ADD_NEW_NODE,
 							options() {
-								return {
-									nodeType: NodeTypes.ComponentApi,
-									callback: (nn: { id: any }) => {
-										newItems.buttonInternalApi = nn.id;
-									},
-									linkProperties: {
-										properties: { ...LinkProperties.ComponentInternalApi }
-									},
-									parent: newItems.button,
-									groupProperties: {},
-									properties: {
-										[NodeProperties.UIText]: `value`,
-										[NodeProperties.Pinned]: false,
-										[NodeProperties.UseAsValue]: true
-									}
-								};
+								if (newItems.button) {
+									return {
+										nodeType: NodeTypes.ComponentApi,
+										callback: (nn: { id: any }) => {
+											newItems.buttonInternalApi = nn.id;
+										},
+										linkProperties: {
+											properties: { ...LinkProperties.ComponentInternalApi }
+										},
+										parent: newItems.button,
+										groupProperties: {},
+										properties: {
+											[NodeProperties.UIText]: `value`,
+											[NodeProperties.Pinned]: false,
+											[NodeProperties.UseAsValue]: true
+										}
+									};
+								}
+								return null;
 							}
 						},
 						{
 							operation: ADD_NEW_NODE,
 							options() {
-								return {
-									nodeType: NodeTypes.ComponentExternalApi,
-									callback: (nn: { id: any }) => {
-										newItems.buttonExternalApi = nn.id;
-									},
-									parent: newItems.button,
-									linkProperties: {
-										properties: { ...LinkProperties.ComponentExternalApi }
-									},
-									groupProperties: {},
-									properties: {
-										[NodeProperties.Pinned]: false,
-										[NodeProperties.UIText]: `value`
-									}
-								};
+								if (newItems.button) {
+									return {
+										nodeType: NodeTypes.ComponentExternalApi,
+										callback: (nn: { id: any }) => {
+											newItems.buttonExternalApi = nn.id;
+										},
+										parent: newItems.button,
+										linkProperties: {
+											properties: { ...LinkProperties.ComponentExternalApi }
+										},
+										groupProperties: {},
+										properties: {
+											[NodeProperties.Pinned]: false,
+											[NodeProperties.UIText]: `value`
+										}
+									};
+								}
+								return null;
 							}
 						},
 						{
 							operation: ADD_LINK_BETWEEN_NODES,
 							options() {
-								return {
-									source: newItems.buttonInternalApi,
-									target: newItems.buttonExternalApi,
-									properties: {
-										...LinkProperties.ComponentInternalConnection
-									}
-								};
+								if (newItems.buttonInternalApi && newItems.buttonExternalApi) {
+									return {
+										source: newItems.buttonInternalApi,
+										target: newItems.buttonExternalApi,
+										properties: {
+											...LinkProperties.ComponentInternalConnection
+										}
+									};
+								}
+								return null;
 							}
 						},
 						{
 							operation: ADD_LINK_BETWEEN_NODES,
 							options() {
-								return {
-									target: newItems.screenComponentIdInternalApi,
-									source: newItems.buttonExternalApi,
+								if (newItems.buttonExternalApi) {
+									return {
+										target: newItems.screenComponentIdInternalApi,
+										source: newItems.buttonExternalApi,
+										properties: {
+											...LinkProperties.ComponentExternalConnection,
+											...needsLoadToScreenState
+												? {
+														[LinkPropertyKeys.InstanceUpdate]: true
+													}
+												: {}
+										}
+									};
+								}
+								return null;
+							}
+						},
+						function() {
+							if (newItems.button) {
+								return addComponentApiToForm({
+									newItems,
+									text: ApiNodeKeys.ViewModel,
+									parent: newItems.button
+								});
+							}
+							return false;
+						},
+						function() {
+							if (newItems.button) {
+								return connectComponentToExternalApi({
+									newItems,
+									parent: newItems.screenComponentId,
+									key: ApiNodeKeys.ViewModel,
 									properties: {
 										...LinkProperties.ComponentExternalConnection,
 										...needsLoadToScreenState
@@ -3153,113 +3188,102 @@ export const CreateDefaultView = {
 													[LinkPropertyKeys.InstanceUpdate]: true
 												}
 											: {}
+									},
+									child: newItems.button
+								});
+							}
+						},
+						...ComponentTypes[uiType].Button.eventApi.map((t: string | number) => {
+							if (newItems.button) {
+								return {
+									operation: ADD_NEW_NODE,
+									options() {
+										return {
+											nodeType: NodeTypes.EventMethod,
+											properties: {
+												...viewPackage,
+												[NodeProperties.InstanceType]: useModelInstance
+													? InstanceTypes.ModelInstance
+													: InstanceTypes.ScreenInstance,
+												[NodeProperties.EventType]: t,
+												[NodeProperties.UIText]: `${t}`,
+												[NodeProperties.Pinned]: false
+											},
+											callback(component: { id: any }) {
+												method_result.formButtonApi = method_result.formButtonApi || {};
+												method_result.formButtonApi[t] = component.id;
+
+												method_result.uiTypes[args.uiType] =
+													method_result.uiTypes[args.uiType] || {};
+												method_result.uiTypes[args.uiType].formButtonApi =
+													method_result.uiTypes[args.uiType].formButtonApi || {};
+												method_result.uiTypes[args.uiType].formButtonApi[t] = component.id;
+											},
+											links: [
+												{
+													target: currentNode.id,
+													linkProperties: {
+														properties: { ...LinkProperties.ModelTypeLink }
+													}
+												},
+												{
+													target: newItems.button,
+													linkProperties: {
+														properties: { ...LinkProperties.EventMethod }
+													}
+												}
+											]
+										};
 									}
 								};
 							}
-						},
-						function() {
-							return addComponentApiToForm({
-								newItems,
-								text: ApiNodeKeys.ViewModel,
-								parent: newItems.button
-							});
-						},
-						function() {
-							return connectComponentToExternalApi({
-								newItems,
-								parent: newItems.screenComponentId,
-								key: ApiNodeKeys.ViewModel,
-								properties: {
-									...LinkProperties.ComponentExternalConnection,
-									...needsLoadToScreenState
-										? {
-												[LinkPropertyKeys.InstanceUpdate]: true
-											}
-										: {}
-								},
-								child: newItems.button
-							});
-						},
-						...ComponentTypes[uiType].Button.eventApi.map((t: string | number) => {
-							return {
-								operation: ADD_NEW_NODE,
-								options() {
-									return {
-										nodeType: NodeTypes.EventMethod,
-										properties: {
-											...viewPackage,
-											[NodeProperties.InstanceType]: useModelInstance
-												? InstanceTypes.ModelInstance
-												: InstanceTypes.ScreenInstance,
-											[NodeProperties.EventType]: t,
-											[NodeProperties.UIText]: `${t}`,
-											[NodeProperties.Pinned]: false
-										},
-										callback(component: { id: any }) {
-											method_result.formButtonApi = method_result.formButtonApi || {};
-											method_result.formButtonApi[t] = component.id;
-
-											method_result.uiTypes[args.uiType] =
-												method_result.uiTypes[args.uiType] || {};
-											method_result.uiTypes[args.uiType].formButtonApi =
-												method_result.uiTypes[args.uiType].formButtonApi || {};
-											method_result.uiTypes[args.uiType].formButtonApi[t] = component.id;
-										},
-										links: [
-											{
-												target: currentNode.id,
-												linkProperties: {
-													properties: { ...LinkProperties.ModelTypeLink }
-												}
-											},
-											{
-												target: newItems.button,
-												linkProperties: {
-													properties: { ...LinkProperties.EventMethod }
-												}
-											}
-										]
-									};
-								}
-							};
+							return false;
 						}),
 						{
 							operation: CHANGE_NODE_PROPERTY,
 							options() {
-								const executeButtonComponent = childComponents.length - 2;
-								const rootCellId = GetFirstCell(layout);
-								const children = GetChildren(layout, rootCellId);
-								const childId = children[executeButtonComponent];
-								const cellProperties = GetCellProperties(layout, childId);
-								cellProperties.children[childId] = childComponents[executeButtonComponent];
-								cellProperties.style.flex = null;
-								cellProperties.style.height = null;
-								addComponentTags(ComponentTags.MainButton, cellProperties);
-								return {
-									prop: NodeProperties.Layout,
-									id: screenComponentId,
-									value: layout
-								};
+								if (newItems.button) {
+									const executeButtonComponent = childComponents.indexOf(newItems.button);
+									if (executeButtonComponent !== -1) {
+										const rootCellId = GetFirstCell(layout);
+										const children = GetChildren(layout, rootCellId);
+										const childId = children[executeButtonComponent];
+										const cellProperties = GetCellProperties(layout, childId);
+										cellProperties.children[childId] = newItems.button;
+										cellProperties.style.flex = null;
+										cellProperties.style.height = null;
+										addComponentTags(ComponentTags.MainButton, cellProperties);
+										return {
+											prop: NodeProperties.Layout,
+											id: screenComponentId,
+											value: layout
+										};
+									}
+								}
+								return null;
 							}
 						},
 						{
 							operation: CHANGE_NODE_PROPERTY,
 							options() {
-								const executeButtonComponent = childComponents.length - 1;
-								const rootCellId = GetFirstCell(layout);
-								const children = GetChildren(layout, rootCellId);
-								const childId = children[executeButtonComponent];
-								const cellProperties = GetCellProperties(layout, childId);
-								cellProperties.children[childId] = childComponents[executeButtonComponent];
-								cellProperties.style.flex = null;
-								cellProperties.style.height = null;
-								addComponentTags(ComponentTags.SecondaryButton, cellProperties);
-								addComponentTags(ComponentTags.CancelButton, cellProperties);
-								return {
-									prop: NodeProperties.Layout,
-									id: screenComponentId,
-									value: layout
-								};
+								const executeButtonComponent = childComponents.indexOf(newItems.cancelbutton);
+								if (executeButtonComponent !== -1) {
+									const rootCellId = GetFirstCell(layout);
+									const children = GetChildren(layout, rootCellId);
+									const childId = children[executeButtonComponent];
+									const cellProperties = GetCellProperties(layout, childId);
+									cellProperties.children[childId] = childComponents[executeButtonComponent];
+									cellProperties.style.flex = null;
+									cellProperties.style.height = null;
+									addComponentTags(ComponentTags.SecondaryButton, cellProperties);
+									addComponentTags(ComponentTags.CancelButton, cellProperties);
+									return {
+										prop: NodeProperties.Layout,
+										id: screenComponentId,
+										value: layout
+									};
+								}
+								return false;
 							}
 						},
 						...modelProperties.map((modelProperty: any, modelIndex: any) => {
@@ -3271,7 +3295,7 @@ export const CreateDefaultView = {
 										modelProperty,
 										currentNode.id,
 										isSharedComponent,
-										agentId
+										uiType
 									);
 									if (!sharedComponent) {
 										switch (GetNodeProp(modelProperty, NodeProperties.NODEType)) {
@@ -3289,7 +3313,7 @@ export const CreateDefaultView = {
 															modelProperty,
 															_ui_model_type,
 															isSharedComponent,
-															agentId
+															uiType
 														);
 													}
 													if (!sharedComponent) {
@@ -3326,7 +3350,7 @@ export const CreateDefaultView = {
 								modelProperty,
 								currentNode.id,
 								isSharedComponent,
-								agentId
+								uiType
 							);
 							if (!sharedComponent) {
 								switch (GetNodeProp(modelProperty, NodeProperties.NODEType)) {
@@ -3351,11 +3375,13 @@ export const CreateDefaultView = {
 									const compNode: any = GetNodeById(compNodeId, graph);
 									const componentType: any = GetNodeProp(compNode, NodeProperties.ComponentType);
 									if (!sharedComponent && componentTypes[componentType]) {
-										componentTypes[componentType].defaultApi.map((x: { property: any }) => {
-											componentProps = addComponentApi(componentProps, {
-												modelProp: x.property
+										if (componentTypes[componentType].defaultApi) {
+											componentTypes[componentType].defaultApi.map((x: { property: any }) => {
+												componentProps = addComponentApi(componentProps, {
+													modelProp: x.property
+												});
 											});
-										});
+										}
 									} else if (sharedComponent) {
 										componentProps = {};
 										//     let { instanceType, model, selector, modelProperty, apiProperty, handlerType, isHandler, dataChain } = apiConfig[i];
@@ -3384,50 +3410,59 @@ export const CreateDefaultView = {
 						{
 							operation: CHANGE_NODE_PROPERTY,
 							options(graph: any) {
-								let componentProps = createComponentApi();
-								const componentTypes = ComponentTypes[uiType];
-								const compNodeId = childComponents[childComponents.length - 1];
-								const compNode = GetNodeById(compNodeId, graph);
-								const componentType = GetNodeProp(compNode, NodeProperties.ComponentType);
-								componentTypes[componentType].defaultApi.map((x: { property: any }) => {
-									componentProps = addComponentApi(componentProps, {
-										modelProp: x.property
-									});
-								});
+								if (newItems.cancelbutton) {
+									let componentProps = createComponentApi();
+									const componentTypes = ComponentTypes[uiType];
 
-								return {
-									prop: NodeProperties.ComponentApi,
-									id: compNodeId,
-									value: componentProps
-								};
+									const compNodeId = newItems.cancelbutton;
+									const compNode = GetNodeById(compNodeId, graph);
+									const componentType = GetNodeProp(compNode, NodeProperties.ComponentType);
+									componentTypes[componentType].defaultApi.map((x: { property: any }) => {
+										componentProps = addComponentApi(componentProps, {
+											modelProp: x.property
+										});
+									});
+
+									return {
+										prop: NodeProperties.ComponentApi,
+										id: compNodeId,
+										value: componentProps
+									};
+								}
+								return null;
 							}
 						},
 						{
 							operation: CHANGE_NODE_PROPERTY,
 							options(graph: any) {
-								let componentProps = createComponentApi();
-								const componentTypes = ComponentTypes[uiType];
-								const compNodeId = childComponents[childComponents.length - 2];
-								const compNode = GetNodeById(compNodeId, graph);
-								const componentType = GetNodeProp(compNode, NodeProperties.ComponentType);
-								componentTypes[componentType].defaultApi.map((x: { property: any }) => {
-									componentProps = addComponentApi(componentProps, {
-										modelProp: x.property
+								if (newItems.button) {
+									let componentProps = createComponentApi();
+									const componentTypes = ComponentTypes[uiType];
+									const compNodeId = newItems.button;
+									const compNode = GetNodeById(compNodeId, graph);
+									const componentType = GetNodeProp(compNode, NodeProperties.ComponentType);
+									componentTypes[componentType].defaultApi.map((x: { property: any }) => {
+										componentProps = addComponentApi(componentProps, {
+											modelProp: x.property
+										});
 									});
-								});
 
-								return {
-									prop: NodeProperties.ComponentApi,
-									id: compNodeId,
-									value: componentProps
-								};
+									return {
+										prop: NodeProperties.ComponentApi,
+										id: compNodeId,
+										value: componentProps
+									};
+								}
+								return null;
 							}
 						},
 						function() {
-							return AddNavigateBackHandler({
-								button: newItems.cancelbutton,
-								evt: uiType === UITypes.ReactNative ? 'onPress' : 'onClick'
-							});
+							if (newItems.cancelbutton) {
+								return AddNavigateBackHandler({
+									button: newItems.cancelbutton,
+									evt: uiType === UITypes.ReactNative ? 'onPress' : 'onClick'
+								});
+							}
 						},
 						function() {
 							const selectorNode = GetNodesByProperties({
@@ -3745,7 +3780,7 @@ export const CreateDefaultView = {
 											modelProperty,
 											_ui_model_type,
 											isSharedComponent,
-											agentId
+											uiType
 										);
 									}
 								}
@@ -3802,6 +3837,7 @@ export const CreateDefaultView = {
 					setupPropertyApi({
 						viewName,
 						modelProperty,
+						childId,
 						currentNode,
 						modelComponentSelectors,
 						useModelInstance,
@@ -4062,7 +4098,7 @@ export const CreateDefaultView = {
 					])(GetDispatchFunc(), GetStateFunc());
 				});
 			}
-			SelectedNode(currentNode.id)(GetDispatchFunc());
+			// SelectedNode(currentNode.id)(GetDispatchFunc());
 		};
 		const { uiTypes } = _args;
 		if (uiTypes) {
@@ -5107,14 +5143,15 @@ function addComponentEventApiNodes(args: {
 
 function addComponentApiNodes(
 	newItems: any,
-	childComponents: any,
-	modelIndex: string | number,
+	childComponents: string[],
+	modelIndex: number,
 	apiName = 'value',
 	externalApiId?: any
 ) {
 	const parent = childComponents[modelIndex];
 	let componentInternalValue: null = null;
 	let componentExternalValue: null = null;
+
 	return [
 		{
 			operation: ADD_NEW_NODE,
@@ -5216,74 +5253,76 @@ function addButtonApiNodes(newItems: any, btn?: any) {
 	let buttonInternalApi: any = null;
 	let buttonExternalApi: any = null;
 	btn = btn || (() => null);
-
-	return [
-		{
-			operation: ADD_NEW_NODE,
-			options() {
-				return {
-					nodeType: NodeTypes.ComponentApi,
-					callback: (nn: { id: any }) => {
-						buttonInternalApi = nn.id;
-					},
-					linkProperties: {
-						properties: { ...LinkProperties.ComponentInternalApi }
-					},
-					parent: btn() || newItems.button,
-					groupProperties: {},
-					properties: {
-						[NodeProperties.UIText]: `label`,
-						[NodeProperties.Pinned]: false,
-						[NodeProperties.UseAsValue]: true
-					}
-				};
+	if (btn() || newItems.button) {
+		return [
+			{
+				operation: ADD_NEW_NODE,
+				options() {
+					return {
+						nodeType: NodeTypes.ComponentApi,
+						callback: (nn: { id: any }) => {
+							buttonInternalApi = nn.id;
+						},
+						linkProperties: {
+							properties: { ...LinkProperties.ComponentInternalApi }
+						},
+						parent: btn() || newItems.button,
+						groupProperties: {},
+						properties: {
+							[NodeProperties.UIText]: `label`,
+							[NodeProperties.Pinned]: false,
+							[NodeProperties.UseAsValue]: true
+						}
+					};
+				}
+			},
+			{
+				operation: ADD_NEW_NODE,
+				options() {
+					return {
+						nodeType: NodeTypes.ComponentExternalApi,
+						callback: (nn: { id: any }) => {
+							buttonExternalApi = nn.id;
+						},
+						parent: btn() || newItems.button,
+						linkProperties: {
+							properties: { ...LinkProperties.ComponentExternalApi }
+						},
+						groupProperties: {},
+						properties: {
+							[NodeProperties.Pinned]: false,
+							[NodeProperties.UIText]: `label`
+						}
+					};
+				}
+			},
+			{
+				operation: ADD_LINK_BETWEEN_NODES,
+				options() {
+					return {
+						source: buttonInternalApi,
+						target: buttonExternalApi,
+						properties: {
+							...LinkProperties.ComponentInternalConnection
+						}
+					};
+				}
+			},
+			{
+				operation: ADD_LINK_BETWEEN_NODES,
+				options() {
+					return {
+						target: newItems.titleService,
+						source: buttonExternalApi,
+						properties: {
+							...LinkProperties.TitleServiceLink
+						}
+					};
+				}
 			}
-		},
-		{
-			operation: ADD_NEW_NODE,
-			options() {
-				return {
-					nodeType: NodeTypes.ComponentExternalApi,
-					callback: (nn: { id: any }) => {
-						buttonExternalApi = nn.id;
-					},
-					parent: btn() || newItems.button,
-					linkProperties: {
-						properties: { ...LinkProperties.ComponentExternalApi }
-					},
-					groupProperties: {},
-					properties: {
-						[NodeProperties.Pinned]: false,
-						[NodeProperties.UIText]: `label`
-					}
-				};
-			}
-		},
-		{
-			operation: ADD_LINK_BETWEEN_NODES,
-			options() {
-				return {
-					source: buttonInternalApi,
-					target: buttonExternalApi,
-					properties: {
-						...LinkProperties.ComponentInternalConnection
-					}
-				};
-			}
-		},
-		{
-			operation: ADD_LINK_BETWEEN_NODES,
-			options() {
-				return {
-					target: newItems.titleService,
-					source: buttonExternalApi,
-					properties: {
-						...LinkProperties.TitleServiceLink
-					}
-				};
-			}
-		}
-	];
+		];
+	}
+	return [];
 }
 
 function ConnectExternalApisToSelectors(args: {
@@ -5682,22 +5721,26 @@ function setupPropertyApi(args: any) {
 
 function connectComponentToExternalApi(args: { newItems: any; parent: any; key: any; properties: any; child: any }) {
 	const { newItems, child, key, parent, properties } = args;
+
 	const { externalId } = getApiConnectors(newItems, child, key);
 	const { internalId } = getApiConnectors(newItems, parent, key);
-	return [
-		{
-			operation: ADD_LINK_BETWEEN_NODES,
-			options() {
-				return {
-					source: externalId,
-					target: internalId,
-					properties: {
-						...properties
-					}
-				};
+	if (externalId && internalId)
+		return [
+			{
+				operation: ADD_LINK_BETWEEN_NODES,
+				options() {
+					return {
+						source: externalId,
+						target: internalId,
+						properties: {
+							...properties
+						}
+					};
+				}
 			}
-		}
-	];
+		];
+
+	throw new Error(`missing externalId ${externalId} or internalId ${internalId}`);
 }
 
 function addComponentApiToForm(args: {
@@ -5713,6 +5756,10 @@ function addComponentApiToForm(args: {
 	let externalId: any;
 	let internalId: any;
 	let skip = false;
+	let exists = !!GetComponentInternalApiNode(text, parent, graph);
+	if (exists) {
+		return [];
+	}
 	return [
 		{
 			operation: ADD_NEW_NODE,
@@ -5829,6 +5876,11 @@ function getApiConnectors(
 ) {
 	newItems.apiConnectors = newItems.apiConnectors || {};
 	newItems.apiConnectors[parent] = newItems.apiConnectors[parent] || {};
+	if (!newItems.apiConnectors[parent][key]) {
+		let externalNode = GetComponentInternalApiNode(key, parent);
+		let internalNode = GetComponentExternalApiNode(key, parent);
+		newItems.apiConnectors[parent][key] = { externalId: externalNode.id, internalId: internalNode.id };
+	}
 	return newItems.apiConnectors[parent][key];
 }
 

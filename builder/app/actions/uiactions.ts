@@ -239,16 +239,20 @@ export function GetGroupProp(id: any, prop: any) {
 }
 
 export function GetSharedComponentFor(
-	viewType: any,
-	modelProperty: any,
-	currentNodeId: any,
+	viewType: string,
+	modelProperty: _.Node,
+	targetModel: any,
 	isSharedProperty: any,
-	agentId: any
+	uiType: string
 ) {
+	if (!uiType) {
+		throw new Error('no ui type set in GetSharedComponentFor');
+	}
 	const graph = GetCurrentGraph(GetState());
 	let viewTypeNodes = GraphMethods.GetNodesLinkedTo(graph, {
-		id: typeof modelProperty === 'string' ? modelProperty : modelProperty.id
+		id: modelProperty.id
 	});
+	// let viewTypeNodes:any = NodesByType(null, NodeTypes.ViewType);
 	// viewTypeNodes = viewTypeNodes.filter((x: any) => {
 	// 	let componentNodes = GraphMethods.GetNodesLinkedTo(graph, {
 	// 		id: x.id,
@@ -267,23 +271,23 @@ export function GetSharedComponentFor(
 	if (isSharedProperty) {
 		viewType = isPluralComponent ? ViewTypes.GetAll : ViewTypes.Get;
 	}
-	viewTypeNodes = viewTypeNodes.filter((x: any) => {
+	viewTypeNodes = viewTypeNodes.filter((x: _.Node) => {
 		let result = GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ViewType;
 
 		result = result && !!GetNodeProp(x, NodeProperties.IsPluralComponent) === !!isPluralComponent;
 		return result;
 	});
-	viewTypeNodes = viewTypeNodes.find((x: { id: any }) => {
+	viewTypeNodes = viewTypeNodes.find((x: _.Node) => {
 		if (
 			GraphMethods.existsLinkBetween(graph, {
 				source: x.id,
-				target: currentNodeId,
+				target: targetModel,
 				type: NodeConstants.LinkType.DefaultViewType
 			})
 		) {
 			const link = GraphMethods.findLink(graph, {
 				source: x.id,
-				target: currentNodeId
+				target: targetModel
 			});
 			if (GetLinkProperty(link, NodeConstants.LinkPropertyKeys.ViewType) === viewType) {
 				return true;
@@ -305,6 +309,8 @@ export function GetSharedComponentFor(
 			return GetNodeProp(modelProperty, NodeProperties.DefaultViewTypeGetAll);
 		case ViewTypes.Update:
 			return GetNodeProp(modelProperty, NodeProperties.DefaultViewTypeUpdate);
+		default:
+			throw new Error('unhandled case for getting shared component');
 	}
 }
 
@@ -442,17 +448,18 @@ export function SetSharedComponent(args: any) {
 	) {
 		const connectionsAll = GraphMethods.GetConnectedNodesByType(GetState(), source, NodeTypes.ComponentNode);
 
-		const connections = connectionsAll
-			.filter((x: any) => GetNodeProp(x, NodeProperties.ViewType) === viewType)
-			.filter((x: any) => GetNodeProp(x, NodeProperties.UIType) === uiType)
-			.filter((x: any) => GetNodeProp(x, NodeProperties.IsPluralComponent) === isPluralComponent)
-			.map((x: any) => ({
-				operation: REMOVE_LINK_BETWEEN_NODES,
-				options: {
-					source,
-					target: x.id
-				}
-			}));
+		const connections: any[] = [];
+		//  connectionsAll
+		// 	.filter((x: any) => GetNodeProp(x, NodeProperties.ViewType) === viewType)
+		// 	.filter((x: any) => GetNodeProp(x, NodeProperties.UIType) === uiType)
+		// 	.filter((x: any) => GetNodeProp(x, NodeProperties.IsPluralComponent) === isPluralComponent)
+		// 	.map((x: any) => ({
+		// 		operation: REMOVE_LINK_BETWEEN_NODES,
+		// 		options: {
+		// 			source,
+		// 			target: x.id
+		// 		}
+		// 	}));
 
 		return [
 			...connections,
@@ -2669,17 +2676,19 @@ export function GetCombinedCondition(id: any, language = NodeConstants.Programmi
 				if (!validationParameters) {
 					throw new Error('missing permission parameters: GetCombinedCondition');
 				}
-				clauses.push(
-					`var {{result}} = await ${GetCodeName(dataChain)}.Execute(${validationParameters
-						.map((v: any) => {
-							// return `${v.paramName}: ${v.value}`;
-							if (v && v.value && v.value.key) {
-								return v.value.key;
-							}
-							return `${v.value}`;
-						})
-						.join()});`
-				);
+				if (language === NodeConstants.ProgrammingLanguages.CSHARP) {
+					clauses.push(
+						`var {{result}} = await ${GetCodeName(dataChain)}.Execute(${validationParameters
+							.map((v: any) => {
+								// return `${v.paramName}: ${v.value}`;
+								if (v && v.value && v.value.key) {
+									return v.value.key;
+								}
+								return `${v.value}: ${v.value}`;
+							})
+							.join()});`
+					);
+				}
 			});
 			break;
 		case NodeTypes.Permission:
@@ -2701,7 +2710,7 @@ export function GetCombinedCondition(id: any, language = NodeConstants.Programmi
 					`var {{result}} = await ${GetCodeName(dataChain)}.Execute(${permissionParameters
 						.map((v: any) => {
 							// return `${v.paramName}: ${v.value}`;
-							return `${v.value}`;
+							return `${v.value}: ${v.value}`;
 						})
 						.join()});`
 				);

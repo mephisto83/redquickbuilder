@@ -198,6 +198,15 @@ export default class SimpleValidationComponent extends Component<any, any> {
 					dataChainType={this.props.dataChainType}
 					targetProperties={targetProperties}
 					properties={properties}
+					config={simpleValidation.isIntersecting}
+					title={Titles.AreIntersecting}
+				/>
+				<EqualityConfigComponent
+					enabled={simpleValidation.enabled}
+					methodDescription={methodDescription}
+					dataChainType={this.props.dataChainType}
+					targetProperties={targetProperties}
+					properties={properties}
 					config={simpleValidation.isNotContained}
 					title={Titles.IsNotContained}
 				/>

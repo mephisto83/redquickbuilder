@@ -7,6 +7,7 @@ export function uuidv4() {
 }
 declare global {
 	export interface String {}
+	export interface Object {}
 	export interface Array<T> {
 		relativeCompliment: any;
 		unique: any;
@@ -363,6 +364,25 @@ export default function() {
 			return str;
 		};
 	})(String.prototype);
+
+  (function(objectPrototype: any) {
+    if (!objectPrototype.entries) {
+      Object.defineProperty(objectPrototype, 'entries', {
+        enumerable: false,
+        writable: true,
+        configurable: true,
+        value(obj: any) {
+          var ownProps = Object.keys(obj),
+            i = ownProps.length,
+            resArray = new Array(i); // preallocate the Array
+          while (i--) resArray[i] = [ ownProps[i], obj[ownProps[i]] ];
+
+          return resArray;
+        }
+      });
+    }
+  })(Object.prototype);
+
 }
 const NEW_LINE = `
 `;

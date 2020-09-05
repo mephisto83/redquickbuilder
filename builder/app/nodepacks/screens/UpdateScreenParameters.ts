@@ -17,7 +17,6 @@ import {
 import { Node } from '../../methods/graph_types';
 import { MethodDescription } from '../../interface/methodprops';
 import { FunctionTypes, MethodFunctions } from '../../constants/functiontypes';
-import { parameter } from '../../components/editor.main.css';
 
 export default async function UpdateScreenParameters(args: any = {}) {
 	let screens = NodesByType(null, NodeTypes.Screen);
