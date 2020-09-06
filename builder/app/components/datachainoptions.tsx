@@ -86,7 +86,7 @@ export default class DataChainOptions extends Component<any, any> {
 					dataChainOptions={dataChainOptions}
 					onChange={onchange}
 				/>
-				<CompareEnumeration
+				{/* <CompareEnumeration
 					dataChainType={this.props.dataChainType}
 					methodDescription={methodDescription}
 					dataChainOptions={dataChainOptions}
@@ -97,7 +97,7 @@ export default class DataChainOptions extends Component<any, any> {
 					methodDescription={methodDescription}
 					dataChainOptions={dataChainOptions}
 					onChange={onchange}
-				/>
+				/> */}
 				<SetBooleanComponent
 					dataChainType={this.props.dataChainType}
 					methodDescription={methodDescription}

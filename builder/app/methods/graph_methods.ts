@@ -3204,7 +3204,6 @@ export function updateNodeProperty(graph: any, options: any) {
 			});
 
 		if (NodePropertiesDirtyChain[prop]) {
-      console.log(prop);
       const temps = NodePropertiesDirtyChain[prop];
 			temps.forEach((temp: any) => {
 				if (!graph.nodeLib[id].dirty[temp.chainProp]) {

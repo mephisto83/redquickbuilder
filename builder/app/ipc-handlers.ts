@@ -62,7 +62,6 @@ export default class IPCHandlers {
 	static setup(mainWindow: any) {
 		let submenu: any = [];
 		ipcMain.on('message', (event, arg) => {
-			console.log(arg); // prints "ping"
 			let msg = JSON.parse(arg);
 			handle(msg)
 				.then((res) => {
@@ -75,12 +74,10 @@ export default class IPCHandlers {
 					);
 				})
 				.catch((v) => {
-					console.log(v);
 				});
 		});
 		ipcMain.on('load-configs', (event, args) => {
 			console.log('load-configs');
-			console.log(args);
 			let res = loadApplicationConfig();
 			event.sender.send(
 				'load-configs-reply',
@@ -92,7 +89,6 @@ export default class IPCHandlers {
 		});
 		ipcMain.on('save-config', (event, arg) => {
 			console.log('save-config');
-			console.log(arg);
 			let { folder, key } = JSON.parse(arg);
 			storeApplicationConfig(folder, key).then((res) => {
 				console.log('config update');
@@ -137,6 +133,21 @@ export default class IPCHandlers {
 				submenu: submenu2
 			})
 		);
+		let temp = new Menu();
+		temp.append(
+			new MenuItem({
+				label: 'Developer Tools',
+				click: () => {
+					mainWindow.webContents.openDevTools();
+				}
+			})
+		);
+		menu2.append(
+			new MenuItem({
+				label: 'Help',
+				submenu: temp
+			})
+		);
 
 		Menu.setApplicationMenu(menu2);
 	}
@@ -177,22 +188,22 @@ export function getAppConfigPathSync($folder?: string) {
 }
 async function storeApplicationConfig(folder: string, key: string) {
 	console.log('store application config');
-	// let application = 'applicationConfig.json';
-	// let applicationPathReq = path.join(getAppConfigPath('reqthread'), application);
-	// let applicationPath = path.join(getAppConfigPath(), application);
-	// if (!fs.existsSync(applicationPath)) {
-	// 	fs.writeFileSync(applicationPath, JSON.stringify({}), 'utf8');
-	// }
-	// let file_contents = fs.readFileSync(applicationPath, 'utf8');
-	// let applicationConfiguration: any = JSON.parse(file_contents);
-	// if (applicationConfiguration) {
-	// 	applicationConfiguration[key] = folder;
-	// }
+	let application = 'applicationConfig.json';
+	let applicationPathReq = path.join(getAppConfigPath('reqthread'), application);
+	let applicationPath = path.join(getAppConfigPath(), application);
+	if (!fs.existsSync(applicationPath)) {
+		fs.writeFileSync(applicationPath, JSON.stringify({}), 'utf8');
+	}
+	let file_contents = fs.readFileSync(applicationPath, 'utf8');
+	let applicationConfiguration: any = JSON.parse(file_contents);
+	if (applicationConfiguration) {
+		applicationConfiguration[key] = folder;
+	}
 
-	// fs.writeFileSync(applicationPathReq, JSON.stringify(applicationConfiguration), 'utf8');
-	// fs.writeFileSync(applicationPath, JSON.stringify(applicationConfiguration), 'utf8');
+	fs.writeFileSync(applicationPathReq, JSON.stringify(applicationConfiguration), 'utf8');
+	fs.writeFileSync(applicationPath, JSON.stringify(applicationConfiguration), 'utf8');
 
-	// return applicationConfiguration;
+	return applicationConfiguration;
 	// setVisual(ApplicationConfig, applicationConfiguration)(dispatch, getState);
 }
 
@@ -206,8 +217,8 @@ export function loadApplicationConfig() {
 		fs.writeFileSync(applicationPath, JSON.stringify(applicationConfiguration), 'utf8');
 
 		return applicationConfiguration;
-  }
-  return {};
+	}
+	return {};
 	// setVisual(ApplicationConfig, applicationConfiguration)(dispatch, getState);
 }
 
@@ -225,10 +236,11 @@ const throttle: any = (func: any, limit: any, context: any) => {
 let communicationTower: CommunicationTower;
 function setupCommunicationTower(mainWindowFunc: any) {
 	communicationTower = new CommunicationTower();
+	let commPort = Math.floor(Math.random() * 5000) + 5000;
 	communicationTower.init({
 		agentName: 'RedQuickBuilder',
 		baseFolder: JobServiceConstants.JobPath(),
-		serverPort: 8001,
+		serverPort: commPort,
 		topDirectory: '../../jobrunner'
 	});
 
@@ -253,7 +265,7 @@ function setupCommunicationTower(mainWindowFunc: any) {
 		}
 	});
 	console.log('set command center');
-	setCommandCenter(7972, 8001);
+	setCommandCenter(7972, commPort);
 }
 function setCommandCenter(targetPort: number, port: number) {
 	return Promise.resolve()
@@ -277,6 +289,7 @@ function setCommandCenter(targetPort: number, port: number) {
 				}
 			}
 		})
+		.catch(() => {})
 		.then(async () => {
 			await sleep(300000);
 		})

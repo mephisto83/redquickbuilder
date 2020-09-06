@@ -10,6 +10,7 @@ export interface RunnerContext {
 export interface CommandCenter {
 	commandCenterPort: any;
 	id: string;
+	failedCalls?: number;
 	commandCenterHost: any;
 }
 export interface Agents {

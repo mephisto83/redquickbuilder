@@ -48,6 +48,8 @@ import { Link } from 'react-router-dom';
 import { IfFalse } from '../components/titles';
 import { platform } from 'os';
 import { NodeTypeColors } from '../constants/nodetypes';
+// import { loadConfigs } from './ipcActions';
+// import { loadConfigs } from './ipcActions';
 const ipcRenderer = require('electron').ipcRenderer;
 const remote = require('electron').remote;
 
@@ -500,6 +502,9 @@ let contextConfig: any = { $path: '', $applicationConfig: {} };
 export function setAppConfigPath($path: string, $applicationConfig: any) {
 	contextConfig.$path = $path;
 	contextConfig.$applicationConfig = $applicationConfig;
+	let dispatch = GetDispatchFunc();
+	let getState = GetStateFunc();
+	if (dispatch && getState) setVisual(ApplicationConfig, $applicationConfig)(dispatch, getState);
 }
 export function getApplicationConfig() {
 	return contextConfig.$applicationConfig;
@@ -519,7 +524,6 @@ export function getAppConfigPathSync($folder?: string) {
 	return contextConfig.$path;
 }
 async function storeApplicationConfig(folder: string, key: string, dispatch: any, getState: any) {
-
 	const { ipcRenderer } = require('electron');
 	ipcRenderer.send('save-config', JSON.stringify({ folder, key }));
 	// setVisual(ApplicationConfig, applicationConfiguration)(dispatch, getState);
@@ -528,10 +532,11 @@ export function updateConfig(applicationConfiguration: any) {
 	if (GetDispatchFunc()) setVisual(ApplicationConfig, applicationConfiguration)(GetDispatchFunc(), GetStateFunc());
 }
 
-export function loadApplicationConfig() {
+export function loadApplicationConfigUI() {
 	return (dispatch: any, getState: any) => {
-		Promise.resolve().then(async () => {
-		});
+		//  loadConfigs();
+		const { ipcRenderer } = require('electron');
+		ipcRenderer.send('load-configs', 'ok');
 	};
 }
 

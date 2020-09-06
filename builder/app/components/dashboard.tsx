@@ -180,7 +180,9 @@ class Dashboard extends Component<any, any> {
 		this.props.setRemoteState();
 		this.props.setVisual(UIA.NODE_COST, 1);
 		this.props.setVisual(UIA.NODE_CONNECTION_COST, 0.2);
-		this.props.loadApplicationConfig();
+		setTimeout(() => {
+			this.props.loadApplicationConfigUI();
+		}, 5000);
 	}
 
 	minified() {

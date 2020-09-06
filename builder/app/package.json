@@ -1,17 +1,17 @@
 {
-  "name": "red-quick-builder",
-  "productName": "red-quick-builder",
-  "version": "1.1.6",
-  "description": "Red Quick Builder",
-  "main": "./main.prod.js",
-  "author": {
     "name": "red-quick-builder",
-    "email": "mephisto8335@gmail.com"
-  },
-  "scripts": {
-    "electron-rebuild": "node -r ../internals/scripts/BabelRegister.js ../internals/scripts/ElectronRebuild.js",
-    "postinstall": "yarn electron-rebuild"
-  },
-  "license": "MIT",
-  "dependencies": {}
+    "productName": "red-quick-builder",
+    "version": "1.1.30",
+    "description": "Red Quick Builder",
+    "main": "./main.prod.js",
+    "author": {
+        "name": "red-quick-builder",
+        "email": "mephisto8335@gmail.com"
+    },
+    "scripts": {
+        "electron-rebuild": "node -r ../internals/scripts/BabelRegister.js ../internals/scripts/ElectronRebuild.js",
+        "postinstall": "yarn electron-rebuild"
+    },
+    "license": "MIT",
+    "dependencies": {}
 }

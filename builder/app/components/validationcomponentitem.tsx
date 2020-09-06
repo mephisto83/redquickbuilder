@@ -96,19 +96,6 @@ export default class ValidationComponentItem extends Component<any, any> {
 						value={validationConfig.autoCalculate}
 					/>
 				</TreeViewItemContainer>
-				{originalConfig && originalConfig !== validationConfig.id ? null : validationConfig &&
-				validationConfig.dataChain ? (
-					<DataChainOptions
-						methods={this.props.methods}
-						onContext={this.props.onContext}
-						name={validationConfig.name}
-						methodDescription={this.props.methodDescription}
-						currentDescription={mountingItem}
-						dataChainType={this.props.dataChainType || DataChainType.Validation}
-						previousEffect={this.props.previousEffect}
-						dataChainOptions={validationConfig.dataChainOptions}
-					/>
-				) : null}
 				<TreeViewButtonGroup>
 					<TreeViewGroupButton
 						title={`${Titles.Delete}`}
@@ -182,6 +169,19 @@ export default class ValidationComponentItem extends Component<any, any> {
 						/>
 					</TreeViewItemContainer>
 				</TreeViewButtonGroup>
+				{originalConfig && originalConfig !== validationConfig.id ? null : validationConfig &&
+				validationConfig.dataChain ? (
+					<DataChainOptions
+						methods={this.props.methods}
+						onContext={this.props.onContext}
+						name={validationConfig.name}
+						methodDescription={this.props.methodDescription}
+						currentDescription={mountingItem}
+						dataChainType={this.props.dataChainType || DataChainType.Validation}
+						previousEffect={this.props.previousEffect}
+						dataChainOptions={validationConfig.dataChainOptions}
+					/>
+				) : null}
 			</TreeViewMenu>
 		);
 	}
@@ -223,8 +223,8 @@ export function validationDataChain(
 						afterEffectOptions: validationConfig.dataChainOptions,
 						methods: methods,
 						routes: routes,
-            override: override,
-            validationConfig
+						override: override,
+						validationConfig
 					},
 					(dataChain: Node) => {
 						if (dataChain && UIA.GetNodeById(dataChain.id)) {

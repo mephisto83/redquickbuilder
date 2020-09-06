@@ -57,7 +57,7 @@ const createWindow = async () => {
 					}
 				: {
 						nodeIntegration: true,
-						// preload: path.join(__dirname, 'dist/renderer.prod.js')
+						preload: path.join(__dirname, 'dist', 'renderer.prod.js')
 					}
 	});
 
@@ -76,7 +76,8 @@ const createWindow = async () => {
 		} else {
 			mainWindow.show();
 			mainWindow.focus();
-		}
+    }
+    // mainWindow.webContents.openDevTools()
 	});
 
 	mainWindow.on('closed', () => {

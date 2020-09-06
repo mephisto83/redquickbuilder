@@ -94,7 +94,69 @@ export const ConditionTypes = {
 export const NodeTypeIcons: any = {};
 export function GetNodeTypeIcon(type: string | number) {
 	if (!NodeTypeIcons[type]) {
-		let files = fs.readdirSync('./app/css/svg');
+		let files: string[] = [];
+		try {
+			files = fs.readdirSync('./app/css/svg');
+		} catch (e) {
+			console.log(e);
+			try {
+				files = [
+					'001-flan.svg',
+					'002-ice cream.svg',
+					'003-cupcake.svg',
+					'004-donut.svg',
+					'005-milkshake.svg',
+					'006-ice cream cup.svg',
+					'007-chocolate bar.svg',
+					'008-candy.svg',
+					'009-ice cream cup.svg',
+					'010-apple pie.svg',
+					'011-cookie.svg',
+					'012-piece of cake.svg',
+					'013-cake.svg',
+					'014-bread roll.svg',
+					'015-croissant.svg',
+					'016-pancakes.svg',
+					'017-lollipop.svg',
+					'018-cotton candy.svg',
+					'019-chocolate bar.svg',
+					'020-marshmallow.svg',
+					'021-jelly.svg',
+					'022-jam.svg',
+					'023-honey.svg',
+					'024-macaron.svg',
+					'025-candy cane.svg',
+					'026-popsicle.svg',
+					'027-meringue.svg',
+					'028-cookie.svg',
+					'029-cake pop.svg',
+					'030-candy.svg',
+					'031-apple.svg',
+					'032-candy.svg',
+					'033-watermelon.svg',
+					'034-ice cream sandwich.svg',
+					'035-bread roll.svg',
+					'036-jelly beans.svg',
+					'037-crepe.svg',
+					'038-waffle.svg',
+					'039-cookie jar.svg',
+					'040-cookie.svg',
+					'041-strawberry.svg',
+					'042-candy jar.svg',
+					'043-hot chocolate.svg',
+					'044-orange juice.svg',
+					'045-gummy.svg',
+					'046-bonbon.svg',
+					'047-chocolate sticks.svg',
+					'048-bread roll.svg',
+					'049-lollipop.svg',
+					'050-lollipop.svg'
+				];
+			} catch (e) {
+				console.log(e);
+			}
+		}
+
 		Object.values(NodeTypes).map((key, index) => {
 			NodeTypeIcons[key] = `./css/svg/${files[index % files.length]}`;
 		});

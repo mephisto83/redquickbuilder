@@ -568,21 +568,28 @@ export function CreateSimpleValidation(): SimpleValidationConfig {
 		urlEmpty: CreateBoolean(),
 		zip: CreateBoolean(),
 		zipEmpty: CreateBoolean(),
-		maxLength: {
-			id: GUID(),
-			enabled: false,
-			value: '500'
-		},
-		minLength: {
-			id: GUID(),
-			enabled: false,
-			value: '1'
-		},
+
+		minLength: CreateMinLength(),
+		maxLength: CreateMaxLength(),
 		areEqual: CreateAreEqual(),
 		isContained: CreateAreEqual(),
 		isNotContained: CreateAreEqual(),
 		isIntersecting: CreateAreEqual(),
 		oneOf: CreateOneOf()
+	};
+}
+export function CreateMaxLength(len?: string) {
+	return {
+		id: GUID(),
+		enabled: false,
+		value: len || '500'
+	};
+}
+export function CreateMinLength(len?: string) {
+	return {
+		id: GUID(),
+		enabled: false,
+		value: len || '1'
 	};
 }
 export function CreateBoolean(): BooleanConfig {
@@ -598,6 +605,48 @@ export function CreateOneOf(): EnumerationConfig {
 		enumerationType: '',
 		enumerations: []
 	};
+}
+export function clearSimpleValidation(config: SimpleValidationConfig): SimpleValidationConfig {
+	config.agent = '';
+	config.agentProperty = '';
+	config.alphaNumeric.enabled = false;
+	config.alphaOnly.enabled = false;
+	config.alphaOnlyWithSpaces.enabled = false;
+	config.areEqual.enabled = false;
+	config.creditCard.enabled = false;
+	config.email.enabled = false;
+	config.emailEmpty.enabled = false;
+	config.enabled = false;
+	config.isContained.enabled = false;
+	config.isFalse.enabled = false;
+	config.isIntersecting.enabled = false;
+	config.isNotContained.enabled = false;
+	config.isNotNull.enabled = false;
+	config.isNull.enabled = false;
+	config.isContained.enabled = false;
+	config.isStrech = false;
+	config.isTrue.enabled = false;
+	config.maxLength.enabled = false;
+	config.minLength.enabled = false;
+	config.model = '';
+	config.modelOutput = '';
+	config.modelProperty = '';
+	config.name = '';
+	config.numericInt.enabled = false;
+	config.oneOf.enabled = false;
+	config.parent = '';
+	config.parentProperty = '';
+	config.relationType = RelationType.Agent;
+	config.requireLowercase.enabled = false;
+	config.requireNonAlphanumeric.enabled = false;
+	config.requireUppercase.enabled = false;
+	config.socialSecurity.enabled = false;
+	config.targetProperty = '';
+	config.url.enabled = false;
+	config.urlEmpty.enabled = false;
+	config.zip.enabled = false;
+	config.zipEmpty.enabled = false;
+	return config;
 }
 export function CreateAreEqual(): AreEqualConfig {
 	return {

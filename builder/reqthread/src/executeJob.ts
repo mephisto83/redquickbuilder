@@ -55,7 +55,8 @@ export default async function executeJob(
 	onProgress: Function
 ) {
 	let jobInstancePath = path.join(options.folderPath, options.agentName, options.projectName, options.fileName);
-	SetPause(true);
+  SetPause(true);
+  console.log(`----------jobInstancePath:  ${jobInstancePath} -----------`)
 	const partPath = path.join(jobInstancePath, JobServiceConstants.INPUT);
 	if (partPath && fs.existsSync(partPath)) {
 		const partContent: string = fs.readFileSync(partPath, 'utf8');

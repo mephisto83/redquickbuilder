@@ -50,7 +50,11 @@ export async function CreateComponentSharedAll(progressFunc: any, filter?: any, 
 			if (filter && !filter(model)) {
 				return;
 			}
-			console.log(`Creating shared components for : ${GetNodeTitle(model)}.${GetNodeTitle(property)}`);
+			console.log(
+				`Creating shared components for :[${GetNodeProp(viewType, NodeProperties.ViewType)}] ${GetNodeTitle(
+					model
+				)}.${GetNodeTitle(property)}`
+			);
 			CreateComponentModel({
 				model: model.id,
 				viewTypeModelId: viewType.id,

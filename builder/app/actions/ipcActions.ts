@@ -53,7 +53,7 @@ import {
 	newGraph,
 	toggleVisualKey,
 	setAppConfigPath,
-  updateConfig
+	updateConfig
 } from './remoteActions';
 import ThemeServiceGenerator from '../generators/themeservicegenerator';
 import ModelGenerator from '../generators/modelgenerators';
@@ -61,8 +61,8 @@ import ModelGenerator from '../generators/modelgenerators';
 const { ipcRenderer } = require('electron');
 const REACTWEB = 'reactweb';
 const hub: any = {};
+
 ipcRenderer.on('message-reply', (event, arg) => {
-	console.log(arg); // prints "pong"
 	const reply = JSON.parse(arg);
 	if (hub[reply.id]) {
 		hub[reply.id].resolve(reply.msg || reply.body);
@@ -78,15 +78,14 @@ ipcRenderer.on('update-jobs', (event, arg) => {
 	}
 });
 ipcRenderer.on('config-update', (event, targ) => {
+  console.log('received config update')
   let arg = JSON.parse(targ);
-  if(arg && arg.body){
-    updateConfig(arg.body);
-  }
+	if (arg && arg.body) {
+		updateConfig(arg.body);
+	}
 });
 ipcRenderer.on('commands', (event, targ) => {
-	console.log(event);
 	let arg = JSON.parse(targ);
-	console.log(arg);
 	try {
 		switch (arg.args) {
 			case 'w':
@@ -142,7 +141,6 @@ ipcRenderer.on('commands', (event, targ) => {
 		console.log(e);
 	}
 });
-
 ipcRenderer.on('load-configs-reply', (event, arg) => {
 	console.log(arg); // prints "pong"
 	let temp = JSON.parse(arg);
@@ -150,7 +148,8 @@ ipcRenderer.on('load-configs-reply', (event, arg) => {
 		setAppConfigPath(temp.folder, temp.body);
 	}
 });
-ipcRenderer.send('load-configs', 'ok');
+export function loadConfigs() {
+}
 
 function message(msg: any, body: any) {
 	return {

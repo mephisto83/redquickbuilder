@@ -30,7 +30,11 @@ import {
 	CreateOneOf,
 	CreateBoolean,
 	GetSimpleValidationId,
-	SimpleValidationsConfiguration
+	SimpleValidationsConfiguration,
+	CreateAreEqual,
+	clearSimpleValidation,
+	CreateMaxLength,
+	CreateMinLength
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
@@ -51,6 +55,7 @@ import NumberConfigComponent from './numberconfigcomponent';
 import OneOfEnumerationComponent from './oneofenumeration';
 import EqualityConfigComponent from './equalityconfigcomponent';
 import TreeViewItem from './treeviewitem';
+import { GetNodeProp } from '../methods/graph_methods';
 
 export default class SimpleValidationComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -154,6 +159,153 @@ export default class SimpleValidationComponent extends Component<any, any> {
 						}
 					}}
 				/>
+				<TreeViewButtonGroup>
+					<TreeViewGroupButton
+						title={`${Titles.Delete}`}
+						onClick={() => {
+							if (this.props.onDelete) {
+								this.props.onDelete();
+								if (this.props.onChange) {
+									this.props.onChange();
+								}
+							}
+						}}
+						icon="fa fa-minus"
+					/>
+					<TreeViewGroupButton
+						title={`${Titles.Copy}`}
+						onClick={() => {
+							UIA.CopyToContext(
+								simpleValidation,
+								UIA.CopyType.SimpleValidation,
+								methodDescription.properties.model,
+								methodDescription.properties.agent,
+								simpleValidation.name
+							);
+						}}
+						icon="fa fa-copy"
+					/>
+					<TreeViewGroupButton
+						title={`${Titles.Paste}`}
+						onClick={() => {
+							let parts = UIA.GetSelectedCopyContext(
+								UIA.CopyType.SimpleValidation,
+								methodDescription.properties.model,
+								methodDescription.properties.agent
+							);
+							let dataChainOptions: DataChainConfiguration = this.props.dataChainOptions;
+							dataChainOptions.simpleValidations = dataChainOptions.simpleValidations || [];
+							dataChainOptions.simpleValidations.push(...parts.map((v) => v.obj));
+						}}
+						icon="fa fa-paste"
+					/>
+					<TreeViewGroupButton
+						title={`${Titles.IsOwnedByAgents}`}
+						onClick={() => {
+							clearSimpleValidation(simpleValidation);
+							simpleValidation.enabled = true;
+							simpleValidation.relationType = RelationType.Agent;
+							if (methodDescription.properties.agent) {
+								simpleValidation.agent = methodDescription.properties.agent;
+								let idProp: Node = UIA.GetModelPropertyChildren(simpleValidation.agent).find(
+									(v: any) => GetNodeProp(v, NodeProperties.UIText) === 'Id'
+								);
+								if (idProp) {
+									simpleValidation.agentProperty = idProp.id;
+								}
+							}
+							if (methodDescription.properties.model) {
+								simpleValidation.areEqual = CreateAreEqual();
+								simpleValidation.areEqual.enabled = true;
+								simpleValidation.areEqual.model = methodDescription.properties.model;
+								let ownerProp: Node = UIA.GetModelPropertyChildren(
+									simpleValidation.areEqual.model
+								).find((v: any) => GetNodeProp(v, NodeProperties.UIText) === 'Owner');
+								simpleValidation.areEqual.modelProperty = ownerProp.id;
+								simpleValidation.areEqual.relationType = RelationType.Model;
+							}
+							simpleValidation.name = `The ${UIA.GetNodeTitle(
+								methodDescription.properties.agent
+							)} owns the ${UIA.GetNodeTitle(methodDescription.properties.model)}`;
+							this.setState({ turn: Date.now() });
+						}}
+						icon="fa  fa-user-secret"
+					/>
+					<TreeViewGroupButton
+						title={`Agent ${Titles.IsNotDeleted}`}
+						onClick={() => {
+							clearSimpleValidation(simpleValidation);
+							simpleValidation.enabled = true;
+							simpleValidation.relationType = RelationType.Agent;
+							if (methodDescription.properties.agent) {
+								simpleValidation.agent = methodDescription.properties.agent;
+								let idProp: Node = UIA.GetModelPropertyChildren(simpleValidation.agent).find(
+									(v: any) => GetNodeProp(v, NodeProperties.UIText) === 'Deleted'
+								);
+								if (idProp) {
+									simpleValidation.agentProperty = idProp.id;
+								}
+							}
+							simpleValidation.isFalse = CreateBoolean();
+							simpleValidation.isFalse.enabled = true;
+							simpleValidation.name = `The ${UIA.GetNodeTitle(
+								methodDescription.properties.agent
+							)} is not deleted`;
+							this.setState({ turn: Date.now() });
+						}}
+						icon="fa  fa-shekel"
+					/>
+					<TreeViewGroupButton
+						title={`Model ${Titles.IsNotDeleted}`}
+						onClick={() => {
+							clearSimpleValidation(simpleValidation);
+							simpleValidation.enabled = true;
+							simpleValidation.relationType = RelationType.Model;
+							if (methodDescription.properties.model) {
+								simpleValidation.model = methodDescription.properties.model;
+								let idProp: Node = UIA.GetModelPropertyChildren(simpleValidation.model).find(
+									(v: any) => GetNodeProp(v, NodeProperties.UIText) === 'Deleted'
+								);
+								if (idProp) {
+									simpleValidation.modelProperty = idProp.id;
+								}
+							}
+							simpleValidation.isFalse = CreateBoolean();
+							simpleValidation.isFalse.enabled = true;
+							simpleValidation.name = `The ${UIA.GetNodeTitle(
+								methodDescription.properties.model
+							)} is not deleted`;
+							this.setState({ turn: Date.now() });
+						}}
+						icon="fa fa-rouble"
+					/>
+					<TreeViewGroupButton
+						title={`Is Valid ${Titles.Name}`}
+						onClick={() => {
+							let oldProp = simpleValidation.modelProperty;
+							clearSimpleValidation(simpleValidation);
+							simpleValidation.modelProperty = oldProp;
+							simpleValidation.enabled = true;
+							simpleValidation.relationType = RelationType.Model;
+							if (methodDescription.properties.model) {
+								simpleValidation.model = methodDescription.properties.model;
+							}
+							simpleValidation.maxLength = CreateMaxLength();
+							simpleValidation.maxLength.enabled = true;
+							simpleValidation.minLength = CreateMinLength();
+							simpleValidation.minLength.enabled = true;
+							simpleValidation.alphaOnlyWithSpaces = CreateBoolean();
+							simpleValidation.alphaOnlyWithSpaces.enabled = true;
+							simpleValidation.name = `The ${UIA.GetNodeTitle(
+								methodDescription.properties.model
+							)}${simpleValidation.modelProperty ? `'s` : ''} ${simpleValidation.modelProperty
+								? UIA.GetNodeTitle(simpleValidation.modelProperty)
+								: ''} is a valid name`;
+							this.setState({ turn: Date.now() });
+						}}
+						icon="fa  fa-jpy"
+					/>
+				</TreeViewButtonGroup>
 				<RelativeTypeComponent
 					methodDescription={methodDescription}
 					relations={simpleValidation}
@@ -313,47 +465,6 @@ export default class SimpleValidationComponent extends Component<any, any> {
 					booleanConfig={simpleValidation.alphaOnlyWithSpaces}
 					title={Titles.AlphaOnlyWithSpaces}
 				/>
-				<TreeViewButtonGroup>
-					<TreeViewGroupButton
-						title={`${Titles.Delete}`}
-						onClick={() => {
-							if (this.props.onDelete) {
-								this.props.onDelete();
-								if (this.props.onChange) {
-									this.props.onChange();
-								}
-							}
-						}}
-						icon="fa fa-minus"
-					/>
-					<TreeViewGroupButton
-						title={`${Titles.Copy}`}
-						onClick={() => {
-							UIA.CopyToContext(
-								simpleValidation,
-								UIA.CopyType.SimpleValidation,
-								methodDescription.properties.model,
-								methodDescription.properties.agent,
-								simpleValidation.name
-							);
-						}}
-						icon="fa fa-copy"
-					/>
-					<TreeViewGroupButton
-						title={`${Titles.Paste}`}
-						onClick={() => {
-							let parts = UIA.GetSelectedCopyContext(
-								UIA.CopyType.SimpleValidation,
-								methodDescription.properties.model,
-								methodDescription.properties.agent
-							);
-							let dataChainOptions: DataChainConfiguration = this.props.dataChainOptions;
-							dataChainOptions.simpleValidations = dataChainOptions.simpleValidations || [];
-							dataChainOptions.simpleValidations.push(...parts.map((v) => v.obj));
-						}}
-						icon="fa fa-paste"
-					/>
-				</TreeViewButtonGroup>
 			</TreeViewMenu>
 		);
 	}

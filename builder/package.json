@@ -23,6 +23,7 @@
     "package-mac": "yarn build && electron-builder build --mac",
     "package-linux": "yarn build && electron-builder build --linux",
     "package-win": "yarn build && electron-builder build --win --x64",
+    "pack-win": "node updateversion.js && npm run package-win",
     "postinstall": "node -r @babel/register internals/scripts/CheckNativeDep.js && electron-builder install-app-deps && yarn build-dll && opencollective-postinstall",
     "postlint-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.{js,jsx,json,html,css,less,scss,yml}'",
     "postlint-styles-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.{css,scss}'",
@@ -65,11 +66,20 @@
     "appId": "mephistowa.redquick.builder",
     "files": [
       "dist/",
+      "templates/",
       "node_modules/",
       "app.html",
       "app.global.css",
       "typeahead.css",
+      "components/",
+      "bower_components/",
+      "cake/",
       "typeahead.css.d.ts",
+      "css/",
+      "css/svg/",
+      "css/goo-menu.css",
+      "css/skins/",
+      "css/alt/",
       "app.global.css.d.ts",
       "ipc-handlers.ts",
       "app.icns",
@@ -114,7 +124,7 @@
       "provider": "github",
       "owner": "mephisto83",
       "repo": "mephisto83",
-      "private": false
+      "private": true
     }
   },
   "repository": {
