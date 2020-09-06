@@ -61,6 +61,16 @@ export default class ValidationComponentItem extends Component<any, any> {
 					active
 					title={'Sentence Input'}
 					onClick={() => {
+						if (!this.state.sentence) {
+							if (validationConfig.dataChainOptions) {
+								let { simpleValidations } = validationConfig.dataChainOptions;
+								if (simpleValidations) {
+									this.setState({
+										sentences: simpleValidations.map((v) => v.name).filter((v) => v).join(NEW_LINE)
+									});
+								}
+							}
+						}
 						this.setState({
 							sentence: !this.state.sentence
 						});
@@ -93,78 +103,95 @@ export default class ValidationComponentItem extends Component<any, any> {
 
 										let { simpleValidations } = validationConfig.dataChainOptions;
 										if (simpleValidations) {
-											let newSimpleValidations: SimpleValidationConfig[] = results.map(
-												(meaning: NLMeaning) => {
-													let simpleValidation = CreateSimpleValidation();
-													simpleValidation.enabled = true;
-													simpleValidation.name = meaning.text;
-													if (meaning.actorClause.relationType) {
-														simpleValidation.relationType =
-															meaning.actorClause.relationType;
-														setupRelation(simpleValidation, meaning.actorClause);
-													}
-													switch (meaning.methodType) {
-														case NLMethodType.AreEqual:
-															let areEqual = CreateAreEqual();
-															if (meaning.targetClause.relationType) {
-																areEqual.enabled = true;
-																areEqual.relationType =
-																	meaning.targetClause.relationType;
-																setupAreEqual(areEqual, meaning.targetClause);
-																simpleValidation.areEqual = areEqual;
-															}
-															break;
-														case NLMethodType.Contains:
-														case NLMethodType.MatchEnumeration:
-															let oneOf = CreateOneOf();
-															if (meaning.targetClause.enumeration) {
-																oneOf.enabled = true;
-																oneOf.enumerationType =
-																	meaning.targetClause.enumeration;
-																if (meaning.targetClause.enumerations) {
-																	oneOf.enumerations =
-																		meaning.targetClause.enumerations;
-																}
-															}
-															break;
-														case NLMethodType.Intersects:
-															let intersecting = CreateAreEqual();
-															if (meaning.targetClause.relationType) {
-																intersecting.enabled = true;
-																intersecting.relationType =
-																	meaning.targetClause.relationType;
-																setupAreEqual(intersecting, meaning.targetClause);
-																simpleValidation.isIntersecting = intersecting;
-															}
-															break;
-														case NLMethodType.IsFalse:
-														case NLMethodType.IsTrue:
-														case NLMethodType.IsA:
-															if (meaning.validation) {
-																Object.entries(
-																	meaning.validation
-																).forEach((temp: any) => {
-																	let [ key, value ] = temp;
-																	if (!value) return;
-																	let nlvc: any = NLValidationClauses;
-																	if (nlvc[key] && nlvc[key].$property) {
-																		Object.entries(
-																			nlvc[key].$property
-																		).forEach((entry: any) => {
-																			let [ key, value ] = entry;
-																			let proxy: any = simpleValidation;
-																			proxy[key] = value();
-																			proxy[key].enabled = true;
-																		});
-																	}
-																});
-															}
-															break;
-													}
-													return simpleValidation;
+											let newSimpleValidations: any[] = results.map((meaning: NLMeaning) => {
+												let simpleValidation = CreateSimpleValidation();
+												simpleValidation.enabled = true;
+												simpleValidation.name = meaning.text;
+												if (meaning.actorClause.relationType) {
+													simpleValidation.relationType = meaning.actorClause.relationType;
+													setupRelation(simpleValidation, meaning.actorClause);
 												}
-											);
+												switch (meaning.methodType) {
+													case NLMethodType.AreEqual:
+														let areEqual = CreateAreEqual();
+														if (meaning.targetClause.relationType) {
+															areEqual.enabled = true;
+															areEqual.relationType = meaning.targetClause.relationType;
+															setupAreEqual(areEqual, meaning.targetClause);
+															simpleValidation.areEqual = areEqual;
+														}
+														break;
+													case NLMethodType.Contains:
+													case NLMethodType.MatchEnumeration:
+														let oneOf = CreateOneOf();
+														if (meaning.targetClause.enumeration) {
+															oneOf.enabled = true;
+															oneOf.enumerationType = meaning.targetClause.enumeration;
+															if (meaning.targetClause.enumerations) {
+																oneOf.enumerations = meaning.targetClause.enumerations;
+															}
+														}
+														break;
+													case NLMethodType.Intersects:
+														let intersecting = CreateAreEqual();
+														if (meaning.targetClause.relationType) {
+															intersecting.enabled = true;
+															intersecting.relationType =
+																meaning.targetClause.relationType;
+															setupAreEqual(intersecting, meaning.targetClause);
+															simpleValidation.isIntersecting = intersecting;
+														}
+														break;
+													case NLMethodType.IsFalse:
+													case NLMethodType.IsTrue:
+													case NLMethodType.IsA:
+														if (meaning.validation) {
+															Object.entries(meaning.validation).forEach((temp: any) => {
+																let [ key, value ] = temp;
+																if (!value) return;
+																let nlvc: any = NLValidationClauses;
+																if (nlvc[key] && nlvc[key].$property) {
+																	Object.entries(
+																		nlvc[key].$property
+																	).forEach((entry: any) => {
+																		let [ key, value ] = entry;
+																		let proxy: any = simpleValidation;
+																		proxy[key] = value();
+																		proxy[key].enabled = true;
+																	});
+																}
+															});
+														}
+														break;
+												}
+												return simpleValidation;
+											});
 											if (newSimpleValidations) {
+												validationConfig.dataChainOptions.simpleValidations =
+													validationConfig.dataChainOptions.simpleValidations || [];
+												validationConfig.dataChainOptions.simpleValidations.length = 0;
+												validationConfig.dataChainOptions.simpleValidations.push(
+													...newSimpleValidations
+												);
+												let methods = this.props.methods;
+												let routes = this.props.routes;
+												let dataChainType = this.props.dataChainType;
+												let override = this.state.override;
+												autoNameGenerateDataChain(
+													validationConfig,
+													mountingItem,
+													dataChainType,
+													methods,
+													routes,
+													override
+												);
+
+												this.setState({
+													turn: UIA.GUID()
+												});
+												if (this.props.onChange) {
+													this.props.onChange();
+												}
 											}
 										}
 									}

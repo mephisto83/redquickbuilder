@@ -586,6 +586,11 @@ export const NLValidationClauses = {
 	},
 	IsFalse: {
 		isA: 'Validation',
-		$def: [ 'is false' ]
+		$def: [ 'is false' ],
+		$property: {
+			isFalse: () => {
+				return CreateBoolean();
+			}
+		}
 	}
 };
