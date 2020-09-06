@@ -52,6 +52,8 @@ import {
 } from '../methods/graph_methods';
 import { ViewTypes } from '../constants/viewtypes';
 import BuildAgentAccessWeb from '../nodepacks/BuildAgentAccessWeb';
+import NLPService, { updateWorld } from '../service/naturallang';
+
 import SelectInput from './selectinput';
 import {
 	FunctionTypes,
@@ -84,6 +86,7 @@ import ContentInfo from './contentinfo';
 import { RouterRootState } from 'connected-react-router';
 import { multiple } from './editor.main.css';
 import { mount } from 'enzyme';
+import getLanguageMeaning from '../service/naturallang';
 
 const AGENT_ACCESS_VIEW_TAB = 'agent -access-view-tab';
 
@@ -465,6 +468,8 @@ class AgentAccessView extends Component<any, any> {
 										className="btn btn-default btn-flat"
 										onClick={(evt) => {
 											evt.stopPropagation();
+                      updateWorld();
+                      getLanguageMeaning('');
 											const accessDescriptions = GetNodesByProperties(
 												{
 													[NodeProperties.NODEType]: NodeTypes.AgentAccessDescription
@@ -531,7 +536,7 @@ class AgentAccessView extends Component<any, any> {
 										className="btn btn-default btn-primary"
 										onClick={(evt) => {
 											evt.stopPropagation();
-											BuildAgentAccessWeb({ ...this.state });
+                      BuildAgentAccessWeb({ ...this.state });
 											return false;
 										}}
 									>

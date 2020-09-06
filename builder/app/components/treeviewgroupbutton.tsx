@@ -25,7 +25,7 @@ export default class TreeViewGroupButton extends Component<any, any> {
 					borderColor: 'transparent'
 				}}
 			>
-				<i className={this.props.icon} style={{ color: '#8aa4af' }} />
+				<i className={this.icon()} style={{ color: '#8aa4af' }} />
 				{this.props.plus ? (
 					<i
 						className={'fa fa-plus'}

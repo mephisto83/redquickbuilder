@@ -5,9 +5,18 @@ import * as Titles from './titles';
 import SelectInput from './selectinput';
 import TextInput from './textinput';
 import TreeViewMenu from './treeviewmenu';
-import { MountingDescription, ValidationConfig } from '../interface/methodprops';
+import {
+	MountingDescription,
+	ValidationConfig,
+	CreateAreEqual,
+	RelationType,
+	AreEqualConfig,
+	HalfRelation,
+	CreateSimpleValidation,
+	CreateOneOf
+} from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
-import { NodeTypes, NodeProperties, Methods } from '../constants/nodetypes';
+import { NodeTypes, NodeProperties, Methods, NEW_LINE } from '../constants/nodetypes';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import { Node } from '../methods/graph_types';
@@ -19,6 +28,8 @@ import { GetNodeProp } from '../methods/graph_methods';
 import Typeahead from './typeahead';
 import CheckBox from './checkbox';
 import { MethodFunctions } from '../constants/functiontypes';
+import getLanguageMeaning, { NLMeaning, NLMethodType, Clause, NLValidationClauses } from '../service/naturallang';
+import { SimpleValidationConfig } from '../../visi_blend/dist/app/interface/methodprops';
 
 export default class ValidationComponentItem extends Component<any, any> {
 	constructor(props: any) {
@@ -45,6 +56,119 @@ export default class ValidationComponentItem extends Component<any, any> {
 				active
 				title={this.props.otitle || validationConfig.name || this.props.title || Titles.Validation}
 			>
+				<TreeViewMenu
+					open={this.state.sentence}
+					active
+					title={'Sentence Input'}
+					onClick={() => {
+						this.setState({
+							sentence: !this.state.sentence
+						});
+					}}
+				>
+					<TreeViewItemContainer>
+						<TextInput
+							textarea
+							label={'Sentences'}
+							value={this.state.sentences}
+							onChange={(val: string) => {
+								this.setState({ sentences: val });
+							}}
+						/>
+					</TreeViewItemContainer>
+					<TreeViewButtonGroup>
+						<TreeViewGroupButton
+							icon="fa fa-star"
+							onClick={() => {
+								if (this.props.methodDescription && this.props.methodDescription.properties)
+									if (this.state.sentences) {
+										let results: NLMeaning[] = this.state.sentences
+											.split(NEW_LINE)
+											.filter((v: string) => v)
+											.map((line: string) => {
+												return getLanguageMeaning(line, {
+													...this.props.methodDescription.properties
+												});
+											});
+
+										let { simpleValidations } = validationConfig.dataChainOptions;
+										if (simpleValidations) {
+											let newSimpleValidations: SimpleValidationConfig[] = results.map(
+												(meaning: NLMeaning) => {
+													let simpleValidation = CreateSimpleValidation();
+													simpleValidation.enabled = true;
+													if (meaning.actorClause.relationType) {
+														simpleValidation.relationType =
+															meaning.actorClause.relationType;
+														setupRelation(simpleValidation, meaning.actorClause);
+													}
+													switch (meaning.methodType) {
+														case NLMethodType.AreEqual:
+															let areEqual = CreateAreEqual();
+															if (meaning.targetClause.relationType) {
+																areEqual.enabled = true;
+																areEqual.relationType =
+																	meaning.targetClause.relationType;
+																setupAreEqual(areEqual, meaning.targetClause);
+																simpleValidation.areEqual = areEqual;
+															}
+															break;
+														case NLMethodType.Contains:
+														case NLMethodType.MatchEnumeration:
+															let oneOf = CreateOneOf();
+															if (meaning.targetClause.enumeration) {
+																oneOf.enabled = true;
+																oneOf.enumerationType =
+																	meaning.targetClause.enumeration;
+																if (meaning.targetClause.enumerations) {
+																	oneOf.enumerations =
+																		meaning.targetClause.enumerations;
+																}
+															}
+															break;
+														case NLMethodType.Intersects:
+															let intersecting = CreateAreEqual();
+															if (meaning.targetClause.relationType) {
+																intersecting.enabled = true;
+																intersecting.relationType =
+																	meaning.targetClause.relationType;
+																setupAreEqual(intersecting, meaning.targetClause);
+																simpleValidation.isIntersecting = intersecting;
+															}
+															break;
+														case NLMethodType.IsFalse:
+														case NLMethodType.IsTrue:
+														case NLMethodType.IsA:
+															if (meaning.validation) {
+																Object.entries(
+																	meaning.validation
+																).forEach((temp: any) => {
+																	let [ key, value ] = temp;
+																	let nlvc: any = NLValidationClauses;
+																	if (nlvc[key] && nlvc[key].$property) {
+																		Object.entries(
+																			nlvc[key].$property
+																		).forEach((entry: any) => {
+																			let [ key, value ] = entry;
+																			let proxy: any = simpleValidation;
+																			proxy[key] = value();
+																		});
+																	}
+																});
+															}
+															break;
+													}
+													return simpleValidation;
+												}
+											);
+											if (newSimpleValidations) {
+											}
+										}
+									}
+							}}
+						/>
+					</TreeViewButtonGroup>
+				</TreeViewMenu>
 				<TreeViewItemContainer>
 					<TextInput
 						label={Titles.Name}
@@ -301,5 +425,78 @@ export function autoName(
 				}
 			}
 		}
+	}
+}
+
+function setupRelation(halfRelation: HalfRelation, clause: Clause) {
+	switch (halfRelation.relationType) {
+		case RelationType.Agent:
+			if (clause.agent) {
+				halfRelation.agent = clause.agent;
+				if (clause.property) {
+					halfRelation.agentProperty = clause.property;
+				}
+			}
+			break;
+		case RelationType.Model:
+			if (clause.agent) {
+				halfRelation.model = clause.agent;
+				if (clause.property) {
+					halfRelation.modelProperty = clause.property;
+				}
+			}
+			break;
+		case RelationType.ModelOuput:
+			if (clause.agent) {
+				halfRelation.modelOutput = clause.agent;
+				if (clause.property) {
+					halfRelation.modelOutputProperty = clause.property;
+				}
+			}
+			break;
+		case RelationType.Parent:
+			if (clause.agent) {
+				halfRelation.parent = clause.agent;
+				if (clause.property) {
+					halfRelation.parentProperty = clause.property;
+				}
+			}
+			break;
+	}
+}
+function setupAreEqual(areEqual: AreEqualConfig, clause: Clause) {
+	switch (areEqual.relationType) {
+		case RelationType.Agent:
+			if (clause.agent) {
+				areEqual.agent = clause.agent;
+				if (clause.property) {
+					areEqual.agentProperty = clause.property;
+				}
+			}
+			break;
+		case RelationType.Model:
+			if (clause.agent) {
+				areEqual.model = clause.agent;
+				if (clause.property) {
+					areEqual.modelProperty = clause.property;
+				}
+			}
+			break;
+		case RelationType.ModelOuput:
+			if (clause.agent) {
+				areEqual.modelOutput = clause.agent;
+				if (clause.property) {
+					areEqual.modelOutputProperty = clause.property;
+				}
+			}
+			break;
+		case RelationType.Parent:
+			if (clause.agent) {
+				areEqual.parent = clause.agent;
+				if (clause.property) {
+					areEqual.parentProperty = clause.property;
+				}
+			}
+			break;
 	}
 }

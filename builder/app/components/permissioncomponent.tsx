@@ -39,7 +39,8 @@ export default class PermissionComponent extends Component<any, any> {
 								enabled: true,
 								name: '',
 								dataChain: '',
-								dataChainOptions: {}
+								dataChainOptions: {},
+								autoCalculate: true
 							});
 
 							this.setState({ turn: UIA.GUID() });
@@ -53,7 +54,7 @@ export default class PermissionComponent extends Component<any, any> {
 							title={Titles.PermissionType}
 							onContext={this.props.onContext}
 							key={permissionConfig.id}
-							methodDescription={index && mountingItem ? null : mountingItem.methodDescription}
+							methodDescription={this.props.methodDescription}
 							mountingItem={mountingItem}
 							dataChainType={DataChainType.Permission}
 							onChange={() => {
