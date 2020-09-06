@@ -229,7 +229,7 @@ export default function getLanguageMeaning(
 	let temp = _nlp(text);
 	console.log(JSON.stringify(temp.possessives().json(), null, 4));
 	let booleanStuff = [ 'is true', 'is false' ];
-	let equals = [ 'must match', 'matches' ];
+	let equals = [ 'must match', 'matches', 'is equal to' ];
 	let isA = [ 'must be a', 'must be an', 'is a', 'is an', ...booleanStuff ];
 	let contains = [ 'contains a', 'contains an' ];
 	let intersects = [ 'intersects', 'intersects with' ];
@@ -245,11 +245,7 @@ export default function getLanguageMeaning(
 	if (understandableClause) {
 		let firstClause = temp.match(understandableClause).lookBehind().text();
 		let secondClause = temp.match(understandableClause).lookAhead().text();
-		if (
-			equals.find((item: string) => {
-				return temp.has(item);
-			})
-		) {
+		if (equals.find((item: string) => temp.has(item))) {
 			result.methodType = NLMethodType.AreEqual;
 		} else if (inAEnumeration.find((item: string) => temp.has(item))) {
 			result.methodType = NLMethodType.MatchEnumeration;
