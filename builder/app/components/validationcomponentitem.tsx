@@ -97,6 +97,7 @@ export default class ValidationComponentItem extends Component<any, any> {
 												(meaning: NLMeaning) => {
 													let simpleValidation = CreateSimpleValidation();
 													simpleValidation.enabled = true;
+													simpleValidation.name = meaning.text;
 													if (meaning.actorClause.relationType) {
 														simpleValidation.relationType =
 															meaning.actorClause.relationType;
@@ -144,6 +145,7 @@ export default class ValidationComponentItem extends Component<any, any> {
 																	meaning.validation
 																).forEach((temp: any) => {
 																	let [ key, value ] = temp;
+																	if (!value) return;
 																	let nlvc: any = NLValidationClauses;
 																	if (nlvc[key] && nlvc[key].$property) {
 																		Object.entries(
@@ -152,6 +154,7 @@ export default class ValidationComponentItem extends Component<any, any> {
 																			let [ key, value ] = entry;
 																			let proxy: any = simpleValidation;
 																			proxy[key] = value();
+																			proxy[key].enabled = true;
 																		});
 																	}
 																});

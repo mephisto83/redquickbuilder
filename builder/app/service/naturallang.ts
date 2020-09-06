@@ -3,7 +3,7 @@ import { NodesByType, GetNodeProp, GetCodeName, GetModelCodeProperties } from '.
 import { NodeTypes, NodeProperties, MakeConstant } from '../constants/nodetypes';
 import { Node } from '../methods/graph_types';
 import { GetNodeTitle } from '../../visi_blend/dist/app/actions/uiactions';
-import { RelationType, CreateBoolean } from '../interface/methodprops';
+import { RelationType, CreateBoolean, CreateMinLength, CreateMaxLength } from '../interface/methodprops';
 let context: any = { world: null };
 const _nlp = nlp.extend((Doc: any, world: any) => {
 	// add new tags
@@ -212,6 +212,7 @@ export function updateWorld() {
 	context.world.addWords(webDictionary);
 }
 export interface NLMeaning {
+	text: string;
 	actorClause: Clause;
 	targetClause: Clause;
 	methodType?: NLMethodType;
@@ -233,12 +234,7 @@ export default function getLanguageMeaning(
 		(a, b) => a.length - b.length
 	);
 
-	let result: {
-		actorClause: Clause;
-		targetClause: Clause;
-		methodType?: NLMethodType;
-		validation: { [str: string]: boolean };
-	} = { actorClause: {}, targetClause: {}, validation: {} };
+	let result: NLMeaning = { actorClause: {}, targetClause: {}, validation: {}, text };
 	let understandableClause = all.find((item: string) => {
 		return temp.has(item);
 	});
@@ -398,7 +394,21 @@ export enum NLMethodType {
 export const NLValidationClauses = {
 	Name: {
 		isA: 'Validation',
-		$def: [ 'is a name' ]
+		$def: [ 'is a name' ],
+		$property: {
+			isNotNull: () => {
+				return CreateBoolean();
+			},
+			minLength: () => {
+				return CreateMinLength('2');
+			},
+			maxLength: () => {
+				return CreateMaxLength('50');
+			},
+			alphaOnlyWithSpaces: () => {
+				return CreateBoolean();
+			}
+		}
 	},
 	Matches: {
 		isA: 'Validation'
@@ -408,7 +418,10 @@ export const NLValidationClauses = {
 		$def: [ 'intersects', 'intersects with' ]
 	},
 	MinLength: {
-		isA: 'Validation'
+		isA: 'Validation',
+    minLength: () => {
+      return CreateMinLength('2');
+    }
 	},
 	MaxLength: {
 		isA: 'Validation'
@@ -420,11 +433,21 @@ export const NLValidationClauses = {
 		isA: 'Validation'
 	},
 	IsTrue: {
-		isA: 'Validation'
+		isA: 'Validation',
+		$property: {
+			isTrue: () => {
+				return CreateBoolean();
+			}
+		}
 	},
 	IsAlphaOnlyWithSpaces: {
 		isA: 'Validation',
-		$def: [ 'is alpha only', 'are alpha only' ]
+		$def: [ 'is alpha only', 'are alpha only' ],
+		$property: {
+			alphaOnlyWithSpaces: () => {
+				return CreateBoolean();
+			}
+		}
 	},
 	IsNull: {
 		isA: 'Validation',
@@ -440,56 +463,126 @@ export const NLValidationClauses = {
 	},
 	IsZipEmpty: {
 		isA: 'Validation',
-		$def: [ 'is an empty zip code' ]
+		$def: [ 'is an empty zip code' ],
+		$property: {
+			zipEmpty: () => {
+				return CreateBoolean();
+			}
+		}
 	},
 	IsZip: {
 		isA: 'Validation',
-		$def: [ 'is a zip code' ]
+		$def: [ 'is a zip code' ],
+		$property: {
+			zip: () => {
+				return CreateBoolean();
+			}
+		}
 	},
 	IsUrlEmpty: {
 		isA: 'Validation',
-		$def: [ 'is an empty url' ]
+		$def: [ 'is an empty url' ],
+		$property: {
+			urlEmpty: () => {
+				return CreateBoolean();
+			}
+		}
 	},
 	IsUrl: {
 		isA: 'Validation',
-		$def: [ 'is a url' ]
+		$def: [ 'is a url' ],
+		$property: {
+			url: () => {
+				return CreateBoolean();
+			}
+		}
 	},
 	IsSocialSecurity: {
 		isA: 'Validation',
-		$def: [ 'is a social security', 'is a social security number' ]
+		$def: [ 'is a social security', 'is a social security number' ],
+		$property: {
+			socialSecurity: () => {
+				return CreateBoolean();
+			}
+		}
 	},
 	RequireUppercase: {
-		isA: 'Validation'
+		isA: 'Validation',
+		$property: {
+			requireUppercase: () => {
+				return CreateBoolean();
+			}
+		}
 	},
 	RequiresNonAlphaNumeric: {
-		isA: 'Validation'
+		isA: 'Validation',
+		$property: {
+			requireNonAlphanumeric: () => {
+				return CreateBoolean();
+			}
+		}
 	},
 	RequiresLowerCase: {
-		isA: 'Validation'
+		isA: 'Validation',
+		$property: {
+			requireLowercase: () => {
+				return CreateBoolean();
+			}
+		}
 	},
 	IsNumericInteger: {
 		isA: 'Validation',
-		$def: [ 'is an integer' ]
+		$def: [ 'is an integer' ],
+		$property: {
+			numericInt: () => {
+				return CreateBoolean();
+			}
+		}
 	},
 	IsEmailEmpty: {
 		isA: 'Validation',
-		$def: [ 'is an empty email' ]
+		$def: [ 'is an empty email' ],
+		$property: {
+			emailEmpty: () => {
+				return CreateBoolean();
+			}
+		}
 	},
 	IsEmail: {
 		isA: 'Validation',
-		$def: [ 'is an email' ]
+		$def: [ 'is an email' ],
+		$property: {
+			email: () => {
+				return CreateBoolean();
+			}
+		}
 	},
 	IsCreditCard: {
 		isA: 'Validation',
-		$def: [ 'is a credit card' ]
+		$def: [ 'is a credit card' ],
+		$property: {
+			creditCard: () => {
+				return CreateBoolean();
+			}
+		}
 	},
 	IsAlphaOnly: {
 		isA: 'Validation',
-		$def: [ 'is alpha only' ]
+		$def: [ 'is alpha only' ],
+		$property: {
+			alphaOnly: () => {
+				return CreateBoolean();
+			}
+		}
 	},
 	IsAlphaNumeric: {
 		isA: 'Validation',
-		$def: [ 'is alpha numeric' ]
+		$def: [ 'is alpha numeric' ],
+		$property: {
+			alphaNumeric: () => {
+				return CreateBoolean();
+			}
+		}
 	},
 	IsFalse: {
 		isA: 'Validation',
