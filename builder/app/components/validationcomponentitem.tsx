@@ -29,7 +29,6 @@ import Typeahead from './typeahead';
 import CheckBox from './checkbox';
 import { MethodFunctions } from '../constants/functiontypes';
 import getLanguageMeaning, { NLMeaning, NLMethodType, Clause, NLValidationClauses } from '../service/naturallang';
-import { SimpleValidationConfig } from '../../visi_blend/dist/app/interface/methodprops';
 
 export default class ValidationComponentItem extends Component<any, any> {
 	constructor(props: any) {
@@ -197,6 +196,7 @@ export default class ValidationComponentItem extends Component<any, any> {
 									}
 							}}
 						/>
+
 					</TreeViewButtonGroup>
 				</TreeViewMenu>
 				<TreeViewItemContainer>

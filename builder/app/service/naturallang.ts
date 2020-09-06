@@ -2,8 +2,8 @@ import nlp from 'compromise';
 import { NodesByType, GetNodeProp, GetCodeName, GetModelCodeProperties } from '../actions/uiactions';
 import { NodeTypes, NodeProperties, MakeConstant } from '../constants/nodetypes';
 import { Node } from '../methods/graph_types';
-import { GetNodeTitle } from '../../visi_blend/dist/app/actions/uiactions';
 import { RelationType, CreateBoolean, CreateMinLength, CreateMaxLength } from '../interface/methodprops';
+import { GetNodeTitle } from '../actions/uiactions';
 let context: any = { world: null };
 const _nlp = nlp.extend((Doc: any, world: any) => {
 	// add new tags
@@ -149,6 +149,10 @@ export function updateWorld() {
 	webDictionary['agent'] = [ AGENT ];
 	webDictionary['agents'] = [ AGENT, POSSESIVE ];
 	webDictionary['model'] = [ MODEL ];
+	webDictionary['output'] = [ 'ModelOutput', MODEL ];
+	webDictionary['outputs'] = [ MODEL, 'ModelOutput', POSSESIVE ];
+	webDictionary['parent'] = [ 'Parent', MODEL ];
+	webDictionary['parents'] = [ MODEL, 'Parent', POSSESIVE ];
 	webDictionary['models'] = [ MODEL, POSSESIVE ];
 	webDictionary['is a valid'] = [ IS_A ];
 	webDictionary['must be a valid'] = [ IS_A ];
@@ -419,9 +423,9 @@ export const NLValidationClauses = {
 	},
 	MinLength: {
 		isA: 'Validation',
-    minLength: () => {
-      return CreateMinLength('2');
-    }
+		minLength: () => {
+			return CreateMinLength('2');
+		}
 	},
 	MaxLength: {
 		isA: 'Validation'
