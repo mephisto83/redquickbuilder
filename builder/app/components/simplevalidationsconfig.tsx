@@ -36,7 +36,8 @@ import {
 	ChangeNodeType,
 	ChangeNodeProp,
 	AddNewSimpleValidationConfigToGraph,
-	GetSimpleValidationId
+	GetSimpleValidationId,
+	CheckAfterEffectDataChainConfiguration
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
@@ -101,20 +102,16 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 				NodeProperties.NODEType,
 				simpleValidationConfiguration.composition.graph
 			) !== NodeTypes.LeafNode;
+		let valid = CheckAfterEffectDataChainConfiguration(dataChainOptions);
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				icon={
-					!simpleValidations.some((v) => !CheckSimpleValidation(v)) ? (
-						'fa fa-check-circle-o'
-					) : (
-						'fa fa-circle-o'
-					)
-				}
+				icon={valid ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
 				active
+				error={!valid}
 				greyed={!simpleValidations.some((v) => v.enabled)}
 				title={Titles.SimpleValidation}
 			>
@@ -395,6 +392,9 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 											simpleValidationConfiguration.composition.graph
 										);
 									}
+								}
+								if (this.props.onChange) {
+									this.props.onChange();
 								}
 							}}
 							onDelete={() => {

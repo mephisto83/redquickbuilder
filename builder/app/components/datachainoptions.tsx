@@ -49,17 +49,17 @@ export default class DataChainOptions extends Component<any, any> {
 				this.props.onChange();
 			}
 		};
+		let valid = CheckAfterEffectDataChainConfiguration(dataChainOptions);
 
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				icon={
-					CheckAfterEffectDataChainConfiguration(dataChainOptions) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'
-				}
+				icon={valid ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
 				active
+				error={!valid}
 				title={Titles.Configuration}
 			>
 				<CheckExistanceConfig
@@ -136,11 +136,12 @@ export default class DataChainOptions extends Component<any, any> {
 					dataChainOptions={dataChainOptions}
 					onChange={onchange}
 				/>
-        <SwaggerCallConfig
+				<SwaggerCallConfig
 					dataChainType={this.props.dataChainType}
 					methodDescription={methodDescription}
 					dataChainOptions={dataChainOptions}
-					onChange={onchange}/>
+					onChange={onchange}
+				/>
 				<TreeViewButtonGroup />
 			</TreeViewMenu>
 		);

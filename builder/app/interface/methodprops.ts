@@ -156,8 +156,18 @@ export function CheckAfterEffectDataChainConfiguration(options: DataChainConfigu
 	return (
 		(!options.getExisting || CheckGetExisting(options.getExisting)) &&
 		(!options.checkExistence || CheckIsExisting(options.checkExistence)) &&
-		(!options.setProperties || CheckSetProperties(options.setProperties))
+		(!options.setProperties || CheckSetProperties(options.setProperties)) &&
+		(!options.simpleValidations || CheckSimpleValidations(options.simpleValidations))
 	);
+}
+export function CheckSimpleValidations(validations: SimpleValidationConfig[]): boolean {
+	let res = true;
+
+	validations.forEach((validation) => {
+		res = res && CheckSimpleValidation(validation);
+	});
+
+	return res;
 }
 export function CreateSetProperty(): SetProperty {
 	return {
@@ -970,9 +980,58 @@ export interface ConfigItem {
 	enabled: boolean;
 	id: string;
 }
-export function CheckSimpleValidation(isvalidation: SimpleValidationConfig) {
-	if (!isvalidation.enabled) {
-		return true;
+export function CheckSimpleValidation(isvalidation: SimpleValidationConfig): boolean {
+	if (isvalidation.enabled) {
+		return (
+			CheckRelation(isvalidation) &&
+			(isvalidation.creditCard.enabled ||
+				isvalidation.isTrue.enabled ||
+				isvalidation.isFalse.enabled ||
+				(isvalidation.areEqual.enabled && CheckRelation(isvalidation.areEqual)) ||
+				(isvalidation.maxLength.enabled && CheckNumberConfig(isvalidation.maxLength)) ||
+				(isvalidation.minLength.enabled && CheckNumberConfig(isvalidation.minLength)) ||
+				isvalidation.alphaOnlyWithSpaces.enabled ||
+				isvalidation.alphaNumeric.enabled ||
+				isvalidation.alphaOnly.enabled ||
+				isvalidation.requireNonAlphanumeric.enabled ||
+				isvalidation.requireLowercase.enabled ||
+				isvalidation.requireUppercase.enabled ||
+				isvalidation.zip.enabled ||
+				isvalidation.zipEmpty.enabled ||
+				isvalidation.email.enabled ||
+				isvalidation.emailEmpty.enabled ||
+				isvalidation.urlEmpty.enabled ||
+				isvalidation.url.enabled ||
+				isvalidation.socialSecurity.enabled ||
+				(isvalidation.oneOf.enabled && CheckEnumerationConfig(isvalidation.oneOf)) ||
+				isvalidation.numericInt.enabled ||
+				isvalidation.isNull.enabled ||
+				isvalidation.isNotNull.enabled ||
+				isvalidation.isContained.enabled)
+		);
+	}
+	return true;
+}
+export function CheckNumberConfig(numberConfig: NumberConfig): boolean {
+	return !numberConfig.enabled || !!numberConfig.value;
+}
+export function CheckEnumerationConfig(oneOf: EnumerationConfig): boolean {
+	return oneOf.enabled && !!oneOf.enumerationType && !!oneOf.enumerations.length && !!oneOf.id;
+}
+export function CheckRelation(halfRelation: HalfRelation): boolean {
+	if (halfRelation.enabled) {
+		switch (halfRelation.relationType) {
+			case RelationType.Agent:
+				return !!halfRelation.agentProperty && !!halfRelation.agent;
+			case RelationType.Model:
+				return !!halfRelation.modelProperty && !!halfRelation.model;
+			case RelationType.ModelOuput:
+				return !!halfRelation.modelOutputProperty && !!halfRelation.modelOutput;
+			case RelationType.Parent:
+				return !!halfRelation.parent && !!halfRelation.parentProperty;
+			default:
+				return false;
+		}
 	}
 	return true;
 }

@@ -33,7 +33,10 @@ import getLanguageMeaning, { NLMeaning, NLMethodType, Clause, NLValidationClause
 export default class ValidationComponentItem extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
-		this.state = { override: true };
+		this.state = {
+			override: true,
+			sentences: ''
+		};
 	}
 	render() {
 		let validationConfig: ValidationConfig = this.props.validationConfig;
@@ -100,103 +103,152 @@ export default class ValidationComponentItem extends Component<any, any> {
 												});
 											});
 
-										let { simpleValidations } = validationConfig.dataChainOptions;
-										if (simpleValidations) {
-											let newSimpleValidations: any[] = results.map((meaning: NLMeaning) => {
-												let simpleValidation = CreateSimpleValidation();
-												simpleValidation.enabled = true;
-												simpleValidation.name = meaning.text;
-												if (meaning.actorClause.relationType) {
-													simpleValidation.relationType = meaning.actorClause.relationType;
-													setupRelation(simpleValidation, meaning.actorClause);
-												}
-												switch (meaning.methodType) {
-													case NLMethodType.AreEqual:
-														let areEqual = CreateAreEqual();
-														if (meaning.targetClause.relationType) {
-															areEqual.enabled = true;
-															areEqual.relationType = meaning.targetClause.relationType;
-															setupAreEqual(areEqual, meaning.targetClause);
-															simpleValidation.areEqual = areEqual;
-														}
-														break;
-													case NLMethodType.Contains:
-													case NLMethodType.MatchEnumeration:
-														let oneOf = CreateOneOf();
-														if (meaning.targetClause.enumeration) {
-															oneOf.enabled = true;
-															oneOf.enumerationType = meaning.targetClause.enumeration;
-															if (meaning.targetClause.enumerations) {
-																oneOf.enumerations = meaning.targetClause.enumerations;
-															}
-														}
-														break;
-													case NLMethodType.Intersects:
-														let intersecting = CreateAreEqual();
-														if (meaning.targetClause.relationType) {
-															intersecting.enabled = true;
-															intersecting.relationType =
-																meaning.targetClause.relationType;
-															setupAreEqual(intersecting, meaning.targetClause);
-															simpleValidation.isIntersecting = intersecting;
-														}
-														break;
-													case NLMethodType.IsFalse:
-													case NLMethodType.IsTrue:
-													case NLMethodType.IsA:
-														if (meaning.validation) {
-															Object.entries(meaning.validation).forEach((temp: any) => {
-																let [ key, value ] = temp;
-																if (!value) return;
-																let nlvc: any = NLValidationClauses;
-																if (nlvc[key] && nlvc[key].$property) {
-																	Object.entries(
-																		nlvc[key].$property
-																	).forEach((entry: any) => {
-																		let [ key, value ] = entry;
-																		let proxy: any = simpleValidation;
-																		proxy[key] = value();
-																		proxy[key].enabled = true;
-																	});
-																}
-															});
-														}
-														break;
-												}
-												return simpleValidation;
-											});
-											if (newSimpleValidations) {
-												validationConfig.dataChainOptions.simpleValidations =
-													validationConfig.dataChainOptions.simpleValidations || [];
-												validationConfig.dataChainOptions.simpleValidations.length = 0;
-												validationConfig.dataChainOptions.simpleValidations.push(
-													...newSimpleValidations
-												);
-												let methods = this.props.methods;
-												let routes = this.props.routes;
-												let dataChainType = this.props.dataChainType;
-												let override = this.state.override;
-												autoNameGenerateDataChain(
-													validationConfig,
-													mountingItem,
-													dataChainType,
-													methods,
-													routes,
-													override
-												);
-
-												this.setState({
-													turn: UIA.GUID()
-												});
-												if (this.props.onChange) {
-													this.props.onChange();
-												}
-											}
-										}
+										this.updateValidationMethod(validationConfig, results, mountingItem);
 									}
 							}}
 						/>
+						<TreeViewGroupButton
+							icon="fa  fa-shekel"
+							title={`Agent ${Titles.IsNotDeleted}`}
+							onClick={() => {
+								let AGENT_IS_NOT_DELETED = `The agent's deleted property is false`;
+								if (this.state.sentences.indexOf(AGENT_IS_NOT_DELETED) === -1) {
+									this.setState({
+										sentences: [ this.state.sentences, AGENT_IS_NOT_DELETED ]
+											.filter((x) => x)
+											.join(NEW_LINE)
+									});
+								}
+							}}
+						/>
+						<TreeViewGroupButton
+							icon="fa fa-rouble"
+							title={`Model ${Titles.IsNotDeleted}`}
+							onClick={() => {
+								let MODEL_IS_NOT_DELETED = `The model's deleted property is false`;
+								if (this.state.sentences.indexOf(MODEL_IS_NOT_DELETED) === -1) {
+									this.setState({
+										sentences: [ this.state.sentences, MODEL_IS_NOT_DELETED ]
+											.filter((x) => x)
+											.join(NEW_LINE)
+									});
+								}
+							}}
+						/>
+						<TreeViewGroupButton
+							icon="fa  fa-inr"
+							title={`Model Output ${Titles.IsNotDeleted}`}
+							onClick={() => {
+								let MODEL_IS_NOT_DELETED = `The output's deleted property is false`;
+								if (this.state.sentences.indexOf(MODEL_IS_NOT_DELETED) === -1) {
+									this.setState({
+										sentences: [ this.state.sentences, MODEL_IS_NOT_DELETED ]
+											.filter((x) => x)
+											.join(NEW_LINE)
+									});
+								}
+							}}
+						/>
+						<TreeViewGroupButton
+							icon="fa fa-rmb"
+							title={`Agent owns the model`}
+							onClick={() => {
+								let AGENT_OWN_THE_MODEL = `The agent's id property is equal to the model's owner property.`;
+								if (this.state.sentences.indexOf(AGENT_OWN_THE_MODEL) === -1) {
+									this.setState({
+										sentences: [ this.state.sentences, AGENT_OWN_THE_MODEL ]
+											.filter((x) => x)
+											.join(NEW_LINE)
+									});
+								}
+							}}
+						/>
+						<TreeViewGroupButton
+							icon="fa fa-dollar"
+							title={`Default Permission Setup`}
+							onClick={() => {
+								let AGENT_IS_NOT_DELETED = `The agent's deleted property is false`;
+								let MODEL_IS_NOT_DELETED = `The model's deleted property is false`;
+								let AGENT_OWN_THE_MODEL = `The agent's id property is equal to the model's owner property.`;
+								if (this.state.sentences.indexOf(AGENT_OWN_THE_MODEL) === -1) {
+									this.setState(
+										{
+											sentences: [
+												...`${this.state.sentences}`.split(NEW_LINE),
+												AGENT_IS_NOT_DELETED,
+												MODEL_IS_NOT_DELETED,
+												AGENT_OWN_THE_MODEL
+											]
+												.unique()
+												.filter((x: any) => x)
+												.join(NEW_LINE)
+										},
+										() => {
+											if (this.props.methodDescription && this.props.methodDescription.properties)
+												if (this.state.sentences) {
+													let results: NLMeaning[] = this.state.sentences
+														.split(NEW_LINE)
+														.filter((v: string) => v)
+														.map((line: string) => {
+															return getLanguageMeaning(line, {
+																...this.props.methodDescription.properties
+															});
+														});
 
+													this.updateValidationMethod(
+														validationConfig,
+														results,
+														mountingItem
+													);
+												}
+										}
+									);
+								}
+							}}
+						/>
+						<TreeViewGroupButton
+							icon="fa fa-gbp"
+							title={`Default Filter Setup`}
+							onClick={() => {
+								let AGENT_IS_NOT_DELETED = `The agent's deleted property is false`;
+								let MODEL_IS_NOT_DELETED = `The output's deleted property is false`;
+								let AGENT_OWN_THE_MODEL = `The agent's id property is equal to the output's owner property.`;
+								if (this.state.sentences.indexOf(AGENT_OWN_THE_MODEL) === -1) {
+									this.setState(
+										{
+											sentences: [
+												...`${this.state.sentences}`.split(NEW_LINE),
+												AGENT_IS_NOT_DELETED,
+												MODEL_IS_NOT_DELETED,
+												AGENT_OWN_THE_MODEL
+											]
+												.unique()
+												.filter((x: any) => x)
+												.join(NEW_LINE)
+										},
+										() => {
+											if (this.props.methodDescription && this.props.methodDescription.properties)
+												if (this.state.sentences) {
+													let results: NLMeaning[] = this.state.sentences
+														.split(NEW_LINE)
+														.filter((v: string) => v)
+														.map((line: string) => {
+															return getLanguageMeaning(line, {
+																...this.props.methodDescription.properties
+															});
+														});
+
+													this.updateValidationMethod(
+														validationConfig,
+														results,
+														mountingItem
+													);
+												}
+										}
+									);
+								}
+							}}
+						/>
 					</TreeViewButtonGroup>
 				</TreeViewMenu>
 				<TreeViewItemContainer>
@@ -331,6 +383,12 @@ export default class ValidationComponentItem extends Component<any, any> {
 						name={validationConfig.name}
 						methodDescription={this.props.methodDescription}
 						currentDescription={mountingItem}
+						onChange={(val: boolean) => {
+							this.setState({ turn: Date.now() });
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
+						}}
 						dataChainType={this.props.dataChainType || DataChainType.Validation}
 						previousEffect={this.props.previousEffect}
 						dataChainOptions={validationConfig.dataChainOptions}
@@ -338,6 +396,95 @@ export default class ValidationComponentItem extends Component<any, any> {
 				) : null}
 			</TreeViewMenu>
 		);
+	}
+
+	private updateValidationMethod(
+		validationConfig: ValidationConfig,
+		results: NLMeaning[],
+		mountingItem: MountingDescription
+	) {
+		let { simpleValidations } = validationConfig.dataChainOptions;
+		if (simpleValidations) {
+			let newSimpleValidations: any[] = results.map((meaning: NLMeaning) => {
+				let simpleValidation = CreateSimpleValidation();
+				simpleValidation.enabled = true;
+				simpleValidation.name = meaning.text;
+				if (meaning.actorClause.relationType) {
+					simpleValidation.relationType = meaning.actorClause.relationType;
+					setupRelation(simpleValidation, meaning.actorClause);
+				}
+				switch (meaning.methodType) {
+					case NLMethodType.AreEqual:
+						let areEqual = CreateAreEqual();
+						if (meaning.targetClause.relationType) {
+							areEqual.enabled = true;
+							areEqual.relationType = meaning.targetClause.relationType;
+							setupAreEqual(areEqual, meaning.targetClause);
+							simpleValidation.areEqual = areEqual;
+						}
+						break;
+					case NLMethodType.Contains:
+					case NLMethodType.MatchEnumeration:
+						let oneOf = CreateOneOf();
+						if (meaning.targetClause.enumeration) {
+							oneOf.enabled = true;
+							oneOf.enumerationType = meaning.targetClause.enumeration;
+							if (meaning.targetClause.enumerations) {
+								oneOf.enumerations = meaning.targetClause.enumerations;
+							}
+							simpleValidation.oneOf = oneOf;
+						}
+						break;
+					case NLMethodType.Intersects:
+						let intersecting = CreateAreEqual();
+						if (meaning.targetClause.relationType) {
+							intersecting.enabled = true;
+							intersecting.relationType = meaning.targetClause.relationType;
+							setupAreEqual(intersecting, meaning.targetClause);
+							simpleValidation.isIntersecting = intersecting;
+						}
+						break;
+					case NLMethodType.IsFalse:
+					case NLMethodType.IsTrue:
+					case NLMethodType.IsA:
+						if (meaning.validation) {
+							Object.entries(meaning.validation).forEach((temp: any) => {
+								let [ key, value ] = temp;
+								if (!value) return;
+								let nlvc: any = NLValidationClauses;
+								if (nlvc[key] && nlvc[key].$property) {
+									Object.entries(nlvc[key].$property).forEach((entry: any) => {
+										let [ key, value ] = entry;
+										let proxy: any = simpleValidation;
+										proxy[key] = value();
+										proxy[key].enabled = true;
+									});
+								}
+							});
+						}
+						break;
+				}
+				return simpleValidation;
+			});
+			if (newSimpleValidations) {
+				validationConfig.dataChainOptions.simpleValidations =
+					validationConfig.dataChainOptions.simpleValidations || [];
+				validationConfig.dataChainOptions.simpleValidations.length = 0;
+				validationConfig.dataChainOptions.simpleValidations.push(...newSimpleValidations);
+				let methods = this.props.methods;
+				let routes = this.props.routes;
+				let dataChainType = this.props.dataChainType;
+				let override = this.state.override;
+				autoNameGenerateDataChain(validationConfig, mountingItem, dataChainType, methods, routes, override);
+
+				this.setState({
+					turn: UIA.GUID()
+				});
+				if (this.props.onChange) {
+					this.props.onChange();
+				}
+			}
+		}
 	}
 }
 

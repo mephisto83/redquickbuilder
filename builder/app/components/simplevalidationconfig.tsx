@@ -93,23 +93,22 @@ export default class SimpleValidationComponent extends Component<any, any> {
 		simpleValidation.oneOf = simpleValidation.oneOf || CreateOneOf();
 		simpleValidation.isTrue = simpleValidation.isTrue || CreateBoolean();
 		simpleValidation.isFalse = simpleValidation.isFalse || CreateBoolean();
-		let valid =
-			simpleValidation &&
-			simpleValidation.enabled &&
-			((simpleValidation.relationType === RelationType.Agent && simpleValidation.agentProperty) ||
-				(simpleValidation.relationType === RelationType.ModelOuput && simpleValidation.modelOutputProperty) ||
-				(simpleValidation.relationType === RelationType.Parent && simpleValidation.parentProperty) ||
-				(simpleValidation.relationType === RelationType.Model && simpleValidation.modelProperty));
-
+		let valid = CheckSimpleValidation(simpleValidation);
+		let onchange = () => {
+			if (this.props.onChange) {
+				this.props.onChange();
+			}
+		};
 		let name = GetSimpleValidationId(simpleValidation, properties);
 		let simpleValidationConfiguration: SimpleValidationsConfiguration = this.props.simpleValidationConfiguration;
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				icon={CheckSimpleValidation(simpleValidation) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+				icon={valid ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
+				error={!valid}
 				active
 				greyed={!simpleValidation.enabled}
 				title={name || Titles.SimpleValidation}
@@ -315,16 +314,19 @@ export default class SimpleValidationComponent extends Component<any, any> {
 					dataChainType={this.props.dataChainType}
 					targetProperties={targetProperties}
 					hideTargetProperty
+					onChange={onchange}
 				/>
 				<NumberConfigComponent
 					enabled={simpleValidation.enabled}
 					numberConfig={simpleValidation.maxLength}
 					title={Titles.MaxLength}
+					onChange={onchange}
 				/>
 				<NumberConfigComponent
 					enabled={simpleValidation.enabled}
 					numberConfig={simpleValidation.minLength}
 					title={Titles.MinLength}
+					onChange={onchange}
 				/>
 				<EqualityConfigComponent
 					enabled={simpleValidation.enabled}
@@ -332,6 +334,7 @@ export default class SimpleValidationComponent extends Component<any, any> {
 					dataChainType={this.props.dataChainType}
 					targetProperties={targetProperties}
 					properties={properties}
+					onChange={onchange}
 					config={simpleValidation.areEqual}
 					title={Titles.AreEqual}
 				/>
@@ -339,6 +342,7 @@ export default class SimpleValidationComponent extends Component<any, any> {
 					enabled={simpleValidation.enabled}
 					methodDescription={methodDescription}
 					dataChainType={this.props.dataChainType}
+					onChange={onchange}
 					targetProperties={targetProperties}
 					properties={properties}
 					config={simpleValidation.isContained}
@@ -349,6 +353,7 @@ export default class SimpleValidationComponent extends Component<any, any> {
 					methodDescription={methodDescription}
 					dataChainType={this.props.dataChainType}
 					targetProperties={targetProperties}
+					onChange={onchange}
 					properties={properties}
 					config={simpleValidation.isIntersecting}
 					title={Titles.AreIntersecting}
@@ -356,6 +361,7 @@ export default class SimpleValidationComponent extends Component<any, any> {
 				<EqualityConfigComponent
 					enabled={simpleValidation.enabled}
 					methodDescription={methodDescription}
+					onChange={onchange}
 					dataChainType={this.props.dataChainType}
 					targetProperties={targetProperties}
 					properties={properties}
@@ -366,20 +372,24 @@ export default class SimpleValidationComponent extends Component<any, any> {
 					enabled={simpleValidation.enabled}
 					booleanConfig={simpleValidation.isNotNull}
 					title={Titles.IsNotNull}
+					onChange={onchange}
 				/>
 				<BooleanConfigComponent
 					enabled={simpleValidation.enabled}
 					booleanConfig={simpleValidation.isTrue}
 					title={Titles.IsTrue}
+					onChange={onchange}
 				/>
 				<BooleanConfigComponent
 					enabled={simpleValidation.enabled}
 					booleanConfig={simpleValidation.isFalse}
+					onChange={onchange}
 					title={Titles.IsFalse}
 				/>
 
 				<BooleanConfigComponent
 					enabled={simpleValidation.enabled}
+					onChange={onchange}
 					booleanConfig={simpleValidation.alphaNumeric}
 					title={Titles.AlphaNumeric}
 				/>
@@ -388,23 +398,28 @@ export default class SimpleValidationComponent extends Component<any, any> {
 					enabled={simpleValidation.enabled}
 					booleanConfig={simpleValidation.alphaOnly}
 					title={Titles.AlphaOnly}
+					onChange={onchange}
 				/>
 				<BooleanConfigComponent
 					enabled={simpleValidation.enabled}
+					onChange={onchange}
 					booleanConfig={simpleValidation.creditCard}
 					title={Titles.CreditCard}
 				/>
 				<BooleanConfigComponent
+					onChange={onchange}
 					enabled={simpleValidation.enabled}
 					booleanConfig={simpleValidation.email}
 					title={Titles.Email}
 				/>
 				<BooleanConfigComponent
 					enabled={simpleValidation.enabled}
+					onChange={onchange}
 					booleanConfig={simpleValidation.emailEmpty}
 					title={Titles.EmailEmpty}
 				/>
 				<BooleanConfigComponent
+					onChange={onchange}
 					enabled={simpleValidation.enabled}
 					booleanConfig={simpleValidation.numericInt}
 					title={Titles.NumericInteger}
@@ -412,57 +427,68 @@ export default class SimpleValidationComponent extends Component<any, any> {
 				<BooleanConfigComponent
 					enabled={simpleValidation.enabled}
 					booleanConfig={simpleValidation.requireLowercase}
+					onChange={onchange}
 					title={Titles.RequireLowercase}
 				/>
 				<BooleanConfigComponent
 					enabled={simpleValidation.enabled}
+					onChange={onchange}
 					booleanConfig={simpleValidation.requireNonAlphanumeric}
 					title={Titles.RequireNonAlphaNumeric}
 				/>
 				<BooleanConfigComponent
 					enabled={simpleValidation.enabled}
 					booleanConfig={simpleValidation.requireUppercase}
+					onChange={onchange}
 					title={Titles.RequireUppercase}
 				/>
 				<BooleanConfigComponent
 					enabled={simpleValidation.enabled}
 					booleanConfig={simpleValidation.socialSecurity}
+					onChange={onchange}
 					title={Titles.SocialSecurity}
 				/>
 				<BooleanConfigComponent
 					enabled={simpleValidation.enabled}
 					booleanConfig={simpleValidation.url}
+					onChange={onchange}
 					title={Titles.Url}
 				/>
 				<BooleanConfigComponent
 					enabled={simpleValidation.enabled}
+					onChange={onchange}
 					booleanConfig={simpleValidation.urlEmpty}
 					title={Titles.UrlEmpty}
 				/>
 				<BooleanConfigComponent
 					enabled={simpleValidation.enabled}
 					booleanConfig={simpleValidation.zip}
+					onChange={onchange}
 					title={Titles.Zip}
 				/>
 				<BooleanConfigComponent
 					enabled={simpleValidation.enabled}
+					onChange={onchange}
 					booleanConfig={simpleValidation.zipEmpty}
 					title={Titles.ZipEmpty}
 				/>
 
 				<OneOfEnumerationComponent
 					enabled={simpleValidation.enabled}
+					onChange={onchange}
 					enumerationConfig={simpleValidation.oneOf}
 					title={Titles.IsOneOf}
 				/>
 				<BooleanConfigComponent
 					enabled={simpleValidation.enabled}
+					onChange={onchange}
 					booleanConfig={simpleValidation.isNull}
 					title={Titles.IsNull}
 				/>
 				<BooleanConfigComponent
 					enabled={simpleValidation.enabled}
 					booleanConfig={simpleValidation.alphaOnlyWithSpaces}
+					onChange={onchange}
 					title={Titles.AlphaOnlyWithSpaces}
 				/>
 			</TreeViewMenu>

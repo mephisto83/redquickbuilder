@@ -61,6 +61,9 @@ export default class PermissionComponent extends Component<any, any> {
 								if (this.props.onChange) {
 									this.props.onChange();
 								}
+								this.setState({
+									turn: UIA.GUID()
+								});
 							}}
 							agent={this.props.agent}
 							onDelete={() => {
