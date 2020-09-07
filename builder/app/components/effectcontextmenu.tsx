@@ -122,10 +122,14 @@ class EffectContextMenu extends Component<any, any> {
 						effectItem.afterEffects = effectItem.afterEffects || [];
 						effectItem.autoSetup = effectItem.autoSetup || { executionAutoCopy: true };
 						effectItem.validations = effectItem.validations || [];
+
 						let parameterConnections: any = null;
 						let bodyParameter: any = null;
 						let methodConstraints: any = null;
 						if (methodDescription) {
+							if (this.hasBodyParameter(methodDescription)) {
+								if (!effectItem.name) effectItem.body = true;
+							}
 							parameterConnections = this.getMethodDescriptionParameters(methodDescription)
 								.filter(this.filterMethodDescriptionFunctionParameters(methodDescription))
 								.map((urlParameter: string, index: number) => {

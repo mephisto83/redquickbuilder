@@ -21,7 +21,7 @@ import {
 	ExecutionConfig
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
-import { NodeTypes, NodeProperties } from '../constants/nodetypes';
+import { NodeTypes, NodeProperties, NEW_LINE } from '../constants/nodetypes';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachain';
@@ -34,11 +34,13 @@ import { mount } from 'enzyme';
 import AfterEffectDataChainOptions from './aftereffectdatachainoptions';
 import DataChainOptions from './datachainoptions';
 import { MethodFunctions } from '../constants/functiontypes';
+import { NLMeaning, NLMethodType } from '../service/naturallang';
+import { GetNLMeaning } from './validationcomponentitem';
 
 export default class ExecutionComponentItem extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
-		this.state = { override: true };
+		this.state = { override: true, sentences: '' };
 	}
 	render() {
 		let executionConfig: ExecutionConfig = this.props.executionConfig;
@@ -56,6 +58,130 @@ export default class ExecutionComponentItem extends Component<any, any> {
 				active
 				title={executionConfig.name || Titles.Execution}
 			>
+				<TreeViewMenu
+					open={this.state.sentence}
+					active
+					title={'Sentence Input'}
+					onClick={() => {
+						if (!this.state.sentence) {
+							if (executionConfig.dataChainOptions) {
+								let { simpleValidations } = executionConfig.dataChainOptions;
+								if (simpleValidations) {
+									this.setState({
+										sentences: simpleValidations.map((v) => v.name).filter((v) => v).join(NEW_LINE)
+									});
+								}
+							}
+						}
+						this.setState({
+							sentence: !this.state.sentence
+						});
+					}}
+				>
+					<TreeViewItemContainer>
+						<TextInput
+							textarea
+							label={'Sentences'}
+							value={this.state.sentences}
+							onChange={(val: string) => {
+								this.setState({ sentences: val });
+							}}
+						/>
+					</TreeViewItemContainer>
+					<TreeViewButtonGroup>
+						<TreeViewGroupButton
+							icon="fa fa-star"
+							onClick={() => {
+								if (this.props.methodDescription && this.props.methodDescription.properties)
+									if (this.state.sentences) {
+										this.autoUpdateSentences(executionConfig, mountingItem);
+										this.setState({
+											turn: UIA.GUID()
+										});
+										if (this.props.onChange) {
+											this.props.onChange();
+										}
+									}
+							}}
+						/>
+						<TreeViewGroupButton
+							icon="fa  fa-shekel"
+							title={`Agent ${Titles.IsNotDeleted}`}
+							onClick={() => {
+								let AGENT_IS_NOT_DELETED = `The agent's deleted property is false`;
+								if (this.state.sentences.indexOf(AGENT_IS_NOT_DELETED) === -1) {
+									this.setState(
+										{
+											sentences: [ this.state.sentences, AGENT_IS_NOT_DELETED ]
+												.filter((x) => x)
+												.join(NEW_LINE)
+										},
+										() => {
+											this.autoUpdateSentences(executionConfig, mountingItem);
+										}
+									);
+								}
+							}}
+						/>
+						<TreeViewGroupButton
+							icon="fa fa-rouble"
+							title={`Model ${Titles.IsNotDeleted}`}
+							onClick={() => {
+								let MODEL_IS_NOT_DELETED = `The model's deleted property is false`;
+								if (this.state.sentences.indexOf(MODEL_IS_NOT_DELETED) === -1) {
+									this.setState(
+										{
+											sentences: [ this.state.sentences, MODEL_IS_NOT_DELETED ]
+												.filter((x) => x)
+												.join(NEW_LINE)
+										},
+										() => {
+											this.autoUpdateSentences(executionConfig, mountingItem);
+										}
+									);
+								}
+							}}
+						/>
+						<TreeViewGroupButton
+							icon="fa  fa-inr"
+							title={`Model Output ${Titles.IsNotDeleted}`}
+							onClick={() => {
+								let MODEL_IS_NOT_DELETED = `The output's deleted property is false`;
+								if (this.state.sentences.indexOf(MODEL_IS_NOT_DELETED) === -1) {
+									this.setState(
+										{
+											sentences: [ this.state.sentences, MODEL_IS_NOT_DELETED ]
+												.filter((x) => x)
+												.join(NEW_LINE)
+										},
+										() => {
+											this.autoUpdateSentences(executionConfig, mountingItem);
+										}
+									);
+								}
+							}}
+						/>
+						<TreeViewGroupButton
+							icon="fa fa-rmb"
+							title={`Agent owns the model`}
+							onClick={() => {
+								let AGENT_OWN_THE_MODEL = `The agent's id property is equal to the model's owner property.`;
+								if (this.state.sentences.indexOf(AGENT_OWN_THE_MODEL) === -1) {
+									this.setState(
+										{
+											sentences: [ this.state.sentences, AGENT_OWN_THE_MODEL ]
+												.filter((x) => x)
+												.join(NEW_LINE)
+										},
+										() => {
+											this.autoUpdateSentences(executionConfig, mountingItem);
+										}
+									);
+								}
+							}}
+						/>
+					</TreeViewButtonGroup>
+				</TreeViewMenu>
 				<TreeViewItemContainer>
 					<TextInput
 						label={Titles.Name}
@@ -163,6 +289,9 @@ export default class ExecutionComponentItem extends Component<any, any> {
 			</TreeViewMenu>
 		);
 	}
+  autoUpdateSentences(executionConfig: ExecutionConfig, mountingItem: MountingDescription) {
+    throw new Error("Method not implemented.");
+  }
 
 	private autoName(executionConfig: ExecutionConfig, mountingItem: MountingDescription) {
 		if (executionConfig) {
@@ -188,6 +317,61 @@ export default class ExecutionComponentItem extends Component<any, any> {
 		}
 	}
 }
+export function updateValidationMethod({
+	executionConfig,
+	results,
+	mountingItem,
+	viewType,
+	methodDescription,
+	functionName,
+	options
+}: {
+	executionConfig: ExecutionConfig;
+	results: NLMeaning[];
+	methodDescription: MethodDescription;
+	viewType: string;
+	functionName: string;
+	mountingItem: MountingDescription;
+	options: { methods: any; routes: any; dataChainType: string; override: boolean };
+}) {
+	let methods = options.methods;
+	let routes = options.routes;
+	let dataChainType = options.dataChainType;
+	let override = options.override;
+
+	let { simpleValidations } = executionConfig.dataChainOptions;
+	if (simpleValidations) {
+		let newSimpleValidations: any[] = results.map((meaning: NLMeaning) => {
+			let simpleValidation = CreateSimpleValidation();
+			simpleValidation.enabled = true;
+			simpleValidation.name = meaning.text;
+			if (meaning.actorClause.relationType) {
+				simpleValidation.relationType = meaning.actorClause.relationType;
+				setupRelation(simpleValidation, meaning.actorClause);
+			}
+			switch (meaning.methodType) {
+			}
+			return simpleValidation;
+		});
+		if (newSimpleValidations) {
+			executionConfig.dataChainOptions.simpleValidations =
+				executionConfig.dataChainOptions.simpleValidations || [];
+			executionConfig.dataChainOptions.simpleValidations.length = 0;
+			executionConfig.dataChainOptions.simpleValidations.push(...newSimpleValidations);
+
+			autoNameExecutionConfig(
+				executionConfig,
+				viewType,
+				mountingItem,
+				methodDescription,
+				functionName,
+				methods,
+				override
+			);
+		}
+	}
+}
+
 export function autoNameExecutionConfig(
 	executionConfig: ExecutionConfig,
 	viewType: string,

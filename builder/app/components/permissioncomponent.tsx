@@ -3,7 +3,12 @@ import React, { Component } from 'react';
 import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
 import TreeViewMenu from './treeviewmenu';
-import { MountingDescription, PermissionConfig } from '../interface/methodprops';
+import {
+	MountingDescription,
+	PermissionConfig,
+	CheckValidationConfigs,
+	ValidationColors
+} from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import ValidationComponentItem from './validationcomponentitem';
@@ -20,11 +25,13 @@ export default class PermissionComponent extends Component<any, any> {
 		mountingItem.permissions = mountingItem.permissions || [];
 		let { permissions } = mountingItem;
 
+		let valid = CheckValidationConfigs(permissions);
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				color={permissions && permissions.length ? '#DD4B39' : ''}
+				color={permissions && permissions.length ? ValidationColors.Ok : ValidationColors.Neutral}
 				active
+				error={!valid}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}

@@ -234,7 +234,8 @@ export default function getLanguageMeaning(
 	let contains = [ 'contains a', 'contains an' ];
 	let intersects = [ 'intersects', 'intersects with' ];
 	let inAEnumeration = [ 'is in an enumeration', 'is an enumeration', 'is in a set' ];
-	let all = [ , ...inAEnumeration, ...intersects, ...equals, ...isA, ...contains ].sort(
+	let executionStuff = [ 'copies to', 'increments by' ];
+	let all = [ ...executionStuff, ...inAEnumeration, ...intersects, ...equals, ...isA, ...contains ].sort(
 		(a, b) => a.length - b.length
 	);
 
@@ -289,6 +290,12 @@ export default function getLanguageMeaning(
 			result.methodType = NLMethodType.IsTrue;
 		} else if (intersects.find((item: string) => temp.has(item))) {
 			result.methodType = NLMethodType.Intersects;
+		} else if (executionStuff.find((item: string) => temp.has(item))) {
+			if (temp.has('copies to')) {
+				result.methodType = NLMethodType.CopyTo;
+			} else if (temp.has('increments by')) {
+				result.methodType = NLMethodType.IncrementBy;
+			}
 		}
 		function findPotentialProperties(modelId?: string): Node[] {
 			let result: Node[] = [];
@@ -389,7 +396,9 @@ export enum NLMethodType {
 	IsTrue = 'IsTrue',
 	Intersects = 'Intersects',
 	IsFalse = 'IsFalse',
-	MatchEnumeration = 'MatchEnumeration'
+	MatchEnumeration = 'MatchEnumeration',
+	CopyTo = 'CopyTo',
+	IncrementBy = 'IncrementBy'
 }
 
 export const NLValidationClauses = {

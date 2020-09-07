@@ -1012,6 +1012,25 @@ export function CheckSimpleValidation(isvalidation: SimpleValidationConfig): boo
 	}
 	return true;
 }
+export const ValidationColors = {
+	Ok: '#00BFB2',
+	Error: '#E71D36',
+	Neutral: '#FDFFFC'
+};
+export function CheckValidationConfigs(validationConfigs: ValidationConfig[]): boolean {
+	let res = true;
+
+	validationConfigs.forEach((validationConfig: ValidationConfig) => {
+		res = res && CheckValidationConfig(validationConfig);
+	});
+
+	return res;
+}
+export function CheckValidationConfig(validationConfig: ValidationConfig): boolean {
+	return validationConfig.dataChainOptions
+		? CheckAfterEffectDataChainConfiguration(validationConfig.dataChainOptions)
+		: true;
+}
 export function CheckNumberConfig(numberConfig: NumberConfig): boolean {
 	return !numberConfig.enabled || !!numberConfig.value;
 }

@@ -8,7 +8,9 @@ import {
 	TargetMethodType,
 	MountingDescription,
 	ValidationConfig,
-	FilterConfig
+	FilterConfig,
+	ValidationColors,
+  CheckValidationConfigs
 } from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
@@ -25,13 +27,16 @@ export default class FilterComponent extends Component<any, any> {
 	render() {
 		let mountingItem: MountingDescription = this.props.mountingItem;
 		mountingItem.filters = mountingItem.filters || [];
-		let { filters } = mountingItem;
+    let { filters } = mountingItem;
+
+		let valid = CheckValidationConfigs(filters);
 
 		return (
 			<TreeViewMenu
 				open={this.state.open}
+				color={filters && filters.length ? ValidationColors.Ok : ValidationColors.Neutral}
 				active
-				color={filters && filters.length ? '#DD4B39' : ''}
+				error={!valid}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
@@ -46,7 +51,8 @@ export default class FilterComponent extends Component<any, any> {
 								id: UIA.GUID(),
 								name: '',
 								dataChain: '',
-								dataChainOptions: {}
+								dataChainOptions: {},
+								autoCalculate: true
 							});
 
 							this.setState({ turn: UIA.GUID() });

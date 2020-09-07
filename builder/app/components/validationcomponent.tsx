@@ -3,7 +3,14 @@ import React, { Component } from 'react';
 import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
 import TreeViewMenu from './treeviewmenu';
-import { AfterEffect, TargetMethodType, MountingDescription, ValidationConfig } from '../interface/methodprops';
+import {
+	AfterEffect,
+	TargetMethodType,
+	MountingDescription,
+	ValidationConfig,
+	CheckValidationConfigs,
+	ValidationColors
+} from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import AfterEffectComponent from './aftereffectcomponent';
@@ -21,11 +28,13 @@ export default class ValidationComponent extends Component<any, any> {
 		mountingItem.validations = mountingItem.validations || [];
 		let { validations } = mountingItem;
 
+		let valid = CheckValidationConfigs(validations);
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				color={validations && validations.length ? '#39A0ED' : ''}
+				color={validations && validations.length ? ValidationColors.Ok : ValidationColors.Neutral}
 				active
+				error={!valid}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
@@ -40,7 +49,8 @@ export default class ValidationComponent extends Component<any, any> {
 								enabled: true,
 								name: '',
 								dataChain: '',
-								dataChainOptions: {}
+								dataChainOptions: {},
+								autoCalculate: true
 							});
 
 							this.setState({ turn: UIA.GUID() });

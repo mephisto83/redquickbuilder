@@ -14,7 +14,9 @@ import {
 	HalfRelation,
 	CreateSimpleValidation,
 	CreateOneOf,
-	MethodDescription
+	MethodDescription,
+	CheckValidationConfig,
+  ValidationColors
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties, Methods, NEW_LINE } from '../constants/nodetypes';
@@ -49,14 +51,17 @@ export default class ValidationComponentItem extends Component<any, any> {
 		if (validationConfig.autoCalculate === undefined) {
 			validationConfig.autoCalculate = true;
 		}
+		let valid = CheckValidationConfig(validationConfig);
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				icon={'fa fa-circle-o'}
+				icon={valid ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+				color={valid ? ValidationColors.Ok : ValidationColors.Neutral}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
 				active
+				error={!valid}
 				title={this.props.otitle || validationConfig.name || this.props.title || Titles.Validation}
 			>
 				<TreeViewMenu
