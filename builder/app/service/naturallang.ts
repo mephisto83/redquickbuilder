@@ -261,7 +261,8 @@ export default function getLanguageMeaning(
 							_nlp(secondClause).has(GetCodeName(vnode).toLocaleLowerCase()) ||
 							_nlp(secondClause).has(GetCodeName(vnode).toLocaleUpperCase())
 					);
-				let enumerationClause = temp.match('with a').lookAhead().text();
+				let enumerationClause =
+					temp.match('with a').lookAhead().text() || temp.match('with an').lookAhead().text();
 				if (enumeration && enumerationClause) {
 					result.targetClause.enumeration = enumeration.id;
 					let possibleEnumerations = GetNodeProp(enumeration, NodeProperties.Enumeration) || [];

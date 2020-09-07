@@ -185,7 +185,7 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 										this.props.onChange();
 									}
 								}}
-								icon="fa  fa-minus-square"
+								icon="fa  fa-font"
 							/>
 						)}
 						{!this.state.selectedNode ? null : (
@@ -217,7 +217,7 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 										}
 									}
 								}}
-								icon="fa fa-thumbs-o-up"
+								icon="fa  fa-opera"
 							/>
 						)}
 						{!this.state.selectedNode ? null : (
