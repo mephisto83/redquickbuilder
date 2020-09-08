@@ -673,7 +673,7 @@ export function autoName(
 	}
 }
 
-function setupRelation(halfRelation: HalfRelation, clause: Clause) {
+export function setupRelation(halfRelation: HalfRelation, clause: Clause) {
 	switch (halfRelation.relationType) {
 		case RelationType.Agent:
 			if (clause.agent) {

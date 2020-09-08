@@ -2557,6 +2557,34 @@ export function GetArbiterPropertyDefinitions(tabs = 3) {
 	);
 	return definitions.join(NodeConstants.NEW_LINE);
 }
+
+export function getDataChainNameSpace(dataChain: any, asFilePath?: boolean) {
+	let dcnamespace = '';
+	let dataChainNameSpace: string[] | null = GetNodeProp(dataChain, NodeProperties.DataChainNameSpace);
+	if (dataChainNameSpace) {
+		if (asFilePath) {
+			return path.join(
+				...dataChainNameSpace.map((v) => {
+					let temp = GetNodeTitle(v);
+					if (temp !== Titles.Unknown) {
+						return temp;
+					}
+					return v;
+				})
+			);
+		}
+		dcnamespace = `${dataChainNameSpace
+			.map((v) => {
+				let temp = GetNodeTitle(v);
+				if (temp !== Titles.Unknown) {
+					return temp;
+				}
+				return v;
+			})
+			.join('.')}`;
+	}
+	return dcnamespace;
+}
 export function GetCustomServiceDefinitions(type: string, tabs = 3) {
 	const services = GetCustomServicesForNodeType(type);
 	const template = `I{{model}} {{model_js}};`;

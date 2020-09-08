@@ -415,8 +415,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		case DataChainType.Execution:
 			can_complete = true;
 			from_parameter_template = `
-      public static async Task<${outputType ||
-			'bool'}> Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change = null, #{{"key":"result"}}# result = null)
+      public static async Task Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change = null, #{{"key":"result"}}# result = null)
       {
           Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task<${outputType ||
 				'bool'}>> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# model, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
@@ -424,7 +423,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
               {{copy_config}}
           };
 
-          return await func(model, agent, change);
+           await func(model, agent, change);
       }
   `;
 			break;
@@ -520,6 +519,11 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			updateComponentProperty(dataChain, NodeProperties.AutoCalculate, autoCalculate);
 			updateComponentProperty(
 				dataChain,
+				NodeProperties.DataChainNameSpace,
+				dataChainConfigOptions.namespaceConfig ? dataChainConfigOptions.namespaceConfig.space : null
+			);
+			updateComponentProperty(
+				dataChain,
 				NodeProperties.AfterEffectKey,
 				`AfterEffectChains.${codeTypeWord(afterEffectParent)}.${codeTypeWord(afterEffectChild)}`
 			);
@@ -538,6 +542,9 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 						[NodeProperties.ArbiterModels]: arbiterModels,
 						[NodeProperties.CompleteFunction]: true,
 						[NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Lambda,
+						[NodeProperties.DataChainNameSpace]: dataChainConfigOptions.namespaceConfig
+							? dataChainConfigOptions.namespaceConfig.space
+							: null,
 						[NodeProperties.LambdaInsertArguments]: lambdaInsertArgumentValues,
 						[NodeProperties.TargetProperty]: target_property,
 						[NodeProperties.Lambda]: from_parameter_template,
@@ -591,7 +598,14 @@ function setupCopyConfig(
 		[ReferenceInsertType.Property]: props,
 		[ReferenceInsertType.Model]: agentOrModel
 	};
-	copy_config = `return ${relProp}.#{{"key":"${relProp}.${GetJSCodeName(
+	let targetModel = GetPropertyModel(target_property);
+	tempLambdaInsertArgumentValues[`result.${GetJSCodeName(target_property)}`] = {
+		[ReferenceInsertType.Property]: target_property,
+		[ReferenceInsertType.Model]: targetModel ? targetModel.id : ''
+	};
+	copy_config = `result.#{{"key":"result.${GetJSCodeName(
+		target_property
+	)}","type":"property","model":"result"}}# = ${relProp}.#{{"key":"${relProp}.${GetJSCodeName(
 		props
 	)}","type":"property","model":"${relProp}"}}#;`;
 	return { target_property, outputType, copy_config };

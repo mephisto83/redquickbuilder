@@ -10,7 +10,8 @@ import {
 	GetCurrentGraph,
 	GetRelativeDataChainPath,
 	GetRootGraph,
-	GetCodeName
+	GetCodeName,
+	getDataChainNameSpace
 } from '../actions/uiactions';
 import {
 	UITypes,
@@ -41,12 +42,15 @@ export default class DataChainGenerator {
 			language
 		}).forEach((f: { node: any; class: any }) => {
 			const dataChain = f.node;
-
+			let dcnamespace = '';
+			dcnamespace = getDataChainNameSpace(dataChain);
+			let relativefilePath = getDataChainNameSpace(dataChain, true);
 			result[GetNodeProp(dataChain, NodeProperties.CodeName)] = {
 				id: GetNodeProp(dataChain, NodeProperties.CodeName),
 				name: GetNodeProp(dataChain, NodeProperties.CodeName),
 				template: NamespaceGenerator.Generate({
 					template: f.class,
+					relativeFilePath: relativefilePath,
 					usings: [
 						...STANDARD_CONTROLLER_USING,
 						`${namespace}${NameSpace.Model}`,
@@ -57,7 +61,7 @@ export default class DataChainGenerator {
 						`${namespace}${NameSpace.Parameters}`
 					],
 					namespace,
-					space: NameSpace.Controllers
+					space: `${NameSpace.Controllers}${dcnamespace ? '.' : ''}${dcnamespace}`
 				})
 			};
 		});

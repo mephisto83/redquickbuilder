@@ -78,8 +78,8 @@ ipcRenderer.on('update-jobs', (event, arg) => {
 	}
 });
 ipcRenderer.on('config-update', (event, targ) => {
-  console.log('received config update')
-  let arg = JSON.parse(targ);
+	console.log('received config update');
+	let arg = JSON.parse(targ);
 	if (arg && arg.body) {
 		updateConfig(arg.body);
 	}
@@ -148,8 +148,7 @@ ipcRenderer.on('load-configs-reply', (event, arg) => {
 		setAppConfigPath(temp.folder, temp.body);
 	}
 });
-export function loadConfigs() {
-}
+export function loadConfigs() {}
 
 function message(msg: any, body: any) {
 	return {
@@ -847,9 +846,17 @@ function generateFiles(workspace: string, solutionName: string, state: any) {
 		const area = CodeTypeToArea[code_type];
 		for (const fileName in temp) {
 			ensureDirectory(path.join(workspace, solutionName + area));
+			if (temp[fileName].relativeFilePath) {
+				ensureDirectory(path.join(workspace, solutionName + area, temp[fileName].relativeFilePath));
+			}
 			if (temp[fileName].template) {
 				writeFileSync(
-					path.join(workspace, solutionName + area, `${temp[fileName].name}.cs`),
+					path.join(
+						workspace,
+						solutionName + area,
+						temp[fileName].relativeFilePath || '',
+						`${temp[fileName].name}.cs`
+					),
 					temp[fileName].template
 				);
 			}

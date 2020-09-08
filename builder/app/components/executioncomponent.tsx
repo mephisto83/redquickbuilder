@@ -3,31 +3,87 @@ import React, { Component } from 'react';
 import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
 import TreeViewMenu from './treeviewmenu';
-import { MountingDescription, ExecutionConfig, ValidationColors, CheckValidationConfigs } from '../interface/methodprops';
+import {
+	MountingDescription,
+	ExecutionConfig,
+	ValidationColors,
+	CheckValidationConfigs,
+	MethodDescription,
+	CreateCopyConfig,
+	RelationType
+} from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
-import ExecutionComponentItem, { autoNameExecutionConfig } from './executioncomponentitem';
+import ExecutionComponentItem, { autoNameExecutionConfig, buildDataChain } from './executioncomponentitem';
 import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import CheckBox from './checkbox';
-import { NodeProperties } from '../constants/nodetypes';
+import { NodeProperties, NEW_LINE } from '../constants/nodetypes';
+import TextInput from './textinput';
+import { Node } from '../methods/graph_types';
+import { GetNLMeaning, setupRelation } from './validationcomponentitem';
+import { NLMeaning, NLMethodType } from '../service/naturallang';
 
 export default class ExecutionComponent extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
-		this.state = {};
+		this.state = { sentence: false, sentences: '' };
 	}
+	autoUpdateSentences({ sentences, mountingItem }: { sentences: string; mountingItem: MountingDescription }) {
+		let sentenceArray = sentences.split(NEW_LINE);
+		while (mountingItem.executions && mountingItem.executions.length) {
+			deleteExecutions(mountingItem.executions, mountingItem.executions[0]);
+		}
+		if (mountingItem.methodDescription) {
+			let nlMeaning: NLMeaning[] = GetNLMeaning({ sentences, methodDescription: mountingItem.methodDescription });
+			nlMeaning.forEach((meaning: NLMeaning) => {
+				let executionConfig: ExecutionConfig = {
+					id: UIA.GUID(),
+					name: '',
+					dataChain: '',
+					enabled: true,
+					dataChainOptions: {},
+					autoCalculate: true
+				};
+				let skip = false;
+				switch (meaning.methodType) {
+					case NLMethodType.CopyTo:
+						let copyConfig = CreateCopyConfig();
+						if (meaning.actorClause.relationType) {
+							copyConfig.relationType = meaning.actorClause.relationType;
+							setupRelation(copyConfig, meaning.actorClause);
+							if (meaning.targetClause.property)
+								copyConfig.targetProperty = meaning.targetClause.property;
+							executionConfig.dataChainOptions.copyConfig = copyConfig;
+							executionConfig.summary = meaning.text;
+							copyConfig.enabled = true;
+							executionConfig.name = `Copy ${UIA.GetNodeTitle(meaning.targetClause.property)}`;
+						}
+						break;
+					case NLMethodType.IncrementBy:
+					default:
+						skip = true;
+						break;
+				}
+				if (!skip) {
+					mountingItem.executions.push(executionConfig);
+				}
+			});
+			autoName(mountingItem, mountingItem.executions, this.props.methods);
+		}
+	}
+
 	render() {
 		let mountingItem: MountingDescription = this.props.mountingItem;
 		mountingItem.executions = mountingItem.executions || [];
-    let { executions } = mountingItem;
+		let { executions } = mountingItem;
 
 		let valid = CheckValidationConfigs(executions);
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-        color={executions && executions.length ? ValidationColors.Ok : ValidationColors.Neutral}
-        active
+				color={executions && executions.length ? ValidationColors.Ok : ValidationColors.Neutral}
+				active
 				error={!valid}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
@@ -36,7 +92,7 @@ export default class ExecutionComponent extends Component<any, any> {
 			>
 				<TreeViewButtonGroup>
 					<TreeViewGroupButton
-						title={`${Titles.AddAfterMethods}`}
+						title={`${Titles.Add} Execution `}
 						onClick={() => {
 							executions.push({
 								id: UIA.GUID(),
@@ -44,7 +100,7 @@ export default class ExecutionComponent extends Component<any, any> {
 								dataChain: '',
 								enabled: true,
 								dataChainOptions: {},
-								autoCalculate: true
+								autoCalculate: false
 							});
 
 							this.setState({ turn: UIA.GUID() });
@@ -70,23 +126,8 @@ export default class ExecutionComponent extends Component<any, any> {
 					<TreeViewGroupButton
 						title={`Auto Name`}
 						onClick={() => {
-							let { methodDescription, viewType } = mountingItem;
-							if (methodDescription) {
-								executions.forEach((executionConfig: ExecutionConfig) => {
-									if (methodDescription) {
-										autoNameExecutionConfig(
-											executionConfig,
-											viewType,
-											mountingItem,
-											methodDescription,
-											mountingItem.name,
-											this.props.methods,
-											true
-										);
-									}
-								});
-								this.setState({ turn: UIA.GUID() });
-							}
+							autoName(mountingItem, executions, this.props.methods);
+							this.setState({ turn: UIA.GUID() });
 						}}
 						icon="fa fa-amazon"
 					/>
@@ -118,6 +159,88 @@ export default class ExecutionComponent extends Component<any, any> {
 						icon="fa fa-paste"
 					/>
 				</TreeViewButtonGroup>
+				<TreeViewMenu
+					open={this.state.sentence}
+					active
+					title={'Sentence Input'}
+					onClick={() => {
+						if (!this.state.sentence) {
+							if (executions.length) {
+								this.setState({
+									sentences: executions.map((v) => v.summary).filter((v) => v).join(NEW_LINE)
+								});
+							}
+						}
+						this.setState({
+							sentence: !this.state.sentence
+						});
+					}}
+				>
+					<TreeViewItemContainer>
+						<TextInput
+							textarea
+							label={'Sentences'}
+							value={this.state.sentences}
+							onChange={(val: string) => {
+								this.setState({ sentences: val });
+							}}
+						/>
+					</TreeViewItemContainer>
+					<TreeViewButtonGroup>
+						<TreeViewGroupButton
+							icon="fa fa-star"
+							onClick={() => {
+								if (this.props.methodDescription && this.props.methodDescription.properties)
+									if (this.state.sentences) {
+										this.autoUpdateSentences({ sentences: this.state.sentences, mountingItem });
+										this.setState({
+											turn: UIA.GUID()
+										});
+										if (this.props.onChange) {
+											this.props.onChange();
+										}
+									}
+							}}
+						/>
+						<TreeViewGroupButton
+							icon="fa fa-copy"
+							onClick={() => {
+								if (this.props.methodDescription && this.props.methodDescription.properties)
+									if (this.state.sentences) {
+										let methodDescription: MethodDescription = this.props.methodDescription;
+										let targetProperties = methodDescription.properties.model
+											? UIA.GetModelCodeProperties(methodDescription.properties.model).filter(
+													(v: Node) => !UIA.GetNodeProp(v, NodeProperties.IsDefaultProperty)
+												)
+											: [];
+										let sentences = targetProperties.map((v: Node) => {
+											return `The model's ${UIA.GetCodeName(
+												v
+											).toLowerCase()} property copies to the target's ${UIA.GetCodeName(
+												v
+											).toLowerCase()}`;
+										});
+										let tempSentences = [
+											...executions.map((v) => v.summary || '').filter((v) => v),
+											...`${this.state.setences || ''}`.split(NEW_LINE),
+											...sentences
+										]
+											.filter((v) => v)
+											.unique()
+											.join(NEW_LINE);
+										this.setState({
+											turn: UIA.GUID(),
+											sentences: tempSentences
+										});
+										if (this.props.onChange) {
+											this.props.onChange();
+										}
+									}
+							}}
+						/>
+					</TreeViewButtonGroup>
+				</TreeViewMenu>
+
 				<TreeViewItemContainer>
 					<CheckBox
 						title={Titles.AutoCopy}
@@ -150,20 +273,8 @@ export default class ExecutionComponent extends Component<any, any> {
 							}}
 							agent={this.props.agent}
 							onDelete={() => {
-								let index: number = executions.findIndex((v) => v.id === executionConfig.id);
-								if (index !== -1 && executions) {
-									if (executionConfig.dataChain) {
-										let originalConfig = UIA.GetNodeProp(
-											executionConfig.dataChain,
-											NodeProperties.OriginalConfig
-										);
-										if (originalConfig === executionConfig.dataChain) {
-											UIA.removeNodeById(executionConfig.dataChain);
-										}
-									}
-									executions.splice(index, 1);
-									this.setState({ turn: UIA.GUID() });
-								}
+								deleteExecutions(executions, executionConfig);
+								this.setState({ turn: UIA.GUID() });
 							}}
 							executionConfig={executionConfig}
 						/>
@@ -171,5 +282,28 @@ export default class ExecutionComponent extends Component<any, any> {
 				})}
 			</TreeViewMenu>
 		);
+	}
+}
+function autoName(mountingItem: MountingDescription, executions: ExecutionConfig[], methods: any) {
+	let { methodDescription, viewType } = mountingItem;
+	if (methodDescription) {
+		executions.forEach((executionConfig: ExecutionConfig) => {
+			if (methodDescription) {
+				buildDataChain(executionConfig, mountingItem, methods, true);
+			}
+		});
+	}
+}
+
+function deleteExecutions(executions: ExecutionConfig[], executionConfig: ExecutionConfig) {
+	let index: number = executions.findIndex((v) => v.id === executionConfig.id);
+	if (index !== -1 && executions) {
+		if (executionConfig.dataChain) {
+			let originalConfig = UIA.GetNodeProp(executionConfig.dataChain, NodeProperties.OriginalConfig);
+			if (originalConfig === executionConfig.dataChain) {
+				UIA.removeNodeById(executionConfig.dataChain);
+			}
+		}
+		executions.splice(index, 1);
 	}
 }

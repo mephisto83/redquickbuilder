@@ -50,7 +50,7 @@ import StaticParametersComponent from './staticparameterscomponent';
 import FilterItemsComponent from './filteritemscomponent';
 import { autoNameGenerateDataChain } from './validationcomponentitem';
 import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
-import { autoNameExecutionConfig } from './executioncomponentitem';
+import { autoNameExecutionConfig, buildDataChain } from './executioncomponentitem';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class EffectContextMenu extends Component<any, any> {
@@ -429,12 +429,9 @@ class EffectContextMenu extends Component<any, any> {
 													.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
 													.forEach((executionConfig: ExecutionConfig) => {
 														if (methodDescription) {
-															autoNameExecutionConfig(
+															buildDataChain(
 																executionConfig,
-																viewType,
 																effectItem,
-																methodDescription,
-																effectItem.name,
 																mode.methods,
 																true
 															);

@@ -12,7 +12,8 @@ import {
 	GetMethodNodeProp,
 	GetCurrentGraph,
 	GetState,
-	GetNodeById
+	GetNodeById,
+	getDataChainNameSpace
 } from '../actions/uiactions';
 import {
 	LinkType,
@@ -311,7 +312,9 @@ export default class ExecutorGenerator {
 								case ExecutorRules.Copy:
 									break;
 								case ExecutorRules.DataChain:
-									template = `result{{model_property}} = await {{node}}.Execute(agent, data, change);`;
+									// Made this change to allow a single data chain to have more power
+									// template = `result{{model_property}} = await {{node}}.Execute(agent, data, change);`;
+									template = `await {{node}}.Execute(agent, data, change, result);`;
 									break;
 								case ExecutorRules.AddModelReference:
 									template = fs.readFileSync(
@@ -335,10 +338,11 @@ export default class ExecutorGenerator {
 								default:
 									throw 'not handle [execution generator]';
 							}
+							let nodeNameSpace = `${getDataChainNameSpace(node)}`;
 							const templateRes = bindTemplate(template, {
 								attribute_type: validators.code[ProgrammingLanguages.CSHARP],
 								attribute_type_arguments,
-								node: GetCodeName(node),
+								node: `${nodeNameSpace}${nodeNameSpace ? '.' : ''}${GetCodeName(node)}`,
 								model_property: `.${GetNodeProp(propertyNode, NodeProperties.CodeName)}`,
 								...{ ...templateBindings }
 							});

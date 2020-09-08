@@ -115,6 +115,16 @@ export interface DataChainConfiguration {
 	getExisting?: GetExistingConfig;
 	setProperties?: SetPropertiesConfig;
 	directExecute?: boolean;
+	namespaceConfig?: NamespaceConfig;
+}
+
+export interface NamespaceConfig {
+	space: string[];
+}
+export function CreateNameSpaceConfig(args: { space: string[] }): NamespaceConfig {
+	return {
+		space: args.space
+	};
 }
 
 export interface RouteConfig extends ConfigItem {
@@ -1093,6 +1103,7 @@ export interface FilterConfig extends ValidationConfig {}
 export interface ValidationConfig {
 	id: string;
 	name: string;
+	summary?: string;
 	dataChain: string;
 	enabled: boolean;
 	autoCalculate: boolean;

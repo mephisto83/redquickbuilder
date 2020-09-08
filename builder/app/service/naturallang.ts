@@ -17,6 +17,9 @@ const _nlp = nlp.extend((Doc: any, world: any) => {
 		Parent: {
 			isA: 'Model'
 		},
+		Target: {
+			isA: 'Model'
+		},
 		ModelOutput: {
 			isA: 'Model'
 		},
@@ -152,6 +155,7 @@ export function updateWorld() {
 	webDictionary['output'] = [ 'ModelOutput', MODEL ];
 	webDictionary['outputs'] = [ MODEL, 'ModelOutput', POSSESIVE ];
 	webDictionary['parent'] = [ 'Parent', MODEL ];
+	webDictionary['target'] = [ MODEL, 'Target' ];
 	webDictionary['parents'] = [ MODEL, 'Parent', POSSESIVE ];
 	webDictionary['models'] = [ MODEL, POSSESIVE ];
 	webDictionary['is a valid'] = [ IS_A ];
@@ -323,7 +327,13 @@ export default function getLanguageMeaning(
 			result.targetClause.relationType = RelationType.Parent;
 			result.targetClause.agent = context ? context.parent : '';
 			targetProperties = findPotentialProperties(context && context.parent ? context.parent : undefined);
-		}
+    }
+		if (_nlp(secondClause).has(`#Target`)) {
+			result.targetClause.relationType = RelationType.Model;
+			result.targetClause.agent = context ? context.model : '';
+			targetProperties = findPotentialProperties(context && context.model ? context.model : undefined);
+    }
+
 		if (_nlp(secondClause).has(`#ModelOutput`)) {
 			result.targetClause.relationType = RelationType.ModelOuput;
 			result.targetClause.agent = context ? context.model_output : '';
@@ -340,6 +350,11 @@ export default function getLanguageMeaning(
 			result.actorClause.agent = context ? context.model : '';
 			actorProperties = findPotentialProperties(context && context.model ? context.model : undefined);
 		}
+		if (_nlp(firstClause).has(`#Target`)) {
+			result.actorClause.relationType = RelationType.Model;
+			result.actorClause.agent = context ? context.model : '';
+			targetProperties = findPotentialProperties(context && context.model ? context.model : undefined);
+    }
 		if (_nlp(firstClause).has(`#Parent`)) {
 			result.actorClause.relationType = RelationType.Parent;
 			result.actorClause.agent = context ? context.parent : '';
