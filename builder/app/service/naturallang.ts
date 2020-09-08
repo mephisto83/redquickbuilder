@@ -1,6 +1,6 @@
 import nlp from 'compromise';
 import { NodesByType, GetNodeProp, GetCodeName, GetModelCodeProperties } from '../actions/uiactions';
-import { NodeTypes, NodeProperties, MakeConstant } from '../constants/nodetypes';
+import { NodeTypes, NodeProperties, MakeConstant, NodeAttributePropertyTypes } from '../constants/nodetypes';
 import { Node } from '../methods/graph_types';
 import { RelationType, CreateBoolean, CreateMinLength, CreateMaxLength } from '../interface/methodprops';
 import { GetNodeTitle } from '../actions/uiactions';
@@ -86,6 +86,9 @@ const _nlp = nlp.extend((Doc: any, world: any) => {
 		RequiresNonAlphaNumeric: {
 			isA: 'Validation'
 		},
+		AttributePropertyTypes: {
+			isA: 'Validation'
+		},
 		RequiresLowerCase: {
 			isA: 'Validation'
 		},
@@ -160,6 +163,16 @@ export function updateWorld() {
 	webDictionary['models'] = [ MODEL, POSSESIVE ];
 	webDictionary['is a valid'] = [ IS_A ];
 	webDictionary['must be a valid'] = [ IS_A ];
+	Object.entries(NodeAttributePropertyTypes).forEach((d: any) => {
+		let [ key, value ] = d;
+		webDictionary[key] = webDictionary[key] || [];
+		webDictionary[key].push(key, 'NodeAttributePropertyTypes');
+		webDictionary[key] = webDictionary[key].unique();
+		webDictionary[key.toLowerCase()] = webDictionary[key.toLowerCase()] || [];
+		webDictionary[key.toLowerCase()].push(key, 'NodeAttributePropertyTypes');
+		webDictionary[key.toLowerCase()] = webDictionary[key.toLowerCase()].unique();
+	});
+
 	Object.entries(NLValidationClauses).forEach((d: any) => {
 		let [ key, value ] = d;
 		if (value && value.$def) {
@@ -239,9 +252,18 @@ export default function getLanguageMeaning(
 	let intersects = [ 'intersects', 'intersects with' ];
 	let inAEnumeration = [ 'is in an enumeration', 'is an enumeration', 'is in a set' ];
 	let executionStuff = [ 'copies to', 'increments by' ];
-	let all = [ ...executionStuff, ...inAEnumeration, ...intersects, ...equals, ...isA, ...contains ].sort(
-		(a, b) => a.length - b.length
-	);
+	let referenceStuff = [ 'must connect to a real' ];
+	let validationStuff = [ 'must conform to a' ];
+	let all = [
+		...validationStuff,
+		...referenceStuff,
+		...executionStuff,
+		...inAEnumeration,
+		...intersects,
+		...equals,
+		...isA,
+		...contains
+	].sort((a, b) => a.length - b.length);
 
 	let result: NLMeaning = { actorClause: {}, targetClause: {}, validation: {}, text };
 	let understandableClause = all.find((item: string) => {
@@ -300,6 +322,10 @@ export default function getLanguageMeaning(
 			} else if (temp.has('increments by')) {
 				result.methodType = NLMethodType.IncrementBy;
 			}
+		} else if (validationStuff.find((item: string) => temp.has(item))) {
+			result.methodType = NLMethodType.ComplexValidations;
+		} else if (referenceStuff.find((item: string) => temp.has(item))) {
+			result.methodType = NLMethodType.Reference;
 		}
 		function findPotentialProperties(modelId?: string): Node[] {
 			let result: Node[] = [];
@@ -327,13 +353,30 @@ export default function getLanguageMeaning(
 			result.targetClause.relationType = RelationType.Parent;
 			result.targetClause.agent = context ? context.parent : '';
 			targetProperties = findPotentialProperties(context && context.parent ? context.parent : undefined);
-    }
+		}
 		if (_nlp(secondClause).has(`#Target`)) {
 			result.targetClause.relationType = RelationType.Model;
 			result.targetClause.agent = context ? context.model : '';
 			targetProperties = findPotentialProperties(context && context.model ? context.model : undefined);
     }
 
+		if (_nlp(secondClause).has(`#NodeAttributePropertyTypes`)) {
+			Object.entries(NodeAttributePropertyTypes).forEach((d: any) => {
+				let [ key, value ] = d;
+
+				if (_nlp(secondClause).has(`#${key}`)) {
+					{
+						result.targetClause.propertyAttributeType = key;
+					}
+				}
+
+				// webDictionary[key] = webDictionary[key] || [];
+				// webDictionary[key].push(key, 'NodeAttributePropertyTypes');
+				// webDictionary[key] = webDictionary[key].unique();
+				// webDictionary[key.toLowerCase()].push(key, 'NodeAttributePropertyTypes');
+				// webDictionary[key.toLowerCase()] = webDictionary[key.toLowerCase()].unique();
+			});
+		}
 		if (_nlp(secondClause).has(`#ModelOutput`)) {
 			result.targetClause.relationType = RelationType.ModelOuput;
 			result.targetClause.agent = context ? context.model_output : '';
@@ -354,7 +397,7 @@ export default function getLanguageMeaning(
 			result.actorClause.relationType = RelationType.Model;
 			result.actorClause.agent = context ? context.model : '';
 			targetProperties = findPotentialProperties(context && context.model ? context.model : undefined);
-    }
+		}
 		if (_nlp(firstClause).has(`#Parent`)) {
 			result.actorClause.relationType = RelationType.Parent;
 			result.actorClause.agent = context ? context.parent : '';
@@ -398,6 +441,7 @@ export default function getLanguageMeaning(
 }
 
 export interface Clause {
+	propertyAttributeType: string;
 	relationType?: RelationType;
 	agent?: string;
 	property?: string;
@@ -413,7 +457,9 @@ export enum NLMethodType {
 	IsFalse = 'IsFalse',
 	MatchEnumeration = 'MatchEnumeration',
 	CopyTo = 'CopyTo',
-	IncrementBy = 'IncrementBy'
+	IncrementBy = 'IncrementBy',
+	Reference = 'Reference',
+	ComplexValidations = 'ComplexValidations'
 }
 
 export const NLValidationClauses = {

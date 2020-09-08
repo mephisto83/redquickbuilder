@@ -57,7 +57,10 @@ export default class ExecutionComponentItem extends Component<any, any> {
 					this.setState({ open: !this.state.open });
 				}}
 				active
-				title={executionConfig.name || Titles.Execution}
+				title={
+					`${executionConfig.name}${executionConfig.summary ? `(${executionConfig.summary})` : ''}` ||
+					Titles.Execution
+				}
 			>
 				<TreeViewItemContainer>
 					<TextInput
@@ -241,11 +244,11 @@ export function buildDataChain(
 				executionConfig.dataChainOptions.namespaceConfig = CreateNameSpaceConfig({
 					space: [
 						methodDescription.properties.agent,
-            methodDescription.properties.model_output || methodDescription.properties.model,
-            mountingItem.viewType,
-            MethodFunctions[methodDescription.functionType].method
+						methodDescription.properties.model_output || methodDescription.properties.model,
+						mountingItem.viewType,
+						MethodFunctions[methodDescription.functionType].method
 					]
-        });
+				});
 
 				BuildDataChainAfterEffectConverter(
 					{

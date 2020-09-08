@@ -583,6 +583,7 @@ export function CreateSimpleValidation(): SimpleValidationConfig {
 		isNull: CreateBoolean(),
 		isTrue: CreateBoolean(),
 		isFalse: CreateBoolean(),
+		referencesExisting: CreateReferences(),
 		alphaNumeric: CreateBoolean(),
 		alphaOnly: CreateBoolean(),
 		creditCard: CreateBoolean(),
@@ -597,7 +598,7 @@ export function CreateSimpleValidation(): SimpleValidationConfig {
 		urlEmpty: CreateBoolean(),
 		zip: CreateBoolean(),
 		zipEmpty: CreateBoolean(),
-
+		isBoolean: CreateBoolean(),
 		minLength: CreateMinLength(),
 		maxLength: CreateMaxLength(),
 		areEqual: CreateAreEqual(),
@@ -605,6 +606,13 @@ export function CreateSimpleValidation(): SimpleValidationConfig {
 		isNotContained: CreateAreEqual(),
 		isIntersecting: CreateAreEqual(),
 		oneOf: CreateOneOf()
+	};
+}
+export function CreateReferences(model?: string): QuarterRelation {
+	return {
+		enabled: false,
+		id: GUID(),
+		model: model || ''
 	};
 }
 export function CreateMaxLength(len?: string) {
@@ -709,6 +717,7 @@ export function SetupConfigInstanceInformation(
 		item.isContained = item.isContained || CreateAreEqual();
 		item.isNotContained = item.isNotContained || CreateAreEqual();
 		item.isIntersecting = item.isIntersecting || CreateAreEqual();
+		item.isBoolean = item.isBoolean || CreateBoolean();
 		let temp = { ...CreateSimpleValidation(), ...item };
 		Object.assign(item, temp);
 	});
@@ -792,10 +801,12 @@ export function CreateGetExistence(): GetExistingConfig {
 		enabled: false
 	};
 }
-export interface HalfRelation extends ConfigItem {
+export interface QuarterRelation extends ConfigItem {
+	model: string;
+}
+export interface HalfRelation extends QuarterRelation {
 	relationType: RelationType;
 	agent: string;
-	model: string;
 	parent: string;
 	modelOutput: string;
 	agentProperty: string; // The property used to find the model.
@@ -924,6 +935,7 @@ export interface SimpleValidationConfig extends AfterEffectRelations {
 	email: BooleanConfig;
 	emailEmpty: BooleanConfig;
 	numericInt: BooleanConfig;
+	isBoolean: BooleanConfig;
 	requireLowercase: BooleanConfig;
 	requireNonAlphanumeric: BooleanConfig;
 	requireUppercase: BooleanConfig;
@@ -933,6 +945,7 @@ export interface SimpleValidationConfig extends AfterEffectRelations {
 	zip: BooleanConfig;
 	zipEmpty: BooleanConfig;
 	isNotNull: BooleanConfig;
+	referencesExisting: QuarterRelation;
 	isTrue: BooleanConfig;
 	isFalse: BooleanConfig;
 	areEqual: AreEqualConfig;
@@ -1016,9 +1029,11 @@ export function CheckSimpleValidation(isvalidation: SimpleValidationConfig): boo
 				isvalidation.requireLowercase.enabled ||
 				isvalidation.requireUppercase.enabled ||
 				isvalidation.zip.enabled ||
+				isvalidation.isBoolean.enabled ||
 				isvalidation.zipEmpty.enabled ||
 				isvalidation.email.enabled ||
-				isvalidation.emailEmpty.enabled ||
+        isvalidation.emailEmpty.enabled ||
+        isvalidation.referencesExisting.enabled && CheckQuarterConfig(isvalidation.referencesExisting))||
 				isvalidation.urlEmpty.enabled ||
 				isvalidation.url.enabled ||
 				isvalidation.socialSecurity.enabled ||
@@ -1052,6 +1067,9 @@ export function CheckValidationConfig(validationConfig: ValidationConfig): boole
 }
 export function CheckNumberConfig(numberConfig: NumberConfig): boolean {
 	return !numberConfig.enabled || !!numberConfig.value;
+}
+export function CheckQuarterConfig(quarterConfig:QuarterRelation):boolean {
+  return !quarterConfig.enabled || !!quarterConfig.model;
 }
 export function CheckEnumerationConfig(oneOf: EnumerationConfig): boolean {
 	return oneOf.enabled && !!oneOf.enumerationType && !!oneOf.enumerations.length && !!oneOf.id;

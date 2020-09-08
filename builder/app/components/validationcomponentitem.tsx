@@ -16,10 +16,21 @@ import {
 	CreateOneOf,
 	MethodDescription,
 	CheckValidationConfig,
-  ValidationColors
+	ValidationColors,
+	CreateMaxLength,
+	CreateMinLength,
+	CreateBoolean,
+	CreateReferences
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
-import { NodeTypes, NodeProperties, Methods, NEW_LINE } from '../constants/nodetypes';
+import {
+	NodeTypes,
+	NodeProperties,
+	Methods,
+	NEW_LINE,
+	LinkType,
+	NodeAttributePropertyTypes
+} from '../constants/nodetypes';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import { Node } from '../methods/graph_types';
@@ -27,11 +38,13 @@ import BuildDataChainAfterEffectConverter, {
 	DataChainType
 } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import DataChainOptions from './datachainoptions';
-import { GetNodeProp } from '../methods/graph_methods';
+import { GetNodeProp, GetNodeLinkedTo } from '../methods/graph_methods';
 import Typeahead from './typeahead';
 import CheckBox from './checkbox';
 import { MethodFunctions } from '../constants/functiontypes';
 import getLanguageMeaning, { NLMeaning, NLMethodType, Clause, NLValidationClauses } from '../service/naturallang';
+import { GetCurrentGraph, GetCodeName } from '../../visi_blend/dist/app/actions/uiactions';
+import { SimpleValidation } from '../../visi_blend/dist/app/components/titles';
 
 export default class ValidationComponentItem extends Component<any, any> {
 	constructor(props: any) {
@@ -284,6 +297,65 @@ export default class ValidationComponentItem extends Component<any, any> {
 								}
 							}}
 						/>
+						<TreeViewGroupButton
+							title={`Create Property Validations`}
+							onClick={() => {
+								let propertySentences: string[] = [];
+								if (this.props.methodDescription && this.props.methodDescription.properties) {
+									let methodDescription: MethodDescription = this.props.methodDescription;
+									if (methodDescription.properties.model) {
+										let modelProperties = UIA.GetModelCodeProperties(
+											methodDescription.properties.model
+										);
+										modelProperties.forEach((modelProperty: Node) => {
+											let attributeNode = GetNodeLinkedTo(GetCurrentGraph(), {
+												id: modelProperty.id,
+												link: LinkType.AttributeLink
+											});
+											let modelTypeNode = GetNodeLinkedTo(GetCurrentGraph(), {
+												id: modelProperty.id,
+												link: LinkType.ModelTypeLink
+											});
+											if (attributeNode) {
+												let uiAttributeType = GetNodeProp(
+													attributeNode,
+													NodeProperties.UIAttributeType
+												);
+												switch (uiAttributeType) {
+													default:
+														propertySentences.push(
+															`The model's ${UIA.GetCodeName(
+																modelProperty
+															).toLowerCase()} property must conform to a ${uiAttributeType.toLowerCase()}.`
+														);
+														break;
+												}
+											}
+											if (modelTypeNode) {
+												propertySentences.push(
+													`The model's ${UIA.GetCodeName(
+														modelProperty
+													).toLowerCase()} property must connect to a real ${GetCodeName(
+														modelTypeNode
+													)}.`
+												);
+											}
+										});
+										this.setState({
+											sentences: [
+												...`${this.state.sentences || ''}`.split(NEW_LINE),
+												...propertySentences
+											]
+												.filter((v) => v)
+												.unique()
+												.join(NEW_LINE)
+										});
+									}
+								}
+								this.setState({ turn: Date.now() });
+							}}
+							icon="fa  fa-won"
+						/>
 					</TreeViewButtonGroup>
 				</TreeViewMenu>
 				<TreeViewItemContainer>
@@ -494,6 +566,126 @@ export function updateValidationMethod({
 				setupRelation(simpleValidation, meaning.actorClause);
 			}
 			switch (meaning.methodType) {
+				case NLMethodType.Reference:
+					simpleValidation.isNotNull = CreateBoolean();
+					simpleValidation.isNotNull.enabled = true;
+					simpleValidation.referencesExisting = CreateReferences(meaning.targetClause.agent);
+					simpleValidation.referencesExisting.enabled = true;
+					break;
+				case NLMethodType.ComplexValidations:
+					if (meaning.targetClause.propertyAttributeType) {
+						switch (meaning.targetClause.propertyAttributeType) {
+							case NodeAttributePropertyTypes.ADDRESS:
+							case NodeAttributePropertyTypes.LONGSTRING:
+								simpleValidation.maxLength = CreateMaxLength('500');
+								simpleValidation.maxLength.enabled = true;
+								simpleValidation.minLength = CreateMinLength('1');
+								simpleValidation.minLength.enabled = true;
+								simpleValidation.isNotNull = CreateBoolean();
+								simpleValidation.isNotNull.enabled = true;
+								break;
+							case NodeAttributePropertyTypes.CARMAKE:
+							case NodeAttributePropertyTypes.CARMODEL:
+								simpleValidation.maxLength = CreateMaxLength('100');
+								simpleValidation.maxLength.enabled = true;
+								simpleValidation.minLength = CreateMinLength('1');
+								simpleValidation.minLength.enabled = true;
+								simpleValidation.isNotNull = CreateBoolean();
+								simpleValidation.isNotNull.enabled = true;
+								break;
+							case NodeAttributePropertyTypes.CARYEAR:
+								simpleValidation.maxLength = CreateMaxLength('4');
+								simpleValidation.maxLength.enabled = true;
+								simpleValidation.minLength = CreateMinLength('4');
+								simpleValidation.minLength.enabled = true;
+								simpleValidation.numericInt = CreateBoolean();
+								simpleValidation.numericInt.enabled = true;
+								simpleValidation.isNotNull = CreateBoolean();
+								simpleValidation.isNotNull.enabled = true;
+								break;
+							case NodeAttributePropertyTypes.BOOLEAN:
+								simpleValidation.isBoolean = CreateBoolean();
+								simpleValidation.isBoolean.enabled = true;
+								break;
+							case NodeAttributePropertyTypes.MONEY:
+							case NodeAttributePropertyTypes.NUMBER:
+							case NodeAttributePropertyTypes.MONTH:
+								simpleValidation.numericInt = CreateBoolean();
+								simpleValidation.numericInt.enabled = true;
+								break;
+							case NodeAttributePropertyTypes.NAME:
+								simpleValidation.maxLength = CreateMaxLength('100');
+								simpleValidation.maxLength.enabled = true;
+								simpleValidation.minLength = CreateMinLength('1');
+								simpleValidation.minLength.enabled = true;
+								simpleValidation.isNotNull = CreateBoolean();
+								simpleValidation.isNotNull.enabled = true;
+								simpleValidation.alphaOnlyWithSpaces = CreateBoolean();
+								simpleValidation.alphaOnlyWithSpaces.enabled = true;
+								break;
+							case NodeAttributePropertyTypes.PHONE:
+								simpleValidation.isNotNull = CreateBoolean();
+								simpleValidation.isNotNull.enabled = true;
+								break;
+							case NodeAttributePropertyTypes.ROUTINGNUMBER:
+								simpleValidation.isNotNull = CreateBoolean();
+								simpleValidation.isNotNull.enabled = true;
+								simpleValidation.numericInt = CreateBoolean();
+								simpleValidation.numericInt.enabled = true;
+								simpleValidation.minLength = CreateMinLength('9');
+								simpleValidation.minLength.enabled = true;
+								simpleValidation.maxLength = CreateMinLength('9');
+								simpleValidation.maxLength.enabled = true;
+								break;
+							case NodeAttributePropertyTypes.SOCIALSECURITY:
+								simpleValidation.socialSecurity = CreateBoolean();
+								simpleValidation.socialSecurity.enabled = true;
+								break;
+							case NodeAttributePropertyTypes.STATE:
+								simpleValidation.minLength = CreateMinLength('2');
+								simpleValidation.minLength.enabled = true;
+								simpleValidation.maxLength = CreateMaxLength('2');
+								simpleValidation.maxLength.enabled = true;
+								simpleValidation.isNotNull = CreateBoolean();
+								simpleValidation.isNotNull.enabled = true;
+								break;
+							case NodeAttributePropertyTypes.STRING:
+								simpleValidation.isNotNull = CreateBoolean();
+								simpleValidation.isNotNull.enabled = true;
+								break;
+							case NodeAttributePropertyTypes.VIN:
+								simpleValidation.minLength = CreateMinLength('17');
+								simpleValidation.minLength.enabled = true;
+								simpleValidation.maxLength = CreateMaxLength('17');
+								simpleValidation.maxLength.enabled = true;
+								simpleValidation.isNotNull = CreateBoolean();
+								simpleValidation.isNotNull.enabled = true;
+								simpleValidation.alphaNumeric = CreateBoolean();
+								simpleValidation.alphaNumeric.enabled = true;
+								break;
+							case NodeAttributePropertyTypes.YEAR:
+								simpleValidation.minLength = CreateMinLength('4');
+								simpleValidation.minLength.enabled = true;
+								simpleValidation.maxLength = CreateMaxLength('4');
+								simpleValidation.maxLength.enabled = true;
+								simpleValidation.isNotNull = CreateBoolean();
+								simpleValidation.isNotNull.enabled = true;
+								simpleValidation.numericInt = CreateBoolean();
+								simpleValidation.numericInt.enabled = true;
+								break;
+							case NodeAttributePropertyTypes.ZIPCODE:
+								simpleValidation.minLength = CreateMinLength('5');
+								simpleValidation.minLength.enabled = true;
+								simpleValidation.maxLength = CreateMaxLength('5');
+								simpleValidation.maxLength.enabled = true;
+								simpleValidation.isNotNull = CreateBoolean();
+								simpleValidation.isNotNull.enabled = true;
+								simpleValidation.numericInt = CreateBoolean();
+								simpleValidation.numericInt.enabled = true;
+								break;
+						}
+					}
+					break;
 				case NLMethodType.AreEqual:
 					let areEqual = CreateAreEqual();
 					if (meaning.targetClause.relationType) {

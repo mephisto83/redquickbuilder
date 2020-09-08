@@ -42,7 +42,7 @@ export default class TreeViewMenu extends Component<any, any> {
 				>
 					{this.props.hideIcon ? null : <i style={{ ...this.error() }} className={`${this.icon()}`} />}
 					<span
-						style={{ ...this.error(), ...this.greyed(), ...this.color() }}
+						style={{ ...this.color(), ...this.greyed(), ...this.error() }}
 						title={this.props.description || this.props.title}
 					>
 						{this.props.title}

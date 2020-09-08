@@ -1656,7 +1656,7 @@ export const Usings = {
 		[NodePropertyTypes.PHONENUMBER]: [ RED_QUICK_DATA, RED_QUICK_ATTRIBUTES ]
 	}
 };
-export const NodeAttributePropertyTypes: any = {
+export const NodeAttributePropertyTypes = {
 	ROUTINGNUMBER: 'ROUTINGNUMBER',
 	CURRENCY: 'CURRENCY',
 	CARMAKE: 'CARMAKE',
