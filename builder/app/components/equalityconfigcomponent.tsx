@@ -10,7 +10,7 @@ import {
 	CreateCheckExistence,
 	RelationType,
 	SetupConfigInstanceInformation,
-	CheckCopyConfig,
+	CheckHalfRelation,
 	CopyConfig,
 	AreEqualConfig
 } from '../interface/methodprops';

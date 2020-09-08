@@ -106,7 +106,7 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				icon={valid ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+				icon={simpleValidations.some((v) => v.enabled) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}

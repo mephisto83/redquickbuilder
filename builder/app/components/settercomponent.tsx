@@ -12,7 +12,8 @@ import {
 	SetupConfigInstanceInformation,
 	CheckSetter,
 	CopyConfig,
-	Setter
+	Setter,
+	ValidationColors
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
@@ -48,15 +49,18 @@ export default class SetterComponent extends Component<any, any> {
 			properties: any[];
 		} = info;
 		let setter: Setter = this.props.getFromInfo(info);
+		let valid = CheckSetter(setter);
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				icon={CheckSetter(setter) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+				icon={setter.enabled ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+				color={setter && setter.enabled ? ValidationColors.Ok : ValidationColors.Neutral}
+				error={!valid}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
 				active
-				greyed={!setter || !setter.enabled}
+				greyed={!setter.enabled}
 				title={this.props.title}
 			>
 				<TreeViewItemContainer>

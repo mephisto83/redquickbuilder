@@ -8,7 +8,9 @@ import {
 	CopyEnumerationConfig,
 	DataChainConfiguration,
 	MethodDescription,
-	SetupConfigInstanceInformation
+	SetupConfigInstanceInformation,
+  ValidationColors,
+  CheckCopyEnumeration
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import SelectInput from './selectinput';
@@ -52,10 +54,13 @@ export default class CopyEnumeration extends Component<any, any> {
 		if (copyEnumeration && copyEnumeration.enumerationType) {
 			enumerations = GetNodeProp(copyEnumeration.enumerationType, NodeProperties.Enumeration);
 		}
+		let valid = CheckCopyEnumeration(copyEnumeration);
 		return (
 			<TreeViewMenu
 				open={this.state.open}
 				icon={copyEnumeration.enabled ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+				color={copyEnumeration && copyEnumeration.enabled ? ValidationColors.Ok : ValidationColors.Neutral}
+				error={!valid}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}

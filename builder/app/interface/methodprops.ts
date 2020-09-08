@@ -166,7 +166,13 @@ export function CheckAfterEffectDataChainConfiguration(options: DataChainConfigu
 	return (
 		(!options.getExisting || CheckGetExisting(options.getExisting)) &&
 		(!options.checkExistence || CheckIsExisting(options.checkExistence)) &&
+		(!options.copyEnumeration || CheckCopyEnumeration(options.copyEnumeration)) &&
 		(!options.setProperties || CheckSetProperties(options.setProperties)) &&
+		(!options.setInteger || CheckSetter(options.setInteger)) &&
+		(!options.setBoolean || CheckSetter(options.setBoolean)) &&
+		(!options.incrementDouble || CheckSetter(options.incrementDouble)) &&
+		(!options.incrementInteger || CheckSetter(options.incrementInteger)) &&
+		(!options.copyConfig || CheckCopyConfig(options.copyConfig)) &&
 		(!options.simpleValidations || CheckSimpleValidations(options.simpleValidations))
 	);
 }
@@ -279,7 +285,10 @@ export function CreateBranch(): BranchConfig {
 		name: ''
 	};
 }
-export function CheckCopyConfig(copyConfig: HalfRelation) {
+export function CheckCopyConfig(copyConfig: CopyConfig): boolean {
+	return CheckHalfRelation(copyConfig) && (!copyConfig.enabled || !!copyConfig.targetProperty);
+}
+export function CheckHalfRelation(copyConfig: HalfRelation): boolean {
 	if (!copyConfig.enabled) {
 		return true;
 	}
@@ -1061,6 +1070,12 @@ export function CheckRelation(halfRelation: HalfRelation): boolean {
 			default:
 				return false;
 		}
+	}
+	return true;
+}
+export function CheckCopyEnumeration(copyEnumeration: CopyEnumerationConfig): boolean {
+	if (copyEnumeration.enabled) {
+		return !!copyEnumeration.enumerationType && !!copyEnumeration.enumeration && !!copyEnumeration.targetProperty;
 	}
 	return true;
 }

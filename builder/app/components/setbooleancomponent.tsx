@@ -35,7 +35,12 @@ export default class SetBooleanComponent extends Component<any, any> {
 				methodDescription={this.props.methodDescription}
 				dataChainType={this.props.dataChainType}
 				dataChainOptions={dataChainOptions}
-				title={Titles.SetBoolean}
+        title={Titles.SetBoolean}
+        onChange={() => {
+          if (this.props.onChange) {
+            this.props.onChange();
+          }
+        }}
 			>
 				<TreeViewItemContainer>
 					<SelectInput

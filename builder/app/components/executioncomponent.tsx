@@ -73,6 +73,19 @@ export default class ExecutionComponent extends Component<any, any> {
 		}
 	}
 
+	componentWillReceiveProps() {
+		let mountingItem: MountingDescription = this.props.mountingItem;
+		if (mountingItem) {
+			mountingItem.executions = mountingItem.executions || [];
+			let { executions } = mountingItem;
+			if (executions) {
+				this.setState({
+					sentences: executions.map((v) => v.summary).filter((v) => v).join(NEW_LINE)
+				});
+			}
+		}
+	}
+
 	render() {
 		let mountingItem: MountingDescription = this.props.mountingItem;
 		mountingItem.executions = mountingItem.executions || [];

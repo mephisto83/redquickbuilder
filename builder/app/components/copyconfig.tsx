@@ -10,13 +10,13 @@ import {
 	CreateCheckExistence,
 	RelationType,
 	SetupConfigInstanceInformation,
+	CheckHalfRelation,
+	CopyConfig,
 	CheckCopyConfig,
-	CopyConfig
+	ValidationColors
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
-import {
-	DataChainType
-} from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
+import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import RelativeTypeComponent from './relativetypecomponent';
 
 export default class CopyConfigComponent extends Component<any, any> {
@@ -49,14 +49,17 @@ export default class CopyConfigComponent extends Component<any, any> {
 			properties: any[];
 		} = this.setupInstanceInfo(dataChainOptions);
 
+		let valid = CheckCopyConfig(copyConfig);
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				icon={CheckCopyConfig(copyConfig) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+				icon={copyConfig.enabled ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
+				color={copyConfig && copyConfig.enabled ? ValidationColors.Ok : ValidationColors.Neutral}
 				active
+				error={!valid}
 				greyed={!copyConfig.enabled}
 				title={Titles.Copy}
 			>
@@ -84,6 +87,14 @@ export default class CopyConfigComponent extends Component<any, any> {
 						((copyConfig.relationType === RelationType.Agent && copyConfig.agentProperty) ||
 							(copyConfig.relationType === RelationType.Model && copyConfig.modelProperty))
 					}
+					onChange={() => {
+						this.setState({
+							turn: UIA.GUID()
+						});
+						if (this.props.onChange) {
+							this.props.onChange();
+						}
+					}}
 					dataChainOptions={dataChainOptions}
 					enabled={copyConfig.enabled}
 					properties={properties}
