@@ -1032,8 +1032,8 @@ export function CheckSimpleValidation(isvalidation: SimpleValidationConfig): boo
 				isvalidation.isBoolean.enabled ||
 				isvalidation.zipEmpty.enabled ||
 				isvalidation.email.enabled ||
-        isvalidation.emailEmpty.enabled ||
-        isvalidation.referencesExisting.enabled && CheckQuarterConfig(isvalidation.referencesExisting))||
+				isvalidation.emailEmpty.enabled ||
+				(isvalidation.referencesExisting.enabled && CheckQuarterConfig(isvalidation.referencesExisting)) ||
 				isvalidation.urlEmpty.enabled ||
 				isvalidation.url.enabled ||
 				isvalidation.socialSecurity.enabled ||
@@ -1068,8 +1068,8 @@ export function CheckValidationConfig(validationConfig: ValidationConfig): boole
 export function CheckNumberConfig(numberConfig: NumberConfig): boolean {
 	return !numberConfig.enabled || !!numberConfig.value;
 }
-export function CheckQuarterConfig(quarterConfig:QuarterRelation):boolean {
-  return !quarterConfig.enabled || !!quarterConfig.model;
+export function CheckQuarterConfig(quarterConfig: QuarterRelation): boolean {
+	return !quarterConfig.enabled || !!quarterConfig.model;
 }
 export function CheckEnumerationConfig(oneOf: EnumerationConfig): boolean {
 	return oneOf.enabled && !!oneOf.enumerationType && !!oneOf.enumerations.length && !!oneOf.id;
