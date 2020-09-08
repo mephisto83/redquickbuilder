@@ -218,37 +218,36 @@ export default class ExecutionComponent extends Component<any, any> {
 						<TreeViewGroupButton
 							icon="fa fa-copy"
 							onClick={() => {
-								if (this.props.methodDescription && this.props.methodDescription.properties)
-									if (this.state.sentences) {
-										let methodDescription: MethodDescription = this.props.methodDescription;
-										let targetProperties = methodDescription.properties.model
-											? UIA.GetModelCodeProperties(methodDescription.properties.model).filter(
-													(v: Node) => !UIA.GetNodeProp(v, NodeProperties.IsDefaultProperty)
-												)
-											: [];
-										let sentences = targetProperties.map((v: Node) => {
-											return `The model's ${UIA.GetCodeName(
-												v
-											).toLowerCase()} property copies to the target's ${UIA.GetCodeName(
-												v
-											).toLowerCase()}`;
-										});
-										let tempSentences = [
-											...executions.map((v) => v.summary || '').filter((v) => v),
-											...`${this.state.setences || ''}`.split(NEW_LINE),
-											...sentences
-										]
-											.filter((v) => v)
-											.unique()
-											.join(NEW_LINE);
-										this.setState({
-											turn: UIA.GUID(),
-											sentences: tempSentences
-										});
-										if (this.props.onChange) {
-											this.props.onChange();
-										}
+								if (this.props.methodDescription && this.props.methodDescription.properties) {
+									let methodDescription: MethodDescription = this.props.methodDescription;
+									let targetProperties = methodDescription.properties.model
+										? UIA.GetModelCodeProperties(methodDescription.properties.model).filter(
+												(v: Node) => !UIA.GetNodeProp(v, NodeProperties.IsDefaultProperty)
+											)
+										: [];
+									let sentences = targetProperties.map((v: Node) => {
+										return `The model's ${UIA.GetCodeName(
+											v
+										).toLowerCase()} property copies to the target's ${UIA.GetCodeName(
+											v
+										).toLowerCase()}`;
+									});
+									let tempSentences = [
+										...executions.map((v) => v.summary || '').filter((v) => v),
+										...`${this.state.setences || ''}`.split(NEW_LINE),
+										...sentences
+									]
+										.filter((v) => v)
+										.unique()
+										.join(NEW_LINE);
+									this.setState({
+										turn: UIA.GUID(),
+										sentences: tempSentences
+									});
+									if (this.props.onChange) {
+										this.props.onChange();
 									}
+								}
 							}}
 						/>
 					</TreeViewButtonGroup>
