@@ -610,6 +610,9 @@ export function CreateSimpleValidation(): SimpleValidationConfig {
 }
 export function CreateReferences(model?: string): QuarterRelation {
 	return {
+		agent: '',
+		relationType: RelationType.Agent,
+		agentProperty: '',
 		enabled: false,
 		id: GUID(),
 		model: model || ''
@@ -802,15 +805,15 @@ export function CreateGetExistence(): GetExistingConfig {
 	};
 }
 export interface QuarterRelation extends ConfigItem {
-	model: string;
-}
-export interface HalfRelation extends QuarterRelation {
 	relationType: RelationType;
 	agent: string;
+	agentProperty: string; // The property used to find the model.
+	model: string;
+	modelProperty: string; // The property used to find the model
+}
+export interface HalfRelation extends QuarterRelation {
 	parent: string;
 	modelOutput: string;
-	agentProperty: string; // The property used to find the model.
-	modelProperty: string; // The property used to find the model
 	parentProperty: string;
 	modelOutputProperty: string; // The property used to find the model
 }

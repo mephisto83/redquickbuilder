@@ -40,6 +40,7 @@ import {
 import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import { ProgrammingLanguages, NodePropertyTypesByLanguage, NEW_LINE } from '../constants/nodetypes';
 import fs from 'fs';
+import { NodeType } from '../../visi_blend/dist/app/components/titles';
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';
 export const BATCH = 'BATCH';
@@ -1152,7 +1153,8 @@ export function IsModel(id: string) {
 export function GetPropertyModel(propId: string): _.Node | null {
 	let nodes = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
 		id: propId,
-		link: NodeConstants.LinkType.ModelTypeLink
+		link: NodeConstants.LinkType.ModelTypeLink,
+		componentType: NodeTypes.Model
 	});
 	nodes.push(
 		...GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {

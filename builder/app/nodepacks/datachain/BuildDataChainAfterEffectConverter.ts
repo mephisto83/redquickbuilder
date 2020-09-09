@@ -37,7 +37,8 @@ import {
 	GetPropertyModel,
 	GetNodeByProperties,
 	ensureRouteSource,
-	IsModel
+	IsModel,
+	GetCurrentGraph
 } from '../../actions/uiactions';
 import {
 	NodeProperties,
@@ -53,13 +54,16 @@ import {
 	getNodesLinkedTo,
 	GetNodesLinkedTo,
 	SOURCE,
-	NodesByType
+	NodesByType,
+	GetNodeLinkedTo
 } from '../../methods/graph_methods';
 import { ReferenceInsertType } from '../../components/lambda/BuildLambda';
 import { SimpleValidation, NodeType } from '../../components/titles';
 import SimpleValidationComponent from '../../components/simplevalidationconfig';
 import { equal } from 'assert';
 import { Node, Graph } from '../../methods/graph_types';
+import { LinkType } from '../../../app/constants/nodetypes';
+import { stringify } from 'querystring';
 
 export interface AfterEffectConvertArgs {
 	from: MethodDescription;
@@ -578,7 +582,6 @@ function setupCopyConfig(
 		relProp = 'model';
 		agentOrModel = from.properties.model;
 	}
-	target_property = targetProperty;
 	setLambdaProperties(
 		tempLambdaInsertArgumentValues,
 		agentProperty,
@@ -594,21 +597,26 @@ function setupCopyConfig(
 	);
 	let attributeType = GetNodeProp(props, NodeProperties.UIAttributeType);
 	outputType = NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][attributeType];
-	tempLambdaInsertArgumentValues[`${relProp}.${GetJSCodeName(props)}`] = {
-		[ReferenceInsertType.Property]: props,
-		[ReferenceInsertType.Model]: agentOrModel
+
+	tempLambdaInsertArgumentValues[`result`] = {
+		[ReferenceInsertType.Model]: from.properties.model ? from.properties.model : ''
 	};
-	let targetModel = GetPropertyModel(target_property);
-	tempLambdaInsertArgumentValues[`result.${GetJSCodeName(target_property)}`] = {
-		[ReferenceInsertType.Property]: target_property,
-		[ReferenceInsertType.Model]: targetModel ? targetModel.id : ''
-	};
-	copy_config = `result.#{{"key":"result.${GetJSCodeName(
-		target_property
-	)}","type":"property","model":"result"}}# = ${relProp}.#{{"key":"${relProp}.${GetJSCodeName(
-		props
-	)}","type":"property","model":"${relProp}"}}#;`;
-	return { target_property, outputType, copy_config };
+	let targetTemplate = '';
+	let targetTemplate2 = '';
+	if (targetProperty) {
+		switch (GetNodeProp(targetProperty, NodeProperties.NODEType)) {
+			case NodeTypes.Model:
+				targetTemplate = `{"key":"result.${GetCodeName(targetProperty)}","type":"model"}`;
+				targetTemplate2 = `{"key":"${relProp}.${GetCodeName(props)}","type":"model"}`;
+				break;
+			case NodeTypes.Property:
+				targetTemplate = `{"key":"result.${GetJSCodeName(targetProperty)}","type":"property","model":"result"}`;
+				targetTemplate2 = `{"key":"${relProp}.${GetJSCodeName(props)}","type":"property","model":"${relProp}"}`;
+				break;
+		}
+	}
+	copy_config = `result.#{${targetTemplate}}# = ${relProp}.#{${targetTemplate2}}#;`;
+	return { target_property: targetProperty, outputType, copy_config };
 }
 function setupCopyEnumeration(
 	copyEnumeration: CopyEnumerationConfig,
@@ -743,6 +751,83 @@ function GenerateSimpleValidations(
 					: 'false'}).IsOk(${valuePropString})`;
 				checks.push({ template: oneOf, id: simpleValidation.id });
 			}
+			if (simpleValidation.referencesExisting && simpleValidation.referencesExisting.enabled) {
+				let relationType = simpleValidation.referencesExisting.relationType;
+				let agentOrModel = '';
+				switch (relationType) {
+					case RelationType.Agent:
+						agentOrModel = 'agent';
+						break;
+					case RelationType.Model:
+						agentOrModel = 'model';
+						break;
+					case RelationType.Parent:
+						agentOrModel = 'parent';
+						break;
+					case RelationType.ModelOuput:
+						agentOrModel = 'model_output';
+						break;
+				}
+				// tempLambdaInsertArgumentValues[
+				// 	`${agentOrModel}.${GetJSCodeName(simpleValidation.referencesExisting.modelProperty)}`
+				// ] = {
+				// 	property: simpleValidation.referencesExisting.modelProperty,
+				// 	model: simpleValidation.referencesExisting.agent,
+				// 	type: ReferenceInsertType.Property
+				// };
+				// tempLambdaInsertArgumentValues[`${agentOrModel}`] = {
+				// 	model: simpleValidation.referencesExisting.agent,
+				// 	type: ReferenceInsertType.Model
+				// };
+				setupLambdaInsertArgs(
+					tempLambdaInsertArgumentValues,
+					simpleValidation.referencesExisting.model,
+					agentOrModel
+				);
+				let classModelKey = 'unknown';
+				if (simpleValidation.referencesExisting.model) {
+					let modelType = GetNodeLinkedTo(GetCurrentGraph(), {
+						id: simpleValidation.referencesExisting.model,
+						link: LinkType.ModelTypeLink,
+						componentType: NodeTypes.Model
+					});
+					if (modelType) {
+						classModelKey = `class.${GetJSCodeName(modelType)}`;
+						tempLambdaInsertArgumentValues[classModelKey] = {
+							model: modelType.id
+						};
+					}
+				}
+				let refExists: any;
+				switch (GetNodeProp(simpleValidation.referencesExisting.model, NodeProperties.NODEType)) {
+					case NodeTypes.Model:
+						classModelKey = `class.${GetJSCodeName(simpleValidation.referencesExisting.model)}`;
+						tempLambdaInsertArgumentValues[classModelKey] = {
+							model: simpleValidation.referencesExisting.model
+						};
+						tempLambdaInsertArgumentValues[
+							`${agentOrModel}.${GetCodeName(simpleValidation.referencesExisting.model)}`
+						] = {
+							model: simpleValidation.referencesExisting.model
+						};
+						refExists = `await (RedStrapper.Resolve<IRedArbiter<#{{"key":"${classModelKey}"}}#>>()).Get<#{{"key":"${classModelKey}"}}#>(${agentOrModel}.#{{"key":"${agentOrModel}.${GetCodeName(
+							simpleValidation.referencesExisting.model
+						)}","type":"model"}}#)`;
+						checks.push({ template: refExists, id: simpleValidation.id });
+						break;
+					case NodeTypes.Property:
+						refExists = `await (RedStrapper.Resolve<IRedArbiter<#{{"key":"${classModelKey}"}}#>>()).Get<#{{"key":"${classModelKey}"}}#>(${agentOrModel}.#{{"key":"${agentOrModel}.${GetCodeName(
+							simpleValidation.referencesExisting.model
+						)}","model":"${classModelKey}","type":"property"}}#)`;
+						checks.push({ template: refExists, id: simpleValidation.id });
+						break;
+				}
+				// let refExists = `await (RedStrapper.Resolve<IRedArbiter<#{{"key":"${classModelKey}"}}#>>()).Get<#{{"key":"${classModelKey}"}}#>(${agentOrModel}.#{{"key":"${agentOrModel}.${GetCodeName(
+				// 	simpleValidation.referencesExisting.modelProperty
+				// )}","type":"model"}}#)`;
+				// checks.push({ template: refExists, id: simpleValidation.id });
+			}
+
 			if (simpleValidation.minLength && simpleValidation.minLength.enabled) {
 				let oneOf = `await new MinLengthAttribute(${simpleValidation.minLength.value},${simpleValidation
 					.maxLength.equal
@@ -764,21 +849,27 @@ function GenerateSimpleValidations(
 				: GetPropertyModel(ops.targetProperty);
 			if (IsModel(ops.targetProperty)) {
 				tempLambdaInsertArgumentValues[`result.${GetCodeName(ops.targetProperty)}`] = {
-					model: targetModel ? targetModel.id : ''
+					model: targetModel ? targetModel.id : '',
+					// property: ops.targetProperty,
+					type: ReferenceInsertType.Model
 				};
-				tempLambdaInsertArgumentValues[`result`] = tempLambdaInsertArgumentValues['model'];
+				if (!tempLambdaInsertArgumentValues[`result`])
+					tempLambdaInsertArgumentValues[`result`] = tempLambdaInsertArgumentValues['model'];
 			} else {
 				tempLambdaInsertArgumentValues[`result.${GetCodeName(ops.targetProperty)}`] = {
 					property: ops.targetProperty,
-					model: targetModel ? targetModel.id : ''
+					model: targetModel ? targetModel.id : '',
+					type: ReferenceInsertType.Property
 				};
 				tempLambdaInsertArgumentValues[`result`] = {
-					model: targetModel ? targetModel.id : ''
+					model: targetModel ? targetModel.id : '',
+					type: ReferenceInsertType.Model
 				};
 			}
-			returnStatement = `return result.#{{"key":"result.${GetCodeName(
-				ops.targetProperty
-			)}","type":"property","model":"result"}}#`;
+			returnStatement = '';
+			// returnStatement = `return result.#{{"key":"result.${GetCodeName(
+			// 	ops.targetProperty
+			// )}","type":"property","model":"result"}}#`;
 			break;
 		default:
 			returnStatement = 'return false';
@@ -1360,56 +1451,62 @@ function setLambdaProperties(
 ) {
 	let agent = agentProperty ? GetPropertyModel(agentProperty) : null;
 	let model = modelProperty ? GetPropertyModel(modelProperty) : null;
+	// if (agent) {
+	// 	tempLambdaInsertArgumentValues['agent'] = {
+	// 		model: agent ? agent.id : null,
+	// 		type: ReferenceInsertType.Model
+	// 	};
+	// }
+	// tempLambdaInsertArgumentValues['agent.prop'] = {
+	// 	property: agentProperty,
+	// 	model: agent ? agent.id : null,
+	// 	type: ReferenceInsertType.Property
+	// };
+	setupLambdaInsertArgs(tempLambdaInsertArgumentValues, agentProperty, 'agent');
 
-	tempLambdaInsertArgumentValues['agent.prop'] = {
-		property: agentProperty,
-		model: agent ? agent.id : null,
-		type: ReferenceInsertType.Property
-	};
-	if (agent) {
-		tempLambdaInsertArgumentValues['agent'] = {
-			model: agent ? agent.id : null,
-			type: ReferenceInsertType.Model
-		};
-	}
-	tempLambdaInsertArgumentValues['model.prop'] = {
-		property: modelProperty,
-		model: model ? model.id : null,
-		type: ReferenceInsertType.Property
-	};
-	if (relationsConfig && relationsConfig.parentProperty) {
-		tempLambdaInsertArgumentValues['parent.prop'] = {
-			property: relationsConfig.parentProperty,
-			model: relationsConfig.parent,
-			type: ReferenceInsertType.Property
-		};
-	}
-	if (relationsConfig && relationsConfig.parent) {
-		tempLambdaInsertArgumentValues['parent'] = {
-			model: relationsConfig.parent,
-			type: ReferenceInsertType.Model
-		};
-	}
-	if (modelOutputProperty) {
-		tempLambdaInsertArgumentValues['model_output.prop'] = {
-			property: modelOutputProperty,
-			model: modelOutput,
-			type: ReferenceInsertType.Property
-		};
-	}
-	if (modelOutput) {
-		tempLambdaInsertArgumentValues['model_output'] = {
-			model: modelOutput,
-			type: ReferenceInsertType.Model
-		};
-	}
-	if (model) {
-		tempLambdaInsertArgumentValues['model'] = {
-			model: model ? model.id : null,
-			type: ReferenceInsertType.Model
-		};
-	}
+	// if (model) {
+	// 	tempLambdaInsertArgumentValues['model'] = {
+	// 		model: model ? model.id : null,
+	// 		type: ReferenceInsertType.Model
+	// 	};
+	// }
 
+	// tempLambdaInsertArgumentValues['model.prop'] = {
+	// 	property: modelProperty,
+	// 	model: model ? model.id : null,
+	// 	type: ReferenceInsertType.Property
+	// };
+
+	setupLambdaInsertArgs(tempLambdaInsertArgumentValues, modelProperty, 'model');
+	// if (relationsConfig && relationsConfig.parentProperty) {
+	// 	tempLambdaInsertArgumentValues['parent.prop'] = {
+	// 		property: relationsConfig.parentProperty,
+	// 		model: relationsConfig.parent,
+	// 		type: ReferenceInsertType.Property
+	// 	};
+	// }
+	setupLambdaInsertArgs(tempLambdaInsertArgumentValues, relationsConfig.parentProperty, 'parent');
+	// if (relationsConfig && relationsConfig.parent) {
+	// 	tempLambdaInsertArgumentValues['parent'] = {
+	// 		model: relationsConfig.parent,
+	// 		type: ReferenceInsertType.Model
+	// 	};
+	// }
+
+	// if (modelOutput) {
+	// 	tempLambdaInsertArgumentValues['model_output'] = {
+	// 		model: modelOutput,
+	// 		type: ReferenceInsertType.Model
+	// 	};
+	// }
+	// if (modelOutputProperty) {
+	// 	tempLambdaInsertArgumentValues['model_output.prop'] = {
+	// 		property: modelOutputProperty,
+	// 		model: modelOutput,
+	// 		type: ReferenceInsertType.Property
+	// 	};
+	// }
+	setupLambdaInsertArgs(tempLambdaInsertArgumentValues, modelOutputProperty, 'model_output');
 	if (targetProperty && ops && ops.to && ops.to.properties) {
 		let target = targetProperty ? GetPropertyModel(targetProperty) : null;
 		tempLambdaInsertArgumentValues[`tomodel.prop`] = {
@@ -1421,6 +1518,29 @@ function setLambdaProperties(
 			model: ops.to.properties.model,
 			type: ReferenceInsertType.Model
 		};
+	} else if (targetProperty) {
+		setupLambdaInsertArgs(tempLambdaInsertArgumentValues, targetProperty, 'result');
+	}
+}
+function setupLambdaInsertArgs(tempLambdaInsertArgumentValues: any, targetProperty: string, key: string) {
+	switch (GetNodeProp(targetProperty, NodeProperties.NODEType)) {
+		case NodeTypes.Model:
+			tempLambdaInsertArgumentValues[`${key}.${GetCodeName(targetProperty)}`] = {
+				[ReferenceInsertType.Model]: targetProperty,
+				type: ReferenceInsertType.Model
+			};
+			break;
+		case NodeTypes.Property:
+			let targetModel = GetPropertyModel(targetProperty);
+			tempLambdaInsertArgumentValues[`${key}.${GetJSCodeName(targetProperty)}`] = {
+				[ReferenceInsertType.Property]: targetProperty,
+				[ReferenceInsertType.Model]: targetModel ? targetModel.id : '',
+				type: ReferenceInsertType.Property
+			};
+			tempLambdaInsertArgumentValues[`${key}`] = {
+				[ReferenceInsertType.Model]: targetModel ? targetModel.id : ''
+			};
+			break;
 	}
 }
 

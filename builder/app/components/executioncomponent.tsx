@@ -30,7 +30,6 @@ export default class ExecutionComponent extends Component<any, any> {
 		this.state = { sentence: false, sentences: '' };
 	}
 	autoUpdateSentences({ sentences, mountingItem }: { sentences: string; mountingItem: MountingDescription }) {
-		let sentenceArray = sentences.split(NEW_LINE);
 		while (mountingItem.executions && mountingItem.executions.length) {
 			deleteExecutions(mountingItem.executions, mountingItem.executions[0]);
 		}
@@ -69,7 +68,11 @@ export default class ExecutionComponent extends Component<any, any> {
 					mountingItem.executions.push(executionConfig);
 				}
 			});
-			autoName(mountingItem, mountingItem.executions, this.props.methods);
+			autoName(mountingItem, this.props.methods);
+			this.setState({ turn: UIA.GUID() });
+			if (this.props.onChange) {
+				this.props.onChange();
+			}
 		}
 	}
 
@@ -139,7 +142,7 @@ export default class ExecutionComponent extends Component<any, any> {
 					<TreeViewGroupButton
 						title={`Auto Name`}
 						onClick={() => {
-							autoName(mountingItem, executions, this.props.methods);
+							autoName(mountingItem, this.props.methods);
 							this.setState({ turn: UIA.GUID() });
 						}}
 						icon="fa fa-amazon"
@@ -250,6 +253,28 @@ export default class ExecutionComponent extends Component<any, any> {
 								}
 							}}
 						/>
+						<TreeViewGroupButton
+							icon={'fa fa-user'}
+							onClick={() => {
+								if (this.props.methodDescription && this.props.methodDescription.properties) {
+									this.autoUpdateSentences({
+										sentences: [
+											...`${this.state.sentences || ''}`.split(NEW_LINE),
+											`The agent's id property copies to the target's owner property`
+										]
+											.unique()
+											.join(NEW_LINE),
+										mountingItem
+									});
+									this.setState({
+										turn: UIA.GUID()
+									});
+									if (this.props.onChange) {
+										this.props.onChange();
+									}
+								}
+							}}
+						/>
 					</TreeViewButtonGroup>
 				</TreeViewMenu>
 
@@ -296,14 +321,17 @@ export default class ExecutionComponent extends Component<any, any> {
 		);
 	}
 }
-function autoName(mountingItem: MountingDescription, executions: ExecutionConfig[], methods: any) {
+function autoName(mountingItem: MountingDescription, methods: any) {
 	let { methodDescription, viewType } = mountingItem;
 	if (methodDescription) {
-		executions.forEach((executionConfig: ExecutionConfig) => {
-			if (methodDescription) {
-				buildDataChain(executionConfig, mountingItem, methods, true);
-			}
-		});
+		mountingItem.executions
+			.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
+			.forEach((executionConfig: ExecutionConfig) => {
+				if (methodDescription) {
+					buildDataChain(executionConfig, mountingItem, methods, true);
+					buildDataChain(executionConfig, mountingItem, methods, true);
+				}
+			});
 	}
 }
 
@@ -314,6 +342,7 @@ function deleteExecutions(executions: ExecutionConfig[], executionConfig: Execut
 			let originalConfig = UIA.GetNodeProp(executionConfig.dataChain, NodeProperties.OriginalConfig);
 			if (originalConfig === executionConfig.dataChain) {
 				UIA.removeNodeById(executionConfig.dataChain);
+				executionConfig.dataChain = '';
 			}
 		}
 		executions.splice(index, 1);

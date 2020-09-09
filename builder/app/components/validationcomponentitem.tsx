@@ -314,7 +314,8 @@ export default class ValidationComponentItem extends Component<any, any> {
 											});
 											let modelTypeNode = GetNodeLinkedTo(GetCurrentGraph(), {
 												id: modelProperty.id,
-												link: LinkType.ModelTypeLink
+												link: LinkType.ModelTypeLink,
+												componentType: NodeTypes.Model
 											});
 											if (attributeNode) {
 												let uiAttributeType = GetNodeProp(
@@ -569,7 +570,13 @@ export function updateValidationMethod({
 				case NLMethodType.Reference:
 					simpleValidation.isNotNull = CreateBoolean();
 					simpleValidation.isNotNull.enabled = true;
-					simpleValidation.referencesExisting = CreateReferences(meaning.targetClause.agent);
+
+					simpleValidation.referencesExisting = CreateReferences(meaning.actorClause.agent);
+					if (meaning.actorClause.relationType) {
+						simpleValidation.referencesExisting.relationType = meaning.actorClause.relationType;
+					}
+					if (meaning.actorClause.property)
+						simpleValidation.referencesExisting.modelProperty = meaning.actorClause.property;
 					simpleValidation.referencesExisting.enabled = true;
 					break;
 				case NLMethodType.ComplexValidations:
