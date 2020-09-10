@@ -20,7 +20,8 @@ import {
 	CreateMaxLength,
 	CreateMinLength,
 	CreateBoolean,
-	CreateReferences
+	CreateReferences,
+	EighthRelation
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import {
@@ -613,6 +614,18 @@ export function updateValidationMethod({
 							case NodeAttributePropertyTypes.BOOLEAN:
 								simpleValidation.isBoolean = CreateBoolean();
 								simpleValidation.isBoolean.enabled = true;
+								break;
+							case NodeAttributePropertyTypes.DATE:
+								simpleValidation.isNotNull = CreateBoolean();
+								simpleValidation.isNotNull.enabled = true;
+								simpleValidation.date = CreateBoolean();
+								simpleValidation.date.enabled = true;
+								break;
+							case NodeAttributePropertyTypes.EMAIL:
+								simpleValidation.email = CreateBoolean();
+								simpleValidation.email.enabled = true;
+								simpleValidation.isNotNull = CreateBoolean();
+								simpleValidation.isNotNull.enabled = true;
 								break;
 							case NodeAttributePropertyTypes.MONEY:
 							case NodeAttributePropertyTypes.NUMBER:

@@ -10,7 +10,8 @@ import {
 	CheckValidationConfigs,
 	MethodDescription,
 	CreateCopyConfig,
-	RelationType
+	RelationType,
+	CreateConcatenateStringConfig
 } from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
@@ -57,6 +58,30 @@ export default class ExecutionComponent extends Component<any, any> {
 							executionConfig.summary = meaning.text;
 							copyConfig.enabled = true;
 							executionConfig.name = `Copy ${UIA.GetNodeTitle(meaning.targetClause.property)}`;
+						}
+						break;
+					case NLMethodType.ConcatenateString:
+						let concatenateString = CreateConcatenateStringConfig();
+						if (meaning.actorClause.relationType) {
+							concatenateString.relationType = meaning.actorClause.relationType;
+							setupRelation(concatenateString, meaning.actorClause);
+							if (meaning.parameterClauses) {
+								executionConfig.summary = meaning.text;
+								concatenateString.enabled = true;
+								if (meaning.options && meaning.options.withSpaces) concatenateString.with = ' ';
+								executionConfig.name = `Concatenate ${UIA.GetNodeTitle(
+									meaning.actorClause.property
+								)} with phrase.`;
+								concatenateString.parameters = meaning.parameterClauses
+									.filter((v) => v.agent && v.property)
+									.map((v) => ({
+										agent: v.agent,
+										property: v.property,
+										relationType: v.relationType
+									}))
+									.map((v: any) => v);
+								executionConfig.dataChainOptions.concatenateString = concatenateString;
+							}
 						}
 						break;
 					case NLMethodType.IncrementBy:
@@ -225,7 +250,9 @@ export default class ExecutionComponent extends Component<any, any> {
 									let methodDescription: MethodDescription = this.props.methodDescription;
 									let targetProperties = methodDescription.properties.model
 										? UIA.GetModelCodeProperties(methodDescription.properties.model).filter(
-												(v: Node) => !UIA.GetNodeProp(v, NodeProperties.IsDefaultProperty)
+												(v: Node) =>
+													!UIA.GetNodeProp(v, NodeProperties.IsDefaultProperty) &&
+													!UIA.GetNodeProp(v, NodeProperties.IgnoreInView)
 											)
 										: [];
 									let sentences = targetProperties.map((v: Node) => {

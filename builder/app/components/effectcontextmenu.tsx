@@ -148,6 +148,8 @@ class EffectContextMenu extends Component<any, any> {
 													: () => false
 											)
 											.map((k: string) => {
+												setDefaultRouteSource(effectItem, urlParameter, k);
+
 												return (
 													<TreeViewMenu
 														title={k}
@@ -351,7 +353,7 @@ class EffectContextMenu extends Component<any, any> {
 														`${MethodFunctions[c].titleTemplate(
 															UIA.GetNodeTitle(model),
 															UIA.GetNodeTitle(agent)
-														)} For ${viewType}`;
+														)} For ${viewType} Effect`;
 												}
 											}
 											effectItem.methodDescription = methodDescription;

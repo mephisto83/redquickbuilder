@@ -21,7 +21,8 @@ import {
 	IsContainedConfig,
 	CopyConfig,
 	CopyEnumerationConfig,
-	ValidationConfig
+	ValidationConfig,
+	ConcatenateStringConfig
 } from '../../interface/methodprops';
 import { MethodFunctions, bindTemplate } from '../../constants/functiontypes';
 import {
@@ -112,6 +113,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 	let staticMethods: string[] = [];
 	let guts: string = '';
 	let copy_config: string = '';
+	let concat_config: string = '';
 	let outputType: string = '';
 	let simplevalidation: string = '';
 	let route_config: string = '';
@@ -127,7 +129,13 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 	if (from.properties.agent) arbiterModels.push(from.properties.agent);
 	if (from.properties.parent) arbiterModels.push(from.properties.parent);
 	if (dataChainConfigOptions) {
-		let { compareEnumeration, compareEnumerations, copyConfig, copyEnumeration } = dataChainConfigOptions;
+		let {
+			compareEnumeration,
+			compareEnumerations,
+			concatenateString,
+			copyConfig,
+			copyEnumeration
+		} = dataChainConfigOptions;
 		if (compareEnumeration) {
 			compare_enumeration = CompareEnumerationFunc(compareEnumeration, tempLambdaInsertArgumentValues);
 		}
@@ -138,6 +146,15 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 					return CompareEnumerationFunc(compareEnumeration, tempLambdaInsertArgumentValues);
 				})
 				.join(NEW_LINE);
+		}
+		if (concatenateString && concatenateString.enabled) {
+			({ concat_config } = setConcatenateConfig({
+				concatenateString,
+				from,
+				tempLambdaInsertArgumentValues,
+				to,
+				outputType
+			}));
 		}
 		if (copyConfig && copyConfig.enabled) {
 			({ target_property, outputType, copy_config } = setupCopyConfig(
@@ -425,6 +442,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				'bool'}>> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# model, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
               {{simplevalidation}}
               {{copy_config}}
+              {{concat_config}}
           };
 
            await func(model, agent, change);
@@ -467,6 +485,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 
           // build model value here.
           {{copy_config}}
+          {{concat_config}}
           {{set_properties}}
           {{get_existing}}
           {{route_config}}
@@ -486,6 +505,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		route_config,
 		set_properties,
 		copy_config,
+		concat_config,
 		guts,
 		simplevalidation,
 		from_model: `${GetCodeName(from.properties.model_output || from.properties.model || from.properties.agent)}`,
@@ -564,6 +584,75 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		}
 	}
 }
+
+function setConcatenateConfig({
+	concatenateString,
+	from,
+	target_property,
+	tempLambdaInsertArgumentValues,
+	to,
+	outputType
+}: {
+	concatenateString: ConcatenateStringConfig;
+	from: MethodDescription;
+	tempLambdaInsertArgumentValues: any;
+	to: MethodDescription | undefined;
+	outputType: string;
+}): { concat_config: string } {
+	let {
+		parameters,
+		relationType,
+		agentProperty,
+		modelProperty,
+		modelOutputProperty,
+		parentProperty
+	} = concatenateString;
+	let internalFunctionProp = ConvertToFunctionProp(relationType);
+
+	setupLambdaInsertArgs(tempLambdaInsertArgumentValues, GetRelationProp(concatenateString), 'result');
+	let resultSection = `result.#{${captureTemplate(
+		GetRelationProp(concatenateString),
+		'result',
+		GetRelationProp(concatenateString)
+	)}}#`;
+	let concat_section = '';
+	if (parameters) {
+		concat_section = parameters
+			.map((parameter) => {
+				let { relationType, property } = parameter;
+				let internalFunctionProp = ConvertToFunctionProp(relationType);
+				setupLambdaInsertArgs(tempLambdaInsertArgumentValues, property, internalFunctionProp);
+				return `${internalFunctionProp}.#{${captureTemplate(property, internalFunctionProp, property)}}#`;
+			})
+			.join(concatenateString.with ? ` + "${concatenateString.with}" + ` : ' + ');
+	}
+
+	return { concat_config: `${resultSection} = ${concat_section};` };
+}
+function GetRelationProp(relation: HalfRelation) {
+	switch (relation.relationType) {
+		case RelationType.Agent:
+			return relation.agentProperty;
+		case RelationType.ModelOuput:
+			return relation.modelOutputProperty;
+		case RelationType.Model:
+			return relation.modelProperty;
+		case RelationType.Parent:
+			return relation.parentProperty;
+	}
+}
+function ConvertToFunctionProp(relationType: RelationType) {
+	switch (relationType) {
+		case RelationType.Agent:
+			return 'agent';
+		case RelationType.ModelOuput:
+			return 'model_output';
+		case RelationType.Model:
+			return 'model';
+		case RelationType.Parent:
+			return 'parent';
+	}
+}
 function setupCopyConfig(
 	copyConfig: CopyConfig,
 	from: MethodDescription,
@@ -617,6 +706,20 @@ function setupCopyConfig(
 	}
 	copy_config = `result.#{${targetTemplate}}# = ${relProp}.#{${targetTemplate2}}#;`;
 	return { target_property: targetProperty, outputType, copy_config };
+}
+function captureTemplate(targetProperty: string, relProp: string, props: string): string {
+	let template: string | undefined;
+	if (targetProperty) {
+		switch (GetNodeProp(targetProperty, NodeProperties.NODEType)) {
+			case NodeTypes.Model:
+				template = `{"key":"${relProp}.${GetCodeName(props)}","type":"model"}`;
+				break;
+			case NodeTypes.Property:
+				template = `{"key":"${relProp}.${GetJSCodeName(props)}","type":"property","model":"${relProp}"}`;
+				break;
+		}
+	}
+	return template || '';
 }
 function setupCopyEnumeration(
 	copyEnumeration: CopyEnumerationConfig,
@@ -728,6 +831,9 @@ function GenerateSimpleValidations(
 			}
 			if (simpleValidation.isFalse && simpleValidation.isFalse.enabled) {
 				checks.push({ template: `!${valuePropString}`, id: simpleValidation.id });
+			}
+			if (simpleValidation.date && simpleValidation.date.enabled) {
+				checks.push({ template: `!${valuePropString} && ${valuePropString} != default(DateTime)`, id: simpleValidation.id });
 			}
 			if (simpleValidation.isTrue && simpleValidation.isTrue.enabled) {
 				checks.push({ template: `${valuePropString}`, id: simpleValidation.id });
@@ -856,15 +962,18 @@ function GenerateSimpleValidations(
 				if (!tempLambdaInsertArgumentValues[`result`])
 					tempLambdaInsertArgumentValues[`result`] = tempLambdaInsertArgumentValues['model'];
 			} else {
-				tempLambdaInsertArgumentValues[`result.${GetCodeName(ops.targetProperty)}`] = {
-					property: ops.targetProperty,
-					model: targetModel ? targetModel.id : '',
-					type: ReferenceInsertType.Property
-				};
-				tempLambdaInsertArgumentValues[`result`] = {
-					model: targetModel ? targetModel.id : '',
-					type: ReferenceInsertType.Model
-				};
+				if (ops.targetProperty && tempLambdaInsertArgumentValues[`result.${GetCodeName(ops.targetProperty)}`]) {
+					tempLambdaInsertArgumentValues[`result.${GetCodeName(ops.targetProperty)}`] = {
+						property: ops.targetProperty,
+						model: targetModel ? targetModel.id : '',
+						type: ReferenceInsertType.Property
+					};
+					if (tempLambdaInsertArgumentValues[`result`])
+						tempLambdaInsertArgumentValues[`result`] = {
+							model: targetModel ? targetModel.id : '',
+							type: ReferenceInsertType.Model
+						};
+				}
 			}
 			returnStatement = '';
 			// returnStatement = `return result.#{{"key":"result.${GetCodeName(
@@ -1538,7 +1647,8 @@ function setupLambdaInsertArgs(tempLambdaInsertArgumentValues: any, targetProper
 				type: ReferenceInsertType.Property
 			};
 			tempLambdaInsertArgumentValues[`${key}`] = {
-				[ReferenceInsertType.Model]: targetModel ? targetModel.id : ''
+				[ReferenceInsertType.Model]: targetModel ? targetModel.id : '',
+				type: ReferenceInsertType.Model
 			};
 			break;
 	}

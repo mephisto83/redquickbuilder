@@ -98,6 +98,7 @@ export interface AutoSetupConfiguration {
 	executionAutoCopy: boolean;
 }
 export interface DataChainConfiguration {
+	concatenateString?: ConcatenateStringConfig;
 	checkExistence?: CheckExistenceConfig;
 	simpleValidation?: SimpleValidationConfig;
 	simpleValidationConfiguration?: SimpleValidationsConfiguration;
@@ -168,6 +169,7 @@ export function CheckAfterEffectDataChainConfiguration(options: DataChainConfigu
 		(!options.checkExistence || CheckIsExisting(options.checkExistence)) &&
 		(!options.copyEnumeration || CheckCopyEnumeration(options.copyEnumeration)) &&
 		(!options.setProperties || CheckSetProperties(options.setProperties)) &&
+		(!options.concatenateString || CheckConcatenateStringConfig(options.concatenateString)) &&
 		(!options.setInteger || CheckSetter(options.setInteger)) &&
 		(!options.setBoolean || CheckSetter(options.setBoolean)) &&
 		(!options.incrementDouble || CheckSetter(options.incrementDouble)) &&
@@ -285,6 +287,12 @@ export function CreateBranch(): BranchConfig {
 		name: ''
 	};
 }
+export function CheckConcatenateStringConfig(concatenateStringConfig: ConcatenateStringConfig): boolean {
+	if (concatenateStringConfig.enabled) {
+		return !!CheckRelation(concatenateStringConfig) && concatenateStringConfig.parameters.length > 1;
+	}
+	return true;
+}
 export function CheckCopyConfig(copyConfig: CopyConfig): boolean {
 	return CheckHalfRelation(copyConfig) && (!copyConfig.enabled || !!copyConfig.targetProperty);
 }
@@ -328,6 +336,31 @@ export function CreateCopyConfig(): CopyConfig {
 		id: GUID(),
 		relationType: RelationType.Model,
 		targetProperty: ''
+	};
+}
+export interface ConcatenateStringConfig extends HalfRelation {
+	parameters: DirectRelation[];
+	with?: string;
+}
+export interface DirectRelation {
+	relationType: RelationType;
+	agent: string;
+	property: string;
+}
+export function CreateConcatenateStringConfig(): ConcatenateStringConfig {
+	return {
+		agent: '',
+		agentProperty: '',
+		model: '',
+		modelProperty: '',
+		modelOutput: '',
+		modelOutputProperty: '',
+		parent: '',
+		parentProperty: '',
+		enabled: false,
+		id: GUID(),
+		parameters: [],
+		relationType: RelationType.Agent
 	};
 }
 export function CreateCopyEnumerationConfig(): CopyEnumerationConfig {
@@ -528,7 +561,10 @@ export function CreateGraphValidationComposition(): SimpleValidationComposition 
 	return { graph };
 }
 
-export function getRelationProperties(methodDescription: MethodDescription, halfRelation: HalfRelation): Node[] {
+export function getRelationProperties(
+	methodDescription: MethodDescription,
+	halfRelation: { relationType: RelationType }
+): Node[] {
 	let properties: Node[] = [];
 	if (methodDescription && halfRelation && halfRelation.relationType) {
 		switch (halfRelation.relationType) {
@@ -583,6 +619,7 @@ export function CreateSimpleValidation(): SimpleValidationConfig {
 		isNull: CreateBoolean(),
 		isTrue: CreateBoolean(),
 		isFalse: CreateBoolean(),
+		date: CreateBoolean(),
 		referencesExisting: CreateReferences(),
 		alphaNumeric: CreateBoolean(),
 		alphaOnly: CreateBoolean(),
@@ -615,7 +652,8 @@ export function CreateReferences(model?: string): QuarterRelation {
 		agentProperty: '',
 		enabled: false,
 		id: GUID(),
-		model: model || ''
+		model: model || '',
+		modelProperty: ''
 	};
 }
 export function CreateMaxLength(len?: string) {
@@ -713,6 +751,7 @@ export function SetupConfigInstanceInformation(
 	dataChainOptions.simpleValidation.isContained = dataChainOptions.simpleValidation.isContained || CreateAreEqual();
 	dataChainOptions.simpleValidation.isNotContained =
 		dataChainOptions.simpleValidation.isNotContained || CreateAreEqual();
+	dataChainOptions.concatenateString = dataChainOptions.concatenateString || CreateConcatenateStringConfig();
 	dataChainOptions.simpleValidationConfiguration =
 		dataChainOptions.simpleValidationConfiguration || CreateSimpleValidationComposition();
 	dataChainOptions.simpleValidations = dataChainOptions.simpleValidations || [];
@@ -721,6 +760,7 @@ export function SetupConfigInstanceInformation(
 		item.isNotContained = item.isNotContained || CreateAreEqual();
 		item.isIntersecting = item.isIntersecting || CreateAreEqual();
 		item.isBoolean = item.isBoolean || CreateBoolean();
+		item.date = item.date || CreateBoolean();
 		let temp = { ...CreateSimpleValidation(), ...item };
 		Object.assign(item, temp);
 	});
@@ -775,6 +815,7 @@ export function SetupConfigInstanceInformation(
 		targetProperties,
 		copyConfig: dataChainOptions.copyConfig,
 		copyEnumeration: dataChainOptions.copyEnumeration,
+		concatenateString: dataChainOptions.concatenateString,
 		simpleValidation: dataChainOptions.simpleValidation,
 		incrementDouble: dataChainOptions.incrementDouble,
 		incrementInteger: dataChainOptions.incrementInteger,
@@ -804,10 +845,12 @@ export function CreateGetExistence(): GetExistingConfig {
 		enabled: false
 	};
 }
-export interface QuarterRelation extends ConfigItem {
+export interface EighthRelation extends ConfigItem {
 	relationType: RelationType;
 	agent: string;
 	agentProperty: string; // The property used to find the model.
+}
+export interface QuarterRelation extends EighthRelation {
 	model: string;
 	modelProperty: string; // The property used to find the model
 }
@@ -944,6 +987,7 @@ export interface SimpleValidationConfig extends AfterEffectRelations {
 	requireUppercase: BooleanConfig;
 	socialSecurity: BooleanConfig;
 	url: BooleanConfig;
+	date: BooleanConfig;
 	urlEmpty: BooleanConfig;
 	zip: BooleanConfig;
 	zipEmpty: BooleanConfig;
@@ -1035,6 +1079,7 @@ export function CheckSimpleValidation(isvalidation: SimpleValidationConfig): boo
 				isvalidation.isBoolean.enabled ||
 				isvalidation.zipEmpty.enabled ||
 				isvalidation.email.enabled ||
+				(isvalidation.date && isvalidation.date.enabled) ||
 				isvalidation.emailEmpty.enabled ||
 				(isvalidation.referencesExisting.enabled && CheckQuarterConfig(isvalidation.referencesExisting)) ||
 				isvalidation.urlEmpty.enabled ||

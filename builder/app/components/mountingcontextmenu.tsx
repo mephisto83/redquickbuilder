@@ -376,7 +376,7 @@ class ContextMenu extends Component<any, any> {
 												].titleTemplate(
 													UIA.GetNodeTitle(model),
 													UIA.GetNodeTitle(agent)
-												)} For ${viewType}`;
+												)} For ${viewType} Mounting`;
 
 												this.setState({ turn: UIA.GUID() });
 											}

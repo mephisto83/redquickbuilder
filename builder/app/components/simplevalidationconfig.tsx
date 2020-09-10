@@ -382,6 +382,12 @@ export default class SimpleValidationComponent extends Component<any, any> {
 				/>
 				<BooleanConfigComponent
 					enabled={simpleValidation.enabled}
+					booleanConfig={simpleValidation.date}
+					title={Titles.Date}
+					onChange={onchange}
+				/>
+				<BooleanConfigComponent
+					enabled={simpleValidation.enabled}
 					booleanConfig={simpleValidation.isFalse}
 					onChange={onchange}
 					title={Titles.IsFalse}

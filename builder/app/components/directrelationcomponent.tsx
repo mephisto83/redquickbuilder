@@ -31,8 +31,7 @@ import {
 	SetProperty,
 	HalfRelation,
 	getRelationProperties,
-  CheckRelation,
-  ValidationColors
+	DirectRelation
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
@@ -49,7 +48,7 @@ import ReturnSettings from './returnsettings';
 import DataChainOptions from './datachainoptions';
 import StretchPathComponent from './stretchpathcomponent';
 
-export default class RelativeTypeComponent extends Component<any, any> {
+export default class DirectRelationComponent extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
 		this.state = {};
@@ -73,12 +72,10 @@ export default class RelativeTypeComponent extends Component<any, any> {
 		let props: any = this.props;
 		let {
 			methodDescription,
-			relations,
-			targetProperties
+			relation: relation
 		}: {
 			methodDescription: MethodDescription;
-			relations: AfterEffectRelations;
-			targetProperties: any[];
+			relation: DirectRelation;
 		} = props;
 		// let startModel =
 		// 	relations.relationType === RelationType.Agent
@@ -86,30 +83,29 @@ export default class RelativeTypeComponent extends Component<any, any> {
 		// 		: methodDescription.properties.model_output || methodDescription.properties.model;
 		let title = '';
 		let property = '';
-		switch (relations.relationType) {
+		switch (relation.relationType) {
 			case RelationType.Agent:
 				title = UIA.GetNodeTitle(methodDescription.properties.agent);
-				property = relations.agentProperty;
+				property = relation.property;
 				break;
 			case RelationType.Model:
 				title = UIA.GetNodeTitle(
 					methodDescription.properties.model_output || methodDescription.properties.model
 				);
-				property = relations.modelProperty;
+				property = relation.property;
 				break;
 			case RelationType.ModelOuput:
 				title = UIA.GetNodeTitle(
 					methodDescription.properties.model_output || methodDescription.properties.model
 				);
-				property = relations.modelOutputProperty;
+				property = relation.property;
 				break;
 			case RelationType.Parent:
 				title = UIA.GetNodeTitle(methodDescription.properties.parent);
-				property = relations.parentProperty;
+				property = relation.property;
 				break;
-    }
-    let valid = CheckRelation(relations);
-		let properties = getRelationProperties(methodDescription, relations);
+		}
+		let properties = getRelationProperties(methodDescription, relation);
 		return (
 			<TreeViewMenu
 				hide={!this.props.enabled}
@@ -117,20 +113,18 @@ export default class RelativeTypeComponent extends Component<any, any> {
 				icon={this.props.valid ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
 				onClick={() => {
 					this.setState({ config: !this.state.config });
-        }}
-        color={relations && relations.enabled ? ValidationColors.Ok : ValidationColors.Neutral}
+				}}
 				active
-				error={!valid}
 				greyed={!this.props.enabled}
-				title={Titles.RelationType}
+				title={property && title ? `${title}${UIA.GetNodeTitle(property)}` : Titles.RelationType}
 			>
 				<TreeViewItemContainer hide={this.props.hideModelAgent}>
 					<SelectInput
 						label={title}
 						options={Object.values(RelationType).map((v: RelationType) => ({ title: v, value: v }))}
-						value={relations.relationType}
+						value={relation.relationType}
 						onChange={(value: RelationType) => {
-							relations.relationType = value;
+							relation.relationType = value;
 							this.setState({
 								turn: UIA.GUID()
 							});
@@ -146,26 +140,26 @@ export default class RelativeTypeComponent extends Component<any, any> {
 						options={properties}
 						value={property}
 						onChange={(value: string) => {
-							switch (relations.relationType) {
+							switch (relation.relationType) {
 								case RelationType.Agent:
-									relations.agentProperty = value;
+									relation.property = value;
 									if (methodDescription.properties.agent)
-										relations.agent = methodDescription.properties.agent;
+										relation.agent = methodDescription.properties.agent;
 									break;
 								case RelationType.Model:
-									relations.modelProperty = value;
+									relation.property = value;
 									if (methodDescription.properties.model)
-										relations.model = methodDescription.properties.model;
+										relation.agent = methodDescription.properties.model;
 									break;
 								case RelationType.ModelOuput:
-									relations.modelOutputProperty = value;
+									relation.property = value;
 									if (methodDescription.properties.model_output)
-										relations.modelOutput = methodDescription.properties.model_output;
+										relation.agent = methodDescription.properties.model_output;
 									break;
 								case RelationType.Parent:
-									relations.parentProperty = value;
+									relation.property = value;
 									if (methodDescription.properties.parent)
-										relations.parent = methodDescription.properties.parent;
+										relation.agent = methodDescription.properties.parent;
 									break;
 							}
 							this.setState({
@@ -177,41 +171,6 @@ export default class RelativeTypeComponent extends Component<any, any> {
 						}}
 					/>
 				</TreeViewItemContainer>
-				<TreeViewItemContainer hide={this.props.hideTargetProperty}>
-					<SelectInput
-						label={UIA.GetNodeTitle(methodDescription.properties.model)}
-						options={targetProperties || []}
-						value={relations.targetProperty}
-						onChange={(value: string) => {
-							relations.targetProperty = value;
-							this.setState({
-								turn: UIA.GUID()
-							});
-							if (this.props.onChange) {
-								this.props.onChange();
-							}
-						}}
-					/>
-				</TreeViewItemContainer>
-				<TreeViewItemContainer hide={this.props.hideTargetProperty}>
-					<CheckBox
-						label={Titles.Stretch}
-						value={relations && relations.isStrech}
-						onChange={(val: boolean) => {
-							relations.isStrech = val;
-							if (val) {
-								relations.stretchPath = relations.stretchPath || CreateStretchPath();
-							}
-							this.setState({
-								turn: UIA.GUID()
-							});
-							if (this.props.onChange) {
-								this.props.onChange();
-							}
-						}}
-					/>
-				</TreeViewItemContainer>
-				<StretchPathComponent stretch={relations.stretchPath} show={relations && relations.isStrech} />
 			</TreeViewMenu>
 		);
 	}

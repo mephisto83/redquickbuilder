@@ -232,9 +232,14 @@ export function updateWorld() {
 
 	context.world.addWords(webDictionary);
 }
+export interface NLOptions {
+	withSpaces?: boolean;
+}
 export interface NLMeaning {
+	parameterClauses?: Clause[];
 	text: string;
 	actorClause: Clause;
+	options?: NLOptions;
 	targetClause: Clause;
 	methodType?: NLMethodType;
 	validation: { [str: string]: boolean };
@@ -251,7 +256,7 @@ export default function getLanguageMeaning(
 	let contains = [ 'contains a', 'contains an' ];
 	let intersects = [ 'intersects', 'intersects with' ];
 	let inAEnumeration = [ 'is in an enumeration', 'is an enumeration', 'is in a set' ];
-	let executionStuff = [ 'copies to', 'increments by' ];
+	let executionStuff = [ 'copies to', 'increments by', 'concatenates with' ];
 	let referenceStuff = [ 'must connect to a real' ];
 	let validationStuff = [ 'must conform to a' ];
 	let all = [
@@ -321,11 +326,70 @@ export default function getLanguageMeaning(
 				result.methodType = NLMethodType.CopyTo;
 			} else if (temp.has('increments by')) {
 				result.methodType = NLMethodType.IncrementBy;
+			} else if (temp.has('concatenates with')) {
+				result.methodType = NLMethodType.ConcatenateString;
+				result.parameterClauses = captureParameters('concatenates with', temp.text(), [ 'with spaces' ]);
+				result.options = {
+					withSpaces: temp.text().split('concatenates with').subset(1).join().indexOf('with spaces') !== -1
+				};
 			}
 		} else if (validationStuff.find((item: string) => temp.has(item))) {
 			result.methodType = NLMethodType.ComplexValidations;
 		} else if (referenceStuff.find((item: string) => temp.has(item))) {
 			result.methodType = NLMethodType.Reference;
+		}
+		function captureParameters(splitPhrase: string, phrase: string, remove?: string[]): Clause[] {
+			let parameterPhrase = phrase.split(splitPhrase).subset(1).join('');
+			if (remove) {
+				remove.forEach((item: string) => {
+					parameterPhrase = parameterPhrase.split(item).join();
+				});
+			}
+			let parts = parameterPhrase.split(',').join(' and ');
+			let clauses = parts.split('and').map((v: string) => v.trim()).map((v: string) => buildClause(v, {}));
+			return clauses;
+		}
+		function buildClause(subClause: string, clause: Clause): Clause {
+			let targetProperties: Node[] = [];
+			if (_nlp(subClause).has(`#Agent`)) {
+				clause.relationType = RelationType.Agent;
+				clause.agent = context ? context.agent : '';
+				targetProperties = findPotentialProperties(context && context.agent ? context.agent : undefined);
+			} else if (_nlp(subClause).has(`#Model`)) {
+				clause.relationType = RelationType.Model;
+				clause.agent = context ? context.model : '';
+				targetProperties = findPotentialProperties(context && context.model ? context.model : undefined);
+			}
+			if (_nlp(subClause).has(`#Parent`)) {
+				clause.relationType = RelationType.Parent;
+				clause.agent = context ? context.parent : '';
+				targetProperties = findPotentialProperties(context && context.parent ? context.parent : undefined);
+			}
+			if (_nlp(subClause).has(`#Target`)) {
+				clause.relationType = RelationType.Model;
+				clause.agent = context ? context.model : '';
+				targetProperties = findPotentialProperties(context && context.model ? context.model : undefined);
+			}
+			clause.property = findProperty(targetProperties, subClause);
+			return clause;
+		}
+		function findProperty(properties: Node[], clauseString: string) {
+			let property: string;
+			if (properties && properties.length) {
+				let aprop = properties.find(
+					(vnode: Node) =>
+						_nlp(clauseString).has(GetNodeTitle(vnode)) ||
+						_nlp(clauseString).has(GetCodeName(vnode)) ||
+						_nlp(clauseString).has(GetCodeName(vnode).toLocaleLowerCase()) ||
+						_nlp(clauseString).has(GetCodeName(vnode).toLocaleUpperCase())
+				);
+				if (aprop) {
+					property = aprop.id;
+				}
+			} else {
+				property = _nlp(clauseString).match(`#${PROPERTY}`).text();
+			}
+			return property;
 		}
 		function findPotentialProperties(modelId?: string): Node[] {
 			let result: Node[] = [];
@@ -358,7 +422,7 @@ export default function getLanguageMeaning(
 			result.targetClause.relationType = RelationType.Model;
 			result.targetClause.agent = context ? context.model : '';
 			targetProperties = findPotentialProperties(context && context.model ? context.model : undefined);
-    }
+		}
 
 		if (_nlp(secondClause).has(`#NodeAttributePropertyTypes`)) {
 			Object.entries(NodeAttributePropertyTypes).forEach((d: any) => {
@@ -441,7 +505,7 @@ export default function getLanguageMeaning(
 }
 
 export interface Clause {
-	propertyAttributeType: string;
+	propertyAttributeType?: string;
 	relationType?: RelationType;
 	agent?: string;
 	property?: string;
@@ -459,7 +523,8 @@ export enum NLMethodType {
 	CopyTo = 'CopyTo',
 	IncrementBy = 'IncrementBy',
 	Reference = 'Reference',
-	ComplexValidations = 'ComplexValidations'
+	ComplexValidations = 'ComplexValidations',
+	ConcatenateString = 'ConcatenateString'
 }
 
 export const NLValidationClauses = {

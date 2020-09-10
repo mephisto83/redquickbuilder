@@ -66,6 +66,7 @@ export default class TextInput extends Component<any, any> {
 					<textarea
 						disabled={this.disabled() ? true : false}
 						className="form-control"
+						style={{ minHeight: 100 }}
 						onBlur={() => {
 							if (this.props.onBlur) {
 								this.props.onBlur();
