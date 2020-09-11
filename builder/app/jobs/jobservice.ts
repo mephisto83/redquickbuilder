@@ -168,7 +168,7 @@ export default class JobService {
 				} else {
 					fs.unlinkSync(folder);
 				}
-			} catch (e) {}
+			} catch (e) { }
 		}
 	}
 	static NewJobCallback: any;
@@ -196,7 +196,7 @@ export default class JobService {
 			let job = await JobService.loadJob(currentJobFile.jobPath);
 			complete = await JobService.IsComplete(job, JobServiceConstants.JobPath());
 			if (!complete) {
-				//		await JobService.MakeSureAgentsAreWorking(job, command);
+			//	await JobService.MakeSureAgentsAreWorking(job, command);
 			}
 			await sleep();
 		} while (!complete);
@@ -216,7 +216,7 @@ export default class JobService {
 				if (notBusyProject && notBusyProject.ready) {
 					console.log(
 						`${notBusyProject.agentProject ||
-							notBusyProject.name} isnt busy, but it hasnt finished the project.`
+						notBusyProject.name} isnt busy, but it hasnt finished the project.`
 					);
 					console.log('so telling it to begin job again');
 					await this.moveJobItemFiles(notBusyProject, item);
@@ -674,7 +674,7 @@ export default class JobService {
 				if (isDone) {
 					// await JobService.CleanUpJob(job);
 				}
-			} catch (e) {}
+			} catch (e) { }
 		}
 	}
 	static CleanUpJob(job: Job) {
@@ -840,6 +840,9 @@ export default class JobService {
 		let isComplete = await JobService.IsJobItemComplete(jobItem);
 		if (isComplete) {
 			this.jobItemCompleteCache[`${job.name} ${partId}`] = isComplete;
+		}
+		else {
+			console.log(`${job.name} ${partId}/ ${jobItem.assignedTo || ''}`)
 		}
 		return isComplete;
 	}
