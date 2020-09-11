@@ -44,8 +44,7 @@ import Typeahead from './typeahead';
 import CheckBox from './checkbox';
 import { MethodFunctions } from '../constants/functiontypes';
 import getLanguageMeaning, { NLMeaning, NLMethodType, Clause, NLValidationClauses } from '../service/naturallang';
-import { GetCurrentGraph, GetCodeName } from '../../visi_blend/dist/app/actions/uiactions';
-import { SimpleValidation } from '../../visi_blend/dist/app/components/titles';
+import { GetCurrentGraph, GetCodeName } from '../actions/uiactions';
 
 export default class ValidationComponentItem extends Component<any, any> {
 	constructor(props: any) {

@@ -435,7 +435,6 @@ export default class CommunicationTower {
 		let port = this.serverPort;
 		await new Promise((resolve, fail) => {
 			const server = http.createServer((request, res) => {
-        console.log('handling request');
 				this.handleRequest(request, res);
 			});
 			server.on('clientError', (err, socket) => {
