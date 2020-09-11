@@ -73,7 +73,7 @@ export default class CommandCenterConfiguration extends Component<any, any> {
 								this.props.onRemove();
 							}
 						}}
-						icon="fa fa-plus"
+						icon="fa fa-minus"
 					/>
 				</TreeViewButtonGroup>
 			</TreeViewMenu>
