@@ -12,8 +12,8 @@ import TreeViewItemContainer from './treeviewitemcontainer';
 import TextInput from './textinput';
 import { NodesByType, GUID } from '../actions/uiactions';
 import SelectInput from './selectinput';
-import { NodeTypes, LinkType } from '..//constants/nodetypes';
-import { GetCurrentGraph } from '../../visi_blend/dist/app/actions/uiactions';
+import { NodeTypes, LinkType } from '../constants/nodetypes';
+import { GetCurrentGraph } from '../actions/uiactions';
 import { GetNodesLinkedTo } from '../methods/graph_methods';
 import SwaggerCallParameters from './swaggercallparameters';
 

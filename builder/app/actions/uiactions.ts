@@ -40,7 +40,6 @@ import {
 import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import { ProgrammingLanguages, NodePropertyTypesByLanguage, NEW_LINE } from '../constants/nodetypes';
 import fs from 'fs';
-import { NodeType } from '../../visi_blend/dist/app/components/titles';
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';
 export const BATCH = 'BATCH';
