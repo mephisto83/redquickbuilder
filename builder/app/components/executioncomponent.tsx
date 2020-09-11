@@ -118,7 +118,19 @@ export default class ExecutionComponent extends Component<any, any> {
 		let mountingItem: MountingDescription = this.props.mountingItem;
 		mountingItem.executions = mountingItem.executions || [];
 		let { executions } = mountingItem;
-
+		let permissionSentences = UIA.Visual(
+			UIA.GetStateFunc()(),
+			`${mountingItem.viewType}-${DataChainType.Permission}`
+		);
+		let validationSentences = UIA.Visual(
+			UIA.GetStateFunc()(),
+			`${mountingItem.viewType}-${DataChainType.Validation}`
+		);
+		let filterSentences = UIA.Visual(UIA.GetStateFunc()(), `${mountingItem.viewType}-${DataChainType.Filter}`);
+		let executionSentences = UIA.Visual(
+			UIA.GetStateFunc()(),
+			`${mountingItem.viewType}-${DataChainType.Execution}`
+		);
 		let valid = CheckValidationConfigs(executions);
 		return (
 			<TreeViewMenu
@@ -198,6 +210,46 @@ export default class ExecutionComponent extends Component<any, any> {
 							}
 						}}
 						icon="fa fa-paste"
+					/>
+					<TreeViewGroupButton
+						title={'Quick Store'}
+						onClick={() => {
+							UIA.QuickStore(`${mountingItem.viewType}-${this.props.dataChainType}`, {
+								sentences: this.state.sentences || ''
+							});
+						}}
+					/>
+					<TreeViewGroupButton
+						title={Titles.Permissions}
+						on={permissionSentences && permissionSentences.length}
+						icon={'fa fa-optin-monster'}
+						onClick={() => {
+							this.setState(permissionSentences);
+						}}
+					/>
+					<TreeViewGroupButton
+						title={Titles.Validations}
+						on={validationSentences && validationSentences.length}
+						icon={'fa fa-houzz'}
+						onClick={() => {
+							this.setState(validationSentences);
+						}}
+					/>
+					<TreeViewGroupButton
+						title={Titles.Filter}
+						on={filterSentences && filterSentences.length}
+						icon={'fa fa-filter'}
+						onClick={() => {
+							this.setState(filterSentences);
+						}}
+					/>
+					<TreeViewGroupButton
+						title={Titles.Executions}
+						on={executionSentences && executionSentences.length}
+						icon={'fa fa-exclamation-triangle'}
+						onClick={() => {
+							this.setState(executionSentences);
+						}}
 					/>
 				</TreeViewButtonGroup>
 				<TreeViewMenu

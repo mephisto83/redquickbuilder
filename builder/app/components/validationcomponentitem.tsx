@@ -66,6 +66,19 @@ export default class ValidationComponentItem extends Component<any, any> {
 			validationConfig.autoCalculate = true;
 		}
 		let valid = CheckValidationConfig(validationConfig);
+		let permissionSentences = UIA.Visual(
+			UIA.GetStateFunc()(),
+			`${mountingItem.viewType}-${DataChainType.Permission}`
+		);
+		let validationSentences = UIA.Visual(
+			UIA.GetStateFunc()(),
+			`${mountingItem.viewType}-${DataChainType.Validation}`
+		);
+		let filterSentences = UIA.Visual(UIA.GetStateFunc()(), `${mountingItem.viewType}-${DataChainType.Filter}`);
+		let executionSentences = UIA.Visual(
+			UIA.GetStateFunc()(),
+			`${mountingItem.viewType}-${DataChainType.Execution}`
+		);
 		return (
 			<TreeViewMenu
 				open={this.state.open}
@@ -324,6 +337,24 @@ export default class ValidationComponentItem extends Component<any, any> {
 													NodeProperties.UIAttributeType
 												);
 												switch (uiAttributeType) {
+													case NodeAttributePropertyTypes.ENUMERATION:
+														let enumerationNode = GetNodeLinkedTo(GetCurrentGraph(), {
+															id: modelProperty.id,
+															componentType: NodeTypes.Enumeration
+														});
+														propertySentences.push(
+															`The model's ${UIA.GetCodeName(
+																modelProperty
+															).toLowerCase()} property is in an enumeration ${GetCodeName(
+																enumerationNode
+															)} with a ${GetNodeProp(
+																enumerationNode,
+																NodeProperties.Enumeration
+															).map(
+																(v: any) => v.value
+															).join(', ')} .`
+														);
+														break;
 													default:
 														propertySentences.push(
 															`The model's ${UIA.GetCodeName(
@@ -358,6 +389,55 @@ export default class ValidationComponentItem extends Component<any, any> {
 							}}
 							icon="fa  fa-won"
 						/>
+						<div style={{ marginLeft: 40 }} />
+						<TreeViewGroupButton
+							title={'Quick Store'}
+							onClick={() => {
+								UIA.QuickStore(`${mountingItem.viewType}-${this.props.dataChainType}`, {
+									sentences: this.state.sentences || ''
+								});
+							}}
+						/>
+						<TreeViewGroupButton
+							title={Titles.Permissions}
+							on={permissionSentences && permissionSentences.length}
+							icon={'fa fa-optin-monster'}
+							onClick={() => {
+								this.setState(permissionSentences);
+							}}
+						/>
+						<TreeViewGroupButton
+							title={Titles.Validations}
+							on={validationSentences && validationSentences.length}
+							icon={'fa fa-houzz'}
+							onClick={() => {
+								this.setState(validationSentences);
+							}}
+						/>
+						<TreeViewGroupButton
+							title={Titles.Filter}
+							on={filterSentences && filterSentences.length}
+							icon={'fa fa-filter'}
+							onClick={() => {
+								this.setState(filterSentences);
+							}}
+						/>
+						<TreeViewGroupButton
+							title={Titles.Executions}
+							on={executionSentences && executionSentences.length}
+							icon={'fa fa-exclamation-triangle'}
+							onClick={() => {
+								this.setState(executionSentences);
+							}}
+						/>
+						{/* <TreeViewGroupButton
+							title={Titles.AfterEffects}
+							on={afteEffectSentences && afteEffectSentences.length}
+							icon={'fa fa-filter'}
+							onClick={() => {
+								this.setState(afteEffectSentences);
+							}}
+						/> */}
 					</TreeViewButtonGroup>
 				</TreeViewMenu>
 				<TreeViewItemContainer>

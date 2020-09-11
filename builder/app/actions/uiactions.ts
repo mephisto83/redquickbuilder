@@ -865,7 +865,13 @@ export function GetModelPropertyChildren(id: string, options: any = {}) {
 		.filter((x) => x.id !== id)
 		.unique((v: { id: any }) => v.id);
 }
-
+export function QuickStore(key: string, value: any) {
+	let dispatch = GetDispatchFunc();
+	let getState = GetStateFunc();
+	if (dispatch && getState) {
+		setVisual(key, value)(dispatch, getState);
+	}
+}
 /**
  * Gets the models properties, that will appear on the model.
  * @param id node id
