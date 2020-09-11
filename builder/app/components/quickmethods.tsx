@@ -44,7 +44,7 @@ import ApplyValidationFromProperties from '../nodepacks/permission/ApplyValidati
 import AddAgentMethods from '../nodepacks/batch/AddAgentMethods';
 import BuildDashboards from '../nodepacks/screens/dashboard/BuildDashboards';
 import ConnectDashboards from '../nodepacks/screens/dashboard/ConnectDashboards';
-import CreateComponentAll from '../nodepacks/batch/CreateComponentAll';
+import CreateComponentAll, { CreateComponentSharedAll } from '../nodepacks/batch/CreateComponentAll';
 import MenuGenerator from '../generators/menugenerator';
 import AddUserRequirements from '../nodepacks/batch/AddUserRequirements';
 import ChangeInputToSelect from '../nodepacks/screens/ChangeInputToSelect';
@@ -60,6 +60,9 @@ import CreateClaimService from '../nodepacks/batch/CreateClaimService';
 import ApplyPremissionChains from '../nodepacks/batch/ApplyPermissionChains';
 import ApplyExecutionChains from '../nodepacks/batch/ApplyExecutionChains';
 import ApplyValidationChains from '../nodepacks/batch/ApplyValidationChains';
+import { SetPause } from '../methods/graph_methods';
+import SetupViewTypes from '../nodepacks/batch/SetupViewTypes';
+import { graphOperation, GetDispatchFunc, GetStateFunc } from '../actions/uiactions';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -158,14 +161,12 @@ class QuickMethods extends Component<any, any, any> {
 								</TreeViewItemContainer>
 								<TreeViewItemContainer>
 									<SelectInput
-										label={Titles.Agents}
-										value={this.state.selectedAgent}
+										label={Titles.UIType}
+										value={this.state.selectedUIType}
 										onChange={(val: string) => {
-											this.setState({ selectedAgent: val });
+											this.setState({ selectedUIType: val });
 										}}
-										options={NodesByType(UIA.GetCurrentGraph(), NodeTypes.Model)
-											.filter((x: Node) => GetNodeProp(x, NodeProperties.IsAgent))
-											.toNodeSelect()}
+										options={Object.keys(UITypes).map((v: string) => ({ title: v, value: v }))}
 									/>
 								</TreeViewItemContainer>
 								<TreeViewItemContainer>
@@ -188,14 +189,14 @@ class QuickMethods extends Component<any, any, any> {
 											this.state.selectedViewType &&
 											this.state.selectedProperty &&
 											this.state.targetModel &&
-											this.state.selectedAgent
+											this.state.selectedUIType
 										) {
 											let res = UIA.GetSharedComponentFor(
 												this.state.selectedViewType,
 												UIA.GetNodeById(this.state.selectedProperty),
 												this.state.targetModel,
 												this.state.isSharedComponent || false,
-												this.state.selectedAgent
+												this.state.selectedUIType
 											);
 											console.log(res);
 											this.setState({ sharedComponentFor: res });
@@ -212,6 +213,46 @@ class QuickMethods extends Component<any, any, any> {
 								}}
 								icon="fa fa-tag"
 							>
+								<TreeViewMenu
+									title={'Create View Types'}
+									onClick={async () => {
+										const res = await CreateViewTypes(() => {});
+										graphOperation(res)(GetDispatchFunc(), GetStateFunc());
+									}}
+								/>
+
+								<TreeViewMenu
+									title="Create Component Shared All"
+									onClick={() => {
+										SetPause(true);
+										CreateComponentSharedAll(() => {}, null, (v:Node)=>{
+                      return v.id === currentNode.id;
+                    }).then(() => {
+											SetPause(false);
+										});
+									}}
+								/>
+
+								<TreeViewMenu
+									title="Create Component All"
+									onClick={() => {
+										SetPause(true);
+										CreateComponentAll(() => {}).then(() => {
+											SetPause(false);
+										});
+									}}
+								/>
+
+								<TreeViewMenu
+									title="Setup View Types"
+									onClick={() => {
+										SetPause(true);
+										SetupViewTypes(() => {}).then(() => {
+											SetPause(false);
+										});
+									}}
+								/>
+
 								<TreeViewMenu
 									title="Add Agent Access Methods"
 									onClick={() => {

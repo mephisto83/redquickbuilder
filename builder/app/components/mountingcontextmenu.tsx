@@ -27,7 +27,8 @@ import {
 	setDefaultRouteSource,
 	PermissionConfig,
 	ValidationConfig,
-	FilterConfig
+	FilterConfig,
+	ExecutionConfig
 } from '../interface/methodprops';
 import SelectInput from './selectinput';
 import { ViewTypes } from '../constants/viewtypes';
@@ -54,6 +55,7 @@ import StaticParametersComponent from './staticparameterscomponent';
 import { autoNameGenerateDataChain } from './validationcomponentitem';
 import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import { mount } from 'enzyme';
+import { autoNameExecutionConfig } from './executioncomponentitem';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -374,7 +376,7 @@ class ContextMenu extends Component<any, any> {
 												].titleTemplate(
 													UIA.GetNodeTitle(model),
 													UIA.GetNodeTitle(agent)
-												)} For ${viewType}`;
+												)} For ${viewType} Mounting`;
 
 												this.setState({ turn: UIA.GUID() });
 											}
@@ -385,40 +387,63 @@ class ContextMenu extends Component<any, any> {
 										title={'Auto generate, permissions, validations, filters'}
 										onClick={() => {
 											if (mountingItem.permissions) {
-												mountingItem.permissions.forEach((permission: PermissionConfig) => {
-													autoNameGenerateDataChain(
-														permission,
-														mountingItem,
-														DataChainType.Permission,
-														mode.methods,
-														null,
-														true
-													);
-												});
+												mountingItem.permissions
+													.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
+													.forEach((permission: PermissionConfig) => {
+														autoNameGenerateDataChain(
+															permission,
+															mountingItem,
+															DataChainType.Permission,
+															mode.methods,
+															null,
+															true
+														);
+													});
 											}
 											if (mountingItem.validations) {
-												mountingItem.validations.forEach((validation: ValidationConfig) => {
-													autoNameGenerateDataChain(
-														validation,
-														mountingItem,
-														DataChainType.Validation,
-														mode.methods,
-														null,
-														true
-													);
-												});
+												mountingItem.validations
+													.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
+													.forEach((validation: ValidationConfig) => {
+														autoNameGenerateDataChain(
+															validation,
+															mountingItem,
+															DataChainType.Validation,
+															mode.methods,
+															null,
+															true
+														);
+													});
 											}
 											if (mountingItem.filters) {
-												mountingItem.filters.forEach((filter: FilterConfig) => {
-													autoNameGenerateDataChain(
-														filter,
-														mountingItem,
-														DataChainType.Filter,
-														mode.methods,
-														null,
-														true
-													);
-												});
+												mountingItem.filters
+													.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
+													.forEach((filter: FilterConfig) => {
+														autoNameGenerateDataChain(
+															filter,
+															mountingItem,
+															DataChainType.Filter,
+															mode.methods,
+															null,
+															true
+														);
+													});
+											}
+											if (mountingItem.executions) {
+												mountingItem.executions
+													.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
+													.forEach((executionConfig: ExecutionConfig) => {
+														if (methodDescription) {
+															autoNameExecutionConfig(
+																executionConfig,
+																viewType,
+																mountingItem,
+																methodDescription,
+																mountingItem.name,
+																mode.methods,
+																true
+															);
+														}
+													});
 											}
 											this.setState({ turn: UIA.GUID() });
 										}}

@@ -164,9 +164,17 @@ export default class CommunicationTower {
 				await this.startServers();
 			} catch (e) {
 				error = true;
+				await this.wait();
 				console.log(e);
 			}
 		} while (error);
+	}
+	async wait() {
+		return new Promise((resolve) => {
+			setTimeout(() => {
+				resolve();
+			}, 10000);
+		});
 	}
 	handleRequest(request: http.IncomingMessage, response: http.ServerResponse): Promise<void> {
 		const { headers, method, url } = request;
@@ -427,6 +435,7 @@ export default class CommunicationTower {
 		let port = this.serverPort;
 		await new Promise((resolve, fail) => {
 			const server = http.createServer((request, res) => {
+        console.log('handling request');
 				this.handleRequest(request, res);
 			});
 			server.on('clientError', (err, socket) => {

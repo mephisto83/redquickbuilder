@@ -35,6 +35,11 @@ export default class SetIntegerComponent extends Component<any, any> {
 				dataChainType={this.props.dataChainType}
 				dataChainOptions={dataChainOptions}
 				title={Titles.SetInteger}
+        onChange={() => {
+          if (this.props.onChange) {
+            this.props.onChange();
+          }
+        }}
 			>
 				<TreeViewItemContainer>
 					<TextInput

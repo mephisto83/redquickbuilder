@@ -26,6 +26,7 @@ import TreeViewMenu from './treeviewmenu';
 import Content from './content';
 import NavigationParameterMenu from './navigationparametermenu';
 import ScreenActivityMenu from './screenactivitymenu';
+import SwaggerActivity from './swaggeractivity';
 import SideBar from './sidebar';
 import DataSourceActivityMenu from './datasourceactivitymenu';
 import SideBarTabs from './sidebartabs';
@@ -80,6 +81,7 @@ import SelectInput from './selectinput';
 import DataChainOperator from './datachainoperator';
 import ThemeProperties from './themeproperties';
 import CurrentNodeProperties from './currentnodeproperties';
+import ScaffoldProject from './scaffoldproject';
 import Slider from './slider';
 import SideMenuContainer from './sidemenucontainer';
 import ExtensionDefinitionMenu from './extensiondefinitionmenu';
@@ -178,7 +180,9 @@ class Dashboard extends Component<any, any> {
 		this.props.setRemoteState();
 		this.props.setVisual(UIA.NODE_COST, 1);
 		this.props.setVisual(UIA.NODE_CONNECTION_COST, 0.2);
-		this.props.loadApplicationConfig();
+		setTimeout(() => {
+			this.props.loadApplicationConfigUI();
+		}, 5000);
 	}
 
 	minified() {
@@ -2130,6 +2134,19 @@ class Dashboard extends Component<any, any> {
 											// this.props.setVisual(LINK_DISTANCE, 75);
 											Promise.resolve()
 												.then(() => {
+													return runSequence(NodeTypes.Enumeration, requestNodes, {
+														exclusiveLinkTypes: [],
+														prefix: 'enumeration',
+														centerMindMap: (args: any) => {
+															centerMindMap(args);
+														},
+														reset: () => {
+															resetMindMap();
+														},
+														MapControls: MapControls
+													});
+												})
+												.then(() => {
 													return runSequence(NodeTypes.AgentAccessDescription, requestNodes, {
 														exclusiveLinkTypes: [],
 														prefix: 'agent-acceess-description',
@@ -2314,7 +2331,7 @@ class Dashboard extends Component<any, any> {
 									small={this.state.small}
 									nonBlock={this.state.nonBlock}
 									linkDistance={UIA.Visual(state, LINK_DISTANCE)}
-									onNodeClick={(nodeId, boundingBox) => {
+									onNodeClick={(nodeId: string, boundingBox: any) => {
 										if (UIA.Visual(state, CONNECTING_NODE)) {
 											const selectedId = UIA.Visual(state, UIA.SELECTED_NODE);
 											console.log(`selectedId:${selectedId} => nodeId:${nodeId}`);
@@ -2560,6 +2577,7 @@ class Dashboard extends Component<any, any> {
 										<ChoiceListItemActivityMenu />
 										{/* <ConditionActivityMenu /> */}
 										<DataChainActvityMenu />
+										<SwaggerActivity />
 										<TextInput
 											label={Titles.NodeLabel}
 											value={currentNode.properties ? currentNode.properties.text : ''}
@@ -2756,8 +2774,9 @@ class Dashboard extends Component<any, any> {
 							{UIA.VisualEq(state, SELECTED_TAB, SCOPE_TAB) ? <MethodParameterMenu /> : null}
 							{UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? <QuickMethods /> : null}
 							{UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? <CurrentNodeProperties /> : null}
-							{UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? <RedQuickConfigurationComponent /> : null}
+							{UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? <ScaffoldProject /> : null}
 							{UIA.VisualEq(state, SELECTED_TAB, DEFAULT_TAB) ? <ThemeProperties /> : null}
+							{UIA.VisualEq(state, SELECTED_TAB, QUICK_MENU) ? <RedQuickConfigurationComponent /> : null}
 						</SideBar>
 					</div>
 				</div>

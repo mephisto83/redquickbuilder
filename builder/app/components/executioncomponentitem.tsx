@@ -18,10 +18,11 @@ import {
 	MountingDescription,
 	MethodDescription,
 	ValidationConfig,
-	ExecutionConfig
+	ExecutionConfig,
+	CreateNameSpaceConfig
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
-import { NodeTypes, NodeProperties } from '../constants/nodetypes';
+import { NodeTypes, NodeProperties, NEW_LINE } from '../constants/nodetypes';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachain';
@@ -34,11 +35,13 @@ import { mount } from 'enzyme';
 import AfterEffectDataChainOptions from './aftereffectdatachainoptions';
 import DataChainOptions from './datachainoptions';
 import { MethodFunctions } from '../constants/functiontypes';
+import { NLMeaning, NLMethodType } from '../service/naturallang';
+import { GetNLMeaning } from './validationcomponentitem';
 
 export default class ExecutionComponentItem extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
-		this.state = { override: true };
+		this.state = { override: true, sentences: '' };
 	}
 	render() {
 		let executionConfig: ExecutionConfig = this.props.executionConfig;
@@ -54,7 +57,10 @@ export default class ExecutionComponentItem extends Component<any, any> {
 					this.setState({ open: !this.state.open });
 				}}
 				active
-				title={executionConfig.name || Titles.Execution}
+				title={
+					`${executionConfig.name}${executionConfig.summary ? `(${executionConfig.summary})` : ''}` ||
+					Titles.Execution
+				}
 			>
 				<TreeViewItemContainer>
 					<TextInput
@@ -163,7 +169,6 @@ export default class ExecutionComponentItem extends Component<any, any> {
 			</TreeViewMenu>
 		);
 	}
-
 	private autoName(executionConfig: ExecutionConfig, mountingItem: MountingDescription) {
 		if (executionConfig) {
 			if (mountingItem) {
@@ -236,6 +241,15 @@ export function buildDataChain(
 		if (mountingItem) {
 			let { methodDescription } = mountingItem;
 			if (methodDescription) {
+				executionConfig.dataChainOptions.namespaceConfig = CreateNameSpaceConfig({
+					space: [
+						methodDescription.properties.agent,
+						methodDescription.properties.model_output || methodDescription.properties.model,
+						mountingItem.viewType,
+						MethodFunctions[methodDescription.functionType].method
+					]
+				});
+
 				BuildDataChainAfterEffectConverter(
 					{
 						name: executionConfig.name,

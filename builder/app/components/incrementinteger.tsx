@@ -36,6 +36,11 @@ export default class IncrementIntegerComponent extends Component<any, any> {
 				dataChainType={this.props.dataChainType}
 				dataChainOptions={dataChainOptions}
 				title={Titles.IncrementInteger}
+        onChange={() => {
+          if (this.props.onChange) {
+            this.props.onChange();
+          }
+        }}
 			>
 				<TreeViewItemContainer>
 					<TextInput

@@ -40,6 +40,7 @@ import {
 import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import { ProgrammingLanguages, NodePropertyTypesByLanguage, NEW_LINE } from '../constants/nodetypes';
 import fs from 'fs';
+import { NodeType } from '../../visi_blend/dist/app/components/titles';
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';
 export const BATCH = 'BATCH';
@@ -239,16 +240,20 @@ export function GetGroupProp(id: any, prop: any) {
 }
 
 export function GetSharedComponentFor(
-	viewType: any,
-	modelProperty: any,
-	currentNodeId: any,
+	viewType: string,
+	modelProperty: _.Node,
+	targetModel: any,
 	isSharedProperty: any,
-	agentId: any
+	uiType: string
 ) {
+	if (!uiType) {
+		throw new Error('no ui type set in GetSharedComponentFor');
+	}
 	const graph = GetCurrentGraph(GetState());
 	let viewTypeNodes = GraphMethods.GetNodesLinkedTo(graph, {
-		id: typeof modelProperty === 'string' ? modelProperty : modelProperty.id
+		id: modelProperty.id
 	});
+	// let viewTypeNodes:any = NodesByType(null, NodeTypes.ViewType);
 	// viewTypeNodes = viewTypeNodes.filter((x: any) => {
 	// 	let componentNodes = GraphMethods.GetNodesLinkedTo(graph, {
 	// 		id: x.id,
@@ -267,23 +272,23 @@ export function GetSharedComponentFor(
 	if (isSharedProperty) {
 		viewType = isPluralComponent ? ViewTypes.GetAll : ViewTypes.Get;
 	}
-	viewTypeNodes = viewTypeNodes.filter((x: any) => {
+	viewTypeNodes = viewTypeNodes.filter((x: _.Node) => {
 		let result = GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ViewType;
 
 		result = result && !!GetNodeProp(x, NodeProperties.IsPluralComponent) === !!isPluralComponent;
 		return result;
 	});
-	viewTypeNodes = viewTypeNodes.find((x: { id: any }) => {
+	viewTypeNodes = viewTypeNodes.find((x: _.Node) => {
 		if (
 			GraphMethods.existsLinkBetween(graph, {
 				source: x.id,
-				target: currentNodeId,
+				target: targetModel,
 				type: NodeConstants.LinkType.DefaultViewType
 			})
 		) {
 			const link = GraphMethods.findLink(graph, {
 				source: x.id,
-				target: currentNodeId
+				target: targetModel
 			});
 			if (GetLinkProperty(link, NodeConstants.LinkPropertyKeys.ViewType) === viewType) {
 				return true;
@@ -305,6 +310,8 @@ export function GetSharedComponentFor(
 			return GetNodeProp(modelProperty, NodeProperties.DefaultViewTypeGetAll);
 		case ViewTypes.Update:
 			return GetNodeProp(modelProperty, NodeProperties.DefaultViewTypeUpdate);
+		default:
+			throw new Error('unhandled case for getting shared component');
 	}
 }
 
@@ -442,17 +449,18 @@ export function SetSharedComponent(args: any) {
 	) {
 		const connectionsAll = GraphMethods.GetConnectedNodesByType(GetState(), source, NodeTypes.ComponentNode);
 
-		const connections = connectionsAll
-			.filter((x: any) => GetNodeProp(x, NodeProperties.ViewType) === viewType)
-			.filter((x: any) => GetNodeProp(x, NodeProperties.UIType) === uiType)
-			.filter((x: any) => GetNodeProp(x, NodeProperties.IsPluralComponent) === isPluralComponent)
-			.map((x: any) => ({
-				operation: REMOVE_LINK_BETWEEN_NODES,
-				options: {
-					source,
-					target: x.id
-				}
-			}));
+		const connections: any[] = [];
+		//  connectionsAll
+		// 	.filter((x: any) => GetNodeProp(x, NodeProperties.ViewType) === viewType)
+		// 	.filter((x: any) => GetNodeProp(x, NodeProperties.UIType) === uiType)
+		// 	.filter((x: any) => GetNodeProp(x, NodeProperties.IsPluralComponent) === isPluralComponent)
+		// 	.map((x: any) => ({
+		// 		operation: REMOVE_LINK_BETWEEN_NODES,
+		// 		options: {
+		// 			source,
+		// 			target: x.id
+		// 		}
+		// 	}));
 
 		return [
 			...connections,
@@ -857,7 +865,13 @@ export function GetModelPropertyChildren(id: string, options: any = {}) {
 		.filter((x) => x.id !== id)
 		.unique((v: { id: any }) => v.id);
 }
-
+export function QuickStore(key: string, value: any) {
+	let dispatch = GetDispatchFunc();
+	let getState = GetStateFunc();
+	if (dispatch && getState) {
+		setVisual(key, value)(dispatch, getState);
+	}
+}
 /**
  * Gets the models properties, that will appear on the model.
  * @param id node id
@@ -1145,7 +1159,8 @@ export function IsModel(id: string) {
 export function GetPropertyModel(propId: string): _.Node | null {
 	let nodes = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
 		id: propId,
-		link: NodeConstants.LinkType.ModelTypeLink
+		link: NodeConstants.LinkType.ModelTypeLink,
+		componentType: NodeTypes.Model
 	});
 	nodes.push(
 		...GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
@@ -2550,6 +2565,34 @@ export function GetArbiterPropertyDefinitions(tabs = 3) {
 	);
 	return definitions.join(NodeConstants.NEW_LINE);
 }
+
+export function getDataChainNameSpace(dataChain: any, asFilePath?: boolean) {
+	let dcnamespace = '';
+	let dataChainNameSpace: string[] | null = GetNodeProp(dataChain, NodeProperties.DataChainNameSpace);
+	if (dataChainNameSpace) {
+		if (asFilePath) {
+			return path.join(
+				...dataChainNameSpace.map((v) => {
+					let temp = GetNodeTitle(v);
+					if (temp !== Titles.Unknown) {
+						return temp;
+					}
+					return v;
+				})
+			);
+		}
+		dcnamespace = `${dataChainNameSpace
+			.map((v) => {
+				let temp = GetNodeTitle(v);
+				if (temp !== Titles.Unknown) {
+					return temp;
+				}
+				return v;
+			})
+			.join('.')}`;
+	}
+	return dcnamespace;
+}
 export function GetCustomServiceDefinitions(type: string, tabs = 3) {
 	const services = GetCustomServicesForNodeType(type);
 	const template = `I{{model}} {{model_js}};`;
@@ -2669,17 +2712,19 @@ export function GetCombinedCondition(id: any, language = NodeConstants.Programmi
 				if (!validationParameters) {
 					throw new Error('missing permission parameters: GetCombinedCondition');
 				}
-				clauses.push(
-					`var {{result}} = await ${GetCodeName(dataChain)}.Execute(${validationParameters
-						.map((v: any) => {
-							// return `${v.paramName}: ${v.value}`;
-							if (v && v.value && v.value.key) {
-								return v.value.key;
-							}
-							return `${v.value}`;
-						})
-						.join()});`
-				);
+				if (language === NodeConstants.ProgrammingLanguages.CSHARP) {
+					clauses.push(
+						`var {{result}} = await ${GetCodeName(dataChain)}.Execute(${validationParameters
+							.map((v: any) => {
+								// return `${v.paramName}: ${v.value}`;
+								if (v && v.value && v.value.key) {
+									return v.value.key;
+								}
+								return `${v.value}: ${v.value}`;
+							})
+							.join()});`
+					);
+				}
 			});
 			break;
 		case NodeTypes.Permission:
@@ -2701,7 +2746,7 @@ export function GetCombinedCondition(id: any, language = NodeConstants.Programmi
 					`var {{result}} = await ${GetCodeName(dataChain)}.Execute(${permissionParameters
 						.map((v: any) => {
 							// return `${v.paramName}: ${v.value}`;
-							return `${v.value}`;
+							return `${v.value}: ${v.value}`;
 						})
 						.join()});`
 				);

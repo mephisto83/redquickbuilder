@@ -18,14 +18,16 @@ export default class TreeViewGroupButton extends Component<any, any> {
 						this.props.onClick();
 					}
 				}}
-				className="btn btn-default btn-flat"
+				className={
+					this.props.on ? `btn btn-default ${this.props.btn || 'btn-primary'}` : 'btn btn-default btn-flat'
+				}
 				style={{
 					backgroundColor: 'transparent',
 					position: 'relative',
 					borderColor: 'transparent'
 				}}
 			>
-				<i className={this.props.icon} style={{ color: '#8aa4af' }} />
+				<i className={this.icon()} style={{ color: '#8aa4af' }} />
 				{this.props.plus ? (
 					<i
 						className={'fa fa-plus'}

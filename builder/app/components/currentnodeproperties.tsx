@@ -52,8 +52,8 @@ class CurrentNodeProperties extends Component<any, any> {
 		let nodeProperties = currentNode.properties || {};
 		let nodePropertyVersions = currentNode.propertyVersions || {};
 		return (
-			<MainSideBar active={true} relative={true}>
-				<SideBar style={{ paddingTop: 0 }}>
+			<MainSideBar active={true} relative>
+				<SideBar relative style={{ paddingTop: 0 }}>
 					<SideBarMenu>
 						<TreeViewMenu
 							open={UIA.Visual(state, 'CURRENT_NODE_PROPERTIES')}

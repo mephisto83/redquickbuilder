@@ -51,7 +51,9 @@ import {
 	toggleContextMenu,
 	setRightMenuTab,
 	newGraph,
-	toggleVisualKey
+	toggleVisualKey,
+	setAppConfigPath,
+	updateConfig
 } from './remoteActions';
 import ThemeServiceGenerator from '../generators/themeservicegenerator';
 import ModelGenerator from '../generators/modelgenerators';
@@ -59,8 +61,8 @@ import ModelGenerator from '../generators/modelgenerators';
 const { ipcRenderer } = require('electron');
 const REACTWEB = 'reactweb';
 const hub: any = {};
+
 ipcRenderer.on('message-reply', (event, arg) => {
-	console.log(arg); // prints "pong"
 	const reply = JSON.parse(arg);
 	if (hub[reply.id]) {
 		hub[reply.id].resolve(reply.msg || reply.body);
@@ -75,60 +77,78 @@ ipcRenderer.on('update-jobs', (event, arg) => {
 			break;
 	}
 });
-
-ipcRenderer.on('commands', (event, arg) => {
-	console.log(event);
-	console.log(arg);
-	switch (arg.args) {
-		case 'w':
-			clearPinned();
-			break;
-		case 'p':
-			togglePinned();
-			break;
-		case 'y':
-			publishFiles();
-			break;
-		case 's':
-			saveCurrentGraph();
-			break;
-		case 'e':
-			setInComponentMode();
-			break;
-		case 'o':
-			openGraph();
-			break;
-		case 'n':
-			newGraph();
-			break;
-		case 'm':
-			newNode();
-			break;
-		case 'l':
-			toggleContextMenu('layout');
-			break;
-		case 'g':
-			toggleVisualKey('GROUPS_ENABLED');
-			break;
-		case 'k':
-			toggleContextMenu('context');
-			break;
-		case 'x':
-			removeCurrentNode();
-			break;
-		case 'q':
-			toggleNodeMark();
-			break;
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-			setRightMenuTab(arg.args);
-			break;
-		default:
-			break;
+ipcRenderer.on('config-update', (event, targ) => {
+	console.log('received config update');
+	let arg = JSON.parse(targ);
+	if (arg && arg.body) {
+		updateConfig(arg.body);
 	}
 });
+ipcRenderer.on('commands', (event, targ) => {
+	let arg = JSON.parse(targ);
+	try {
+		switch (arg.args) {
+			case 'w':
+				clearPinned();
+				break;
+			case 'p':
+				togglePinned();
+				break;
+			case 'y':
+				publishFiles();
+				break;
+			case 's':
+				saveCurrentGraph();
+				break;
+			case 'e':
+				setInComponentMode();
+				break;
+			case 'o':
+				openGraph();
+				break;
+			case 'n':
+				newGraph();
+				break;
+			case 'm':
+				newNode();
+				break;
+			case 'l':
+				toggleContextMenu('layout');
+				break;
+			case 'g':
+				toggleVisualKey('GROUPS_ENABLED');
+				break;
+			case 'k':
+				toggleContextMenu('context');
+				break;
+			case 'x':
+				removeCurrentNode();
+				break;
+			case 'q':
+				toggleNodeMark();
+				break;
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+				setRightMenuTab(arg.args);
+				break;
+			default:
+				break;
+		}
+	} catch (e) {
+		console.log('error while calling remote command');
+		console.log(e);
+	}
+});
+ipcRenderer.on('load-configs-reply', (event, arg) => {
+	console.log(arg); // prints "pong"
+	let temp = JSON.parse(arg);
+	if (temp && temp.body) {
+		setAppConfigPath(temp.folder, temp.body);
+	}
+});
+export function loadConfigs() {}
 
 function message(msg: any, body: any) {
 	return {
@@ -206,9 +226,16 @@ export function scaffoldProject(options: any = {}) {
 			.then(errorHandler())
 			.then(() => {
 				console.log('Finished Scaffolding.');
+				if (options.exclusive && !options.netcore) {
+					return Promise.resolve();
+				}
 				return generateFiles(path.join(workspace, root.title, 'netcore'), solutionName, state);
 			})
 			.then(() => {
+				console.log('generating react native');
+				if (options.exclusive && !options.reactnative) {
+					return Promise.resolve();
+				}
 				console.log('generate react-native files');
 				return generateReactNative(
 					path.join(workspace, root.title, 'reactnative', root[GraphKeys.PROJECTNAME]),
@@ -216,6 +243,10 @@ export function scaffoldProject(options: any = {}) {
 				);
 			})
 			.then(() => {
+				console.log('generating electrion io');
+				if (options.exclusive && !options.electronio) {
+					return Promise.resolve();
+				}
 				console.log('generate electron io files');
 				return generateElectronIO(
 					path.join(workspace, root.title, 'electronio', root[GraphKeys.PROJECTNAME]),
@@ -223,10 +254,15 @@ export function scaffoldProject(options: any = {}) {
 				);
 			})
 			.then(() => {
+				console.log('generating react web');
+				if (options.exclusive && !options.reactweb) {
+					return Promise.resolve();
+				}
 				console.log('generate react web files');
 				return generateReactWeb(path.join(workspace, root.title, REACTWEB, root[GraphKeys.PROJECTNAME]), state);
 			})
 			.then(() => {
+				console.log('generating net core identity');
 				const namespace = root ? root[GraphKeys.NAMESPACE] : null;
 				const server_side_setup = root ? root[GraphKeys.SERVER_SIDE_SETUP] : null;
 				const graph = root;
@@ -436,6 +472,10 @@ ${interfaceFunctions.join(NEW_LINE)}
 				}
 			})
 			.then(() => {
+				console.log('generating react native');
+				if (options.exclusive && !options.reactnative) {
+					return Promise.resolve();
+				}
 				console.log('Write react-native files');
 				const appName = root[GraphKeys.PROJECTNAME];
 				const version = 'v1';
@@ -450,6 +490,10 @@ ${interfaceFunctions.join(NEW_LINE)}
 				console.warn('No app name given');
 			})
 			.then(() => {
+				console.log('generating election io');
+				if (options.exclusive && !options.electronio) {
+					return Promise.resolve();
+				}
 				console.log('Clear electron theme');
 				return clearElectronIOTheme(
 					path.join(workspace, root.title, 'electronio', root[GraphKeys.PROJECTNAME]),
@@ -457,10 +501,18 @@ ${interfaceFunctions.join(NEW_LINE)}
 				);
 			})
 			.then(() => {
+				console.log('generating react web');
+				if (options.exclusive && !options.reactweb) {
+					return Promise.resolve();
+				}
 				console.log('Create react web theme');
 				return clearReactWebTheme(path.join(workspace, root.title, REACTWEB, root[GraphKeys.PROJECTNAME]));
 			})
 			.then(() => {
+				console.log('generating election io');
+				if (options.exclusive && !options.electrionio) {
+					return Promise.resolve();
+				}
 				console.log('Write electron files');
 				const appName = root[GraphKeys.PROJECTNAME];
 				const version = 'v1';
@@ -475,6 +527,10 @@ ${interfaceFunctions.join(NEW_LINE)}
 				console.warn('No app name given');
 			})
 			.then(() => {
+				console.log('generating react web');
+				if (options.exclusive && !options.reactweb) {
+					return Promise.resolve();
+				}
 				console.log('Write reactweb files');
 				const appName = root[GraphKeys.PROJECTNAME];
 				const version = 'v1';
@@ -489,6 +545,10 @@ ${interfaceFunctions.join(NEW_LINE)}
 				console.warn('No app name given');
 			})
 			.then(() => {
+				console.log('generating election io');
+				if (options.exclusive && !options.electrionio) {
+					return Promise.resolve();
+				}
 				console.log('Write electron theme');
 				return generateElectronIOTheme(
 					path.join(workspace, root.title, 'electronio', root[GraphKeys.PROJECTNAME]),
@@ -496,10 +556,17 @@ ${interfaceFunctions.join(NEW_LINE)}
 				);
 			})
 			.then(() => {
+				console.log('generating react web');
+				if (options.exclusive && !options.reactweb) {
+					return Promise.resolve();
+				}
 				return generateReactWebTheme(
 					path.join(workspace, root.title, 'reactweb', root[GraphKeys.PROJECTNAME]),
 					state
 				);
+			})
+			.then(() => {
+				console.log('Scaffold complete');
 			});
 	};
 }
@@ -779,9 +846,17 @@ function generateFiles(workspace: string, solutionName: string, state: any) {
 		const area = CodeTypeToArea[code_type];
 		for (const fileName in temp) {
 			ensureDirectory(path.join(workspace, solutionName + area));
+			if (temp[fileName].relativeFilePath) {
+				ensureDirectory(path.join(workspace, solutionName + area, temp[fileName].relativeFilePath));
+			}
 			if (temp[fileName].template) {
 				writeFileSync(
-					path.join(workspace, solutionName + area, `${temp[fileName].name}.cs`),
+					path.join(
+						workspace,
+						solutionName + area,
+						temp[fileName].relativeFilePath || '',
+						`${temp[fileName].name}.cs`
+					),
 					temp[fileName].template
 				);
 			}

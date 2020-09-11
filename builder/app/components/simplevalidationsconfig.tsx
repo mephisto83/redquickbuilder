@@ -36,7 +36,8 @@ import {
 	ChangeNodeType,
 	ChangeNodeProp,
 	AddNewSimpleValidationConfigToGraph,
-	GetSimpleValidationId
+	GetSimpleValidationId,
+	CheckAfterEffectDataChainConfiguration
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
@@ -101,20 +102,16 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 				NodeProperties.NODEType,
 				simpleValidationConfiguration.composition.graph
 			) !== NodeTypes.LeafNode;
+		let valid = CheckAfterEffectDataChainConfiguration(dataChainOptions);
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				icon={
-					!simpleValidations.some((v) => !CheckSimpleValidation(v)) ? (
-						'fa fa-check-circle-o'
-					) : (
-						'fa fa-circle-o'
-					)
-				}
+				icon={simpleValidations.some((v) => v.enabled) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
 				active
+				error={!valid}
 				greyed={!simpleValidations.some((v) => v.enabled)}
 				title={Titles.SimpleValidation}
 			>
@@ -188,7 +185,7 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 										this.props.onChange();
 									}
 								}}
-								icon="fa  fa-minus-square"
+								icon="fa  fa-font"
 							/>
 						)}
 						{!this.state.selectedNode ? null : (
@@ -220,7 +217,7 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 										}
 									}
 								}}
-								icon="fa fa-thumbs-o-up"
+								icon="fa  fa-opera"
 							/>
 						)}
 						{!this.state.selectedNode ? null : (
@@ -395,6 +392,9 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 											simpleValidationConfiguration.composition.graph
 										);
 									}
+								}
+								if (this.props.onChange) {
+									this.props.onChange();
 								}
 							}}
 							onDelete={() => {

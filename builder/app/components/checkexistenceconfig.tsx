@@ -13,13 +13,12 @@ import {
 	SkipSettings,
 	CheckIsExisting,
 	CheckExistenceConfig,
-	SetupConfigInstanceInformation
+	SetupConfigInstanceInformation,
+  ValidationColors
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import TreeViewButtonGroup from './treeviewbuttongroup';
-import {
-	DataChainType
-} from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
+import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import ReturnSettings from './returnsettings';
 
 export default class CheckExistanceConfig extends Component<any, any> {
@@ -56,16 +55,18 @@ export default class CheckExistanceConfig extends Component<any, any> {
 			properties: any[];
 			targetProperties: any[];
 		} = this.setupInstanceInfo(dataChainOptions);
-
+		let valid = CheckIsExisting(checkExistence);
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				icon={CheckIsExisting(checkExistence) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+				icon={checkExistence.enabled ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
+				color={checkExistence && checkExistence.enabled ? ValidationColors.Ok : ValidationColors.Neutral}
+				error={!valid}
 				active
-				greyed={checkExistence.enabled}
+				greyed={!checkExistence.enabled}
 				title={Titles.ChexkExistence}
 			>
 				<TreeViewItemContainer>

@@ -20,7 +20,9 @@ import {
 	HalfRelation,
 	IsContainedConfig,
 	CopyConfig,
-	CopyEnumerationConfig
+	CopyEnumerationConfig,
+	ValidationConfig,
+	ConcatenateStringConfig
 } from '../../interface/methodprops';
 import { MethodFunctions, bindTemplate } from '../../constants/functiontypes';
 import {
@@ -36,7 +38,8 @@ import {
 	GetPropertyModel,
 	GetNodeByProperties,
 	ensureRouteSource,
-	IsModel
+	IsModel,
+	GetCurrentGraph
 } from '../../actions/uiactions';
 import {
 	NodeProperties,
@@ -52,14 +55,16 @@ import {
 	getNodesLinkedTo,
 	GetNodesLinkedTo,
 	SOURCE,
-	NodesByType
+	NodesByType,
+	GetNodeLinkedTo
 } from '../../methods/graph_methods';
 import { ReferenceInsertType } from '../../components/lambda/BuildLambda';
-import { code } from '../../components/editor.main.css';
 import { SimpleValidation, NodeType } from '../../components/titles';
 import SimpleValidationComponent from '../../components/simplevalidationconfig';
 import { equal } from 'assert';
 import { Node, Graph } from '../../methods/graph_types';
+import { LinkType } from '../../../app/constants/nodetypes';
+import { stringify } from 'querystring';
 
 export interface AfterEffectConvertArgs {
 	from: MethodDescription;
@@ -70,6 +75,7 @@ export interface AfterEffectConvertArgs {
 	afterEffect?: AfterEffect;
 	override?: boolean;
 	currentDescription?: MountingDescription;
+	validationConfig?: ValidationConfig;
 	name: string;
 	routes: AfterEffect[];
 	methods: MountingDescription[];
@@ -94,6 +100,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		afterEffectOptions: dataChainConfigOptions,
 		routes,
 		methods,
+		validationConfig,
 		afterEffectParent,
 		override,
 		afterEffectChild,
@@ -106,6 +113,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 	let staticMethods: string[] = [];
 	let guts: string = '';
 	let copy_config: string = '';
+	let concat_config: string = '';
 	let outputType: string = '';
 	let simplevalidation: string = '';
 	let route_config: string = '';
@@ -121,7 +129,13 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 	if (from.properties.agent) arbiterModels.push(from.properties.agent);
 	if (from.properties.parent) arbiterModels.push(from.properties.parent);
 	if (dataChainConfigOptions) {
-		let { compareEnumeration, compareEnumerations, copyConfig, copyEnumeration } = dataChainConfigOptions;
+		let {
+			compareEnumeration,
+			compareEnumerations,
+			concatenateString,
+			copyConfig,
+			copyEnumeration
+		} = dataChainConfigOptions;
 		if (compareEnumeration) {
 			compare_enumeration = CompareEnumerationFunc(compareEnumeration, tempLambdaInsertArgumentValues);
 		}
@@ -132,6 +146,15 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 					return CompareEnumerationFunc(compareEnumeration, tempLambdaInsertArgumentValues);
 				})
 				.join(NEW_LINE);
+		}
+		if (concatenateString && concatenateString.enabled) {
+			({ concat_config } = setConcatenateConfig({
+				concatenateString,
+				from,
+				tempLambdaInsertArgumentValues,
+				to,
+				outputType
+			}));
 		}
 		if (copyConfig && copyConfig.enabled) {
 			({ target_property, outputType, copy_config } = setupCopyConfig(
@@ -361,7 +384,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		case DataChainType.Permission:
 			can_complete = true;
 			from_parameter_template = `
-      public static async Task<bool> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent)
+      public static async Task<bool> Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null)
       {
 
         Func<#{{"key":"model"}}#, #{{"key":"agent"}}#, Task<bool>> func = async (#{{"key":"model"}}# model, #{{"key":"agent"}}# agent) => {
@@ -392,7 +415,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				}
 			}
 			from_parameter_template = `
-      public static async Task<bool> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change_parameter)
+      public static async Task<bool> Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change_parameter = null)
       {
         Func<#{{"key":"model"}}#, #{{"key":"agent"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task<bool>> func = async (#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change_parameter) => {
 
@@ -413,16 +436,16 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		case DataChainType.Execution:
 			can_complete = true;
 			from_parameter_template = `
-      public static async Task<${outputType ||
-			'bool'}> Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change, #{{"key":"result"}}# result)
+      public static async Task Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change = null, #{{"key":"result"}}# result = null)
       {
           Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task<${outputType ||
 				'bool'}>> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# model, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
               {{simplevalidation}}
               {{copy_config}}
+              {{concat_config}}
           };
 
-          return await func(model, agent, change);
+           await func(model, agent, change);
       }
   `;
 			break;
@@ -434,7 +457,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			}
 
 			from_parameter_template = `
-    public static async Task<#{{"key":"model"}}#, bool> Filter(#{{"key":"agent"}}# agent = null, #{{"key":"model"}}# model = null${parent_input})
+    public static async Task<Func<#{{"key":"model"}}#, bool>> Filter(#{{"key":"agent"}}# agent = null, #{{"key":"model"}}# model = null${parent_input})
     {
         Func<#{{"key":"model_output"}}#, bool> func = (#{{"key":"model_output"}}# model_output) => {
             {{simplevalidation}}
@@ -454,7 +477,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				}
 			}
 			from_parameter_template = `
-      public static async Task Execute(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change)
+      public static async Task Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change = null)
       {
           Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# fromModel, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
 
@@ -462,6 +485,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 
           // build model value here.
           {{copy_config}}
+          {{concat_config}}
           {{set_properties}}
           {{get_existing}}
           {{route_config}}
@@ -481,6 +505,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		route_config,
 		set_properties,
 		copy_config,
+		concat_config,
 		guts,
 		simplevalidation,
 		from_model: `${GetCodeName(from.properties.model_output || from.properties.model || from.properties.agent)}`,
@@ -497,6 +522,9 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		let methodFunction = MethodFunctions[from.functionType];
 		const lambdaInsertArgumentValues = GetNodeProp(dataChain, NodeProperties.LambdaInsertArguments) || {};
 
+		let autoCalculate = afterEffect
+			? afterEffect.autoCalculate
+			: false || validationConfig ? validationConfig.autoCalculate : false;
 		if (dataChain) {
 			let lambdaInsert = {
 				...tempLambdaInsertArgumentValues,
@@ -512,6 +540,12 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			updateComponentProperty(dataChain, NodeProperties.CompleteFunction, true);
 			updateComponentProperty(dataChain, NodeProperties.ArbiterModels, arbiterModels);
 			updateComponentProperty(dataChain, NodeProperties.UIText, name);
+			updateComponentProperty(dataChain, NodeProperties.AutoCalculate, autoCalculate);
+			updateComponentProperty(
+				dataChain,
+				NodeProperties.DataChainNameSpace,
+				dataChainConfigOptions.namespaceConfig ? dataChainConfigOptions.namespaceConfig.space : null
+			);
 			updateComponentProperty(
 				dataChain,
 				NodeProperties.AfterEffectKey,
@@ -525,12 +559,16 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 					{
 						[NodeProperties.UIText]: name,
 						[NodeProperties.NODEType]: NodeTypes.DataChain,
+						[NodeProperties.AutoCalculate]: autoCalculate,
 						[NodeProperties.CS]: true,
 						[NodeProperties.CSEntryPoint]: true,
 						[NodeProperties.DataChainTypeCategory]: type,
 						[NodeProperties.ArbiterModels]: arbiterModels,
 						[NodeProperties.CompleteFunction]: true,
 						[NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Lambda,
+						[NodeProperties.DataChainNameSpace]: dataChainConfigOptions.namespaceConfig
+							? dataChainConfigOptions.namespaceConfig.space
+							: null,
 						[NodeProperties.LambdaInsertArguments]: lambdaInsertArgumentValues,
 						[NodeProperties.TargetProperty]: target_property,
 						[NodeProperties.Lambda]: from_parameter_template,
@@ -544,6 +582,74 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				)
 			)(GetDispatchFunc(), GetStateFunc());
 		}
+	}
+}
+
+function setConcatenateConfig({
+	concatenateString,
+	from,
+	tempLambdaInsertArgumentValues,
+	to,
+	outputType
+}: {
+	concatenateString: ConcatenateStringConfig;
+	from: MethodDescription;
+	tempLambdaInsertArgumentValues: any;
+	to: MethodDescription | undefined;
+	outputType: string;
+}): { concat_config: string } {
+	let {
+		parameters,
+		relationType,
+		agentProperty,
+		modelProperty,
+		modelOutputProperty,
+		parentProperty
+	} = concatenateString;
+	let internalFunctionProp = ConvertToFunctionProp(relationType);
+
+	setupLambdaInsertArgs(tempLambdaInsertArgumentValues, GetRelationProp(concatenateString), 'result');
+	let resultSection = `result.#{${captureTemplate(
+		GetRelationProp(concatenateString),
+		'result',
+		GetRelationProp(concatenateString)
+	)}}#`;
+	let concat_section = '';
+	if (parameters) {
+		concat_section = parameters
+			.map((parameter) => {
+				let { relationType, property } = parameter;
+				let internalFunctionProp = ConvertToFunctionProp(relationType);
+				setupLambdaInsertArgs(tempLambdaInsertArgumentValues, property, internalFunctionProp);
+				return `${internalFunctionProp}.#{${captureTemplate(property, internalFunctionProp, property)}}#`;
+			})
+			.join(concatenateString.with ? ` + "${concatenateString.with}" + ` : ' + ');
+	}
+
+	return { concat_config: `${resultSection} = ${concat_section};` };
+}
+function GetRelationProp(relation: HalfRelation) {
+	switch (relation.relationType) {
+		case RelationType.Agent:
+			return relation.agentProperty;
+		case RelationType.ModelOuput:
+			return relation.modelOutputProperty;
+		case RelationType.Model:
+			return relation.modelProperty;
+		case RelationType.Parent:
+			return relation.parentProperty;
+	}
+}
+function ConvertToFunctionProp(relationType: RelationType) {
+	switch (relationType) {
+		case RelationType.Agent:
+			return 'agent';
+		case RelationType.ModelOuput:
+			return 'model_output';
+		case RelationType.Model:
+			return 'model';
+		case RelationType.Parent:
+			return 'parent';
 	}
 }
 function setupCopyConfig(
@@ -564,7 +670,6 @@ function setupCopyConfig(
 		relProp = 'model';
 		agentOrModel = from.properties.model;
 	}
-	target_property = targetProperty;
 	setLambdaProperties(
 		tempLambdaInsertArgumentValues,
 		agentProperty,
@@ -580,14 +685,40 @@ function setupCopyConfig(
 	);
 	let attributeType = GetNodeProp(props, NodeProperties.UIAttributeType);
 	outputType = NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][attributeType];
-	tempLambdaInsertArgumentValues[`${relProp}.${GetJSCodeName(props)}`] = {
-		[ReferenceInsertType.Property]: props,
-		[ReferenceInsertType.Model]: agentOrModel
+
+	tempLambdaInsertArgumentValues[`result`] = {
+		[ReferenceInsertType.Model]: from.properties.model ? from.properties.model : ''
 	};
-	copy_config = `return ${relProp}.#{{"key":"${relProp}.${GetJSCodeName(
-		props
-	)}","type":"property","model":"${relProp}"}}#;`;
-	return { target_property, outputType, copy_config };
+	let targetTemplate = '';
+	let targetTemplate2 = '';
+	if (targetProperty) {
+		switch (GetNodeProp(targetProperty, NodeProperties.NODEType)) {
+			case NodeTypes.Model:
+				targetTemplate = `{"key":"result.${GetCodeName(targetProperty)}","type":"model"}`;
+				targetTemplate2 = `{"key":"${relProp}.${GetCodeName(props)}","type":"model"}`;
+				break;
+			case NodeTypes.Property:
+				targetTemplate = `{"key":"result.${GetJSCodeName(targetProperty)}","type":"property","model":"result"}`;
+				targetTemplate2 = `{"key":"${relProp}.${GetJSCodeName(props)}","type":"property","model":"${relProp}"}`;
+				break;
+		}
+	}
+	copy_config = `result.#{${targetTemplate}}# = ${relProp}.#{${targetTemplate2}}#;`;
+	return { target_property: targetProperty, outputType, copy_config };
+}
+function captureTemplate(targetProperty: string, relProp: string, props: string): string {
+	let template: string | undefined;
+	if (targetProperty) {
+		switch (GetNodeProp(targetProperty, NodeProperties.NODEType)) {
+			case NodeTypes.Model:
+				template = `{"key":"${relProp}.${GetCodeName(props)}","type":"model"}`;
+				break;
+			case NodeTypes.Property:
+				template = `{"key":"${relProp}.${GetJSCodeName(props)}","type":"property","model":"${relProp}"}`;
+				break;
+		}
+	}
+	return template || '';
 }
 function setupCopyEnumeration(
 	copyEnumeration: CopyEnumerationConfig,
@@ -675,6 +806,15 @@ function GenerateSimpleValidations(
 				);
 				checks.push({ template: equality, id: simpleValidation.id });
 			}
+			if (simpleValidation.isIntersecting && simpleValidation.isIntersecting.enabled) {
+				let equality = GenerateIsIntersectingComparer(
+					simpleValidation,
+					simpleValidation.isIntersecting,
+					tempLambdaInsertArgumentValues,
+					false
+				);
+				checks.push({ template: equality, id: simpleValidation.id });
+			}
 			if (simpleValidation.isContained && simpleValidation.isContained.enabled) {
 				let equality = GenerateIsContainedComparer(
 					simpleValidation,
@@ -690,6 +830,9 @@ function GenerateSimpleValidations(
 			}
 			if (simpleValidation.isFalse && simpleValidation.isFalse.enabled) {
 				checks.push({ template: `!${valuePropString}`, id: simpleValidation.id });
+			}
+			if (simpleValidation.date && simpleValidation.date.enabled) {
+				checks.push({ template: `!${valuePropString} && ${valuePropString} != default(DateTime)`, id: simpleValidation.id });
 			}
 			if (simpleValidation.isTrue && simpleValidation.isTrue.enabled) {
 				checks.push({ template: `${valuePropString}`, id: simpleValidation.id });
@@ -713,6 +856,83 @@ function GenerateSimpleValidations(
 					: 'false'}).IsOk(${valuePropString})`;
 				checks.push({ template: oneOf, id: simpleValidation.id });
 			}
+			if (simpleValidation.referencesExisting && simpleValidation.referencesExisting.enabled) {
+				let relationType = simpleValidation.referencesExisting.relationType;
+				let agentOrModel = '';
+				switch (relationType) {
+					case RelationType.Agent:
+						agentOrModel = 'agent';
+						break;
+					case RelationType.Model:
+						agentOrModel = 'model';
+						break;
+					case RelationType.Parent:
+						agentOrModel = 'parent';
+						break;
+					case RelationType.ModelOuput:
+						agentOrModel = 'model_output';
+						break;
+				}
+				// tempLambdaInsertArgumentValues[
+				// 	`${agentOrModel}.${GetJSCodeName(simpleValidation.referencesExisting.modelProperty)}`
+				// ] = {
+				// 	property: simpleValidation.referencesExisting.modelProperty,
+				// 	model: simpleValidation.referencesExisting.agent,
+				// 	type: ReferenceInsertType.Property
+				// };
+				// tempLambdaInsertArgumentValues[`${agentOrModel}`] = {
+				// 	model: simpleValidation.referencesExisting.agent,
+				// 	type: ReferenceInsertType.Model
+				// };
+				setupLambdaInsertArgs(
+					tempLambdaInsertArgumentValues,
+					simpleValidation.referencesExisting.model,
+					agentOrModel
+				);
+				let classModelKey = 'unknown';
+				if (simpleValidation.referencesExisting.model) {
+					let modelType = GetNodeLinkedTo(GetCurrentGraph(), {
+						id: simpleValidation.referencesExisting.model,
+						link: LinkType.ModelTypeLink,
+						componentType: NodeTypes.Model
+					});
+					if (modelType) {
+						classModelKey = `class.${GetJSCodeName(modelType)}`;
+						tempLambdaInsertArgumentValues[classModelKey] = {
+							model: modelType.id
+						};
+					}
+				}
+				let refExists: any;
+				switch (GetNodeProp(simpleValidation.referencesExisting.model, NodeProperties.NODEType)) {
+					case NodeTypes.Model:
+						classModelKey = `class.${GetJSCodeName(simpleValidation.referencesExisting.model)}`;
+						tempLambdaInsertArgumentValues[classModelKey] = {
+							model: simpleValidation.referencesExisting.model
+						};
+						tempLambdaInsertArgumentValues[
+							`${agentOrModel}.${GetCodeName(simpleValidation.referencesExisting.model)}`
+						] = {
+							model: simpleValidation.referencesExisting.model
+						};
+						refExists = `await (RedStrapper.Resolve<IRedArbiter<#{{"key":"${classModelKey}"}}#>>()).Get<#{{"key":"${classModelKey}"}}#>(${agentOrModel}.#{{"key":"${agentOrModel}.${GetCodeName(
+							simpleValidation.referencesExisting.model
+						)}","type":"model"}}#)`;
+						checks.push({ template: refExists, id: simpleValidation.id });
+						break;
+					case NodeTypes.Property:
+						refExists = `await (RedStrapper.Resolve<IRedArbiter<#{{"key":"${classModelKey}"}}#>>()).Get<#{{"key":"${classModelKey}"}}#>(${agentOrModel}.#{{"key":"${agentOrModel}.${GetCodeName(
+							simpleValidation.referencesExisting.model
+						)}","model":"${classModelKey}","type":"property"}}#)`;
+						checks.push({ template: refExists, id: simpleValidation.id });
+						break;
+				}
+				// let refExists = `await (RedStrapper.Resolve<IRedArbiter<#{{"key":"${classModelKey}"}}#>>()).Get<#{{"key":"${classModelKey}"}}#>(${agentOrModel}.#{{"key":"${agentOrModel}.${GetCodeName(
+				// 	simpleValidation.referencesExisting.modelProperty
+				// )}","type":"model"}}#)`;
+				// checks.push({ template: refExists, id: simpleValidation.id });
+			}
+
 			if (simpleValidation.minLength && simpleValidation.minLength.enabled) {
 				let oneOf = `await new MinLengthAttribute(${simpleValidation.minLength.value},${simpleValidation
 					.maxLength.equal
@@ -734,24 +954,33 @@ function GenerateSimpleValidations(
 				: GetPropertyModel(ops.targetProperty);
 			if (IsModel(ops.targetProperty)) {
 				tempLambdaInsertArgumentValues[`result.${GetCodeName(ops.targetProperty)}`] = {
-					model: targetModel ? targetModel.id : ''
+					model: targetModel ? targetModel.id : '',
+					// property: ops.targetProperty,
+					type: ReferenceInsertType.Model
 				};
-				tempLambdaInsertArgumentValues[`result`] = tempLambdaInsertArgumentValues['model'];
+				if (!tempLambdaInsertArgumentValues[`result`])
+					tempLambdaInsertArgumentValues[`result`] = tempLambdaInsertArgumentValues['model'];
 			} else {
-				tempLambdaInsertArgumentValues[`result.${GetCodeName(ops.targetProperty)}`] = {
-					property: ops.targetProperty,
-					model: targetModel ? targetModel.id : ''
-				};
-				tempLambdaInsertArgumentValues[`result`] = {
-					model: targetModel ? targetModel.id : ''
-				};
+				if (ops.targetProperty && tempLambdaInsertArgumentValues[`result.${GetCodeName(ops.targetProperty)}`]) {
+					tempLambdaInsertArgumentValues[`result.${GetCodeName(ops.targetProperty)}`] = {
+						property: ops.targetProperty,
+						model: targetModel ? targetModel.id : '',
+						type: ReferenceInsertType.Property
+					};
+					if (tempLambdaInsertArgumentValues[`result`])
+						tempLambdaInsertArgumentValues[`result`] = {
+							model: targetModel ? targetModel.id : '',
+							type: ReferenceInsertType.Model
+						};
+				}
 			}
-			returnStatement = `return result.#{{"key":"result.${GetCodeName(
-				ops.targetProperty
-			)}","type":"property","model":"result"}}#`;
+			returnStatement = '';
+			// returnStatement = `return result.#{{"key":"result.${GetCodeName(
+			// 	ops.targetProperty
+			// )}","type":"property","model":"result"}}#`;
 			break;
 		default:
-			returnStatement = 'result false';
+			returnStatement = 'return false';
 	}
 	if (!(simpleValidationConfiguration && simpleValidationConfiguration.enabled)) {
 		result = checks
@@ -864,6 +1093,23 @@ function GenerateIsContainedComparer(
 	SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, areEqual.relationType, areEqual);
 
 	return `${not ? '!' : ''}(${valuePropString} != null && ${valuePropString}.Contains(${equalityTo}))`;
+}
+
+function GenerateIsIntersectingComparer(
+	simpleValidation: SimpleValidationConfig,
+	areEqual: IsContainedConfig,
+	tempLambdaInsertArgumentValues: any,
+	not: boolean
+) {
+	let { relationType } = simpleValidation;
+	let valuePropString = GetRelationTypeValuePropString(relationType, simpleValidation);
+	let equalityTo = GetRelationTypeValuePropString(areEqual.relationType, areEqual);
+	SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, relationType, simpleValidation);
+	SetLambdaInsertArgumentValues(tempLambdaInsertArgumentValues, areEqual.relationType, areEqual);
+
+	return `${not
+		? '!'
+		: ''}(${valuePropString} != null && ${valuePropString}.AsQueryable().Intersect(${equalityTo}).Any())`;
 }
 
 function SetLambdaInsertArgumentValues(
@@ -1313,56 +1559,62 @@ function setLambdaProperties(
 ) {
 	let agent = agentProperty ? GetPropertyModel(agentProperty) : null;
 	let model = modelProperty ? GetPropertyModel(modelProperty) : null;
+	// if (agent) {
+	// 	tempLambdaInsertArgumentValues['agent'] = {
+	// 		model: agent ? agent.id : null,
+	// 		type: ReferenceInsertType.Model
+	// 	};
+	// }
+	// tempLambdaInsertArgumentValues['agent.prop'] = {
+	// 	property: agentProperty,
+	// 	model: agent ? agent.id : null,
+	// 	type: ReferenceInsertType.Property
+	// };
+	setupLambdaInsertArgs(tempLambdaInsertArgumentValues, agentProperty, 'agent');
 
-	tempLambdaInsertArgumentValues['agent.prop'] = {
-		property: agentProperty,
-		model: agent ? agent.id : null,
-		type: ReferenceInsertType.Property
-	};
-	if (agent) {
-		tempLambdaInsertArgumentValues['agent'] = {
-			model: agent ? agent.id : null,
-			type: ReferenceInsertType.Model
-		};
-	}
-	tempLambdaInsertArgumentValues['model.prop'] = {
-		property: modelProperty,
-		model: model ? model.id : null,
-		type: ReferenceInsertType.Property
-	};
-	if (relationsConfig && relationsConfig.parentProperty) {
-		tempLambdaInsertArgumentValues['parent.prop'] = {
-			property: relationsConfig.parentProperty,
-			model: relationsConfig.parent,
-			type: ReferenceInsertType.Property
-		};
-	}
-	if (relationsConfig && relationsConfig.parent) {
-		tempLambdaInsertArgumentValues['parent'] = {
-			model: relationsConfig.parent,
-			type: ReferenceInsertType.Model
-		};
-	}
-	if (modelOutputProperty) {
-		tempLambdaInsertArgumentValues['model_output.prop'] = {
-			property: modelOutputProperty,
-			model: modelOutput,
-			type: ReferenceInsertType.Property
-		};
-	}
-	if (modelOutput) {
-		tempLambdaInsertArgumentValues['model_output'] = {
-			model: modelOutput,
-			type: ReferenceInsertType.Model
-		};
-	}
-	if (model) {
-		tempLambdaInsertArgumentValues['model'] = {
-			model: model ? model.id : null,
-			type: ReferenceInsertType.Model
-		};
-	}
+	// if (model) {
+	// 	tempLambdaInsertArgumentValues['model'] = {
+	// 		model: model ? model.id : null,
+	// 		type: ReferenceInsertType.Model
+	// 	};
+	// }
 
+	// tempLambdaInsertArgumentValues['model.prop'] = {
+	// 	property: modelProperty,
+	// 	model: model ? model.id : null,
+	// 	type: ReferenceInsertType.Property
+	// };
+
+	setupLambdaInsertArgs(tempLambdaInsertArgumentValues, modelProperty, 'model');
+	// if (relationsConfig && relationsConfig.parentProperty) {
+	// 	tempLambdaInsertArgumentValues['parent.prop'] = {
+	// 		property: relationsConfig.parentProperty,
+	// 		model: relationsConfig.parent,
+	// 		type: ReferenceInsertType.Property
+	// 	};
+	// }
+	setupLambdaInsertArgs(tempLambdaInsertArgumentValues, relationsConfig.parentProperty, 'parent');
+	// if (relationsConfig && relationsConfig.parent) {
+	// 	tempLambdaInsertArgumentValues['parent'] = {
+	// 		model: relationsConfig.parent,
+	// 		type: ReferenceInsertType.Model
+	// 	};
+	// }
+
+	// if (modelOutput) {
+	// 	tempLambdaInsertArgumentValues['model_output'] = {
+	// 		model: modelOutput,
+	// 		type: ReferenceInsertType.Model
+	// 	};
+	// }
+	// if (modelOutputProperty) {
+	// 	tempLambdaInsertArgumentValues['model_output.prop'] = {
+	// 		property: modelOutputProperty,
+	// 		model: modelOutput,
+	// 		type: ReferenceInsertType.Property
+	// 	};
+	// }
+	setupLambdaInsertArgs(tempLambdaInsertArgumentValues, modelOutputProperty, 'model_output');
 	if (targetProperty && ops && ops.to && ops.to.properties) {
 		let target = targetProperty ? GetPropertyModel(targetProperty) : null;
 		tempLambdaInsertArgumentValues[`tomodel.prop`] = {
@@ -1374,6 +1626,30 @@ function setLambdaProperties(
 			model: ops.to.properties.model,
 			type: ReferenceInsertType.Model
 		};
+	} else if (targetProperty) {
+		setupLambdaInsertArgs(tempLambdaInsertArgumentValues, targetProperty, 'result');
+	}
+}
+function setupLambdaInsertArgs(tempLambdaInsertArgumentValues: any, targetProperty: string, key: string) {
+	switch (GetNodeProp(targetProperty, NodeProperties.NODEType)) {
+		case NodeTypes.Model:
+			tempLambdaInsertArgumentValues[`${key}.${GetCodeName(targetProperty)}`] = {
+				[ReferenceInsertType.Model]: targetProperty,
+				type: ReferenceInsertType.Model
+			};
+			break;
+		case NodeTypes.Property:
+			let targetModel = GetPropertyModel(targetProperty);
+			tempLambdaInsertArgumentValues[`${key}.${GetJSCodeName(targetProperty)}`] = {
+				[ReferenceInsertType.Property]: targetProperty,
+				[ReferenceInsertType.Model]: targetModel ? targetModel.id : '',
+				type: ReferenceInsertType.Property
+			};
+			tempLambdaInsertArgumentValues[`${key}`] = {
+				[ReferenceInsertType.Model]: targetModel ? targetModel.id : '',
+				type: ReferenceInsertType.Model
+			};
+			break;
 	}
 }
 

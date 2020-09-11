@@ -10,7 +10,8 @@ import {
 	DataChainConfiguration,
 	RelationType,
 	CreateGetExistence,
-	CheckGetExisting
+	CheckGetExisting,
+	ValidationColors
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import TreeViewButtonGroup from './treeviewbuttongroup';
@@ -61,10 +62,13 @@ export default class GetExistanceConfig extends Component<any, any> {
 		if (methodDescription && methodDescription.properties && methodDescription.properties.model) {
 			targetProperties = UIA.GetModelPropertyChildren(methodDescription.properties.model).toNodeSelect();
 		}
+		let valid = CheckGetExisting(getExisting);
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				icon={CheckGetExisting(getExisting) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+				icon={getExisting.enabled ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+				color={getExisting && getExisting.enabled ? ValidationColors.Ok : ValidationColors.Neutral}
+				error={!valid}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}

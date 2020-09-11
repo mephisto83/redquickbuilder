@@ -27,7 +27,16 @@ import { GenerateModelKeys } from '../service/keyservice';
 class CodeEditor extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
-		let definitions = fs.readFileSync('./app/templates/reactweb/v1/src/actions/uiactions.d.ts', 'utf8');
+
+		let definitions = '';
+		try {
+			definitions = fs.readFileSync('./app/templates/reactweb/v1/src/actions/uiactions.d.ts', 'utf8');
+		} catch (e) {
+			console.error(e);
+			try {
+				definitions = fs.readFileSync('./templates/reactweb/v1/src/actions/uiactions.d.ts', 'utf8');
+			} catch (e) {}
+		}
 		this.state = {
 			original: '',
 			value: '',

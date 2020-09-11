@@ -13,6 +13,7 @@ import TreeViewButtonGroup from './treeviewbuttongroup';
 import CheckExistanceConfig from './checkexistenceconfig';
 import GetExistanceConfig from './getexistenceconfig';
 import SetPropertiesConfig from './setpropertiesconfig';
+import SwaggerCallConfig from './swaggercallconfig';
 import SimpleValidationComponent from './simplevalidationconfig';
 import CopyConfigComponent from './copyconfig';
 import SetIntegerComponent from './setinteger';
@@ -23,6 +24,7 @@ import CompareEnumeration from './compareenumeration';
 import CopyEnumeration from './copyenumeration';
 import CompareEnumerations from './compareenumerations';
 import SimpleValidationsComponent from './simplevalidationsconfig';
+import ConcatenateStringConfigComponent from './concatenatstringconfigcomponent';
 
 export default class DataChainOptions extends Component<any, any> {
 	constructor(props: any) {
@@ -48,17 +50,17 @@ export default class DataChainOptions extends Component<any, any> {
 				this.props.onChange();
 			}
 		};
+		let valid = CheckAfterEffectDataChainConfiguration(dataChainOptions);
 
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				icon={
-					CheckAfterEffectDataChainConfiguration(dataChainOptions) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'
-				}
+				icon={valid ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
 				active
+				error={!valid}
 				title={Titles.Configuration}
 			>
 				<CheckExistanceConfig
@@ -79,13 +81,19 @@ export default class DataChainOptions extends Component<any, any> {
 					dataChainOptions={dataChainOptions}
 					onChange={onchange}
 				/>
+				<ConcatenateStringConfigComponent
+					dataChainType={this.props.dataChainType}
+					methodDescription={methodDescription}
+					dataChainOptions={dataChainOptions}
+					onChange={onchange}
+				/>
 				<SetIntegerComponent
 					dataChainType={this.props.dataChainType}
 					methodDescription={methodDescription}
 					dataChainOptions={dataChainOptions}
 					onChange={onchange}
 				/>
-				<CompareEnumeration
+				{/* <CompareEnumeration
 					dataChainType={this.props.dataChainType}
 					methodDescription={methodDescription}
 					dataChainOptions={dataChainOptions}
@@ -96,7 +104,7 @@ export default class DataChainOptions extends Component<any, any> {
 					methodDescription={methodDescription}
 					dataChainOptions={dataChainOptions}
 					onChange={onchange}
-				/>
+				/> */}
 				<SetBooleanComponent
 					dataChainType={this.props.dataChainType}
 					methodDescription={methodDescription}
@@ -130,6 +138,12 @@ export default class DataChainOptions extends Component<any, any> {
 					onChange={onchange}
 				/>
 				<SetPropertiesConfig
+					dataChainType={this.props.dataChainType}
+					methodDescription={methodDescription}
+					dataChainOptions={dataChainOptions}
+					onChange={onchange}
+				/>
+				<SwaggerCallConfig
 					dataChainType={this.props.dataChainType}
 					methodDescription={methodDescription}
 					dataChainOptions={dataChainOptions}

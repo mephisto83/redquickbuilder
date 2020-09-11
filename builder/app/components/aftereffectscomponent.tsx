@@ -18,7 +18,7 @@ export default class AfterEffectsComponent extends Component<any, any> {
 
 		return (
 			<TreeViewMenu
-        open={this.state.open}
+				open={this.state.open}
 				active
 				onClick={() => {
 					this.setState({ open: !this.state.open });
@@ -35,7 +35,8 @@ export default class AfterEffectsComponent extends Component<any, any> {
 								dataChain: '',
 								targetType: TargetMethodType.Effect,
 								target: '',
-								dataChainOptions: {}
+								dataChainOptions: {},
+								autoCalculate: true
 							});
 
 							this.setState({ turn: UIA.GUID() });
@@ -73,7 +74,7 @@ export default class AfterEffectsComponent extends Component<any, any> {
 							onDelete={() => {
 								let index: number = afterEffects.findIndex((v) => v.id === afterEffect.id);
 								if (index !== -1 && afterEffects) {
-                  if (afterEffect.dataChain) {
+									if (afterEffect.dataChain) {
 										UIA.removeNodeById(afterEffect.dataChain);
 									}
 									afterEffects.splice(index, 1);

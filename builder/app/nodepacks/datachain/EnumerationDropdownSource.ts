@@ -113,11 +113,9 @@ export default function(args: {
 						prop: 'Lambda',
 						id: context.node0,
 						value:
-							'(str: string): { title: string, value: string }[] => {\n    return Object.keys(#{' +
+							'(str: string): { title: string, value: string }[] => {\n    return Object.entries(#{' +
 							enumerationModelName +
-							'}).map((key: string) => {\n        return {\n            title: titleService.get(key),\n            value: #{' +
-							enumerationModelName +
-							'}[key]\n        }\n    })\n}\n\n'
+							'}).map((args: string[]) => {\n  let [key, value] = args; \n        return {\n            title: titleService.get(key),\n            value: value\n        }\n    })\n}\n\n'
 					}
 				}
 			];

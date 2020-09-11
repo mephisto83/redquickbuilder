@@ -2,7 +2,65 @@
 Red Quick builder 
 
 Building Native IOS, Android and Web apps from a mind map.
+## Quick entry using NLP
 
+```
+// const nlp = require('compromise')
+import nlp from 'compromise';
+
+nlp.extend((Doc, world) => {
+    // add new tags
+    world.addTags({
+        Model: {
+            isA:'Noun',
+        },
+        Agent: {
+            isA: 'Model'
+        },
+        Parent:{
+            isA:'Model'
+        },
+        User: {
+            isA: 'Agent'
+        },
+        Property: {
+            isA:'Noun'
+        },
+        Validation: {
+            isA: 'BooleanConfig'
+        },
+        Name: {
+            isA:'Validation'
+        },
+        Matches: {
+            isA:'Validation'
+        },
+        Intersects:{
+            isA:'Validation'
+        }
+    })
+
+    // add or change words in the lexicon
+    world.addWords({
+        Agent:'Agent',
+        Parent:'Parent',
+        Model:'Model',
+        matches:'Matches',
+        intersects:'Intersects',
+        'first name': ['Property','Noun']
+    })
+
+    
+
+})
+let temp = nlp(`The agent's first name intersects with the model's districts `)
+// console.log(JSON.stringify(temp.match('#Agent').json(), null, 4));
+console.log(JSON.stringify(temp.possessives().json(), null, 4));
+
+console.log(JSON.stringify(temp.match('#Matches').json(), null, 4));
+console.log(JSON.stringify(temp.match('#Intersects').json(), null, 4));
+
+```
 
 ## Class, CRUD and Result combinations.
 

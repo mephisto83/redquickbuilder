@@ -30,7 +30,9 @@ import {
 	CreateStretchPath,
 	SetProperty,
 	HalfRelation,
-	getRelationProperties
+	getRelationProperties,
+  CheckRelation,
+  ValidationColors
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
@@ -105,7 +107,8 @@ export default class RelativeTypeComponent extends Component<any, any> {
 				title = UIA.GetNodeTitle(methodDescription.properties.parent);
 				property = relations.parentProperty;
 				break;
-		}
+    }
+    let valid = CheckRelation(relations);
 		let properties = getRelationProperties(methodDescription, relations);
 		return (
 			<TreeViewMenu
@@ -114,8 +117,10 @@ export default class RelativeTypeComponent extends Component<any, any> {
 				icon={this.props.valid ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
 				onClick={() => {
 					this.setState({ config: !this.state.config });
-				}}
+        }}
+        color={relations && relations.enabled ? ValidationColors.Ok : ValidationColors.Neutral}
 				active
+				error={!valid}
 				greyed={!this.props.enabled}
 				title={Titles.RelationType}
 			>

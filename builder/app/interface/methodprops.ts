@@ -12,6 +12,8 @@ import {
 	updateNodeProperty
 } from '../methods/graph_methods';
 import { NodeTypes, NodeProperties, LinkProperties } from '../constants/nodetypes';
+import SwaggerCallConfig from '../components/swaggercallconfig';
+import { SwaggerPathDescription, SwaggerParameters, SwaggerEndpointDescription } from '../service/swagger';
 
 export interface DashboardAccessProps {
 	access: false;
@@ -96,6 +98,7 @@ export interface AutoSetupConfiguration {
 	executionAutoCopy: boolean;
 }
 export interface DataChainConfiguration {
+	concatenateString?: ConcatenateStringConfig;
 	checkExistence?: CheckExistenceConfig;
 	simpleValidation?: SimpleValidationConfig;
 	simpleValidationConfiguration?: SimpleValidationsConfiguration;
@@ -104,6 +107,7 @@ export interface DataChainConfiguration {
 	copyEnumeration?: CopyEnumerationConfig;
 	setBoolean?: SetBoolean;
 	setInteger?: SetInteger;
+	swaggerCall?: SwaggerCall;
 	incrementInteger?: IncrementInteger;
 	incrementDouble?: IncrementDouble;
 	compareEnumeration?: CompareEnumeration;
@@ -112,6 +116,16 @@ export interface DataChainConfiguration {
 	getExisting?: GetExistingConfig;
 	setProperties?: SetPropertiesConfig;
 	directExecute?: boolean;
+	namespaceConfig?: NamespaceConfig;
+}
+
+export interface NamespaceConfig {
+	space: string[];
+}
+export function CreateNameSpaceConfig(args: { space: string[] }): NamespaceConfig {
+	return {
+		space: args.space
+	};
 }
 
 export interface RouteConfig extends ConfigItem {
@@ -123,6 +137,7 @@ export function CreateFilterConfig(): FilterConfig {
 		enabled: true,
 		dataChain: '',
 		dataChainOptions: {},
+		autoCalculate: true,
 		id: GUID(),
 		name: ''
 	};
@@ -152,8 +167,25 @@ export function CheckAfterEffectDataChainConfiguration(options: DataChainConfigu
 	return (
 		(!options.getExisting || CheckGetExisting(options.getExisting)) &&
 		(!options.checkExistence || CheckIsExisting(options.checkExistence)) &&
-		(!options.setProperties || CheckSetProperties(options.setProperties))
+		(!options.copyEnumeration || CheckCopyEnumeration(options.copyEnumeration)) &&
+		(!options.setProperties || CheckSetProperties(options.setProperties)) &&
+		(!options.concatenateString || CheckConcatenateStringConfig(options.concatenateString)) &&
+		(!options.setInteger || CheckSetter(options.setInteger)) &&
+		(!options.setBoolean || CheckSetter(options.setBoolean)) &&
+		(!options.incrementDouble || CheckSetter(options.incrementDouble)) &&
+		(!options.incrementInteger || CheckSetter(options.incrementInteger)) &&
+		(!options.copyConfig || CheckCopyConfig(options.copyConfig)) &&
+		(!options.simpleValidations || CheckSimpleValidations(options.simpleValidations))
 	);
+}
+export function CheckSimpleValidations(validations: SimpleValidationConfig[]): boolean {
+	let res = true;
+
+	validations.forEach((validation) => {
+		res = res && CheckSimpleValidation(validation);
+	});
+
+	return res;
 }
 export function CreateSetProperty(): SetProperty {
 	return {
@@ -255,7 +287,16 @@ export function CreateBranch(): BranchConfig {
 		name: ''
 	};
 }
-export function CheckCopyConfig(copyConfig: HalfRelation) {
+export function CheckConcatenateStringConfig(concatenateStringConfig: ConcatenateStringConfig): boolean {
+	if (concatenateStringConfig.enabled) {
+		return !!CheckRelation(concatenateStringConfig) && concatenateStringConfig.parameters.length > 1;
+	}
+	return true;
+}
+export function CheckCopyConfig(copyConfig: CopyConfig): boolean {
+	return CheckHalfRelation(copyConfig) && (!copyConfig.enabled || !!copyConfig.targetProperty);
+}
+export function CheckHalfRelation(copyConfig: HalfRelation): boolean {
 	if (!copyConfig.enabled) {
 		return true;
 	}
@@ -295,6 +336,31 @@ export function CreateCopyConfig(): CopyConfig {
 		id: GUID(),
 		relationType: RelationType.Model,
 		targetProperty: ''
+	};
+}
+export interface ConcatenateStringConfig extends HalfRelation {
+	parameters: DirectRelation[];
+	with?: string;
+}
+export interface DirectRelation {
+	relationType: RelationType;
+	agent: string;
+	property: string;
+}
+export function CreateConcatenateStringConfig(): ConcatenateStringConfig {
+	return {
+		agent: '',
+		agentProperty: '',
+		model: '',
+		modelProperty: '',
+		modelOutput: '',
+		modelOutputProperty: '',
+		parent: '',
+		parentProperty: '',
+		enabled: false,
+		id: GUID(),
+		parameters: [],
+		relationType: RelationType.Agent
 	};
 }
 export function CreateCopyEnumerationConfig(): CopyEnumerationConfig {
@@ -495,7 +561,10 @@ export function CreateGraphValidationComposition(): SimpleValidationComposition 
 	return { graph };
 }
 
-export function getRelationProperties(methodDescription: MethodDescription, halfRelation: HalfRelation): Node[] {
+export function getRelationProperties(
+	methodDescription: MethodDescription,
+	halfRelation: { relationType: RelationType }
+): Node[] {
 	let properties: Node[] = [];
 	if (methodDescription && halfRelation && halfRelation.relationType) {
 		switch (halfRelation.relationType) {
@@ -550,6 +619,8 @@ export function CreateSimpleValidation(): SimpleValidationConfig {
 		isNull: CreateBoolean(),
 		isTrue: CreateBoolean(),
 		isFalse: CreateBoolean(),
+		date: CreateBoolean(),
+		referencesExisting: CreateReferences(),
 		alphaNumeric: CreateBoolean(),
 		alphaOnly: CreateBoolean(),
 		creditCard: CreateBoolean(),
@@ -564,20 +635,39 @@ export function CreateSimpleValidation(): SimpleValidationConfig {
 		urlEmpty: CreateBoolean(),
 		zip: CreateBoolean(),
 		zipEmpty: CreateBoolean(),
-		maxLength: {
-			id: GUID(),
-			enabled: false,
-			value: '500'
-		},
-		minLength: {
-			id: GUID(),
-			enabled: false,
-			value: '1'
-		},
+		isBoolean: CreateBoolean(),
+		minLength: CreateMinLength(),
+		maxLength: CreateMaxLength(),
 		areEqual: CreateAreEqual(),
 		isContained: CreateAreEqual(),
 		isNotContained: CreateAreEqual(),
+		isIntersecting: CreateAreEqual(),
 		oneOf: CreateOneOf()
+	};
+}
+export function CreateReferences(model?: string): QuarterRelation {
+	return {
+		agent: '',
+		relationType: RelationType.Agent,
+		agentProperty: '',
+		enabled: false,
+		id: GUID(),
+		model: model || '',
+		modelProperty: ''
+	};
+}
+export function CreateMaxLength(len?: string) {
+	return {
+		id: GUID(),
+		enabled: false,
+		value: len || '500'
+	};
+}
+export function CreateMinLength(len?: string) {
+	return {
+		id: GUID(),
+		enabled: false,
+		value: len || '1'
 	};
 }
 export function CreateBoolean(): BooleanConfig {
@@ -593,6 +683,48 @@ export function CreateOneOf(): EnumerationConfig {
 		enumerationType: '',
 		enumerations: []
 	};
+}
+export function clearSimpleValidation(config: SimpleValidationConfig): SimpleValidationConfig {
+	config.agent = '';
+	config.agentProperty = '';
+	config.alphaNumeric.enabled = false;
+	config.alphaOnly.enabled = false;
+	config.alphaOnlyWithSpaces.enabled = false;
+	config.areEqual.enabled = false;
+	config.creditCard.enabled = false;
+	config.email.enabled = false;
+	config.emailEmpty.enabled = false;
+	config.enabled = false;
+	config.isContained.enabled = false;
+	config.isFalse.enabled = false;
+	config.isIntersecting.enabled = false;
+	config.isNotContained.enabled = false;
+	config.isNotNull.enabled = false;
+	config.isNull.enabled = false;
+	config.isContained.enabled = false;
+	config.isStrech = false;
+	config.isTrue.enabled = false;
+	config.maxLength.enabled = false;
+	config.minLength.enabled = false;
+	config.model = '';
+	config.modelOutput = '';
+	config.modelProperty = '';
+	config.name = '';
+	config.numericInt.enabled = false;
+	config.oneOf.enabled = false;
+	config.parent = '';
+	config.parentProperty = '';
+	config.relationType = RelationType.Agent;
+	config.requireLowercase.enabled = false;
+	config.requireNonAlphanumeric.enabled = false;
+	config.requireUppercase.enabled = false;
+	config.socialSecurity.enabled = false;
+	config.targetProperty = '';
+	config.url.enabled = false;
+	config.urlEmpty.enabled = false;
+	config.zip.enabled = false;
+	config.zipEmpty.enabled = false;
+	return config;
 }
 export function CreateAreEqual(): AreEqualConfig {
 	return {
@@ -619,12 +751,16 @@ export function SetupConfigInstanceInformation(
 	dataChainOptions.simpleValidation.isContained = dataChainOptions.simpleValidation.isContained || CreateAreEqual();
 	dataChainOptions.simpleValidation.isNotContained =
 		dataChainOptions.simpleValidation.isNotContained || CreateAreEqual();
+	dataChainOptions.concatenateString = dataChainOptions.concatenateString || CreateConcatenateStringConfig();
 	dataChainOptions.simpleValidationConfiguration =
 		dataChainOptions.simpleValidationConfiguration || CreateSimpleValidationComposition();
 	dataChainOptions.simpleValidations = dataChainOptions.simpleValidations || [];
 	dataChainOptions.simpleValidations.forEach((item) => {
 		item.isContained = item.isContained || CreateAreEqual();
 		item.isNotContained = item.isNotContained || CreateAreEqual();
+		item.isIntersecting = item.isIntersecting || CreateAreEqual();
+		item.isBoolean = item.isBoolean || CreateBoolean();
+		item.date = item.date || CreateBoolean();
 		let temp = { ...CreateSimpleValidation(), ...item };
 		Object.assign(item, temp);
 	});
@@ -636,7 +772,7 @@ export function SetupConfigInstanceInformation(
 	dataChainOptions.incrementInteger = dataChainOptions.incrementInteger || CreateIncrementInteger();
 	dataChainOptions.compareEnumeration = dataChainOptions.compareEnumeration || CreateCompareEnumeration();
 	dataChainOptions.compareEnumerations = dataChainOptions.compareEnumerations || [ CreateCompareEnumeration() ];
-
+	dataChainOptions.swaggerCall = dataChainOptions.swaggerCall || CreateSwaggerCall();
 	let checkExistence = dataChainOptions.checkExistence;
 	let properties: any[] = [];
 	let targetProperties: any[] = [];
@@ -679,6 +815,7 @@ export function SetupConfigInstanceInformation(
 		targetProperties,
 		copyConfig: dataChainOptions.copyConfig,
 		copyEnumeration: dataChainOptions.copyEnumeration,
+		concatenateString: dataChainOptions.concatenateString,
 		simpleValidation: dataChainOptions.simpleValidation,
 		incrementDouble: dataChainOptions.incrementDouble,
 		incrementInteger: dataChainOptions.incrementInteger,
@@ -686,6 +823,7 @@ export function SetupConfigInstanceInformation(
 		setBoolean: dataChainOptions.setBoolean,
 		simpleValidations: dataChainOptions.simpleValidations,
 		setInteger: dataChainOptions.setInteger,
+		swaggerCall: dataChainOptions.swaggerCall,
 		compareEnumeration: dataChainOptions.compareEnumeration,
 		compareEnumerations: dataChainOptions.compareEnumerations
 	};
@@ -707,14 +845,18 @@ export function CreateGetExistence(): GetExistingConfig {
 		enabled: false
 	};
 }
-export interface HalfRelation extends ConfigItem {
+export interface EighthRelation extends ConfigItem {
 	relationType: RelationType;
 	agent: string;
+	agentProperty: string; // The property used to find the model.
+}
+export interface QuarterRelation extends EighthRelation {
 	model: string;
+	modelProperty: string; // The property used to find the model
+}
+export interface HalfRelation extends QuarterRelation {
 	parent: string;
 	modelOutput: string;
-	agentProperty: string; // The property used to find the model.
-	modelProperty: string; // The property used to find the model
 	parentProperty: string;
 	modelOutputProperty: string; // The property used to find the model
 }
@@ -765,6 +907,7 @@ export interface BranchConfig {
 export interface CopyConfig extends AfterEffectRelations {}
 export interface AreEqualConfig extends AfterEffectRelations {}
 export interface IsContainedConfig extends AfterEffectRelations {}
+export interface IsIntersectingConfig extends AfterEffectRelations {}
 export interface IsNotContainedConfig extends AfterEffectRelations {}
 export interface Setter extends HalfRelation {
 	value: string;
@@ -773,7 +916,61 @@ export interface SetBoolean extends Setter {}
 export interface SetInteger extends Setter {}
 export interface IncrementInteger extends Setter {}
 export interface IncrementDouble extends Setter {}
-
+export interface SwaggerCall extends ConfigItem {
+	swagger: string;
+	swaggerApiPath: string;
+	swaggerApiDescription: string;
+	swaggerParameters: SwaggerParameterConfig[];
+}
+export interface SwaggerParameterConfig extends AfterEffectRelations {
+	swaggerParameterName: string;
+	swaggerParameterType: string;
+	swaggerParameterFormat?: string;
+	swaggerParameterRequired: boolean;
+}
+export function CreateAfterEffectRelations(): AfterEffectRelations {
+	return {
+		agent: '',
+		agentProperty: '',
+		enabled: false,
+		id: GUID(),
+		model: '',
+		modelOutput: '',
+		modelOutputProperty: '',
+		modelProperty: '',
+		parent: '',
+		parentProperty: '',
+		relationType: RelationType.Agent,
+		targetProperty: ''
+	};
+}
+export function CreateSwaggerParameters(
+	endpointDescription: SwaggerEndpointDescription,
+	params: SwaggerParameterConfig[]
+): SwaggerParameterConfig[] {
+	let result: SwaggerParameterConfig[] = [];
+	return result;
+}
+export function CreateSwaggerParameter(param: SwaggerParameters): SwaggerParameterConfig {
+	return {
+		...CreateAfterEffectRelations(),
+		swaggerParameterFormat: param.format,
+		swaggerParameterName: param.name,
+		swaggerParameterRequired: param.required,
+		swaggerParameterType: param.type
+	};
+}
+export function CreateSwaggerCall(): SwaggerCall {
+	return {
+		swagger: '',
+		swaggerApiDescription: '',
+		enabled: false,
+		id: '',
+		swaggerApiPath: '',
+		swaggerParameters: [],
+		name: ''
+	};
+}
 export interface SimpleValidationConfig extends AfterEffectRelations {
 	minLength: NumberConfig;
 	maxLength: NumberConfig;
@@ -784,19 +981,23 @@ export interface SimpleValidationConfig extends AfterEffectRelations {
 	email: BooleanConfig;
 	emailEmpty: BooleanConfig;
 	numericInt: BooleanConfig;
+	isBoolean: BooleanConfig;
 	requireLowercase: BooleanConfig;
 	requireNonAlphanumeric: BooleanConfig;
 	requireUppercase: BooleanConfig;
 	socialSecurity: BooleanConfig;
 	url: BooleanConfig;
+	date: BooleanConfig;
 	urlEmpty: BooleanConfig;
 	zip: BooleanConfig;
 	zipEmpty: BooleanConfig;
 	isNotNull: BooleanConfig;
+	referencesExisting: QuarterRelation;
 	isTrue: BooleanConfig;
 	isFalse: BooleanConfig;
 	areEqual: AreEqualConfig;
 	isContained: IsContainedConfig;
+	isIntersecting: IsIntersectingConfig;
 	isNotContained: IsNotContainedConfig;
 	isNull: BooleanConfig;
 	oneOf: EnumerationConfig;
@@ -858,9 +1059,89 @@ export interface ConfigItem {
 	enabled: boolean;
 	id: string;
 }
-export function CheckSimpleValidation(isvalidation: SimpleValidationConfig) {
-	if (!isvalidation.enabled) {
-		return true;
+export function CheckSimpleValidation(isvalidation: SimpleValidationConfig): boolean {
+	if (isvalidation.enabled) {
+		return (
+			CheckRelation(isvalidation) &&
+			(isvalidation.creditCard.enabled ||
+				isvalidation.isTrue.enabled ||
+				isvalidation.isFalse.enabled ||
+				(isvalidation.areEqual.enabled && CheckRelation(isvalidation.areEqual)) ||
+				(isvalidation.maxLength.enabled && CheckNumberConfig(isvalidation.maxLength)) ||
+				(isvalidation.minLength.enabled && CheckNumberConfig(isvalidation.minLength)) ||
+				isvalidation.alphaOnlyWithSpaces.enabled ||
+				isvalidation.alphaNumeric.enabled ||
+				isvalidation.alphaOnly.enabled ||
+				isvalidation.requireNonAlphanumeric.enabled ||
+				isvalidation.requireLowercase.enabled ||
+				isvalidation.requireUppercase.enabled ||
+				isvalidation.zip.enabled ||
+				isvalidation.isBoolean.enabled ||
+				isvalidation.zipEmpty.enabled ||
+				isvalidation.email.enabled ||
+				(isvalidation.date && isvalidation.date.enabled) ||
+				isvalidation.emailEmpty.enabled ||
+				(isvalidation.referencesExisting.enabled && CheckQuarterConfig(isvalidation.referencesExisting)) ||
+				isvalidation.urlEmpty.enabled ||
+				isvalidation.url.enabled ||
+				isvalidation.socialSecurity.enabled ||
+				(isvalidation.oneOf.enabled && CheckEnumerationConfig(isvalidation.oneOf)) ||
+				isvalidation.numericInt.enabled ||
+				isvalidation.isNull.enabled ||
+				isvalidation.isNotNull.enabled ||
+				isvalidation.isContained.enabled)
+		);
+	}
+	return true;
+}
+export const ValidationColors = {
+	Ok: '#00BFB2',
+	Error: '#E71D36',
+	Neutral: '#FDFFFC'
+};
+export function CheckValidationConfigs(validationConfigs: ValidationConfig[]): boolean {
+	let res = true;
+
+	validationConfigs.forEach((validationConfig: ValidationConfig) => {
+		res = res && CheckValidationConfig(validationConfig);
+	});
+
+	return res;
+}
+export function CheckValidationConfig(validationConfig: ValidationConfig): boolean {
+	return validationConfig.dataChainOptions
+		? CheckAfterEffectDataChainConfiguration(validationConfig.dataChainOptions)
+		: true;
+}
+export function CheckNumberConfig(numberConfig: NumberConfig): boolean {
+	return !numberConfig.enabled || !!numberConfig.value;
+}
+export function CheckQuarterConfig(quarterConfig: QuarterRelation): boolean {
+	return !quarterConfig.enabled || !!quarterConfig.model;
+}
+export function CheckEnumerationConfig(oneOf: EnumerationConfig): boolean {
+	return oneOf.enabled && !!oneOf.enumerationType && !!oneOf.enumerations.length && !!oneOf.id;
+}
+export function CheckRelation(halfRelation: HalfRelation): boolean {
+	if (halfRelation.enabled) {
+		switch (halfRelation.relationType) {
+			case RelationType.Agent:
+				return !!halfRelation.agentProperty && !!halfRelation.agent;
+			case RelationType.Model:
+				return !!halfRelation.modelProperty && !!halfRelation.model;
+			case RelationType.ModelOuput:
+				return !!halfRelation.modelOutputProperty && !!halfRelation.modelOutput;
+			case RelationType.Parent:
+				return !!halfRelation.parent && !!halfRelation.parentProperty;
+			default:
+				return false;
+		}
+	}
+	return true;
+}
+export function CheckCopyEnumeration(copyEnumeration: CopyEnumerationConfig): boolean {
+	if (copyEnumeration.enabled) {
+		return !!copyEnumeration.enumerationType && !!copyEnumeration.enumeration && !!copyEnumeration.targetProperty;
 	}
 	return true;
 }
@@ -890,6 +1171,7 @@ export interface AfterEffect {
 	dataChainOptions: DataChainConfiguration;
 	id: string;
 	name: string;
+	autoCalculate: boolean;
 	dataChain: string;
 	targetType: TargetMethodType;
 	target: string;
@@ -902,8 +1184,10 @@ export interface FilterConfig extends ValidationConfig {}
 export interface ValidationConfig {
 	id: string;
 	name: string;
+	summary?: string;
 	dataChain: string;
 	enabled: boolean;
+	autoCalculate: boolean;
 	dataChainOptions: DataChainConfiguration;
 }
 export interface StaticParameters extends ConfigItem {

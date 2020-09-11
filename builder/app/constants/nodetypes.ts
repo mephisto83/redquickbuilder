@@ -14,6 +14,9 @@ export const NodeTypes = {
 	ComponentApiConnector: 'component-api-connector',
 	ScreenContainer: 'screen-container',
 	ScreenEffect: 'ScreenEffect',
+	Swagger: 'Swagger',
+	SwaggerApiPath: 'SwaggerApiPath',
+	SwaggerApiDescription: 'SwaggerApiDescription',
 	ScreenEffectApi: 'ScreenEffectApi',
 	RootNode: 'composition-rootNode',
 	LeafNode: 'composition-leafNode',
@@ -91,7 +94,69 @@ export const ConditionTypes = {
 export const NodeTypeIcons: any = {};
 export function GetNodeTypeIcon(type: string | number) {
 	if (!NodeTypeIcons[type]) {
-		let files = fs.readdirSync('./app/css/svg');
+		let files: string[] = [];
+		try {
+			files = fs.readdirSync('./app/css/svg');
+		} catch (e) {
+			console.log(e);
+			try {
+				files = [
+					'001-flan.svg',
+					'002-ice cream.svg',
+					'003-cupcake.svg',
+					'004-donut.svg',
+					'005-milkshake.svg',
+					'006-ice cream cup.svg',
+					'007-chocolate bar.svg',
+					'008-candy.svg',
+					'009-ice cream cup.svg',
+					'010-apple pie.svg',
+					'011-cookie.svg',
+					'012-piece of cake.svg',
+					'013-cake.svg',
+					'014-bread roll.svg',
+					'015-croissant.svg',
+					'016-pancakes.svg',
+					'017-lollipop.svg',
+					'018-cotton candy.svg',
+					'019-chocolate bar.svg',
+					'020-marshmallow.svg',
+					'021-jelly.svg',
+					'022-jam.svg',
+					'023-honey.svg',
+					'024-macaron.svg',
+					'025-candy cane.svg',
+					'026-popsicle.svg',
+					'027-meringue.svg',
+					'028-cookie.svg',
+					'029-cake pop.svg',
+					'030-candy.svg',
+					'031-apple.svg',
+					'032-candy.svg',
+					'033-watermelon.svg',
+					'034-ice cream sandwich.svg',
+					'035-bread roll.svg',
+					'036-jelly beans.svg',
+					'037-crepe.svg',
+					'038-waffle.svg',
+					'039-cookie jar.svg',
+					'040-cookie.svg',
+					'041-strawberry.svg',
+					'042-candy jar.svg',
+					'043-hot chocolate.svg',
+					'044-orange juice.svg',
+					'045-gummy.svg',
+					'046-bonbon.svg',
+					'047-chocolate sticks.svg',
+					'048-bread roll.svg',
+					'049-lollipop.svg',
+					'050-lollipop.svg'
+				];
+			} catch (e) {
+				console.log(e);
+			}
+		}
+
 		Object.values(NodeTypes).map((key, index) => {
 			NodeTypeIcons[key] = `./css/svg/${files[index % files.length]}`;
 		});
@@ -216,6 +281,9 @@ export const NodeTypeColors = {
 	[NodeTypes.Services]: '#59FFA0',
 	[NodeTypes.ClassNode]: '#C3BAAA',
 	[NodeTypes.Maestro]: '#780116',
+	[NodeTypes.Swagger]: '#E952DE',
+	[NodeTypes.SwaggerApiPath]: '#B24C63',
+	[NodeTypes.SwaggerApiDescription]: '#386641',
 	[NodeTypes.Condition]: '#CAFE48',
 	[NodeTypes.Validator]: '#151522',
 	[NodeTypes.ModelFilter]: '#312313',
@@ -342,8 +410,11 @@ export const NodeProperties = {
 	ViewModelKey: 'ViewModelKey',
 	UserOfAgent: 'UserOfAgent',
 	StateKey: 'StateKey',
+	AutoCalculate: 'AutoCalculate',
 	DefaultPropertyValueType: 'DefaultPropertyValueType',
 	DefaultPropertyValue: 'DefaultPropertyValue',
+	SwaggerNode: 'SwaggerNode',
+	SwaggerClassName: 'SwaggerClassName',
 	GridPlacement: 'GridPlacement',
 	CompleteFunction: 'CompleteFunction',
 	ArbiterModels: 'ArbiterModels',
@@ -519,6 +590,7 @@ export const NodeProperties = {
 	IsDataChainPagingTake: 'IsDataChainPagingTake',
 	UIText: 'text',
 	Target: 'Target',
+	SwaggerPath: 'SwaggerPath',
 	UseAsValue: 'UseAsValue',
 	IsUrlParameter: 'IsUrlParameter',
 	NavigationAction: 'NavigationAction',
@@ -528,7 +600,9 @@ export const NodeProperties = {
 	IsReferenceList: 'isReferenceList',
 	UseHttps: 'UseHttps',
 	Description: 'description',
-
+	IsSwagger: 'IsSwagger',
+	SwaggerMethodDefinition: 'SwaggerMethodDefinition',
+	SwaggerEndpoint: 'SwaggerEndpoint',
 	UISingular: 'uiSingular',
 	UIChoice: 'uiChoice',
 	UIChoiceType: 'uiChoiceType',
@@ -620,6 +694,7 @@ export const NodeProperties = {
 	ScopeGraph: 'scopedGraph',
 
 	DataChainFunctionType: 'DataChainFunctionType',
+	DataChainNameSpace: 'DataChainNameSpace',
 	DataChainProperty: 'DataChainProperty',
 	QueryParameterType: 'QueryParameterType',
 	Component: 'Component',
@@ -718,6 +793,9 @@ export const LinkType = {
 	ExecutionDataChain: 'ExecutionDataChain',
 	DataChainIsDisabled: 'DataChainIsDisabled',
 	Composition: 'Composition',
+	SwaggerClass: 'SwaggerClass',
+	SwaggerMethodDescription: 'SwaggerMethodDescription',
+	SwaggerPaths: 'SwaggerPaths',
 	StateKey: 'StateKey',
 	DataChainScreenEffect: 'DataChainScreenEffect',
 	DataChainScreenEffectImpl: 'DataChainScreenEffectImpl',
@@ -1001,6 +1079,12 @@ export const LinkProperties = {
 	UserOfAgentType: {
 		type: LinkType.UserOfAgentType
 	},
+	SwaggerClass: {
+		type: LinkType.SwaggerClass
+	},
+	SwaggerPaths: {
+		type: LinkType.SwaggerPaths
+	},
 	Composition: {
 		type: LinkType.Composition
 	},
@@ -1012,6 +1096,9 @@ export const LinkProperties = {
 	},
 	ValidationDataChain: {
 		type: LinkType.ValidationDataChain
+	},
+	SwaggerMethodDescription: {
+		type: LinkType.SwaggerMethodDescription
 	},
 	ExecutionDataChain: {
 		type: LinkType.ExecutionDataChain
@@ -1512,8 +1599,11 @@ export const NodePropertyTypes = {
 	INT: 'INT',
 	FLOAT: 'FLOAT',
 	DOUBLE: 'DOUBLE',
+	LONG: 'LONG',
 	BOOLEAN: 'BOOLEAN',
 	EMAIL: 'EMAIL',
+	REFERENCE: 'REFERENCE',
+	OBJECT: 'OBJECT',
 	PHONENUMBER: 'PHONENUMBER'
 };
 export const NEW_LINE = `
@@ -1566,7 +1656,7 @@ export const Usings = {
 		[NodePropertyTypes.PHONENUMBER]: [ RED_QUICK_DATA, RED_QUICK_ATTRIBUTES ]
 	}
 };
-export const NodeAttributePropertyTypes: any = {
+export const NodeAttributePropertyTypes = {
 	ROUTINGNUMBER: 'ROUTINGNUMBER',
 	CURRENCY: 'CURRENCY',
 	CARMAKE: 'CARMAKE',

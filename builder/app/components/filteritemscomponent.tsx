@@ -9,7 +9,9 @@ import {
 	MountingDescription,
 	ValidationConfig,
 	FilterConfig,
-	CreateFilterConfig
+	CreateFilterConfig,
+  ValidationColors,
+  CheckValidationConfigs
 } from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
@@ -38,10 +40,13 @@ export default class FilterItemsComponent extends Component<any, any> {
 			return <span>No model/output</span>;
 		}
 		let properties: Node[] = UIA.GetModelPropertyChildren(model);
+		let valid = CheckValidationConfigs(Object.values(filterItem));
 		return (
 			<TreeViewMenu
+				color={filterItem && Object.keys(filterItem).length ? ValidationColors.Ok : ValidationColors.Neutral}
 				open={this.state.open}
 				active
+				error={!valid}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}

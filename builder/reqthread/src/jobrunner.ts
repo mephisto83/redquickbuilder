@@ -21,6 +21,7 @@ import CommunicationTower, {
 } from '../../app/jobs/communicationTower';
 import { RunnerContext, CommandCenter } from '../../app/jobs/interfaces';
 import StoreGraph from '../../app/methods/storeGraph';
+import { setAppConfigPath } from '../../app/actions/remoteActions';
 let communicationTower: CommunicationTower;
 let runnerContext: RunnerContext = {
 	agents: {},
@@ -34,6 +35,19 @@ let runnerContext: RunnerContext = {
 };
 (async function runner() {
 	try {
+		let appConfig = {};
+		let appConfigPath = getAppConfigPath();
+		if (fs.existsSync(appConfigPath)) {
+			appConfig = JSON.parse(fs.readFileSync(path.join(appConfigPath, 'applicationConfig.json'), 'utf8'));
+		}
+		setAppConfigPath(appConfigPath, appConfig);
+		console.log(`----------- appConfigPath ----------`);
+		console.log(appConfigPath);
+		console.log(`----------- appConfig ----------`);
+		console.log(appConfig);
+		console.log(`job runner: ${JobServiceConstants.JobPath()}`);
+		console.log(`job file path: ${JobServiceConstants.JobsFilePath()}`);
+
 		communicationTower = new CommunicationTower();
 		communicationTower.init({
 			agentName: null,
@@ -41,7 +55,6 @@ let runnerContext: RunnerContext = {
 			serverPort: 7972,
 			topDirectory: '../../jobrunner'
 		});
-
 		await communicationTower.start({
 			[RedQuickDistributionCommand.RaisingHand]: handleHandRaising,
 			[RedQuickDistributionCommand.SetAgentProjects]: setAgentProjects,
@@ -70,6 +83,33 @@ let runnerContext: RunnerContext = {
 	} finally {
 	}
 })();
+export function getAppConfigPath($folder?: string) {
+	const homedir = require('os').homedir();
+	const folder = $folder ? path.join(homedir, '.rqb', $folder) : path.join(homedir, '.rqb');
+	console.log(`get app config path : ${folder}`);
+	ensureDirectorySync(folder);
+	return folder;
+}
+
+export function ensureDirectorySync(dir) {
+	if (!fs.existsSync(dir)) {
+		console.log(`doesnt exist : ${dir}`);
+	} else {
+	}
+	const _dir_parts = dir.split(path.sep);
+	_dir_parts.map((_, i) => {
+		if (i > 1 || _dir_parts.length - 1 === i) {
+			let tempDir = path.join(..._dir_parts.subset(0, i + 1));
+			if (dir.startsWith(path.sep)) {
+				tempDir = `${path.sep}${tempDir}`;
+			}
+			if (!fs.existsSync(tempDir)) {
+				fs.mkdirSync(tempDir);
+			}
+		}
+	});
+}
+
 async function setCommandCenter(message: RedQuickDistributionMessage): Promise<ListenerReply> {
 	let msg: any = message;
 	// console.debug('set command center');
@@ -169,9 +209,13 @@ async function tellCommandCenter() {
 						currentJobInformation: GetCurrentJobInformation()
 					}
 				);
-			} catch (e) {}
+			} catch (e) {
+				commandCenter.failedCalls = commandCenter.failedCalls || 0;
+				commandCenter.failedCalls += 1;
+			}
 		}
 	});
+	runnerContext.commandCenters = runnerContext.commandCenters.filter((v) => v.failedCalls > 10);
 }
 async function pullCompletedJobItemTogether(message: RedQuickDistributionMessage): Promise<void> {
 	let relativePath = path_join(
