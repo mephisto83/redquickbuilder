@@ -275,8 +275,9 @@ export default function getLanguageMeaning(
 		return temp.has(item);
 	});
 	if (understandableClause) {
-		let firstClause = temp.match(understandableClause).lookBehind().text();
-		let secondClause = temp.match(understandableClause).lookAhead().text();
+		let temp_: any = temp.match(understandableClause);
+		let firstClause = temp_.lookBehind().text();
+		let secondClause = temp_.lookAhead().text();
 		if (equals.find((item: string) => temp.has(item))) {
 			result.methodType = NLMethodType.AreEqual;
 		} else if (inAEnumeration.find((item: string) => temp.has(item))) {
@@ -293,8 +294,9 @@ export default function getLanguageMeaning(
 							_nlp(secondClause).has(GetCodeName(vnode).toLocaleLowerCase()) ||
 							_nlp(secondClause).has(GetCodeName(vnode).toLocaleUpperCase())
 					);
-				let enumerationClause =
-					temp.match('with a').lookAhead().text() || temp.match('with an').lookAhead().text();
+				temp_ = temp.match('with a');
+				let temp__: any = temp.match('with an');
+				let enumerationClause = temp_.lookAhead().text() || temp__.lookAhead().text();
 				if (enumeration && enumerationClause) {
 					result.targetClause.enumeration = enumeration.id;
 					let possibleEnumerations = GetNodeProp(enumeration, NodeProperties.Enumeration) || [];
@@ -374,7 +376,7 @@ export default function getLanguageMeaning(
 			return clause;
 		}
 		function findProperty(properties: Node[], clauseString: string) {
-			let property: string;
+			let property: string = '';
 			if (properties && properties.length) {
 				let aprop = properties.find(
 					(vnode: Node) =>
@@ -395,7 +397,7 @@ export default function getLanguageMeaning(
 			let result: Node[] = [];
 
 			if (modelId) {
-				result = GetModelCodeProperties(modelId).sort((a, b) => {
+				result = GetModelCodeProperties(modelId).sort((a: Node, b: Node) => {
 					return GetNodeTitle(a).length - GetNodeTitle(b).length;
 				});
 			}

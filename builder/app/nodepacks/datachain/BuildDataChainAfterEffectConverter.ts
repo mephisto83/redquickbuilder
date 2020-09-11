@@ -588,7 +588,6 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 function setConcatenateConfig({
 	concatenateString,
 	from,
-	target_property,
 	tempLambdaInsertArgumentValues,
 	to,
 	outputType
