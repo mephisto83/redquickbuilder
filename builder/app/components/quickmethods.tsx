@@ -226,7 +226,7 @@ class QuickMethods extends Component<any, any, any> {
 									onClick={() => {
 										SetPause(true);
 										CreateComponentSharedAll(() => {}, null, (v:Node)=>{
-                      return v.id === currentNode.id;
+                     return true; // return v.id === currentNode.id;
                     }).then(() => {
 											SetPause(false);
 										});
