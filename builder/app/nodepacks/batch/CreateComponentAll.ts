@@ -1,4 +1,4 @@
-import { UITypes, NodeProperties, NodeTypes } from '../../constants/nodetypes';
+import { UITypes, NodeProperties, NodeTypes, LinkType } from '../../constants/nodetypes';
 import { ViewTypes } from '../../constants/viewtypes';
 import {
 	GetNodeTitle,
@@ -13,12 +13,18 @@ import {
 	isAccessNode,
 	GetCurrentGraph,
 	GetLinkProperty,
-	hasAccessNode
+	hasAccessNode,
+	GetModelReferencedByProperty,
+	AddLinkBetweenNodes,
+	graphOperation
 } from '../../actions/uiactions';
 import { CreateDefaultView } from '../../constants/nodepackages';
 import { GetViewTypeModelType } from '../viewtype/SetupViewTypeForCreate';
-import { findLink } from '../../methods/graph_methods';
+import { findLink, GetNodesLinkedTo, GetLinkBetween } from '../../methods/graph_methods';
 import { Node } from '../../methods/graph_types';
+import { GraphLink } from '../../methods/graph_types';
+import { ApiNodeKeys } from '../../../visi_blend/dist/app/constants/nodetypes';
+import { SetupApiComponent } from '../SetupApiBetweenComponents';
 
 export async function CreateComponentSharedAll(progressFunc: any, filter?: any, filterViewTypes?: any) {
 	console.log('Create Component All');
@@ -45,7 +51,7 @@ export async function CreateComponentSharedAll(progressFunc: any, filter?: any, 
 	const defaultViewTypes = NodesByType(null, NodeTypes.ViewType);
 	await defaultViewTypes
 		.filter((v: any) => (filterViewTypes ? filterViewTypes(v) : true))
-		.forEachAsync(async (viewType: any, viewTypeIndex: any, viewTypeCount: any) => {
+		.forEachAsync(async (viewType: Node, viewTypeIndex: any, viewTypeCount: any) => {
 			const { model, property } = GetViewTypeModelType(viewType.id);
 			if (filter && !filter(model)) {
 				return;
@@ -55,6 +61,42 @@ export async function CreateComponentSharedAll(progressFunc: any, filter?: any, 
 					model
 				)}.${GetNodeTitle(property)}`
 			);
+
+			let modelReferenceByProperty = GetModelReferencedByProperty(property);
+			let isPluralRef =
+				GetNodeProp(modelReferenceByProperty.property, NodeProperties.NODEType) === NodeTypes.Model;
+			// Try to find a group of components already implementing what we want.
+			let matchingDefaultViewType: Node | undefined = defaultViewTypes.find((viewTypeNode: Node) => {
+				const local = GetViewTypeModelType(viewTypeNode.id);
+				const currentLocalRef = GetModelReferencedByProperty(local.property);
+				if (!modelReferenceByProperty) {
+					throw new Error('model referencing a property not found');
+				}
+				if (!currentLocalRef) {
+					throw new Error('View type isnt referencing a model');
+				}
+				let isPlural = GetNodeProp(local.property, NodeProperties.NODEType) === NodeTypes.Model;
+				return (
+					isPluralRef === isPlural &&
+					modelReferenceByProperty.id === currentLocalRef.id &&
+					GetNodeProp(viewTypeNode, NodeProperties.ViewType) ===
+						GetNodeProp(viewType, NodeProperties.ViewType)
+				);
+			});
+
+			// There is an existing component, that we can connect to.
+			if (matchingDefaultViewType) {
+				let alreadyMadeSharedComponents: Node[] = GetNodesLinkedTo(null, {
+					id: matchingDefaultViewType.id,
+					link: LinkType.DefaultViewType,
+					componentType: NodeTypes.ComponentNode
+				});
+				SetupApiForDefaultViewType(viewType);
+				DuplicateDefaultViewTypes(matchingDefaultViewType, alreadyMadeSharedComponents, viewType);
+				if (progressFunc) await progressFunc(0);
+				return;
+			}
+
 			CreateComponentModel({
 				model: model.id,
 				viewTypeModelId: viewType.id,
@@ -67,6 +109,39 @@ export async function CreateComponentSharedAll(progressFunc: any, filter?: any, 
 		});
 
 	return result;
+}
+
+function SetupApiForDefaultViewType(viewType: Node) {
+  graphOperation(
+    ['value', ApiNodeKeys.ViewModel, 'label', 'placeholder', 'error', 'success'].map((v: string) => {
+      return SetupApiComponent({
+        component_a: {
+          external: v,
+          id: viewType.id,
+          internal: v
+        }
+      });
+    })
+  )(GetDispatchFunc(), GetStateFunc());
+}
+
+function DuplicateDefaultViewTypes(matchingDefaultViewType: Node, alreadyMadeSharedComponents: Node[], viewType: Node) {
+	if (matchingDefaultViewType) {
+		alreadyMadeSharedComponents.map((v: Node) => {
+			let link: GraphLink | undefined = GetLinkBetween(
+				matchingDefaultViewType ? matchingDefaultViewType.id : null,
+				v.id,
+				GetCurrentGraph()
+			);
+			if (link) {
+				let duplicateProps = JSON.parse(JSON.stringify(link.properties));
+				graphOperation(AddLinkBetweenNodes(viewType.id, v.id, duplicateProps))(
+					GetDispatchFunc(),
+					GetStateFunc()
+				);
+			}
+		});
+	}
 }
 
 export default async function CreateComponentAll(progressFunc: any, filter?: any) {

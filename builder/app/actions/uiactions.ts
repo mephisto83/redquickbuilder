@@ -314,6 +314,18 @@ export function GetSharedComponentFor(
 	}
 }
 
+export function GetModelReferencedByProperty(property: string, currentGraph?: any) {
+	currentGraph = currentGraph || GetCurrentGraph(_getState());
+	if (GetNodeProp(property, NodeProperties.NODEType) === NodeTypes.Model) {
+		return GetNodeById(property);
+	}
+	return GraphMethods.GetNodeLinkedTo(currentGraph, {
+		id: property,
+		link: NodeConstants.LinkType.ModelTypeLink,
+		componentType: NodeTypes.Model
+	});
+}
+
 export function getViewTypeEndpointsForDefaults(viewType: any, currentGraph: any, id: any) {
 	currentGraph = currentGraph || GetCurrentGraph(_getState());
 
