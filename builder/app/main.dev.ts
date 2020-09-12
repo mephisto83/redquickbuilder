@@ -23,6 +23,7 @@ export default class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
+let objectViewerWindow: BrowserWindow | null = null;
 
 if (process.env.NODE_ENV === 'production' || true) {
 	const sourceMapSupport = require('source-map-support');
@@ -40,8 +41,42 @@ const installExtensions = async () => {
 
 	return Promise.all(extensions.map((name) => installer.default(installer[name], forceDownload))).catch(console.log);
 };
+const createObjectViewerWindow = async () => {
+	objectViewerWindow = new BrowserWindow({
+		show: false,
+		width: 400,
+		height: 400,
+		frame: false,
+		webPreferences:
+			process.env.NODE_ENV === 'development' || process.env.E2E_BUILD === 'true'
+				? {
+						nodeIntegration: true
+					}
+				: {
+						nodeIntegration: true,
+						preload: path.join(__dirname, 'dist', 'renderer.prod.js')
+					}
+	});
+	objectViewerWindow.loadURL(`file://${__dirname}/app.html`);
+	objectViewerWindow.webContents.on('did-finish-load', () => {
+		if (!objectViewerWindow) {
+			throw new Error('"mainWindow" is not defined');
+		}
+		// if (process.env.START_MINIMIZED) {
+		// 	objectViewerWindow.minimize();
+		// } else {
+		// 	objectViewerWindow.show();
+		// 	objectViewerWindow.focus();
+		// }
+		// mainWindow.webContents.openDevTools()
+	});
 
+	objectViewerWindow.on('closed', () => {
+		objectViewerWindow = null;
+	});
+};
 const createWindow = async () => {
+	if (objectViewerWindow === null) await createObjectViewerWindow();
 	if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
 		await installExtensions();
 	}
@@ -69,27 +104,29 @@ const createWindow = async () => {
 		if (!mainWindow) {
 			throw new Error('"mainWindow" is not defined');
 		}
-		IPCHandlers.setup(mainWindow);
+		IPCHandlers.setup(mainWindow, {
+			mainWindow: mainWindow,
+			objectViewerWindow: objectViewerWindow
+		});
 
 		if (process.env.START_MINIMIZED) {
 			mainWindow.minimize();
 		} else {
 			mainWindow.show();
 			mainWindow.focus();
-    }
-    // mainWindow.webContents.openDevTools()
+		}
 	});
 
 	mainWindow.on('closed', () => {
+		if (objectViewerWindow) {
+			objectViewerWindow.close();
+		}
 		mainWindow = null;
 	});
 
-	// const menuBuilder = new MenuBuilder(mainWindow);
-	// menuBuilder.buildMenu();
-
 	// Remove this if your app does not use auto updates
 	// eslint-disable-next-line
-	new AppUpdater();
+	// new AppUpdater();
 };
 
 /**
@@ -113,5 +150,6 @@ app.on('ready', createWindow);
 app.on('activate', () => {
 	// On macOS it's common to re-create a window in the app when the
 	// dock icon is clicked and there are no other windows open.
+
 	if (mainWindow === null) createWindow();
 });

@@ -2503,7 +2503,8 @@ class Dashboard extends Component<any, any> {
 											// this.props.SelectedNode(nodeId);
 											// this.props.setVisual(UIA.SELECTED_NODE_BB, boundingBox);
 											// this.props.setVisual(SIDE_PANEL_OPEN, true);
-											this.props.SelectNode(nodeId, boundingBox);
+                      this.props.SelectNode(nodeId, boundingBox);
+                      this.props.sendNode(nodeId);
 										} else {
 											this.props.SelectedNode(null);
 										}

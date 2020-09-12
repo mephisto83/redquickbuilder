@@ -4,16 +4,20 @@ import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
 import Routes from '../Routes';
 
+import { setHistory } from '../actions/uiactions';
 
 export default class Root extends Component<any, any> {
-  render() {
-    const { store, history } = this.props;
-    return (
-      <Provider store={store}>
-        <ConnectedRouter history={history}>
-          <Routes />
-        </ConnectedRouter>
-      </Provider>
-    );
-  }
+	componentDidMount() {
+		setHistory(this.props.history);
+	}
+	render() {
+		const { store, history } = this.props;
+		return (
+			<Provider store={store}>
+				<ConnectedRouter history={history}>
+					<Routes />
+				</ConnectedRouter>
+			</Provider>
+		);
+	}
 }

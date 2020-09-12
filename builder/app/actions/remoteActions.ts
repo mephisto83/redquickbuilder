@@ -32,7 +32,8 @@ import {
 	GetLink,
 	GetCssName,
 	GetState,
-	pinConnectedNodesByLinkType
+	pinConnectedNodesByLinkType,
+	GetNodeById
 } from './uiactions';
 import { processRecording } from '../utils/utilservice';
 import prune from '../methods/prune';
@@ -42,12 +43,13 @@ const path = require('path');
 import fs from 'fs';
 import JobService, { ensureDirectory, JobServiceConstants, ensureDirectorySync } from '../jobs/jobservice';
 import StoreGraph, { LoadGraph } from '../methods/storeGraph';
-import { Graph, GraphLink, Node } from '../methods/graph_types';
+import { Graph, GraphLink, Node, QuickAccess } from '../methods/graph_types';
 import { NodeProperties, LinkType, LinkPropertyKeys } from '../constants/nodetypes';
 import { Link } from 'react-router-dom';
 import { IfFalse } from '../components/titles';
 import { platform } from 'os';
 import { NodeTypeColors } from '../constants/nodetypes';
+import { HandlerEvents } from '../ipc/handler-events';
 // import { loadConfigs } from './ipcActions';
 // import { loadConfigs } from './ipcActions';
 const ipcRenderer = require('electron').ipcRenderer;
@@ -527,6 +529,60 @@ async function storeApplicationConfig(folder: string, key: string, dispatch: any
 	const { ipcRenderer } = require('electron');
 	ipcRenderer.send('save-config', JSON.stringify({ folder, key }));
 	// setVisual(ApplicationConfig, applicationConfiguration)(dispatch, getState);
+}
+export function showViewer() {
+	viewObject([], []);
+}
+export function remoteSelectNode(id: string) {
+	const { ipcRenderer } = require('electron');
+	ipcRenderer.send(
+		'message',
+		JSON.stringify({
+			msg: HandlerEvents.remoteCommand.message,
+			body: { id, command: 'select' }
+		})
+	);
+	return () => {};
+}
+export function sendNode(id: string) {
+	return (dispatch: Function, getState: Function) => {
+		let node = GetNodeById(id);
+		let othernodes: Node[] = [];
+		let graph: Graph = GetCurrentGraph();
+		let links = Object.entries(graph.nodeLinkIds[id]).map((v) => {
+			let [ key, value ] = v;
+			othernodes.push(GetNodeById(key));
+			return graph.linkLib[value];
+		});
+		viewObject([ node, ...othernodes ], links, {
+			currentNode: id,
+			nodeLinkIds: {
+				[id]: graph.nodeLinkIds[id]
+			},
+			nodeConnections: {
+				[id]: graph.nodeConnections[id]
+			}
+		});
+	};
+}
+async function viewObject(
+	nodes: Node[],
+	links: GraphLink[],
+	options?: {
+		currentNode: string;
+		clear?: boolean;
+		nodeLinkIds: QuickAccess<string>;
+		nodeConnections?: QuickAccess<string>;
+	}
+) {
+	const { ipcRenderer } = require('electron');
+	ipcRenderer.send(
+		'message',
+		JSON.stringify({
+			msg: HandlerEvents.viewWindow.message,
+			body: { nodes, links, options }
+		})
+	);
 }
 export function updateConfig(applicationConfiguration: any) {
 	if (GetDispatchFunc()) setVisual(ApplicationConfig, applicationConfiguration)(GetDispatchFunc(), GetStateFunc());

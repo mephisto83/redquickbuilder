@@ -40,6 +40,7 @@ import {
 import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import { ProgrammingLanguages, NodePropertyTypesByLanguage, NEW_LINE } from '../constants/nodetypes';
 import fs from 'fs';
+import routes from '../constants/routes';
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';
 export const BATCH = 'BATCH';
@@ -184,6 +185,28 @@ export function generateDataSeeds() {
 export function Visual(state: any, key: any) {
 	return GetC(state, VISUAL, key);
 }
+export function GetNodeForView(state: any, key: any) {
+	if (!key) {
+		return null;
+	}
+	return GetC(state, NODE, key);
+}
+export function GetNodeConnectionsForView(state:any, key:any){
+  if(!key){
+    return null;
+  }
+  return GetC(state, NODE_CONNECTIONS,key);
+}
+export function GetNodeLinksForView(state:any, key:any){
+  if(!key){
+    return null;
+  }
+  return GetC(state, NODE_LINKS,key);
+}
+export function GetLinkForView(state: any, key: any) {
+	return GetC(state, LINK, key);
+}
+
 export function ChoseModel(id: any) {
 	return `choson model ${id}`;
 }
@@ -3589,7 +3612,71 @@ export async function ensureDirectory(dir: any) {
 function getUserHome() {
 	return process.env[process.platform == 'win32' ? 'USERPROFILE' : 'HOME'];
 }
+// Object Viewer
+let history: any = null;
+export function setHistory(_history: any) {
+	history = _history;
+}
+export function setVisualNode(node: _.Node) {
+	return (dispatch: Function, getState: Function) => {
+		dispatch(UIC('NODE', node.id, node));
+	};
+}
+export function setVisualLink(link: _.GraphLink) {
+	return (dispatch: Function, getState: Function) => {
+		dispatch(UIC('LINK', link.id, link));
+	};
+}
+export const CURRENT_VIEW_NODE = 'CURRENT_VIEW_NODE';
+export function setCurrentViewNode(nodeId: string) {
+	return setVisual(CURRENT_VIEW_NODE, nodeId);
+}
 
+export function handleViewWindowMessage(args: {
+	nodes: _.Node[];
+	links: _.GraphLink[];
+	options?: {
+		currentNode: string;
+		nodeLinkIds: GraphTypes.QuickAccess<string>;
+		nodeConnections?: GraphTypes.QuickAccess<string>;
+	};
+	clear: boolean;
+}) {
+	let { nodes, links, clear, options } = args;
+	if (history && history.length === 1) {
+		history.push(routes.OBJECT_VIEWER);
+	}
+	let batchCommands: any[] = [];
+	if (nodes) {
+		nodes.forEach((node: _.Node) => {
+			batchCommands.push(UIC(NODE, node.id, node));
+		});
+	}
+	if (links) {
+		links.forEach((link: _.GraphLink) => {
+			batchCommands.push(UIC(LINK, link.id, link));
+		});
+	}
+	if (options) {
+		let { currentNode, nodeLinkIds, nodeConnections } = options;
+		batchCommands.push(UIC(VISUAL, CURRENT_VIEW_NODE, currentNode));
+		if (nodeLinkIds && nodeLinkIds[currentNode]) {
+			batchCommands.push(UIC(NODE_LINKS, currentNode, nodeLinkIds[currentNode]));
+		}
+		if (nodeConnections && nodeConnections[currentNode]) {
+			batchCommands.push(UIC(NODE_CONNECTIONS, currentNode, nodeConnections[currentNode]));
+		}
+	}
+	let dispatch = GetDispatchFunc();
+	if (dispatch) {
+		dispatch(Batch(batchCommands));
+	}
+}
+export const NODE = 'NODE';
+export const LINK = 'LINK';
+export const NODE_LINKS = 'NODE_LINKS';
+export const NODE_CONNECTIONS = 'NODE_CONNECTIONS';
+//end Object Viewer
 export function setVisual(key: string, value: any) {
 	if (key === SELECTED_NODE || key === SELECTED_NODE_BB)
 		if (GraphMethods.Paused()) {

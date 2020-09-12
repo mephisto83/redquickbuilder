@@ -5,12 +5,13 @@ import fs from 'fs';
 import path from 'path';
 import CommunicationTower, { RedQuickDistributionCommand } from './jobs/communicationTower';
 import { JobServiceConstants, sleep } from './jobs/jobservice';
+import { BrowserWindow } from 'electron';
 var child_process = require('child_process'),
 	spawn = child_process.spawn;
 
 const { Menu, MenuItem } = require('electron');
 
-const letters = 'wpsonmgqeyl1k234x'.split('');
+const letters = 'wpsonmgqeiyl1k234x'.split('');
 const MenuItems: any = {
 	w: {
 		label: 'Clear Pinned'
@@ -59,11 +60,12 @@ const MenuItems: any = {
 	4: { label: 'Menu 4' }
 };
 export default class IPCHandlers {
-	static setup(mainWindow: any) {
+	static setup(mainWindow: any, windowCollections: { [str: string]: BrowserWindow | null }) {
 		let submenu: any = [];
 		ipcMain.on('message', (event, arg) => {
-			let msg = JSON.parse(arg);
-			handle(msg)
+      let msg = JSON.parse(arg);
+      console.log(msg);
+			handle(msg, windowCollections)
 				.then((res) => {
 					event.sender.send(
 						'message-reply',
@@ -73,8 +75,7 @@ export default class IPCHandlers {
 						})
 					);
 				})
-				.catch((v) => {
-				});
+				.catch((v) => {});
 		});
 		ipcMain.on('load-configs', (event, args) => {
 			console.log('load-configs');
@@ -311,11 +312,26 @@ function updateCommandCenter(mainWindowFunc: any, args: any) {
 	}
 }
 function noOp() {}
-function handle(msg: any) {
+function handle(msg: any, windowCollections: { [str: string]: BrowserWindow | null }) {
 	let message = msg.msg;
 	let result = Promise.resolve();
 
 	switch (message) {
+		case HandlerEvents.viewWindow.message:
+			result = Promise.resolve().then(() => {
+				if (windowCollections.objectViewerWindow && windowCollections.objectViewerWindow.webContents) {
+					if (!windowCollections.objectViewerWindow.isVisible()) windowCollections.objectViewerWindow.show();
+					windowCollections.objectViewerWindow.webContents.send(HandlerEvents.viewWindow.message, msg);
+				}
+			});
+			break;
+		case HandlerEvents.remoteCommand.message:
+			result = Promise.resolve().then(() => {
+				if (windowCollections.mainWindow && windowCollections.mainWindow.webContents) {
+					windowCollections.mainWindow.webContents.send(HandlerEvents.remoteCommand.message, msg);
+				}
+			});
+			break;
 		case HandlerEvents.scaffold.message:
 			result = Promise.resolve().then(() => {
 				return scaffoldProject(msg.body);

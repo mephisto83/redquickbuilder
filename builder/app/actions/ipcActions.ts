@@ -41,7 +41,8 @@ import {
 	GetControllerNode,
 	updateJobs,
 	GetState,
-	GetCurrentGraph
+	GetCurrentGraph,
+	handleViewWindowMessage
 } from './uiactions';
 import { GraphKeys, GetNodesLinkedTo } from '../methods/graph_methods';
 import { HandlerEvents } from '../ipc/handler-events';
@@ -53,7 +54,8 @@ import {
 	newGraph,
 	toggleVisualKey,
 	setAppConfigPath,
-	updateConfig
+	updateConfig,
+	showViewer
 } from './remoteActions';
 import ThemeServiceGenerator from '../generators/themeservicegenerator';
 import ModelGenerator from '../generators/modelgenerators';
@@ -61,7 +63,13 @@ import ModelGenerator from '../generators/modelgenerators';
 const { ipcRenderer } = require('electron');
 const REACTWEB = 'reactweb';
 const hub: any = {};
-
+ipcRenderer.on(HandlerEvents.viewWindow.message, (event, arg) => {
+	console.log(arg);
+	if (arg && arg.body) handleViewWindowMessage(arg.body);
+});
+ipcRenderer.on(HandlerEvents.remoteCommand.message, (event, arg) => {
+	console.log(arg);
+});
 ipcRenderer.on('message-reply', (event, arg) => {
 	const reply = JSON.parse(arg);
 	if (hub[reply.id]) {
@@ -90,6 +98,9 @@ ipcRenderer.on('commands', (event, targ) => {
 		switch (arg.args) {
 			case 'w':
 				clearPinned();
+				break;
+			case 'i':
+				showViewer();
 				break;
 			case 'p':
 				togglePinned();
