@@ -178,7 +178,7 @@ ipcRenderer.on('load-configs-reply', (event, arg) => {
 		setAppConfigPath(temp.folder, temp.body);
 	}
 });
-export function loadConfigs() {}
+export function loadConfigs() { }
 
 function message(msg: any, body: any) {
 	return {
@@ -216,20 +216,20 @@ export function scaffoldProject(options: any = {}) {
 		(filesOnly
 			? Promise.resolve()
 			: send(HandlerEvents.scaffold.message, {
-					solutionName,
-					appName: root[GraphKeys.PROJECTNAME] || '',
-					workspace: path.join(workspace, root.title, 'netcore')
-				}))
+				solutionName,
+				appName: root[GraphKeys.PROJECTNAME] || '',
+				workspace: path.join(workspace, root.title, 'netcore')
+			}))
 			.then(errorHandler())
 			.then(
 				() =>
 					filesOnly
 						? Promise.resolve()
 						: send(HandlerEvents.reactnative.message, {
-								solutionName,
-								appName: root[GraphKeys.PROJECTNAME] || '',
-								workspace: path.join(workspace, root.title, 'reactnative')
-							})
+							solutionName,
+							appName: root[GraphKeys.PROJECTNAME] || '',
+							workspace: path.join(workspace, root.title, 'reactnative')
+						})
 			)
 			.then(errorHandler())
 			.then(
@@ -237,10 +237,10 @@ export function scaffoldProject(options: any = {}) {
 					filesOnly
 						? Promise.resolve()
 						: send(HandlerEvents.reactweb.message, {
-								solutionName,
-								appName: root[GraphKeys.PROJECTNAME] || '',
-								workspace: path.join(workspace, root.title, 'reactweb')
-							})
+							solutionName,
+							appName: root[GraphKeys.PROJECTNAME] || '',
+							workspace: path.join(workspace, root.title, 'reactweb')
+						})
 			)
 			.then(errorHandler())
 			.then(
@@ -248,10 +248,10 @@ export function scaffoldProject(options: any = {}) {
 					filesOnly
 						? Promise.resolve()
 						: send(HandlerEvents.electron.message, {
-								solutionName,
-								appName: root[GraphKeys.PROJECTNAME] || '',
-								workspace: path.join(workspace, root.title, 'electronio')
-							})
+							solutionName,
+							appName: root[GraphKeys.PROJECTNAME] || '',
+							workspace: path.join(workspace, root.title, 'electronio')
+						})
 			)
 			.then(errorHandler())
 			.then(() => {
@@ -646,7 +646,7 @@ function generateFolderStructure(
 	});
 }
 function generateReactNative(workspace: string, state: any) {
-	const code_types = [ ...Object.values(ReactNativeTypes) ];
+	const code_types = [...Object.values(ReactNativeTypes)];
 
 	code_types.map((code_type) => {
 		const temp = Generator.generate({
@@ -680,7 +680,7 @@ function generateReactNative(workspace: string, state: any) {
 	});
 }
 function generateElectronIO(workspace: string, state: any) {
-	const codeTypes = [ ...Object.values(ReactNativeTypes) ];
+	const codeTypes = [...Object.values(ReactNativeTypes)];
 
 	codeTypes.map((codeType) => {
 		const temp = Generator.generate({
@@ -716,7 +716,7 @@ function generateElectronIO(workspace: string, state: any) {
 }
 
 function generateReactWeb(workspace: string, state: any) {
-	const codeTypes = [ ...Object.values(ReactNativeTypes) ];
+	const codeTypes = [...Object.values(ReactNativeTypes)];
 
 	codeTypes.map((codeType) => {
 		const temp = Generator.generate({
@@ -859,7 +859,8 @@ function generateReactWebTheme(workspace: string, state: any) {
 	});
 }
 function generateFiles(workspace: string, solutionName: string, state: any) {
-	const code_types = [
+	const code_types = [GeneratedTypes.CSDataChain];
+	let ats = [
 		NodeTypes.Controller,
 		NodeTypes.Model,
 		NodeTypes.ExtensionType,
@@ -922,12 +923,12 @@ function generateFiles(workspace: string, solutionName: string, state: any) {
 function CreateRegistrations(nodes: any[], namefunc: any = null, interfacefunc: any = null) {
 	namefunc =
 		namefunc ||
-		function(v: any) {
+		function (v: any) {
 			return GetCodeName(v);
 		};
 	interfacefunc =
 		interfacefunc ||
-		function(v: any) {
+		function (v: any) {
 			return `I${GetCodeName(v)}`;
 		};
 	return nodes.map((v: any) => `builder.RegisterType<${namefunc(v)}>().As<${interfacefunc(v)}>();`).join(NEW_LINE);
