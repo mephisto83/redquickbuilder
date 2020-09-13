@@ -80,12 +80,34 @@ export default class RoutingInput extends Component<any, any> {
 					/>
 					<TreeViewGroupButton
 						icon="fa fa-ship"
+						title={ViewTypes.GetAll}
 						onClick={() => {
 							let agentName = UIA.GetCodeName(this.props.agent).toLocaleLowerCase();
 							let modelName = UIA.GetCodeName(this.props.model).toLocaleLowerCase();
 							let sentences = [
 								`The ${agentName} navigates to the ${modelName}'s Get screen with the ${modelName}'s id as model`,
-								`The ${agentName} navigates to the ${modelName}'s Create screen`,
+								`The ${agentName} navigates to the ${modelName}'s Create screen`
+							].join(NEW_LINE);
+
+							this.setState(
+								{
+									sentences
+								},
+								() => {
+									this.buildRoutes();
+								}
+							);
+						}}
+					/>
+					<TreeViewGroupButton
+						title={ViewTypes.Get}
+						icon="fa fa-wheelchair"
+						onClick={() => {
+							let agentName = UIA.GetCodeName(this.props.agent).toLocaleLowerCase();
+							let modelName = UIA.GetCodeName(this.props.model).toLocaleLowerCase();
+							let sentences = [
+								`The ${agentName} navigates to the ${modelName}'s Update screen with the ${modelName}'s id as model`,
+								`The ${agentName} navigates to the ${modelName}'s Create screen`
 							].join(NEW_LINE);
 
 							this.setState(
@@ -158,7 +180,7 @@ export default class RoutingInput extends Component<any, any> {
 					if (source) {
 						route.source = source;
 					}
-          return route;
+					return route;
 				})
 				.filter((v) => v);
 			if (this.props.onNewRoutes) {

@@ -1063,33 +1063,35 @@ export function CheckSimpleValidation(isvalidation: SimpleValidationConfig): boo
 	if (isvalidation.enabled) {
 		return (
 			CheckRelation(isvalidation) &&
-			(isvalidation.creditCard.enabled ||
-				isvalidation.isTrue.enabled ||
-				isvalidation.isFalse.enabled ||
+			((isvalidation.creditCard && isvalidation.creditCard.enabled) ||
+				(isvalidation.isTrue && isvalidation.isTrue.enabled) ||
+				(isvalidation.isFalse && isvalidation.isFalse.enabled) ||
 				(isvalidation.areEqual.enabled && CheckRelation(isvalidation.areEqual)) ||
 				(isvalidation.maxLength.enabled && CheckNumberConfig(isvalidation.maxLength)) ||
 				(isvalidation.minLength.enabled && CheckNumberConfig(isvalidation.minLength)) ||
-				isvalidation.alphaOnlyWithSpaces.enabled ||
-				isvalidation.alphaNumeric.enabled ||
-				isvalidation.alphaOnly.enabled ||
-				isvalidation.requireNonAlphanumeric.enabled ||
-				isvalidation.requireLowercase.enabled ||
-				isvalidation.requireUppercase.enabled ||
-				isvalidation.zip.enabled ||
-				isvalidation.isBoolean.enabled ||
-				isvalidation.zipEmpty.enabled ||
-				isvalidation.email.enabled ||
+				(isvalidation.alphaOnlyWithSpaces && isvalidation.alphaOnlyWithSpaces.enabled) ||
+				(isvalidation.alphaNumeric && isvalidation.alphaNumeric.enabled) ||
+				(isvalidation.alphaOnly && isvalidation.alphaOnly.enabled) ||
+				(isvalidation.requireNonAlphanumeric && isvalidation.requireNonAlphanumeric.enabled) ||
+				(isvalidation.requireLowercase && isvalidation.requireLowercase.enabled) ||
+				(isvalidation.requireUppercase && isvalidation.requireUppercase.enabled) ||
+				(isvalidation.zip && isvalidation.zip.enabled) ||
+				(isvalidation.isBoolean && isvalidation.isBoolean.enabled) ||
+				(isvalidation.zipEmpty && isvalidation.zipEmpty.enabled) ||
+				(isvalidation.email && isvalidation.email.enabled) ||
 				(isvalidation.date && isvalidation.date.enabled) ||
-				isvalidation.emailEmpty.enabled ||
-				(isvalidation.referencesExisting.enabled && CheckQuarterConfig(isvalidation.referencesExisting)) ||
-				isvalidation.urlEmpty.enabled ||
-				isvalidation.url.enabled ||
-				isvalidation.socialSecurity.enabled ||
-				(isvalidation.oneOf.enabled && CheckEnumerationConfig(isvalidation.oneOf)) ||
-				isvalidation.numericInt.enabled ||
-				isvalidation.isNull.enabled ||
-				isvalidation.isNotNull.enabled ||
-				isvalidation.isContained.enabled)
+				(isvalidation.emailEmpty && isvalidation.emailEmpty.enabled) ||
+				(isvalidation.referencesExisting &&
+					isvalidation.referencesExisting.enabled &&
+					CheckQuarterConfig(isvalidation.referencesExisting)) ||
+				(isvalidation.urlEmpty && isvalidation.urlEmpty.enabled) ||
+				(isvalidation.url && isvalidation.url.enabled) ||
+				(isvalidation.socialSecurity && isvalidation.socialSecurity.enabled) ||
+				(isvalidation.oneOf && isvalidation.oneOf.enabled && CheckEnumerationConfig(isvalidation.oneOf)) ||
+				(isvalidation.numericInt && isvalidation.numericInt.enabled) ||
+				(isvalidation.isNull && isvalidation.isNull.enabled) ||
+				(isvalidation.isNotNull && isvalidation.isNotNull.enabled) ||
+				(isvalidation.isContained && isvalidation.isContained.enabled))
 		);
 	}
 	return true;

@@ -172,7 +172,7 @@ const NODE_MENU = 'NODE_MENU';
 const CONNECTING_NODE = 'CONNECTING_NODE';
 const LINK_DISTANCE = 'LINK_DISTANCE';
 class Dashboard extends Component<any, any> {
-	constructor(props) {
+	constructor(props: any) {
 		super(props);
 		this.state = {};
 	}
@@ -180,7 +180,7 @@ class Dashboard extends Component<any, any> {
 		this.props.setState();
 		this.props.setRemoteState();
 		this.props.setVisual(UIA.NODE_COST, 1);
-		this.props.setVisual(UIA.NODE_CONNECTION_COST, 0.2);
+		this.props.setVisual(UIA.NODE_CONNECTION_COST, 1);
 		setTimeout(() => {
 			this.props.loadApplicationConfigUI();
 		}, 5000);
@@ -2503,8 +2503,8 @@ class Dashboard extends Component<any, any> {
 											// this.props.SelectedNode(nodeId);
 											// this.props.setVisual(UIA.SELECTED_NODE_BB, boundingBox);
 											// this.props.setVisual(SIDE_PANEL_OPEN, true);
-                      this.props.SelectNode(nodeId, boundingBox);
-                      this.props.sendNode(nodeId);
+											this.props.SelectNode(nodeId, boundingBox);
+											this.props.sendNode(nodeId);
 										} else {
 											this.props.SelectedNode(null);
 										}
