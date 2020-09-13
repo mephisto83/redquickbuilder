@@ -549,11 +549,13 @@ export function sendNode(id: string) {
 		let node = GetNodeById(id);
 		let othernodes: Node[] = [];
 		let graph: Graph = GetCurrentGraph();
-		let links = Object.entries(graph.nodeLinkIds[id]).map((v) => {
-			let [ key, value ] = v;
-			othernodes.push(GetNodeById(key));
-			return graph.linkLib[value];
-		});
+		let links = !graph.nodeLinkIds[id]
+			? []
+			: Object.entries(graph.nodeLinkIds[id]).map((v) => {
+					let [ key, value ] = v;
+					othernodes.push(GetNodeById(key));
+					return graph.linkLib[value];
+				});
 		viewObject([ node, ...othernodes ], links, {
 			currentNode: id,
 			nodeLinkIds: {

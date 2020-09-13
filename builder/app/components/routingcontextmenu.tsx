@@ -35,6 +35,7 @@ import { MethodFunctions } from '../constants/functiontypes';
 import { GetNodesByProperties } from '../methods/graph_methods';
 import CheckBox from './checkbox';
 import StaticParametersComponent from './staticparameterscomponent';
+import RoutingInput from './routinginput';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -397,6 +398,7 @@ class ContextMenu extends Component<any, any> {
 		}
 		return result;
 	}
+
 	private filterMethodDescriptionFunctionParameters(
 		methodDescription: MethodDescription
 	): (value: string, index: number, array: string[]) => boolean {
@@ -467,6 +469,16 @@ class ContextMenu extends Component<any, any> {
 		const currentInfo = this.getCurrentInfo(menuMode);
 		const menuitems = this.getMenuMode(menuMode);
 		const defaultMenus = this.getDefaultMenu(menuMode);
+		const large =
+			this.state.large || this.state.pLarger || this.state.vLarger || this.state.aLarger || this.state.eLarger;
+		const menu_width = large ? 755 : 350;
+		let icon_expando: any = {
+			fontSize: `1.4rem`,
+			paddingLeft: 5,
+			top: -2,
+			position: 'relative'
+		};
+
 		return (
 			<Draggable handle=".draggable-header,.draggable-footer">
 				<div
@@ -474,7 +486,7 @@ class ContextMenu extends Component<any, any> {
 					style={{
 						zIndex: 1000,
 						position: 'fixed',
-						width: this.state.secondaryMenu ? 500 : 250,
+						width: this.state.secondaryMenu ? 500 : menu_width,
 						display,
 						top: 250,
 						left: 500
@@ -493,8 +505,29 @@ class ContextMenu extends Component<any, any> {
 							>
 								<span aria-hidden="true">×</span>
 							</button>
+							<button
+								type="button"
+								onClick={() => {
+									this.setState({ large: !this.state.large });
+								}}
+								className="close"
+								data-dismiss="modal"
+								aria-label="Expand"
+							>
+								<span aria-hidden="true">
+									<i className={large ? 'fa  fa-compress' : 'fa  fa-expand'} style={icon_expando} />
+								</span>
+							</button>
 						</div>
-						<div className="modal-body" style={{ padding: 0 }}>
+						<div
+							className="modal-body"
+							style={{
+								padding: 0,
+								maxHeight: `calc(100vh - 125px)`,
+								overflowY: 'auto',
+								overflowX: 'hidden'
+							}}
+						>
 							<div
 								className={this.state.secondaryMenu ? '' : 'row'}
 								style={this.state.secondaryMenu ? { display: 'flex' } : {}}
@@ -504,6 +537,19 @@ class ContextMenu extends Component<any, any> {
 									style={this.state.secondaryMenu ? { width: '50%' } : {}}
 								>
 									<GenericPropertyContainer active title="asdf" subTitle="afaf" nodeType={nodeType}>
+										<RoutingInput
+											agent={menuMode.agent}
+											viewType={menuMode.viewType}
+											model={menuMode.model}
+											onNewRoutes={(newRoutes: RouteDescription[]) => {
+												let routing: Routing = menuMode.routing;
+												routing.routes.length = 0;
+												routing.routes.push(...newRoutes);
+
+												menuMode.callback(routing);
+												this.setState({ turn: UIA.GUID() });
+											}}
+										/>
 										{currentInfo}
 										{menuitems}
 										{defaultMenus}

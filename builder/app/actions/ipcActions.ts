@@ -42,7 +42,12 @@ import {
 	updateJobs,
 	GetState,
 	GetCurrentGraph,
-	handleViewWindowMessage
+	handleViewWindowMessage,
+	SelectNode,
+	SELECTED_NODE,
+	VISUAL,
+	UIC,
+	setPinned
 } from './uiactions';
 import { GraphKeys, GetNodesLinkedTo } from '../methods/graph_methods';
 import { HandlerEvents } from '../ipc/handler-events';
@@ -67,9 +72,23 @@ ipcRenderer.on(HandlerEvents.viewWindow.message, (event, arg) => {
 	console.log(arg);
 	if (arg && arg.body) handleViewWindowMessage(arg.body);
 });
+
 ipcRenderer.on(HandlerEvents.remoteCommand.message, (event, arg) => {
 	console.log(arg);
+	if (arg) {
+		let { body } = arg;
+		if (body && body.command) {
+			switch (body.command) {
+				case 'select':
+					let dispatch = GetDispatchFunc();
+					dispatch(UIC(VISUAL, SELECTED_NODE, body.id));
+					setPinned(body.id, true);
+					break;
+			}
+		}
+	}
 });
+
 ipcRenderer.on('message-reply', (event, arg) => {
 	const reply = JSON.parse(arg);
 	if (hub[reply.id]) {

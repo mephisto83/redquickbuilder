@@ -49,11 +49,18 @@ class ObjectViewer extends Component<any, any> {
 		if (enumerationConfig && enumerationConfig.enumerationType) {
 			enumerations = GetNodeProp(enumerationConfig.enumerationType, NodeProperties.Enumeration);
 		}
-		const layout = [
+		const Deflayout = [
 			{ i: 'a', x: 0, y: 0, w: 6, h: 6 },
 			{ i: 'b', x: 6, y: 0, w: 3, h: 6 },
 			{ i: 'c', x: 0, y: 6, w: 1, h: 2 }
 		];
+		const layout = {
+			lg: Deflayout,
+			md: Deflayout,
+			sm: Deflayout,
+			xs: Deflayout,
+			xxs: Deflayout
+		};
 		let currentViewNode: string | null = Visual(state, UIA.CURRENT_VIEW_NODE);
 		let node: Node = UIA.GetNodeForView(state, currentViewNode);
 		let connections: QuickAccess<string> = UIA.GetNodeConnectionsForView(state, currentViewNode);
@@ -61,8 +68,8 @@ class ObjectViewer extends Component<any, any> {
 		let linkConnections: QuickAccess<string> = UIA.GetNodeLinksForView(state, currentViewNode);
 		let connectedNodes = linkConnections
 			? Object.entries(linkConnections).map((item) => {
-          let [ key, value ] = item;
-          links.push(UIA.GetLinkForView(state, value));
+					let [ key, value ] = item;
+					links.push(UIA.GetLinkForView(state, value));
 					return UIA.GetNodeForView(state, key);
 				})
 			: [];
@@ -81,16 +88,20 @@ class ObjectViewer extends Component<any, any> {
 						</Panel>
 					</div>
 					<div key="b">
-						<Panel stretch>
+						<Panel stretch title={'Connecting Nodes'}>
 							{' '}
 							<NodeViewList nodes={connectedNodes} />
 						</Panel>
 					</div>
 					<div key="c">
-						<Panel stretch>
-							<LinkViewList state={state} links={links} onSelectNode={(item)=>{
-                this.props.remoteSelectNode(item);
-              }} />
+						<Panel stretch title={'Links Nodes'}>
+							<LinkViewList
+								state={state}
+								links={links}
+								onSelectNode={(item) => {
+									this.props.remoteSelectNode(item);
+								}}
+							/>
 						</Panel>
 					</div>
 				</ResponsiveGridLayout>

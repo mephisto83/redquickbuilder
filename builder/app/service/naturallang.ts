@@ -4,11 +4,26 @@ import { NodeTypes, NodeProperties, MakeConstant, NodeAttributePropertyTypes } f
 import { Node } from '../methods/graph_types';
 import { RelationType, CreateBoolean, CreateMinLength, CreateMaxLength } from '../interface/methodprops';
 import { GetNodeTitle } from '../actions/uiactions';
+import { ViewTypes } from '../constants/viewtypes';
 let context: any = { world: null };
+const AGENT = 'Agent';
+const MODEL = 'Model';
+const SCREEN_PARAMETER = 'ScreenParameter';
+const USER = 'User';
+const POSSESIVE = 'Possesive';
+const ViewType = 'ViewType';
+const ENUMERATION = 'Enumeration';
+const ENUMERATIONVALUE = 'EnumerationValue';
+const IS_A = 'IS_A';
+const PROPERTY = 'Property';
+
 const _nlp = nlp.extend((Doc: any, world: any) => {
 	// add new tags
 	world.addTags({
 		Model: {
+			isA: 'Noun'
+		},
+		[SCREEN_PARAMETER]: {
 			isA: 'Noun'
 		},
 		Agent: {
@@ -116,6 +131,9 @@ const _nlp = nlp.extend((Doc: any, world: any) => {
 		Enumeration: {
 			isA: 'Noun'
 		},
+		ViewType: {
+			isA: 'Noun'
+		},
 		EnumerationValue: {
 			isA: 'Nount'
 		},
@@ -142,27 +160,28 @@ function setNLPWorld(_world: any) {
 	context.world = _world;
 }
 
-const AGENT = 'Agent';
-const MODEL = 'Model';
-const USER = 'User';
-const POSSESIVE = 'Possesive';
-const ENUMERATION = 'Enumeration';
-const ENUMERATIONVALUE = 'EnumerationValue';
-const IS_A = 'IS_A';
-const PROPERTY = 'Property';
 export function updateWorld() {
 	let webDictionary: { [str: string]: string[] } = {};
 	webDictionary['agent'] = [ AGENT ];
 	webDictionary['agents'] = [ AGENT, POSSESIVE ];
-	webDictionary['model'] = [ MODEL ];
+	webDictionary['model'] = [ MODEL, SCREEN_PARAMETER ];
 	webDictionary['output'] = [ 'ModelOutput', MODEL ];
 	webDictionary['outputs'] = [ MODEL, 'ModelOutput', POSSESIVE ];
-	webDictionary['parent'] = [ 'Parent', MODEL ];
+	webDictionary['parent'] = [ 'Parent', MODEL, SCREEN_PARAMETER ];
 	webDictionary['target'] = [ MODEL, 'Target' ];
 	webDictionary['parents'] = [ MODEL, 'Parent', POSSESIVE ];
 	webDictionary['models'] = [ MODEL, POSSESIVE ];
 	webDictionary['is a valid'] = [ IS_A ];
 	webDictionary['must be a valid'] = [ IS_A ];
+	Object.keys(ViewTypes).map((v: string) => {
+		webDictionary[v] = webDictionary[v] || [];
+		webDictionary[v.toLowerCase()] = webDictionary[v.toLowerCase()] || [];
+		webDictionary[v.toUpperCase()] = webDictionary[v.toUpperCase()] || [];
+		webDictionary[v].push(ViewType, v, v.toLowerCase());
+		webDictionary[v.toLowerCase()].push(ViewType, v, v.toLowerCase());
+		webDictionary[v.toUpperCase()].push(ViewType, v, v.toLowerCase());
+		webDictionary[v] = webDictionary[v].unique();
+	});
 	Object.entries(NodeAttributePropertyTypes).forEach((d: any) => {
 		let [ key, value ] = d;
 		webDictionary[key] = webDictionary[key] || [];
@@ -236,6 +255,7 @@ export interface NLOptions {
 	withSpaces?: boolean;
 }
 export interface NLMeaning {
+	viewType?: string;
 	parameterClauses?: Clause[];
 	text: string;
 	actorClause: Clause;
@@ -243,6 +263,11 @@ export interface NLMeaning {
 	targetClause: Clause;
 	methodType?: NLMethodType;
 	validation: { [str: string]: boolean };
+}
+export interface RoutingArgs {
+  as?: string;
+	useArgument?: string;
+	subClause?: Clause;
 }
 export default function getLanguageMeaning(
 	text: string,
@@ -259,7 +284,9 @@ export default function getLanguageMeaning(
 	let executionStuff = [ 'copies to', 'increments by', 'concatenates with' ];
 	let referenceStuff = [ 'must connect to a real' ];
 	let validationStuff = [ 'must conform to a' ];
+	let navigationStuff = [ 'navigates to' ];
 	let all = [
+		...navigationStuff,
 		...validationStuff,
 		...referenceStuff,
 		...executionStuff,
@@ -339,6 +366,8 @@ export default function getLanguageMeaning(
 			result.methodType = NLMethodType.ComplexValidations;
 		} else if (referenceStuff.find((item: string) => temp.has(item))) {
 			result.methodType = NLMethodType.Reference;
+		} else if (navigationStuff.find((item: string) => temp.has(item))) {
+			result.methodType = NLMethodType.Navigate;
 		}
 		function captureParameters(splitPhrase: string, phrase: string, remove?: string[]): Clause[] {
 			let parameterPhrase = phrase.split(splitPhrase).subset(1).join('');
@@ -424,6 +453,39 @@ export default function getLanguageMeaning(
 			result.targetClause.relationType = RelationType.Model;
 			result.targetClause.agent = context ? context.model : '';
 			targetProperties = findPotentialProperties(context && context.model ? context.model : undefined);
+		}
+		if (result.methodType === NLMethodType.Navigate) {
+			if (_nlp(secondClause).has(`#ViewType`)) {
+				result.viewType = Object.keys(ViewTypes).find(
+					(v) =>
+						_nlp(secondClause).has(v) ||
+						_nlp(secondClause).has(v) ||
+						_nlp(secondClause).has(v.toLocaleLowerCase()) ||
+						_nlp(secondClause).has(v.toLocaleUpperCase())
+				);
+				if (_nlp(secondClause).has('with the')) {
+					let postArgs = _nlp(secondClause).match('with the').lookAhead('').text();
+					if (_nlp(postArgs).has('model argument')) {
+						result.targetClause.argument = {
+							useArgument: 'model'
+						};
+					} else if (_nlp(postArgs).has('parent argument')) {
+						result.targetClause.argument = {
+							useArgument: 'parent'
+						};
+					} else {
+						result.targetClause.argument = {
+							subClause: {}
+						};
+						buildClause(postArgs, result.targetClause.argument.subClause || {});
+					}
+					if (_nlp(postArgs).has('as model')) {
+						result.targetClause.argument.as = 'model';
+					} else if (_nlp(postArgs).has('as parent')) {
+						result.targetClause.argument.as = 'parent';
+					}
+				}
+			}
 		}
 
 		if (_nlp(secondClause).has(`#NodeAttributePropertyTypes`)) {
@@ -512,6 +574,7 @@ export interface Clause {
 	agent?: string;
 	property?: string;
 	enumerations?: any;
+	argument?: RoutingArgs;
 	enumeration?: string;
 }
 export enum NLMethodType {
@@ -526,7 +589,8 @@ export enum NLMethodType {
 	IncrementBy = 'IncrementBy',
 	Reference = 'Reference',
 	ComplexValidations = 'ComplexValidations',
-	ConcatenateString = 'ConcatenateString'
+	ConcatenateString = 'ConcatenateString',
+	Navigate = 'Navigate'
 }
 
 export const NLValidationClauses = {

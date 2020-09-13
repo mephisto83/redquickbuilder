@@ -21,7 +21,8 @@ import {
 	CreateMinLength,
 	CreateBoolean,
 	CreateReferences,
-	EighthRelation
+	EighthRelation,
+	MethodPropsProperties
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import {
@@ -349,9 +350,9 @@ export default class ValidationComponentItem extends Component<any, any> {
 															)} with a ${GetNodeProp(
 																enumerationNode,
 																NodeProperties.Enumeration
-															).map(
-																(v: any) => v.value
-															).join(', ')} .`
+															)
+																.map((v: any) => v.value)
+																.join(', ')} .`
 														);
 														break;
 													default:
@@ -616,6 +617,19 @@ export function GetNLMeaning(args: { sentences: string; methodDescription: Metho
 	let results: NLMeaning[] = sentences.split(NEW_LINE).filter((v: string) => v).map((line: string) => {
 		return getLanguageMeaning(line, {
 			...methodDescription.properties
+		});
+	});
+	return results;
+}
+
+export function GetNaturalLanguageMeaning(args: {
+	sentences: string;
+	methodDescription: MethodPropsProperties;
+}): NLMeaning[] {
+	let { methodDescription, sentences } = args;
+	let results: NLMeaning[] = sentences.split(NEW_LINE).filter((v: string) => v).map((line: string) => {
+		return getLanguageMeaning(line, {
+			...methodDescription
 		});
 	});
 	return results;

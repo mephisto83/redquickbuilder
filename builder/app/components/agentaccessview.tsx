@@ -89,7 +89,9 @@ import { mount } from 'enzyme';
 import getLanguageMeaning from '../service/naturallang';
 
 const AGENT_ACCESS_VIEW_TAB = 'agent -access-view-tab';
-
+const context: { methods: any[] | null } = {
+	methods: null
+};
 class AgentAccessView extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
@@ -468,8 +470,8 @@ class AgentAccessView extends Component<any, any> {
 										className="btn btn-default btn-flat"
 										onClick={(evt) => {
 											evt.stopPropagation();
-                      updateWorld();
-                      getLanguageMeaning('');
+											updateWorld();
+											getLanguageMeaning('');
 											const accessDescriptions = GetNodesByProperties(
 												{
 													[NodeProperties.NODEType]: NodeTypes.AgentAccessDescription
@@ -536,7 +538,7 @@ class AgentAccessView extends Component<any, any> {
 										className="btn btn-default btn-primary"
 										onClick={(evt) => {
 											evt.stopPropagation();
-                      BuildAgentAccessWeb({ ...this.state });
+											BuildAgentAccessWeb({ ...this.state });
 											return false;
 										}}
 									>
@@ -1360,7 +1362,7 @@ class AgentAccessView extends Component<any, any> {
 																				routes: []
 																			};
 																			if (
-																				this.hasFunctionViewTypeValue(
+																				this.hasRoutingDescription(
 																					agentIndex,
 																					modelIndex,
 																					v
@@ -1964,7 +1966,7 @@ class AgentAccessView extends Component<any, any> {
 					methods.push(...effect.effects);
 				}
 			}
-		});
+    });
 	}
 
 	private createDashboardMountingDescriptionButton(agent: string, dashboard: string, mounting: ViewMounting) {
@@ -2010,9 +2012,14 @@ class AgentAccessView extends Component<any, any> {
 		let hasEffects = false;
 		if (effect && effect.effects) {
 			hasEffects = !!effect.effects.length;
-			this.state.agents.map((_: any, index: number) => {
-				this.collectMethods(index, methods);
-			});
+			if (context.methods) {
+				methods = context.methods;
+			} else {
+				this.state.agents.map((_: any, index: number) => {
+					this.collectMethods(index, methods);
+				});
+        context.methods = methods;
+			}
 		}
 		return (
 			<div className="btn-group">
@@ -2105,6 +2112,15 @@ class AgentAccessView extends Component<any, any> {
 
 	private getRoutingDescription(agentIndex: number, modelIndex: number, v: string): Routing {
 		return this.state.agentRouting[agentIndex][modelIndex][v];
+	}
+
+	private hasRoutingDescription(agentIndex: number, modelIndex: number, v: string): boolean {
+		return (
+			!!this.state.agentRouting &&
+			!!this.state.agentRouting[agentIndex] &&
+			!!this.state.agentRouting[agentIndex][modelIndex] &&
+			!!this.state.agentRouting[agentIndex][modelIndex][v]
+		);
 	}
 	private getDashboardRoutingDescription(agent: string, dashboard: string): Routing {
 		return this.state.dashboardRouting[agent][dashboard];
