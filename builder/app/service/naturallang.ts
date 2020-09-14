@@ -1,10 +1,19 @@
 import nlp from 'compromise';
-import { NodesByType, GetNodeProp, GetCodeName, GetModelCodeProperties } from '../actions/uiactions';
+import {
+	NodesByType,
+	GetNodeProp,
+	GetCodeName,
+	GetModelCodeProperties,
+	GetCurrentGraph,
+	GetNodeCode
+} from '../actions/uiactions';
+import * as monaco from 'monaco-editor';
 import { NodeTypes, NodeProperties, MakeConstant, NodeAttributePropertyTypes } from '../constants/nodetypes';
 import { Node } from '../methods/graph_types';
 import { RelationType, CreateBoolean, CreateMinLength, CreateMaxLength } from '../interface/methodprops';
 import { GetNodeTitle } from '../actions/uiactions';
 import { ViewTypes } from '../constants/viewtypes';
+import { GetNodesByProperties } from '../methods/graph_methods';
 let context: any = { world: null };
 const AGENT = 'Agent';
 const MODEL = 'Model';
@@ -12,6 +21,7 @@ const SCREEN_PARAMETER = 'ScreenParameter';
 const USER = 'User';
 const POSSESIVE = 'Possesive';
 const ViewType = 'ViewType';
+const DASHBOARD = 'Dashboard';
 const ENUMERATION = 'Enumeration';
 const ENUMERATIONVALUE = 'EnumerationValue';
 const IS_A = 'IS_A';
@@ -28,6 +38,9 @@ const _nlp = nlp.extend((Doc: any, world: any) => {
 		},
 		Agent: {
 			isA: 'Model'
+		},
+		Dashboard: {
+			isA: 'Noun'
 		},
 		Parent: {
 			isA: 'Model'
@@ -202,7 +215,12 @@ export function updateWorld() {
 			});
 		}
 	});
-	let nodes: Node[] = NodesByType(null, [ NodeTypes.Model, NodeTypes.Property, NodeTypes.Enumeration ]);
+	let nodes: Node[] = NodesByType(null, [
+		NodeTypes.Model,
+		NodeTypes.Property,
+		NodeTypes.Enumeration,
+		NodeTypes.NavigationScreen
+	]);
 	nodes.forEach((node: Node) => {
 		let type = GetNodeProp(node, NodeProperties.NODEType);
 		[ GetNodeTitle(node), GetCodeName(node) ].filter((v) => v).forEach((v) => {
@@ -220,6 +238,10 @@ export function updateWorld() {
 				webDictionary[v].push(PROPERTY);
 			} else if (type === NodeTypes.Enumeration) {
 				webDictionary[v].push(ENUMERATION);
+			} else if (type === NodeTypes.NavigationScreen) {
+				if (GetNodeProp(node, NodeProperties.IsDashboard)) {
+					webDictionary[v].push(DASHBOARD);
+				}
 			}
 			webDictionary[v].push(v);
 			webDictionary[v] = webDictionary[v].unique();
@@ -265,37 +287,122 @@ export interface NLMeaning {
 	validation: { [str: string]: boolean };
 }
 export interface RoutingArgs {
-  as?: string;
+	as?: string;
 	useArgument?: string;
 	subClause?: Clause;
 }
+let booleanStuff = [ 'is true', 'is false' ];
+let equals = [ 'must match', 'matches', 'is equal to' ];
+let isA = [ 'must be a', 'must be an', 'is a', 'is an', ...booleanStuff ];
+let contains = [ 'contains a', 'contains an' ];
+let intersects = [ 'intersects', 'intersects with' ];
+let inAEnumeration = [ 'is in an enumeration', 'is an enumeration', 'is in a set' ];
+let executionStuff = [ 'copies to', 'increments by', 'concatenates with' ];
+let referenceStuff = [ 'must connect to a real' ];
+let validationStuff = [ 'must conform to a' ];
+let navigationStuff = [ 'navigates to' ];
+let all = [
+	...navigationStuff,
+	...validationStuff,
+	...referenceStuff,
+	...executionStuff,
+	...inAEnumeration,
+	...intersects,
+	...equals,
+	...isA,
+	...contains
+].sort((a, b) => a.length - b.length);
+export const Cache: any = { context: {} };
+export function cacheSuggestionData() {
+	let nodes: Node[] = NodesByType(null, [
+		NodeTypes.Model,
+		NodeTypes.Property,
+		NodeTypes.Enumeration,
+		NodeTypes.NavigationScreen
+	]);
+	let context: any = {
+		models: [],
+		screens: [],
+		agents: [],
+		enumerations: []
+	};
+	nodes.forEach((node: Node) => {
+		switch (GetNodeProp(node, NodeProperties.NODEType)) {
+			case NodeTypes.Model:
+				context.models.push(node);
+				if (GetNodeProp(node, NodeProperties.IsAgent)) {
+					context.agents.push(node);
+				}
+				break;
+			case NodeTypes.NavigationScreen:
+				if (GetNodeProp(node, NodeProperties.IsDashboard)) {
+					context.screens.push(node);
+				}
+				break;
+			case NodeTypes.Enumeration:
+				context.enumerations.push(node);
+				break;
+		}
+	});
+	Cache.context = context;
+}
+
+export function getTextEditorSuggestions(text: string, editorContext?: { model: string }) {
+	let temp = _nlp(text);
+
+	let suggestions: any[] = [];
+	if (Cache.context)
+		if (Cache.context.agents && temp.has(`agent`)) {
+			Cache.context.agents.map((agent: Node) => {
+				suggestions.push({
+					label: `agent: ${GetCodeName(agent)}`,
+					kind: monaco.languages.CompletionItemKind.Text,
+					insertText: GetCodeName(agent)
+				});
+			});
+		} else if (Cache.context.models && temp.has(`model`)) {
+			Cache.context.models.map((model: Node) => {
+				suggestions.push({
+					label: `model: ${GetCodeName(model)}`,
+					kind: monaco.languages.CompletionItemKind.Text,
+					insertText: GetCodeName(model)
+				});
+			});
+		} else if (Cache.context.agents && temp.has(`dashboard`)) {
+			Cache.context.screens.map((agent: Node) => {
+				suggestions.push({
+					label: `dashboard: ${GetCodeName(agent)}`,
+					kind: monaco.languages.CompletionItemKind.Text,
+					insertText: GetCodeName(agent)
+				});
+			});
+		} else if (temp.has('viewtype')) {
+			Object.keys(ViewTypes).forEach((viewType: string) => {
+				suggestions.push({
+					label: `viewtype: ${viewType}`,
+					kind: monaco.languages.CompletionItemKind.Text,
+					insertText: viewType
+				});
+			});
+		} else if (temp.has('argtype')) {
+			[ 'model', 'property' ].forEach((argtype: string) => {
+				suggestions.push({
+					label: `argtype: ${argtype}`,
+					kind: monaco.languages.CompletionItemKind.Text,
+					insertText: argtype
+				});
+			});
+		} else if (Cache.context.properties && temp.has('property')) {
+		}
+	return suggestions;
+}
+
 export default function getLanguageMeaning(
 	text: string,
 	context?: { agent?: string; model?: string; parent?: string; model_output?: string }
 ): NLMeaning {
 	let temp = _nlp(text);
 	console.log(JSON.stringify(temp.possessives().json(), null, 4));
-	let booleanStuff = [ 'is true', 'is false' ];
-	let equals = [ 'must match', 'matches', 'is equal to' ];
-	let isA = [ 'must be a', 'must be an', 'is a', 'is an', ...booleanStuff ];
-	let contains = [ 'contains a', 'contains an' ];
-	let intersects = [ 'intersects', 'intersects with' ];
-	let inAEnumeration = [ 'is in an enumeration', 'is an enumeration', 'is in a set' ];
-	let executionStuff = [ 'copies to', 'increments by', 'concatenates with' ];
-	let referenceStuff = [ 'must connect to a real' ];
-	let validationStuff = [ 'must conform to a' ];
-	let navigationStuff = [ 'navigates to' ];
-	let all = [
-		...navigationStuff,
-		...validationStuff,
-		...referenceStuff,
-		...executionStuff,
-		...inAEnumeration,
-		...intersects,
-		...equals,
-		...isA,
-		...contains
-	].sort((a, b) => a.length - b.length);
 
 	let result: NLMeaning = { actorClause: {}, targetClause: {}, validation: {}, text };
 	let understandableClause = all.find((item: string) => {
@@ -442,6 +549,13 @@ export default function getLanguageMeaning(
 		} else if (_nlp(secondClause).has(`#Model`)) {
 			result.targetClause.relationType = RelationType.Model;
 			result.targetClause.agent = context ? context.model : '';
+			if (!result.targetClause.agent) {
+				let modelName = _nlp(secondClause).match('#Model').text();
+				let modelNameNode = NodesByType(null, NodeTypes.Model).find((v: Node) => GetCodeName(v) === modelName);
+				if (modelNameNode) {
+					result.targetClause.agent = modelNameNode.id;
+				}
+			}
 			targetProperties = findPotentialProperties(context && context.model ? context.model : undefined);
 		}
 		if (_nlp(secondClause).has(`#Parent`)) {
@@ -463,6 +577,7 @@ export default function getLanguageMeaning(
 						_nlp(secondClause).has(v.toLocaleLowerCase()) ||
 						_nlp(secondClause).has(v.toLocaleUpperCase())
 				);
+
 				if (_nlp(secondClause).has('with the')) {
 					let postArgs = _nlp(secondClause).match('with the').lookAhead('').text();
 					if (_nlp(postArgs).has('model argument')) {
@@ -484,6 +599,27 @@ export default function getLanguageMeaning(
 					} else if (_nlp(postArgs).has('as parent')) {
 						result.targetClause.argument.as = 'parent';
 					}
+				}
+			}
+			if (_nlp(secondClause).has('the dashboard')) {
+				let postArgs = _nlp(secondClause).match('the dashboard').lookAhead('').text();
+				if (_nlp(postArgs).has(`#${DASHBOARD}`)) {
+					let screen = GetNodesByProperties(
+						{
+							[NodeProperties.IsDashboard]: true,
+							[NodeProperties.NODEType]: NodeTypes.NavigationScreen
+						},
+						GetCurrentGraph()
+					).find(
+						(v: Node) =>
+							_nlp(secondClause).has(GetCodeName(v)) ||
+							_nlp(secondClause).has(GetNodeTitle(v)) ||
+							_nlp(secondClause).has(GetCodeName(v).toLocaleLowerCase()) ||
+							_nlp(secondClause).has(GetNodeTitle(v).toLocaleUpperCase()) ||
+							_nlp(secondClause).has(GetNodeTitle(v).toLocaleLowerCase()) ||
+							_nlp(secondClause).has(GetCodeName(v).toLocaleUpperCase())
+					);
+					if (screen) result.targetClause.dashboard = screen.id;
 				}
 			}
 		}
@@ -569,6 +705,7 @@ export default function getLanguageMeaning(
 }
 
 export interface Clause {
+	dashboard?: string;
 	propertyAttributeType?: string;
 	relationType?: RelationType;
 	agent?: string;

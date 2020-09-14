@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import TextAreaEditor from './textareaeditor';
 
 export default class TextInput extends Component<any, any> {
 	inputType: any;
@@ -59,6 +60,70 @@ export default class TextInput extends Component<any, any> {
 				}
 			}
 		};
+		if (this.props.texteditor) {
+			return (
+				<div className={this.props.inputgroup ? 'input-group' : 'form-group'}>
+					{this.props.inputgroup ? null : <label>{this.label()}</label>}
+					<TextAreaEditor
+            active={this.props.active}
+						className="form-control"
+						style={{ height: 250 }}
+						onBlur={() => {
+							if (this.props.onBlur) {
+								this.props.onBlur();
+							}
+							if (!this.immediate()) {
+								if (this.props.onChange) {
+									if (this.state.value !== this.props.value)
+										this.props.onChange(this.state.value || '');
+								}
+							}
+							if (this.props.onChanged) {
+								this.props.onChanged(this.state.value || '');
+							}
+							this.setState({ focused: false });
+						}}
+						onFocus={() => {
+							if (this.props.onFocus) {
+								this.props.onFocus();
+							}
+							this.setState({ focused: true });
+						}}
+						value={this.value()}
+						onKeyPress={handleKeyPress}
+						onChange={(v: any) => {
+							if (this.props.onChangeText) {
+								this.props.onChangeText(v.target.value);
+							}
+							if (this.immediate()) {
+								if (this.props.onChange) {
+									this.props.onChange(v.target.value);
+								}
+							} else {
+								this.setState({ value: v.target.value });
+							}
+						}}
+						placeholder={this.placeholder()}
+					/>
+					{this.props.inputgroup ? (
+						<span className="input-group-btn">
+							<button
+								onClick={() => {
+									if (this.props.onClick) {
+										this.props.onClick();
+									}
+								}}
+								name="search"
+								id="search-btn"
+								className="btn btn-flat"
+							>
+								<i className="fa fa-edit" />
+							</button>
+						</span>
+					) : null}
+				</div>
+			);
+		}
 		if (this.props.textarea) {
 			return (
 				<div className={this.props.inputgroup ? 'input-group' : 'form-group'}>

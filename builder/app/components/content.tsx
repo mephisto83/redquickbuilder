@@ -8,7 +8,8 @@ export default class Content extends Component<any, any> {
 				className="content-wrapper"
 				style={{
 					minHeight: 'calc(100vh-50px)',
-					position: 'relative'
+					position: 'relative',
+					overflowY: 'scroll'
 				}}
 			>
 				{this.props.children}

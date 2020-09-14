@@ -52,7 +52,7 @@ import {
 } from '../methods/graph_methods';
 import { ViewTypes } from '../constants/viewtypes';
 import BuildAgentAccessWeb from '../nodepacks/BuildAgentAccessWeb';
-import NLPService, { updateWorld } from '../service/naturallang';
+import NLPService, { updateWorld, cacheSuggestionData } from '../service/naturallang';
 
 import SelectInput from './selectinput';
 import {
@@ -471,7 +471,8 @@ class AgentAccessView extends Component<any, any> {
 										onClick={(evt) => {
 											evt.stopPropagation();
 											updateWorld();
-											getLanguageMeaning('');
+                      getLanguageMeaning('');
+                      cacheSuggestionData();
 											const accessDescriptions = GetNodesByProperties(
 												{
 													[NodeProperties.NODEType]: NodeTypes.AgentAccessDescription

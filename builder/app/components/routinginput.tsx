@@ -43,7 +43,15 @@ export default class RoutingInput extends Component<any, any> {
 		super(props);
 		this.state = { sentences: '' };
 	}
-
+	componentWillUpdate(prevProps: any) {
+		if (prevProps && prevProps.routing && prevProps.routing.routes) {
+			let routes: RouteDescription[] = prevProps.routing.routes;
+			let sentences = routes.map((route: RouteDescription) => route.name).filter((v) => v).join(NEW_LINE);
+			if (this.state.routes !== routes && sentences !== this.state.sentences) {
+				this.setState({ sentences, routes });
+			}
+		}
+	}
 	render() {
 		let props: any = this.props;
 		const { state } = this.props;
@@ -63,8 +71,10 @@ export default class RoutingInput extends Component<any, any> {
 			>
 				<TreeViewItemContainer>
 					<TextInput
-						textarea
+						texteditor
+						active={this.state.open}
 						label={'Sentences'}
+						immediate
 						value={this.state.sentences}
 						onChange={(val: string) => {
 							this.setState({ sentences: val });
@@ -107,6 +117,27 @@ export default class RoutingInput extends Component<any, any> {
 							let modelName = UIA.GetCodeName(this.props.model).toLocaleLowerCase();
 							let sentences = [
 								`The ${agentName} navigates to the ${modelName}'s Update screen with the ${modelName}'s id as model`,
+								`The ${agentName} navigates to the ${modelName}'s Create screen`
+							].join(NEW_LINE);
+
+							this.setState(
+								{
+									sentences
+								},
+								() => {
+									this.buildRoutes();
+								}
+							);
+						}}
+					/>
+					<TreeViewGroupButton
+						title={ViewTypes.Get}
+						icon="fa  fa-tripadvisor"
+						onClick={() => {
+							let agentName = UIA.GetCodeName(this.props.agent).toLocaleLowerCase();
+							let modelName = UIA.GetCodeName(this.props.model).toLocaleLowerCase();
+							let sentences = [
+								`The ${agentName} navigates to the ${modelName}'s GetAll screen`,
 								`The ${agentName} navigates to the ${modelName}'s Create screen`
 							].join(NEW_LINE);
 
@@ -174,6 +205,10 @@ export default class RoutingInput extends Component<any, any> {
 						id: UIA.GUID(),
 						name: meaning.text
 					};
+					if (meaning.targetClause && meaning.targetClause.dashboard) {
+						route.dashboard = meaning.targetClause.dashboard;
+						route.isDashboard = true;
+					}
 					if (this.props.viewType === ViewTypes.GetAll && meaning.viewType !== ViewTypes.Create) {
 						route.isItemized = true;
 					}

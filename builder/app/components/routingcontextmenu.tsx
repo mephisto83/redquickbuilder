@@ -540,6 +540,7 @@ class ContextMenu extends Component<any, any> {
 										<RoutingInput
 											agent={menuMode.agent}
 											viewType={menuMode.viewType}
+                      routing={menuMode.routing}
 											model={menuMode.model}
 											onNewRoutes={(newRoutes: RouteDescription[]) => {
 												let routing: Routing = menuMode.routing;

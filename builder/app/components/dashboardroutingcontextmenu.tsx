@@ -35,6 +35,7 @@ import { MethodFunctions } from '../constants/functiontypes';
 import { GetNodesByProperties, NodesByType } from '../methods/graph_methods';
 import CheckBox from './checkbox';
 import StaticParametersComponent from './staticparameterscomponent';
+import RoutingInput from './routinginput';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class DashboardRoutingContextMenu extends Component<any, any> {
@@ -473,6 +474,15 @@ class DashboardRoutingContextMenu extends Component<any, any> {
 		const currentInfo = this.getCurrentInfo(menuMode);
 		const menuitems = this.getMenuMode(menuMode);
 		const defaultMenus = this.getDefaultMenu(menuMode);
+		const large =
+			this.state.large || this.state.pLarger || this.state.vLarger || this.state.aLarger || this.state.eLarger;
+		const menu_width = large ? 1000 : 350;
+		let icon_expando: any = {
+			fontSize: `1.4rem`,
+			paddingLeft: 5,
+			top: -2,
+			position: 'relative'
+		};
 		return (
 			<Draggable handle=".draggable-header,.draggable-footer">
 				<div
@@ -480,7 +490,7 @@ class DashboardRoutingContextMenu extends Component<any, any> {
 					style={{
 						zIndex: 1000,
 						position: 'fixed',
-						width: this.state.secondaryMenu ? 500 : 250,
+						width: this.state.secondaryMenu ? 500 : menu_width,
 						display,
 						top: 250,
 						left: 500
@@ -498,6 +508,19 @@ class DashboardRoutingContextMenu extends Component<any, any> {
 								aria-label="Close"
 							>
 								<span aria-hidden="true">×</span>
+							</button>{' '}
+							<button
+								type="button"
+								onClick={() => {
+									this.setState({ large: !this.state.large });
+								}}
+								className="close"
+								data-dismiss="modal"
+								aria-label="Expand"
+							>
+								<span aria-hidden="true">
+									<i className={large ? 'fa  fa-compress' : 'fa  fa-expand'} style={icon_expando} />
+								</span>
 							</button>
 						</div>
 						<div className="modal-body" style={{ padding: 0 }}>
@@ -511,6 +534,20 @@ class DashboardRoutingContextMenu extends Component<any, any> {
 								>
 									<GenericPropertyContainer active title="asdf" subTitle="afaf" nodeType={nodeType}>
 										{currentInfo}
+										<RoutingInput
+											agent={menuMode.agent}
+											viewType={menuMode.viewType}
+                      model={menuMode.model}
+                      routing={menuMode.routing}
+											onNewRoutes={(newRoutes: RouteDescription[]) => {
+												let routing: Routing = menuMode.routing;
+												routing.routes.length = 0;
+												routing.routes.push(...newRoutes);
+
+												menuMode.callback(routing);
+												this.setState({ turn: UIA.GUID() });
+											}}
+										/>
 										{menuitems}
 										{defaultMenus}
 									</GenericPropertyContainer>
@@ -535,13 +572,13 @@ class DashboardRoutingContextMenu extends Component<any, any> {
 		);
 	}
 	getCurrentInfo(menuMode: any) {
-		let { model, agent } = menuMode;
-		if (model && agent) {
+		let { dashboard, agent } = menuMode;
+		if (dashboard && agent) {
 			return [
 				<TreeViewMenu
 					key={'current-agent'}
 					icon={'fa fa-square-o'}
-					title={`${UIA.GetNodeTitle(model)}/${UIA.GetNodeTitle(agent)}`}
+					title={`${UIA.GetNodeTitle(dashboard)}/${UIA.GetNodeTitle(agent)}`}
 				/>
 			];
 		}
