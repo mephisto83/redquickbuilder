@@ -87,6 +87,8 @@ import { RouterRootState } from 'connected-react-router';
 import { multiple } from './editor.main.css';
 import { mount } from 'enzyme';
 import getLanguageMeaning from '../service/naturallang';
+import { effectAutoGeneratePVF } from './effectcontextmenu';
+import { mountingAutoGeneratePVF } from './mountingcontextmenu';
 
 const AGENT_ACCESS_VIEW_TAB = 'agent -access-view-tab';
 const context: { methods: any[] | null } = {
@@ -471,8 +473,8 @@ class AgentAccessView extends Component<any, any> {
 										onClick={(evt) => {
 											evt.stopPropagation();
 											updateWorld();
-                      getLanguageMeaning('');
-                      cacheSuggestionData();
+											getLanguageMeaning('');
+											cacheSuggestionData();
 											const accessDescriptions = GetNodesByProperties(
 												{
 													[NodeProperties.NODEType]: NodeTypes.AgentAccessDescription
@@ -545,6 +547,33 @@ class AgentAccessView extends Component<any, any> {
 									>
 										Set
 									</a>
+									<a
+										className="btn btn-default btn-primary"
+										onClick={(evt) => {
+											evt.stopPropagation();
+											this.autoUpdateEffect({
+												onlyAgents,
+												models: NodesByType(null, NodeTypes.Model).map((d: Node) => d.id)
+											});
+											return false;
+										}}
+									>
+										Auto Update Effects
+									</a>
+									<a
+										className="btn btn-default btn-primary"
+										onClick={(evt) => {
+											evt.stopPropagation();
+											this.autoUpdateMounting({
+												onlyAgents,
+												models: NodesByType(null, NodeTypes.Model).map((d: Node) => d.id)
+											});
+											return false;
+										}}
+									>
+										Auto Update Mounting
+									</a>
+
 								</FormControl>
 							</Box>
 							<Box title={'Errors'}>{this.calculateErrors()}</Box>
@@ -1839,13 +1868,13 @@ class AgentAccessView extends Component<any, any> {
 		dashboard: string,
 		routing: Routing
 	) {
-		routing.routes.forEach((route: RouteDescription) => {
-			if (route.viewType && route.model) {
-				// let targetModelIndex = this.state.models.indexOf(route.model);
-				// let targetMethodDescription = this.getDashboardMethodDescription(agent, targetModelIndex, route.viewType);
-				// route.targetMethodDescription = targetMethodDescription;
-			}
-		});
+		// routing.routes.forEach((route: RouteDescription) => {
+		// 	if (route.viewType && route.model) {
+		// 		// let targetModelIndex = this.state.models.indexOf(route.model);
+		// 		// let targetMethodDescription = this.getDashboardMethodDescription(agent, targetModelIndex, route.viewType);
+		// 		// route.targetMethodDescription = targetMethodDescription;
+		// 	}
+		// });
 		return (
 			<div className="btn-group">
 				<button
@@ -1967,7 +1996,7 @@ class AgentAccessView extends Component<any, any> {
 					methods.push(...effect.effects);
 				}
 			}
-    });
+		});
 	}
 
 	private createDashboardMountingDescriptionButton(agent: string, dashboard: string, mounting: ViewMounting) {
@@ -2000,7 +2029,78 @@ class AgentAccessView extends Component<any, any> {
 			</div>
 		);
 	}
-
+	private autoUpdateMounting({ onlyAgents, models }: { onlyAgents: any[]; models: string[] }) {
+		//mountingAutoGeneratePVF
+		let methods: string[] = [];
+		this.state.agents.map((_: any, index: number) => {
+			this.collectMethods(index, methods);
+		});
+		Object.keys(ViewTypes).forEach((v: string) => {
+			models.forEach((model, modelIndex) => {
+				onlyAgents.forEach((agent, agentIndex) => {
+					let effect: ViewMounting = this.getMountingDescription(agentIndex, modelIndex, v);
+					if (effect) {
+						effect.mountings.forEach((effectItem: MountingDescription) => {
+							let { methodDescription } = effectItem;
+							mountingAutoGeneratePVF(
+								effectItem,
+								{
+									mode: {
+										agentIndex,
+										agent: onlyAgents[agentIndex].id,
+										model,
+										modelIndex,
+										viewType: v,
+										methods,
+										outState: this.state,
+										effect: effect,
+										callback: (value: Effect) => {}
+									}
+								},
+								methodDescription,
+								v
+							);
+						});
+					}
+				});
+			});
+		});
+	}
+	private autoUpdateEffect({ onlyAgents, models }: { onlyAgents: any[]; models: string[] }) {
+		let methods: string[] = [];
+		this.state.agents.map((_: any, index: number) => {
+			this.collectMethods(index, methods);
+		});
+		Object.keys(ViewTypes).forEach((v: string) => {
+			models.forEach((model, modelIndex) => {
+				onlyAgents.forEach((agent, agentIndex) => {
+					let effect: Effect = this.getEffectDescription(agentIndex, modelIndex, v);
+					if (effect) {
+						effect.effects.forEach((effectItem: EffectDescription) => {
+							let { methodDescription } = effectItem;
+							effectAutoGeneratePVF(
+								effectItem,
+								{
+									mode: {
+										agentIndex,
+										agent: onlyAgents[agentIndex].id,
+										model,
+										modelIndex,
+										viewType: v,
+										methods,
+										outState: this.state,
+										effect: effect,
+										callback: (value: Effect) => {}
+									}
+								},
+								methodDescription
+							);
+						});
+					}
+				});
+			});
+		});
+	}
 	private createEffectDescriptionButton(
 		agentIndex: number,
 		onlyAgents: any[],
@@ -2019,7 +2119,7 @@ class AgentAccessView extends Component<any, any> {
 				this.state.agents.map((_: any, index: number) => {
 					this.collectMethods(index, methods);
 				});
-        context.methods = methods;
+				context.methods = methods;
 			}
 		}
 		return (

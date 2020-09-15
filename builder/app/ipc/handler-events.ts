@@ -16,6 +16,10 @@ export const HandlerEvents = {
 		message: 'remote-command',
 		reply: 'remote-command-reply'
 	},
+	codeWindowCommand: {
+		message: 'code-window-command',
+		reply: 'code-window-command-reply'
+	},
 	electron: {
 		message: 'electron-project',
 		reply: 'electron-project-reply'

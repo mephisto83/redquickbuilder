@@ -681,7 +681,7 @@ export default class MindMap extends Component<any, any> {
 		nn.width = 40;
 		nn.height = 40;
 		nn.name = nn.id;
-		let max = count < 10 ? 500 : 5000;
+		let max = count * 4 + 200;
 		let maxx = max * (1920 / 1080);
 		if (!this.props.nonBlock || this.state.graph.nodes.length === 1) {
 			nn.fixed = false;

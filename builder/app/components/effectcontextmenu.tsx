@@ -384,62 +384,7 @@ class EffectContextMenu extends Component<any, any> {
 										icon="fa fa-sitemap"
 										title={'Auto generate, permissions, validations, filters'}
 										onClick={() => {
-											if (effectItem.permissions) {
-												effectItem.permissions
-													.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
-													.forEach((permission: PermissionConfig) => {
-														autoNameGenerateDataChain(
-															permission,
-															effectItem,
-															DataChainType.Permission,
-															mode.methods,
-															null,
-															true
-														);
-													});
-											}
-											if (effectItem.validations) {
-												effectItem.validations
-													.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
-													.forEach((validation: ValidationConfig) => {
-														autoNameGenerateDataChain(
-															validation,
-															effectItem,
-															DataChainType.Validation,
-															mode.methods,
-															null,
-															true
-														);
-													});
-											}
-											if (effectItem.filters) {
-												effectItem.filters
-													.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
-													.forEach((filter: FilterConfig) => {
-														autoNameGenerateDataChain(
-															filter,
-															effectItem,
-															DataChainType.Filter,
-															mode.methods,
-															null,
-															true
-														);
-													});
-											}
-											if (effectItem.executions) {
-												effectItem.executions
-													.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
-													.forEach((executionConfig: ExecutionConfig) => {
-														if (methodDescription) {
-															buildDataChain(
-																executionConfig,
-																effectItem,
-																mode.methods,
-																true
-															);
-														}
-													});
-											}
+											effectAutoGeneratePVF(effectItem, mode, methodDescription);
 											this.setState({ turn: UIA.GUID() });
 										}}
 									/>
@@ -755,3 +700,55 @@ class EffectContextMenu extends Component<any, any> {
 }
 
 export default UIConnect(EffectContextMenu);
+export function effectAutoGeneratePVF(
+	effectItem: EffectDescription,
+	mode: any,
+	methodDescription: MethodDescription | undefined
+) {
+	if (effectItem) {
+		if (effectItem.permissions) {
+			effectItem.permissions
+				.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
+				.forEach((permission: PermissionConfig) => {
+					autoNameGenerateDataChain(
+						permission,
+						effectItem,
+						DataChainType.Permission,
+						mode.methods,
+						null,
+						true
+					);
+				});
+		}
+		if (effectItem.validations) {
+			effectItem.validations
+				.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
+				.forEach((validation: ValidationConfig) => {
+					autoNameGenerateDataChain(
+						validation,
+						effectItem,
+						DataChainType.Validation,
+						mode.methods,
+						null,
+						true
+					);
+				});
+		}
+		if (effectItem.filters) {
+			effectItem.filters
+				.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
+				.forEach((filter: FilterConfig) => {
+					autoNameGenerateDataChain(filter, effectItem, DataChainType.Filter, mode.methods, null, true);
+				});
+		}
+		if (effectItem.executions) {
+			effectItem.executions
+				.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
+				.forEach((executionConfig: ExecutionConfig) => {
+					if (methodDescription) {
+						buildDataChain(executionConfig, effectItem, mode.methods, true);
+					}
+				});
+		}
+	}
+}

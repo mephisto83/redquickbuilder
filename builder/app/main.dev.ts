@@ -24,6 +24,7 @@ export default class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 let objectViewerWindow: BrowserWindow | null = null;
+let codeViewWindow: BrowserWindow | null = null;
 
 if (process.env.NODE_ENV === 'production' || true) {
 	const sourceMapSupport = require('source-map-support');
@@ -41,8 +42,8 @@ const installExtensions = async () => {
 
 	return Promise.all(extensions.map((name) => installer.default(installer[name], forceDownload))).catch(console.log);
 };
-const createObjectViewerWindow = async () => {
-	objectViewerWindow = new BrowserWindow({
+const createObjectViewerWindow = async (onclose: Function): Promise<BrowserWindow | null> => {
+	let objectViewerWindow: BrowserWindow | null = new BrowserWindow({
 		show: false,
 		width: 400,
 		height: 400,
@@ -62,21 +63,23 @@ const createObjectViewerWindow = async () => {
 		if (!objectViewerWindow) {
 			throw new Error('"mainWindow" is not defined');
 		}
-		// if (process.env.START_MINIMIZED) {
-		// 	objectViewerWindow.minimize();
-		// } else {
-		// 	objectViewerWindow.show();
-		// 	objectViewerWindow.focus();
-		// }
-		// mainWindow.webContents.openDevTools()
 	});
 
-	objectViewerWindow.on('closed', () => {
-		objectViewerWindow = null;
-	});
+	objectViewerWindow.on('closed', onclose);
+	return objectViewerWindow;
 };
 const createWindow = async () => {
-	if (objectViewerWindow === null) await createObjectViewerWindow();
+	if (objectViewerWindow === null) {
+		objectViewerWindow = await createObjectViewerWindow(() => {
+			objectViewerWindow = null;
+		});
+	}
+	if (codeViewWindow === null) {
+		codeViewWindow = await createObjectViewerWindow(() => {
+			codeViewWindow = null;
+		});
+	}
+
 	if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
 		await installExtensions();
 	}
@@ -106,7 +109,8 @@ const createWindow = async () => {
 		}
 		IPCHandlers.setup(mainWindow, {
 			mainWindow: mainWindow,
-			objectViewerWindow: objectViewerWindow
+			objectViewerWindow: objectViewerWindow,
+			codeViewWindow: codeViewWindow
 		});
 
 		if (process.env.START_MINIMIZED) {

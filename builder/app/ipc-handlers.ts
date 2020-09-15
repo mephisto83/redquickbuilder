@@ -63,8 +63,8 @@ export default class IPCHandlers {
 	static setup(mainWindow: any, windowCollections: { [str: string]: BrowserWindow | null }) {
 		let submenu: any = [];
 		ipcMain.on('message', (event, arg) => {
-      let msg = JSON.parse(arg);
-      console.log(msg);
+			let msg = JSON.parse(arg);
+			console.log(msg);
 			handle(msg, windowCollections)
 				.then((res) => {
 					event.sender.send(
@@ -322,6 +322,14 @@ function handle(msg: any, windowCollections: { [str: string]: BrowserWindow | nu
 				if (windowCollections.objectViewerWindow && windowCollections.objectViewerWindow.webContents) {
 					if (!windowCollections.objectViewerWindow.isVisible()) windowCollections.objectViewerWindow.show();
 					windowCollections.objectViewerWindow.webContents.send(HandlerEvents.viewWindow.message, msg);
+				}
+			});
+			break;
+		case HandlerEvents.codeWindowCommand.message:
+			result = Promise.resolve().then(() => {
+				if (windowCollections.codeViewWindow && windowCollections.codeViewWindow.webContents) {
+					if (!windowCollections.codeViewWindow.isVisible()) windowCollections.codeViewWindow.show();
+					windowCollections.codeViewWindow.webContents.send(HandlerEvents.codeWindowCommand.message, msg);
 				}
 			});
 			break;

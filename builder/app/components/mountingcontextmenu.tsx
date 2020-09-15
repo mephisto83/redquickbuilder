@@ -386,65 +386,7 @@ class ContextMenu extends Component<any, any> {
 										icon="fa fa-sitemap"
 										title={'Auto generate, permissions, validations, filters'}
 										onClick={() => {
-											if (mountingItem.permissions) {
-												mountingItem.permissions
-													.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
-													.forEach((permission: PermissionConfig) => {
-														autoNameGenerateDataChain(
-															permission,
-															mountingItem,
-															DataChainType.Permission,
-															mode.methods,
-															null,
-															true
-														);
-													});
-											}
-											if (mountingItem.validations) {
-												mountingItem.validations
-													.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
-													.forEach((validation: ValidationConfig) => {
-														autoNameGenerateDataChain(
-															validation,
-															mountingItem,
-															DataChainType.Validation,
-															mode.methods,
-															null,
-															true
-														);
-													});
-											}
-											if (mountingItem.filters) {
-												mountingItem.filters
-													.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
-													.forEach((filter: FilterConfig) => {
-														autoNameGenerateDataChain(
-															filter,
-															mountingItem,
-															DataChainType.Filter,
-															mode.methods,
-															null,
-															true
-														);
-													});
-											}
-											if (mountingItem.executions) {
-												mountingItem.executions
-													.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
-													.forEach((executionConfig: ExecutionConfig) => {
-														if (methodDescription) {
-															autoNameExecutionConfig(
-																executionConfig,
-																viewType,
-																mountingItem,
-																methodDescription,
-																mountingItem.name,
-																mode.methods,
-																true
-															);
-														}
-													});
-											}
+											mountingAutoGeneratePVF(mountingItem, mode, methodDescription, viewType);
 											this.setState({ turn: UIA.GUID() });
 										}}
 									/>
@@ -753,6 +695,52 @@ class ContextMenu extends Component<any, any> {
 }
 
 export default UIConnect(ContextMenu);
+export function mountingAutoGeneratePVF(
+	mountingItem: MountingDescription,
+	mode: any,
+	methodDescription: MethodDescription | undefined,
+	viewType: string
+) {
+	if (mountingItem.permissions) {
+		mountingItem.permissions
+			.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
+			.forEach((permission: PermissionConfig) => {
+				autoNameGenerateDataChain(permission, mountingItem, DataChainType.Permission, mode.methods, null, true);
+			});
+	}
+	if (mountingItem.validations) {
+		mountingItem.validations
+			.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
+			.forEach((validation: ValidationConfig) => {
+				autoNameGenerateDataChain(validation, mountingItem, DataChainType.Validation, mode.methods, null, true);
+			});
+	}
+	if (mountingItem.filters) {
+		mountingItem.filters
+			.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
+			.forEach((filter: FilterConfig) => {
+				autoNameGenerateDataChain(filter, mountingItem, DataChainType.Filter, mode.methods, null, true);
+			});
+	}
+	if (mountingItem.executions) {
+		mountingItem.executions
+			.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
+			.forEach((executionConfig: ExecutionConfig) => {
+				if (methodDescription) {
+					autoNameExecutionConfig(
+						executionConfig,
+						viewType,
+						mountingItem,
+						methodDescription,
+						mountingItem.name,
+						mode.methods,
+						true
+					);
+				}
+			});
+	}
+}
+
 function autoName(
 	c: string,
 	methodDescription: MethodDescription | undefined,

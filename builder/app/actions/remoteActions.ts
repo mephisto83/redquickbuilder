@@ -586,6 +586,17 @@ async function viewObject(
 		})
 	);
 }
+
+export function viewCode(code: string) {
+	const { ipcRenderer } = require('electron');
+	ipcRenderer.send(
+		'message',
+		JSON.stringify({
+			msg: HandlerEvents.codeWindowCommand.message,
+			body: { code }
+		})
+	);
+}
 export function updateConfig(applicationConfiguration: any) {
 	if (GetDispatchFunc()) setVisual(ApplicationConfig, applicationConfiguration)(GetDispatchFunc(), GetStateFunc());
 }

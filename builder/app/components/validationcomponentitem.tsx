@@ -46,6 +46,7 @@ import CheckBox from './checkbox';
 import { MethodFunctions } from '../constants/functiontypes';
 import getLanguageMeaning, { NLMeaning, NLMethodType, Clause, NLValidationClauses } from '../service/naturallang';
 import { GetCurrentGraph, GetCodeName } from '../actions/uiactions';
+import { viewCode } from '../actions/remoteActions';
 
 export default class ValidationComponentItem extends Component<any, any> {
 	constructor(props: any) {
@@ -551,6 +552,9 @@ export default class ValidationComponentItem extends Component<any, any> {
 							icon={'fa fa-hand-grab-o'}
 							onClick={() => {
 								UIA.SelectNode(validationConfig.dataChain, null)(UIA.GetDispatchFunc());
+								if (validationConfig.dataChain) {
+									viewCode(UIA.GenerateCSChainFunction(validationConfig.dataChain));
+								}
 							}}
 						/>
 					) : null}
