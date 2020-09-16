@@ -157,7 +157,7 @@ export default class AfterEffectCheckExistanceConfig extends Component<any, any>
 									case RelationType.Model:
 										checkExistence.modelProperty = value;
 										break;
-									case RelationType.ModelOuput:
+									case RelationType.ModelOutput:
 										checkExistence.modelOutputProperty = value;
 										break;
 									case RelationType.Parent:

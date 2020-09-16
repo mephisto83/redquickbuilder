@@ -642,7 +642,7 @@ export default function getLanguageMeaning(
 			});
 		}
 		if (_nlp(secondClause).has(`#ModelOutput`)) {
-			result.targetClause.relationType = RelationType.ModelOuput;
+			result.targetClause.relationType = RelationType.ModelOutput;
 			result.targetClause.agent = context ? context.model_output : '';
 			targetProperties = findPotentialProperties(
 				context && context.model_output ? context.model_output : undefined
@@ -668,7 +668,7 @@ export default function getLanguageMeaning(
 			actorProperties = findPotentialProperties(context && context.parent ? context.parent : undefined);
 		}
 		if (_nlp(firstClause).has(`#ModelOutput`)) {
-			result.actorClause.relationType = RelationType.ModelOuput;
+			result.actorClause.relationType = RelationType.ModelOutput;
 			result.actorClause.agent = context ? context.model_output : '';
 			actorProperties = findPotentialProperties(
 				context && context.model_output ? context.model_output : undefined

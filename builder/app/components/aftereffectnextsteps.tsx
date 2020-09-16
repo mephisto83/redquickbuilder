@@ -40,7 +40,10 @@ export default class AfterEffectNextSteps extends Component<any, any> {
 		let nextStepsConfiguration: NextStepsConfiguration = dataChainOptions.nextStepsConfiguration;
 		let valid = CheckNextStepsConfiguration(nextStepsConfiguration);
 		let methods: MountingDescription[] = this.props.methods;
-
+		let targetMountingDescription: MountingDescription | undefined =
+			nextStepsConfiguration && methods
+				? methods.find((v) => v.id === nextStepsConfiguration.descriptionId)
+				: undefined;
 		return (
 			<TreeViewMenu
 				open={this.state.open}
@@ -91,7 +94,9 @@ export default class AfterEffectNextSteps extends Component<any, any> {
 				{(nextStepsConfiguration.steps || []).map((nextStepConfig: NextStepConfiguration, index: number) => {
 					return (
 						<AfterEffectNextStep
-							key={nextStepConfig.id}
+              key={nextStepConfig.id}
+              dataChainType={this.props.dataChainType}
+              targetMountingDescription={targetMountingDescription}
 							methodDescription={this.props.methodDescription}
 							onContext={this.props.onContext}
 							onChange={() => {

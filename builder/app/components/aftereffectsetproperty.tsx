@@ -35,6 +35,7 @@ export default class AfterEffectSetupProperty extends Component<any, any> {
 		let value: string = '';
 		let showSetProperty = false;
 		let showValueInput = false;
+		let showParentProperty = false;
 		let showEnumeration = false;
 		let enumerationOptions: any[] = [];
 		let valueTitle = '';
@@ -154,6 +155,42 @@ export default class AfterEffectSetupProperty extends Component<any, any> {
 							value={setProperty.modelProperty}
 							onChange={(value: string) => {
 								setProperty.modelProperty = value;
+								this.setState({
+									turn: UIA.GUID()
+								});
+								if (this.props.onChange) {
+									this.props.onChange();
+								}
+							}}
+						/>
+					</TreeViewItemContainer>
+				) : null}
+				{showSetProperty && setProperty.relationType === RelationType.Parent ? (
+					<TreeViewItemContainer>
+						<SelectInput
+							label={Titles.Parent}
+							options={this.props.parentProperties || []}
+							value={setProperty.parentProperty}
+							onChange={(value: string) => {
+								setProperty.parentProperty = value;
+								this.setState({
+									turn: UIA.GUID()
+								});
+								if (this.props.onChange) {
+									this.props.onChange();
+								}
+							}}
+						/>
+					</TreeViewItemContainer>
+				) : null}
+				{showSetProperty && setProperty.relationType === RelationType.ModelOutput ? (
+					<TreeViewItemContainer>
+						<SelectInput
+							label={Titles.ModelOutput}
+							options={this.props.modelOutputProperties || []}
+							value={setProperty.modelOutputProperty}
+							onChange={(value: string) => {
+								setProperty.modelOutputProperty = value;
 								this.setState({
 									turn: UIA.GUID()
 								});

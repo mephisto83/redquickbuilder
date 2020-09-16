@@ -1014,7 +1014,7 @@ export function setupRelation(halfRelation: HalfRelation, clause: Clause) {
 				}
 			}
 			break;
-		case RelationType.ModelOuput:
+		case RelationType.ModelOutput:
 			if (clause.agent) {
 				halfRelation.modelOutput = clause.agent;
 				if (clause.property) {
@@ -1050,7 +1050,7 @@ function setupAreEqual(areEqual: AreEqualConfig, clause: Clause) {
 				}
 			}
 			break;
-		case RelationType.ModelOuput:
+		case RelationType.ModelOutput:
 			if (clause.agent) {
 				areEqual.modelOutput = clause.agent;
 				if (clause.property) {

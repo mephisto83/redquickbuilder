@@ -121,7 +121,7 @@ export interface DataChainConfiguration {
 }
 
 export interface NextStepConfiguration extends ConfigItem {
-	checkExistance: DataChainConfiguration;
+	existenceCheck: ExistenceCheckConfig;
 	constructModel: ConstructModelConfig;
 	sendMessageToLakeConfig: SendMessageToLakeConfig;
 }
@@ -168,7 +168,7 @@ export function CreateNextStepConfiguration(): NextStepConfiguration {
 }
 export function CheckNextStepsConfiguration(config: NextStepsConfiguration): boolean {
 	if (config && config.enabled) {
-		return !!config.steps.length;
+		return !!config.steps.length && !!config.descriptionId;
 	}
 	return true;
 }
@@ -176,9 +176,9 @@ export function CheckNextStepsConfiguration(config: NextStepsConfiguration): boo
 export function CheckNextStepConfiguration(config: NextStepConfiguration): boolean {
 	if (config && config.enabled) {
 		return (
-			!!config.checkExistance &&
-			!!config.checkExistance.checkExistence &&
-			CheckIsExisting(config.checkExistance.checkExistence) &&
+			(!config.checkExistance ||
+				!config.checkExistance.checkExistence ||
+				CheckIsExisting(config.checkExistance.checkExistence)) &&
 			config.constructModel &&
 			CheckConstructModel(config.constructModel) &&
 			config.sendMessageToLakeConfig &&
@@ -321,6 +321,8 @@ export interface SetProperty {
 	relationType: RelationType;
 	agentProperty: string; // The property used to find the model.
 	modelProperty: string; // The property used to find the model
+	parentProperty: string;
+	modelOutputProperty: string;
 	targetProperty: string;
 	floatValue: string;
 	doubleValue: string;
@@ -546,7 +548,7 @@ export function GetSimpleValidationId(simpleValidation: any, properties: any) {
 		simpleValidation &&
 		simpleValidation.enabled &&
 		((simpleValidation.relationType === RelationType.Agent && simpleValidation.agentProperty) ||
-			(simpleValidation.relationType === RelationType.ModelOuput && simpleValidation.modelProperty) ||
+			(simpleValidation.relationType === RelationType.ModelOutput && simpleValidation.modelProperty) ||
 			(simpleValidation.relationType === RelationType.Model && simpleValidation.modelProperty));
 	if (valid) {
 		switch (simpleValidation.relationType) {
@@ -558,7 +560,7 @@ export function GetSimpleValidationId(simpleValidation: any, properties: any) {
 				let prop2 = properties.find((v: any) => v.id === simpleValidation.modelProperty);
 				if (prop2) name = `model.${prop2.title}`;
 				break;
-			case RelationType.ModelOuput:
+			case RelationType.ModelOutput:
 				let prop3 = properties.find((v: any) => v.id === simpleValidation.modelProperty);
 				if (prop3) name = `model_output.${prop3.title}`;
 				break;
@@ -658,7 +660,7 @@ export function getRelationProperties(
 					properties = GetModelCodeProperties(methodDescription.properties.agent).toNodeSelect();
 				}
 				break;
-			case RelationType.ModelOuput:
+			case RelationType.ModelOutput:
 				if (
 					methodDescription.properties &&
 					(methodDescription.properties.model_output || methodDescription.properties.model)
@@ -868,7 +870,7 @@ export function SetupConfigInstanceInformation(
 					properties = GetModelCodeProperties(methodDescription.properties.agent).toNodeSelect();
 				}
 				break;
-			case RelationType.ModelOuput:
+			case RelationType.ModelOutput:
 				if (
 					methodDescription.properties &&
 					(methodDescription.properties.model_output || methodDescription.properties.model)
@@ -983,6 +985,14 @@ export interface CheckExistenceConfig extends AfterEffectRelations {
 	returnSetting: ReturnSettingConfig;
 	ifTrue: BranchConfig;
 	ifFalse: BranchConfig;
+}
+export interface ExistenceCheckConfig extends ConfigItem {
+	head: HalfRelation;
+	orderedCheck: ConnectionChain[];
+}
+export interface ConnectionChain {
+	model: string;
+	modelProperty: string;
 }
 export interface BranchConfig {
 	name: string;
@@ -1116,7 +1126,7 @@ export interface GetExistingConfig extends AfterEffectRelations {}
 export enum RelationType {
 	Agent = 'Agent',
 	Model = 'Model',
-	ModelOuput = 'ModelOutput',
+	ModelOutput = 'ModelOutput',
 	Parent = 'Parent'
 }
 export interface ReturnSettingConfig extends ConfigItem {
@@ -1216,7 +1226,7 @@ export function CheckRelation(halfRelation: HalfRelation): boolean {
 				return !!halfRelation.agentProperty && !!halfRelation.agent;
 			case RelationType.Model:
 				return !!halfRelation.modelProperty && !!halfRelation.model;
-			case RelationType.ModelOuput:
+			case RelationType.ModelOutput:
 				return !!halfRelation.modelOutputProperty && !!halfRelation.modelOutput;
 			case RelationType.Parent:
 				return !!halfRelation.parent && !!halfRelation.parentProperty;
@@ -1229,6 +1239,12 @@ export function CheckRelation(halfRelation: HalfRelation): boolean {
 export function CheckCopyEnumeration(copyEnumeration: CopyEnumerationConfig): boolean {
 	if (copyEnumeration.enabled) {
 		return !!copyEnumeration.enumerationType && !!copyEnumeration.enumeration && !!copyEnumeration.targetProperty;
+	}
+	return true;
+}
+export function CheckExistenceCheck(config: ExistenceCheckConfig) {
+	if (config && config.enabled) {
+		return !!config.head && !!config.orderedCheck && !!config.orderedCheck.length;
 	}
 	return true;
 }

@@ -94,7 +94,7 @@ export default class DirectRelationComponent extends Component<any, any> {
 				);
 				property = relation.property;
 				break;
-			case RelationType.ModelOuput:
+			case RelationType.ModelOutput:
 				title = UIA.GetNodeTitle(
 					methodDescription.properties.model_output || methodDescription.properties.model
 				);
@@ -151,7 +151,7 @@ export default class DirectRelationComponent extends Component<any, any> {
 									if (methodDescription.properties.model)
 										relation.agent = methodDescription.properties.model;
 									break;
-								case RelationType.ModelOuput:
+								case RelationType.ModelOutput:
 									relation.property = value;
 									if (methodDescription.properties.model_output)
 										relation.agent = methodDescription.properties.model_output;

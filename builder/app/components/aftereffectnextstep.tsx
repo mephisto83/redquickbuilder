@@ -6,11 +6,13 @@ import TreeViewMenu from './treeviewmenu';
 import {
 	MountingDescription,
 	NextStepConfiguration,
-	CheckNextStepConfiguration
+	CheckNextStepConfiguration,
+	ValidationColors
 } from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import CheckExistanceConfig from './checkexistenceconfig';
 import ConstructModelConfiguration from './constructmodelconfiguration';
+import CheckExistanceConfigComponent from './checkexistenceconfigcomponent';
 
 export default class AfterEffectNextStep extends Component<any, any> {
 	constructor(props: any) {
@@ -37,11 +39,11 @@ export default class AfterEffectNextStep extends Component<any, any> {
 		};
 		let valid = CheckNextStepConfiguration(nextStepConfig);
 
-
 		return (
 			<TreeViewMenu
 				open={this.state.open}
 				icon={valid ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+				color={valid ? ValidationColors.Ok : ValidationColors.Neutral}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
@@ -49,14 +51,15 @@ export default class AfterEffectNextStep extends Component<any, any> {
 				error={!valid}
 				title={Titles.Configuration}
 			>
-				<CheckExistanceConfig
+				<CheckExistanceConfigComponent
 					dataChainType={this.props.dataChainType}
 					methodDescription={methodDescription}
-					dataChainOptions={nextStepConfig.checkExistance}
+					existenceCheck={nextStepConfig.existenceCheck}
 					onChange={onchange}
 				/>
 				<ConstructModelConfiguration
 					dataChainType={this.props.dataChainType}
+					targetMountingDescription={this.props.targetMountingDescription}
 					methodDescription={methodDescription}
 					constructModel={nextStepConfig.constructModel}
 					onChange={onchange}

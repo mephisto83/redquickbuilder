@@ -97,7 +97,7 @@ export default class RelativeTypeComponent extends Component<any, any> {
 				);
 				property = relations.modelProperty;
 				break;
-			case RelationType.ModelOuput:
+			case RelationType.ModelOutput:
 				title = UIA.GetNodeTitle(
 					methodDescription.properties.model_output || methodDescription.properties.model
 				);
@@ -157,7 +157,7 @@ export default class RelativeTypeComponent extends Component<any, any> {
 									if (methodDescription.properties.model)
 										relations.model = methodDescription.properties.model;
 									break;
-								case RelationType.ModelOuput:
+								case RelationType.ModelOutput:
 									relations.modelOutputProperty = value;
 									if (methodDescription.properties.model_output)
 										relations.modelOutput = methodDescription.properties.model_output;

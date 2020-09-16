@@ -141,7 +141,7 @@ export default class CheckExistanceConfig extends Component<any, any> {
 									case RelationType.Parent:
 										checkExistence.parentProperty = value;
 										break;
-									case RelationType.ModelOuput:
+									case RelationType.ModelOutput:
 										checkExistence.modelOutputProperty = value;
 										break;
 								}

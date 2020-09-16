@@ -632,7 +632,7 @@ function GetRelationProp(relation: HalfRelation) {
 	switch (relation.relationType) {
 		case RelationType.Agent:
 			return relation.agentProperty;
-		case RelationType.ModelOuput:
+		case RelationType.ModelOutput:
 			return relation.modelOutputProperty;
 		case RelationType.Model:
 			return relation.modelProperty;
@@ -644,7 +644,7 @@ function ConvertToFunctionProp(relationType: RelationType) {
 	switch (relationType) {
 		case RelationType.Agent:
 			return 'agent';
-		case RelationType.ModelOuput:
+		case RelationType.ModelOutput:
 			return 'model_output';
 		case RelationType.Model:
 			return 'model';
@@ -872,7 +872,7 @@ function GenerateSimpleValidations(
 					case RelationType.Parent:
 						agentOrModel = 'parent';
 						break;
-					case RelationType.ModelOuput:
+					case RelationType.ModelOutput:
 						agentOrModel = 'model_output';
 						break;
 				}
@@ -1139,7 +1139,7 @@ function SetLambdaInsertArgumentValues(
 				model: simpleValidation.parent
 			};
 			break;
-		case RelationType.ModelOuput:
+		case RelationType.ModelOutput:
 			tempLambdaInsertArgumentValues[
 				`model_output.${GetCodeName(simpleValidation.modelOutputProperty || simpleValidation.modelProperty)}`
 			] = {
@@ -1162,7 +1162,7 @@ function GetRelationTypeValuePropString(relationType: RelationType, simpleValida
 				simpleValidation.modelProperty
 			)}","type":"property","model":"model"}}#`;
 			break;
-		case RelationType.ModelOuput:
+		case RelationType.ModelOutput:
 			valuePropString = `model_output.#{{"key":"model_output.${GetCodeName(
 				simpleValidation.modelOutputProperty || simpleValidation.modelProperty
 			)}","type":"property","model":"model_output"}}#`;

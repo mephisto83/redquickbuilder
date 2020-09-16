@@ -13,7 +13,8 @@ import {
 	ConstructModelConfig,
 	CheckConstructModel,
 	SetProperty,
-	CreateSetProperty
+	CreateSetProperty,
+  ValidationColors
 } from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import CheckExistanceConfig from './checkexistenceconfig';
@@ -42,10 +43,36 @@ export default class ConstructModelConfiguration extends Component<any, any> {
 			return <span />;
 		}
 
-		let methodDescription: MountingDescription = this.props.methodDescription;
+		let methodDescription: MethodDescription = this.props.methodDescription;
 		if (!methodDescription) {
 			return <span />;
 		}
+		let targetMountingDescription: MountingDescription = this.props.targetMountingDescription;
+		if (!targetMountingDescription) {
+			return <span />;
+		}
+
+		let targetModel = targetMountingDescription.methodDescription
+			? targetMountingDescription.methodDescription.properties.model
+			: null;
+		let targetProperties: any[] = [];
+		if (targetModel) {
+			targetProperties = UIA.GetModelCodeProperties(targetModel).toNodeSelect();
+		}
+		let parentProperties: any[] = [];
+		let modelProperties: any[] = [];
+		let modelOutputProperties: any[] = [];
+		let agentProperties: any[] = [];
+		let parentModel = methodDescription ? methodDescription.properties.parent : null;
+		let agentModel = methodDescription ? methodDescription.properties.agent : null;
+		let modelOutputModel = methodDescription ? methodDescription.properties.model_output : null;
+		let modelModel = methodDescription ? methodDescription.properties.model : null;
+
+		parentProperties = ModelCodeProps(parentModel);
+		modelProperties = ModelCodeProps(modelModel);
+		agentProperties = ModelCodeProps(agentModel);
+		modelOutputProperties = ModelCodeProps(modelOutputModel);
+
 		let onchange = () => {
 			this.setState({
 				turn: UIA.GUID()
@@ -60,6 +87,7 @@ export default class ConstructModelConfiguration extends Component<any, any> {
 			<TreeViewMenu
 				open={this.state.open}
 				icon={valid ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+				color={valid ? ValidationColors.Ok : ValidationColors.Neutral}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
@@ -85,8 +113,12 @@ export default class ConstructModelConfiguration extends Component<any, any> {
 						return (
 							<AfterEffectSetupProperty
 								key={setProperty.id}
-                setProperty={setProperty}
-                onChange={onchange}
+								setProperty={setProperty}
+								targetProperties={targetProperties}
+								parentProperties={parentProperties}
+								agentProperties={agentProperties}
+								modelOutputProperties={modelOutputProperties}
+								onChange={onchange}
 								onDelete={() => {
 									constructModel.setProperties.properties = constructModel.setProperties.properties.filter(
 										(v) => v.id !== setProperty.id
@@ -99,4 +131,11 @@ export default class ConstructModelConfiguration extends Component<any, any> {
 			</TreeViewMenu>
 		);
 	}
+}
+
+function ModelCodeProps(model: string | null | undefined): any[] {
+	if (model) {
+		return UIA.GetModelCodeProperties(model).toNodeSelect();
+	}
+	return [];
 }
