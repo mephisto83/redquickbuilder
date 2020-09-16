@@ -161,9 +161,9 @@ export function CreateNextStepConfiguration(): NextStepConfiguration {
 		id: GUID(),
 		enabled: true,
 		name: '',
-		checkExistance: {},
 		constructModel: CreateConstructModelConfig(),
-		sendMessageToLakeConfig: CreateSendMessageToLakeConfig()
+		sendMessageToLakeConfig: CreateSendMessageToLakeConfig(),
+		existenceCheck: CreateExistenceCheck()
 	};
 }
 export function CheckNextStepsConfiguration(config: NextStepsConfiguration): boolean {
@@ -176,9 +176,8 @@ export function CheckNextStepsConfiguration(config: NextStepsConfiguration): boo
 export function CheckNextStepConfiguration(config: NextStepConfiguration): boolean {
 	if (config && config.enabled) {
 		return (
-			(!config.checkExistance ||
-				!config.checkExistance.checkExistence ||
-				CheckIsExisting(config.checkExistance.checkExistence)) &&
+			(!config.existenceCheck ||
+				CheckExistenceCheck(config.existenceCheck)) &&
 			config.constructModel &&
 			CheckConstructModel(config.constructModel) &&
 			config.sendMessageToLakeConfig &&
@@ -284,7 +283,9 @@ export function CreateSetProperty(): SetProperty {
 		stringValue: '',
 		targetProperty: '',
 		enumerationValue: '',
-		booleanValue: 'false'
+		booleanValue: 'false',
+		modelOutputProperty: '',
+		parentProperty: ''
 	};
 }
 export function CheckSetProperties(setProperties: SetPropertiesConfig) {
@@ -986,11 +987,25 @@ export interface CheckExistenceConfig extends AfterEffectRelations {
 	ifTrue: BranchConfig;
 	ifFalse: BranchConfig;
 }
+export function CheckConnectionChain(chain: ConnectionChainItem[]): boolean {
+	return !chain.find((c) => !CheckConnectionChainItem(c));
+}
+export function CheckConnectionChainItem(config: ConnectionChainItem): boolean {
+	return !!config && !!config.model && !!config.modelProperty;
+}
+export function CreateExistenceCheck(): ExistenceCheckConfig {
+	return {
+		head: CreateHalf(),
+		orderedCheck: [],
+		enabled: false,
+		id: GUID()
+	};
+}
 export interface ExistenceCheckConfig extends ConfigItem {
 	head: HalfRelation;
-	orderedCheck: ConnectionChain[];
+	orderedCheck: ConnectionChainItem[];
 }
-export interface ConnectionChain {
+export interface ConnectionChainItem extends ConfigItem {
 	model: string;
 	modelProperty: string;
 }

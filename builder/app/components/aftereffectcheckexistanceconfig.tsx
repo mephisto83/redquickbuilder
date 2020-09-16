@@ -87,7 +87,7 @@ export default class AfterEffectCheckExistanceConfig extends Component<any, any>
 				}}
 				greyed={!checkExistence || !checkExistence.enabled}
 				active
-				title={Titles.ChexkExistence}
+				title={Titles.CheckExistence}
 			>
 				<TreeViewItemContainer>
 					<CheckBox

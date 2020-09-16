@@ -23,6 +23,7 @@ import TreeViewItemContainer from './treeviewitemcontainer';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import ReturnSettings from './returnsettings';
+import ConnectionChainComponent from './connectionchain';
 
 export default class CheckExistanceConfigComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -31,21 +32,6 @@ export default class CheckExistanceConfigComponent extends Component<any, any> {
 	}
 
 	render() {
-		let dataChainOptions: DataChainConfiguration = this.props.dataChainOptions;
-		let ok = false;
-		let isValidation = false;
-		switch (this.props.dataChainType) {
-			case DataChainType.Validation:
-				isValidation = true;
-				ok = true;
-				break;
-			case DataChainType.AfterEffect:
-				ok = true;
-				break;
-		}
-		if (!dataChainOptions || !ok) {
-			return <span />;
-		}
 		let methodDescription: MethodDescription = this.props.methodDescription;
 		if (!methodDescription) {
 			return <span />;
@@ -68,7 +54,7 @@ export default class CheckExistanceConfigComponent extends Component<any, any> {
 				error={!valid}
 				active
 				greyed={!existenceCheck.enabled}
-				title={Titles.ChexkExistence}
+				title={Titles.CheckExistence}
 			>
 				<TreeViewItemContainer>
 					<CheckBox
@@ -147,63 +133,8 @@ export default class CheckExistanceConfigComponent extends Component<any, any> {
 							}}
 						/>
 					</TreeViewItemContainer>
-					<TreeViewItemContainer>
-						<SelectInput
-							label={UIA.GetNodeTitle(methodDescription.properties.model)}
-							options={targetProperties}
-							value={existenceCheck.targetProperty}
-							onChange={(value: string) => {
-								existenceCheck.targetProperty = value;
-								this.setState({
-									turn: UIA.GUID()
-								});
-								if (this.props.onChange) {
-									this.props.onChange();
-								}
-							}}
-						/>
-					</TreeViewItemContainer>
+          <ConnectionChainComponent chain={existenceCheck.orderedCheck} />
 				</TreeViewMenu>
-				<ReturnSettings
-					existenceCheck={existenceCheck}
-					onChange={() => {
-						this.setState({
-							turn: UIA.GUID()
-						});
-						if (this.props.onChange) {
-							this.props.onChange();
-						}
-					}}
-				/>
-				<TreeViewMenu
-					open={this.state.skipopen}
-					icon={CheckIsExisting(existenceCheck) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
-					onClick={() => {
-						this.setState({ skipopen: !this.state.skipopen });
-					}}
-					hide={!existenceCheck || !existenceCheck.enabled}
-					active={isValidation && (!existenceCheck.returnSetting || !existenceCheck.returnSetting.enabled)}
-					greyed={existenceCheck.enabled}
-					title={Titles.SkipSettings}
-				>
-					<TreeViewItemContainer>
-						<SelectInput
-							label={Titles.SkipSetting}
-							options={Object.values(SkipSettings).map((v: string) => ({ title: v, value: v }))}
-							value={existenceCheck.skipSettings}
-							onChange={(value: SkipSettings) => {
-								existenceCheck.skipSettings = value;
-								this.setState({
-									turn: UIA.GUID()
-								});
-								if (this.props.onChange) {
-									this.props.onChange();
-								}
-							}}
-						/>
-					</TreeViewItemContainer>
-				</TreeViewMenu>
-				<TreeViewButtonGroup />
 			</TreeViewMenu>
 		);
 	}
@@ -230,8 +161,8 @@ export default class CheckExistanceConfigComponent extends Component<any, any> {
 			case RelationType.ModelOutput:
 				if (methodDescription.properties.model_output) {
 					head.modelOutput = methodDescription.properties.model_output;
-				}
-				return head.modelOutput;
+        }
+        break;
 			case RelationType.Parent:
 				if (methodDescription.properties.parent) {
 					head.parent = methodDescription.properties.parent;
@@ -254,13 +185,13 @@ export default class CheckExistanceConfigComponent extends Component<any, any> {
 	getHeadProperty(head: HalfRelation) {
 		switch (head.relationType) {
 			case RelationType.Agent:
-				return head.agent;
+				return head.agentProperty;
 			case RelationType.Model:
-				return head.model;
+				return head.modelProperty;
 			case RelationType.ModelOutput:
-				return head.modelOutput;
+				return head.modelOutputProperty;
 			case RelationType.Parent:
-				return head.parent;
+				return head.parentProperty;
 		}
 	}
 	getLabel(head: HalfRelation) {

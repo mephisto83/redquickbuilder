@@ -67,7 +67,7 @@ export default class CheckExistanceConfig extends Component<any, any> {
 				error={!valid}
 				active
 				greyed={!checkExistence.enabled}
-				title={Titles.ChexkExistence}
+				title={Titles.CheckExistence}
 			>
 				<TreeViewItemContainer>
 					<CheckBox

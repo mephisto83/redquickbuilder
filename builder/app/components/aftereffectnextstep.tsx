@@ -7,7 +7,9 @@ import {
 	MountingDescription,
 	NextStepConfiguration,
 	CheckNextStepConfiguration,
-	ValidationColors
+	ValidationColors,
+  MethodDescription,
+  CreateExistenceCheck
 } from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import CheckExistanceConfig from './checkexistenceconfig';
@@ -23,9 +25,9 @@ export default class AfterEffectNextStep extends Component<any, any> {
 		let nextStepConfig: NextStepConfiguration = this.props.nextStepConfig;
 		if (!nextStepConfig) {
 			return <span />;
-		}
-
-		let methodDescription: MountingDescription = this.props.methodDescription;
+    }
+    nextStepConfig.existenceCheck = nextStepConfig.existenceCheck || CreateExistenceCheck();
+		let methodDescription: MethodDescription = this.props.methodDescription;
 		if (!methodDescription) {
 			return <span />;
 		}
