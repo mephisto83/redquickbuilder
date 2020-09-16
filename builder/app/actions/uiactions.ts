@@ -4721,7 +4721,7 @@ export function updateComponentProperty(nodeId: string, prop: string, value: any
 				options() {
 					return {
 						prop: prop,
-						value: JSON.parse(JSON.stringify(value)),
+						value: value === undefined ? undefined : JSON.parse(JSON.stringify(value)),
 						id: nodeId
 					};
 				}

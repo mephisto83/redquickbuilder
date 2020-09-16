@@ -105,7 +105,7 @@ export default class ModelGenerator {
 	}
 
 	static GenerateCommon(options: { state: any }) {
-		let template = fs.readFileSync('./app/templates/common/common.d.ts', 'utf8');
+		let template = fs_readFileSync('./app/templates/common/common.d.ts', 'utf8');
 		let userModel = GetNodeByProperties({
 			[NodeProperties.IsUser]: true,
 			[NodeProperties.NODEType]: NodeTypes.Model
@@ -197,9 +197,9 @@ export default class ModelGenerator {
 		//   direction: GraphMethods.TARGET
 		// }).filter(x => x.id !== node.id);
 		connectedProperties = [ ...connectedProperties, ...logicalParents ];
-		const propertyTemplate = fs.readFileSync(MODEL_PROPERTY_TEMPLATE, 'utf8');
-		const attributeTemplate = fs.readFileSync(MODEL_ATTRIBUTE_TEMPLATE, 'utf8');
-		const staticFunctionTemplate = fs.readFileSync(MODEL_STATIC_TEMPLATES, 'utf8');
+		const propertyTemplate = fs_readFileSync(MODEL_PROPERTY_TEMPLATE, 'utf8');
+		const attributeTemplate = fs_readFileSync(MODEL_ATTRIBUTE_TEMPLATE, 'utf8');
+		const staticFunctionTemplate = fs_readFileSync(MODEL_STATIC_TEMPLATES, 'utf8');
 
 		const validatorFunctions = GraphMethods.getNodesByLinkType(graph, {
 			id: nodeId,
@@ -474,7 +474,7 @@ export default class ModelGenerator {
 		templateSwapDictionary.properties = properties.join('');
 		templateSwapDictionary.staticFunctions = staticFunctions.unique((x: any) => x).join('\n');
 
-		let modelTemplate = fs.readFileSync(MODEL_TEMPLATE, 'utf8');
+		let modelTemplate = fs_readFileSync(MODEL_TEMPLATE, 'utf8');
 		modelTemplate = bindTemplate(modelTemplate, templateSwapDictionary);
 
 		const result = {
@@ -561,8 +561,8 @@ ${items}
 		let connectedProperties = GetModelPropertyChildren(node.id); //Get all properties including link to other models
 		const logicalParents: any[] = []; // No more having parents referencing back.
 		connectedProperties = [ ...connectedProperties, ...logicalParents ];
-		const propertyTemplate = fs.readFileSync(MODEL_PROPERTY_TEMPLATE_TS, 'utf8');
-		const staticFunctionTemplate = fs.readFileSync(MODEL_STATIC_TEMPLATES, 'utf8');
+		const propertyTemplate = fs_readFileSync(MODEL_PROPERTY_TEMPLATE_TS, 'utf8');
+		const staticFunctionTemplate = fs_readFileSync(MODEL_STATIC_TEMPLATES, 'utf8');
 
 		let imports: string[] = [];
 		const staticFunctions = [];
@@ -661,7 +661,7 @@ ${items}
 		}
 		templateSwapDictionary.properties = properties.unique().join('');
 
-		let modelTemplate = fs.readFileSync(MODEL_TEMPLATE_TS, 'utf8');
+		let modelTemplate = fs_readFileSync(MODEL_TEMPLATE_TS, 'utf8');
 		templateSwapDictionary.imports = includeImports ? imports.join(NEW_LINE) : '';
 		modelTemplate = bindTemplate(modelTemplate, templateSwapDictionary);
 
@@ -683,4 +683,15 @@ ${items}
 		}
 		return res;
 	}
+}
+
+export function fs_readFileSync(pa:string, typ:string){
+  try{
+    return fs.readFileSync(pa, typ);
+  }
+  catch{
+    if(pa.indexOf('./app') !== -1){
+      return fs.readFileSync('./'+pa.substring('./app'.length));
+    }
+  }
 }

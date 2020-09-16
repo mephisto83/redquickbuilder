@@ -39,7 +39,8 @@ export default class ScreenEffectsComponent extends Component<any, any> {
 							screenEffects.push({
 								id: UIA.GUID(),
 								name: '',
-								dataChain: ''
+								dataChain: '',
+								passDeep: false
 							});
 
 							this.setState({ turn: UIA.GUID() });
@@ -55,8 +56,8 @@ export default class ScreenEffectsComponent extends Component<any, any> {
 								if (this.props.onChange) {
 									this.props.onChange();
 								}
-              }}
-              agent={this.props.agent}
+							}}
+							agent={this.props.agent}
 							onDelete={() => {
 								let index: number = screenEffects.findIndex((v) => v.id === screenEffect.id);
 								if (index !== -1 && screenEffects) {

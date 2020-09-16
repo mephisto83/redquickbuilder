@@ -31,6 +31,7 @@ export default class RenderedCode extends Component<any, any> {
 	render() {
 		const { state } = this.props;
 		const options = {
+			automaticLayout: true,
 			selectOnLineNumbers: true
 		};
 		const currentNode = UIA.Node(state, UIA.Visual(state, SELECTED_NODE));

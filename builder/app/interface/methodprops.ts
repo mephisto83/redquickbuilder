@@ -109,6 +109,7 @@ export interface DataChainConfiguration {
 	setInteger?: SetInteger;
 	swaggerCall?: SwaggerCall;
 	incrementInteger?: IncrementInteger;
+	nextStepsConfiguration?: NextStepsConfiguration;
 	incrementDouble?: IncrementDouble;
 	compareEnumeration?: CompareEnumeration;
 	compareEnumerations?: CompareEnumeration[];
@@ -117,6 +118,88 @@ export interface DataChainConfiguration {
 	setProperties?: SetPropertiesConfig;
 	directExecute?: boolean;
 	namespaceConfig?: NamespaceConfig;
+}
+
+export interface NextStepConfiguration extends ConfigItem {
+	checkExistance: DataChainConfiguration;
+	constructModel: ConstructModelConfig;
+	sendMessageToLakeConfig: SendMessageToLakeConfig;
+}
+export interface ConstructModelConfig extends ConfigItem {
+	model: string;
+	setProperties: SetPropertiesConfig;
+}
+export interface SendMessageToLakeConfig extends ConfigItem {}
+export interface NextStepsConfiguration extends ConfigItem {
+	steps: NextStepConfiguration[];
+	descriptionId: string;
+}
+export function CreateNextStepsConfiguration(): NextStepsConfiguration {
+	return {
+		steps: [],
+		enabled: false,
+		descriptionId: '',
+		id: GUID()
+	};
+}
+export function CreateConstructModelConfig(): ConstructModelConfig {
+	return {
+		enabled: false,
+		id: GUID(),
+		model: '',
+		setProperties: CreateSetProperties()
+	};
+}
+export function CreateSendMessageToLakeConfig(): SendMessageToLakeConfig {
+	return {
+		enabled: true,
+		id: GUID()
+	};
+}
+export function CreateNextStepConfiguration(): NextStepConfiguration {
+	return {
+		id: GUID(),
+		enabled: true,
+		name: '',
+		checkExistance: {},
+		constructModel: CreateConstructModelConfig(),
+		sendMessageToLakeConfig: CreateSendMessageToLakeConfig()
+	};
+}
+export function CheckNextStepsConfiguration(config: NextStepsConfiguration): boolean {
+	if (config && config.enabled) {
+		return !!config.steps.length;
+	}
+	return true;
+}
+
+export function CheckNextStepConfiguration(config: NextStepConfiguration): boolean {
+	if (config && config.enabled) {
+		return (
+			!!config.checkExistance &&
+			!!config.checkExistance.checkExistence &&
+			CheckIsExisting(config.checkExistance.checkExistence) &&
+			config.constructModel &&
+			CheckConstructModel(config.constructModel) &&
+			config.sendMessageToLakeConfig &&
+			CheckSendMessageToLakeConfig(config.sendMessageToLakeConfig)
+		);
+	}
+	return true;
+}
+export function CheckSendMessageToLakeConfig(config: SendMessageToLakeConfig): boolean {
+	if (config && config.enabled) {
+		return config.enabled;
+	}
+	return true;
+}
+export function CheckConstructModel(constructModel: ConstructModelConfig): boolean {
+	if (constructModel && constructModel.enabled) {
+		return (
+			!!constructModel.model && !!constructModel.setProperties && CheckSetProperties(constructModel.setProperties)
+		);
+	}
+	return true;
 }
 
 export interface NamespaceConfig {
@@ -194,6 +277,7 @@ export function CreateSetProperty(): SetProperty {
 		enumeration: '',
 		floatValue: '',
 		integerValue: '',
+		id: GUID(),
 		modelProperty: '',
 		relationType: RelationType.Agent,
 		setPropertyType: SetPropertyType.String,
@@ -245,6 +329,7 @@ export interface SetProperty {
 	stringValue: string;
 	enumeration: string;
 	enumerationValue: string;
+	id: string;
 }
 export enum SetPropertyType {
 	Property = 'Property',

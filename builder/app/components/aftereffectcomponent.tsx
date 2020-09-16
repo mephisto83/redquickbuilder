@@ -30,6 +30,7 @@ import BuildDataChainAfterEffectConverter, {
 } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import { mount } from 'enzyme';
 import AfterEffectDataChainOptions from './aftereffectdatachainoptions';
+import { viewCode } from '../actions/remoteActions';
 
 export default class AfterEffectComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -140,6 +141,17 @@ export default class AfterEffectComponent extends Component<any, any> {
 						}}
 						icon="fa fa-arrow-down"
 					/>
+					{afterEffect.dataChain ? (
+						<TreeViewGroupButton
+							icon={'fa fa-hand-grab-o'}
+							onClick={() => {
+								UIA.SelectNode(afterEffect.dataChain, null)(UIA.GetDispatchFunc());
+								if (afterEffect.dataChain) {
+									viewCode(UIA.GenerateCSChainFunction(afterEffect.dataChain));
+								}
+							}}
+						/>
+					) : null}
 					<TreeViewGroupButton
 						title={`Build Datachain`}
 						onClick={() => {
@@ -151,13 +163,13 @@ export default class AfterEffectComponent extends Component<any, any> {
 											BuildDataChainAfterEffectConverter(
 												{
 													name: afterEffect.name,
-                          from: methodDescription,
-                          afterEffect,
+													from: methodDescription,
+													afterEffect,
 													dataChain: afterEffect.dataChain,
 													methods: this.props.methods,
 													type: DataChainType.AfterEffect,
-                          to: currentDescription.methodDescription,
-                          currentDescription,
+													to: currentDescription.methodDescription,
+													currentDescription,
 													routes: this.props.routes || [],
 													afterEffectChild: afterEffect.name,
 													afterEffectParent: this.props.mountingItem.name,
@@ -189,9 +201,9 @@ export default class AfterEffectComponent extends Component<any, any> {
 													{
 														name: afterEffect.name,
 														from: currentDescription.methodDescription,
-                            dataChain: afterEffect.dataChain,
-                            currentDescription,
-                            afterEffect,
+														dataChain: afterEffect.dataChain,
+														currentDescription,
+														afterEffect,
 														methods: this.props.methods,
 														to: currentDescription.methodDescription,
 														routes: this.props.routes || [],
@@ -199,7 +211,7 @@ export default class AfterEffectComponent extends Component<any, any> {
 														type: DataChainType.AfterEffect,
 														afterEffectParent: this.props.mountingItem.name,
 														afterEffectOptions: afterEffect.dataChainOptions,
-                            override: this.state.override
+														override: this.state.override
 													},
 													(dataChain: Node) => {
 														afterEffect.dataChain = dataChain.id;

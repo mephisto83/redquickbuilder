@@ -14,7 +14,7 @@ import {
 	CheckIsExisting,
 	CheckExistenceConfig,
 	SetupConfigInstanceInformation,
-  ValidationColors
+	ValidationColors
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import TreeViewButtonGroup from './treeviewbuttongroup';
@@ -137,6 +137,12 @@ export default class CheckExistanceConfig extends Component<any, any> {
 										break;
 									case RelationType.Model:
 										checkExistence.modelProperty = value;
+										break;
+									case RelationType.Parent:
+										checkExistence.parentProperty = value;
+										break;
+									case RelationType.ModelOuput:
+										checkExistence.modelOutputProperty = value;
 										break;
 								}
 								this.setState({

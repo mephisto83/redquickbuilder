@@ -438,8 +438,8 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			from_parameter_template = `
       public static async Task Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change = null, #{{"key":"result"}}# result = null)
       {
-          Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task<${outputType ||
-				'bool'}>> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# model, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
+          Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task> func =
+            async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# model, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
               {{simplevalidation}}
               {{copy_config}}
               {{concat_config}}
@@ -832,7 +832,10 @@ function GenerateSimpleValidations(
 				checks.push({ template: `!${valuePropString}`, id: simpleValidation.id });
 			}
 			if (simpleValidation.date && simpleValidation.date.enabled) {
-				checks.push({ template: `!${valuePropString} && ${valuePropString} != default(DateTime)`, id: simpleValidation.id });
+				checks.push({
+					template: `!${valuePropString} && ${valuePropString} != default(DateTime)`,
+					id: simpleValidation.id
+				});
 			}
 			if (simpleValidation.isTrue && simpleValidation.isTrue.enabled) {
 				checks.push({ template: `${valuePropString}`, id: simpleValidation.id });
@@ -1338,10 +1341,10 @@ function GenerateBranchMethods(
 	let { checkExistence } = dataChainConfigOptions;
 	if (checkExistence) {
 		let { ifFalse, ifTrue } = checkExistence;
-		if (ifFalse.enabled) {
+		if (ifFalse && ifFalse.enabled) {
 			GenerateIfBranch(ifFalse, routes, result, methodDescriptions);
 		}
-		if (ifTrue.enabled) {
+		if (ifTrue && ifTrue.enabled) {
 			GenerateIfBranch(ifTrue, routes, result, methodDescriptions);
 		}
 	}

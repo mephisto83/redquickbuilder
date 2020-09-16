@@ -19,6 +19,7 @@ import TreeViewGroupButton from './treeviewgroupbutton';
 import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachain';
 import { GetStateFunc, graphOperation } from '../actions/uiactions';
 import { Node } from '../methods/graph_types';
+import { viewCode } from '../actions/remoteActions';
 
 export default class ScreenEffectComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -125,6 +126,15 @@ export default class ScreenEffectComponent extends Component<any, any> {
 							)(UIA.GetDispatchFunc(), GetStateFunc());
 						}}
 						icon="fa fa-chain"
+					/>
+					<TreeViewGroupButton
+						icon={'fa fa-hand-grab-o'}
+						onClick={() => {
+							UIA.SelectNode(screenEffect.dataChain, null)(UIA.GetDispatchFunc());
+							if (screenEffect.dataChain) {
+								viewCode(UIA.GenerateCSChainFunction(screenEffect.dataChain));
+							}
+						}}
 					/>
 					{this.props.agent ? (
 						<TreeViewGroupButton

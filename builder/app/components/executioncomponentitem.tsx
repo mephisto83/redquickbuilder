@@ -243,8 +243,10 @@ export function buildDataChain(
 			if (methodDescription) {
 				executionConfig.dataChainOptions.namespaceConfig = CreateNameSpaceConfig({
 					space: [
-						methodDescription.properties.agent,
-						methodDescription.properties.model_output || methodDescription.properties.model,
+						`${UIA.GetNodeTitle(methodDescription.properties.agent)}NSP`,
+						`${UIA.GetNodeTitle(
+							methodDescription.properties.model_output || methodDescription.properties.model
+						)}NSP`,
 						mountingItem.viewType,
 						MethodFunctions[methodDescription.functionType].method
 					]

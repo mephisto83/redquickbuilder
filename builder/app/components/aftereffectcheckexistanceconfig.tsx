@@ -157,6 +157,12 @@ export default class AfterEffectCheckExistanceConfig extends Component<any, any>
 									case RelationType.Model:
 										checkExistence.modelProperty = value;
 										break;
+									case RelationType.ModelOuput:
+										checkExistence.modelOutputProperty = value;
+										break;
+									case RelationType.Parent:
+										checkExistence.parentProperty = value;
+										break;
 								}
 								this.setState({
 									turn: UIA.GUID()

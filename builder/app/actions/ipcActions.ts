@@ -48,7 +48,7 @@ import {
 	VISUAL,
 	UIC,
 	setPinned,
-  handleCodeWindowMessage
+	handleCodeWindowMessage
 } from './uiactions';
 import { GraphKeys, GetNodesLinkedTo } from '../methods/graph_methods';
 import { HandlerEvents } from '../ipc/handler-events';
@@ -865,8 +865,7 @@ function generateReactWebTheme(workspace: string, state: any) {
 	});
 }
 function generateFiles(workspace: string, solutionName: string, state: any) {
-	const code_types = [ GeneratedTypes.CSDataChain ];
-	let ats = [
+	const code_types = [
 		NodeTypes.Controller,
 		NodeTypes.Model,
 		NodeTypes.ExtensionType,

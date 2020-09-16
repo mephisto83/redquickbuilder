@@ -617,3 +617,5 @@ export const AutoCalculate = 'Auto calculate';
 export const String = 'String';
 export const SetPropertyType = 'Set Property type';
 export const ScaffoldTargets = 'Scaffold Targets';
+export const NextStep = 'Add Next Step';
+export const NextSteps = 'Next Steps';

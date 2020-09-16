@@ -19,6 +19,7 @@ import AfterEffectSetPropertiesConfig from './aftereffectsetpropertiesconfig';
 import AfterEffectRouteConfigComponent from './aftereffectrouteconfigcomponent';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import CheckBox from './checkbox';
+import AfterEffectNextSteps from './aftereffectnextsteps';
 
 export default class AfterEffectDataChainOption extends Component<any, any> {
 	constructor(props: any) {
@@ -80,6 +81,12 @@ export default class AfterEffectDataChainOption extends Component<any, any> {
 					dataChainOptions={dataChainOptions}
 					routes={this.props.routes}
 					onChange={onchange}
+				/>
+				<AfterEffectNextSteps
+					dataChainOptions={dataChainOptions}
+					onChange={onchange}
+					methodDescription={currentMethodDescription}
+					methods={this.props.methods}
 				/>
 				<AfterEffectGetExistanceConfig
 					previousMethodDescription={previousMethodDescription}

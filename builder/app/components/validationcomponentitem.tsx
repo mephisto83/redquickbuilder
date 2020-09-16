@@ -22,7 +22,8 @@ import {
 	CreateBoolean,
 	CreateReferences,
 	EighthRelation,
-	MethodPropsProperties
+	MethodPropsProperties,
+	CreateNameSpaceConfig
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import {
@@ -977,6 +978,19 @@ export function autoName(
 						}
 						break;
 				}
+
+				validationConfig.dataChainOptions.namespaceConfig =
+					validationConfig.dataChainOptions.namespaceConfig ||
+					CreateNameSpaceConfig({
+						space: [
+							props.dataChainType,
+							`${GetCodeName(methodDescription.properties.agent)}NSP`,
+							`${GetCodeName(
+								methodDescription.properties.model_output || methodDescription.properties.model
+							)}NSP`,
+							viewType
+						]
+					});
 			}
 		}
 	}

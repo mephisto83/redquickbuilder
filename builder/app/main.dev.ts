@@ -125,6 +125,9 @@ const createWindow = async () => {
 		if (objectViewerWindow) {
 			objectViewerWindow.close();
 		}
+		if (codeViewWindow) {
+			codeViewWindow.close();
+		}
 		mainWindow = null;
 	});
 
