@@ -297,7 +297,7 @@ let isA = [ 'must be a', 'must be an', 'is a', 'is an', ...booleanStuff ];
 let contains = [ 'contains a', 'contains an' ];
 let intersects = [ 'intersects', 'intersects with' ];
 let inAEnumeration = [ 'is in an enumeration', 'is an enumeration', 'is in a set' ];
-let executionStuff = [ 'copies to', 'increments by', 'concatenates with' ];
+let executionStuff = [ 'copies to', 'increments by', 'concatenates with', 'concatenates list with' ];
 let referenceStuff = [ 'must connect to a real' ];
 let validationStuff = [ 'must conform to a' ];
 let navigationStuff = [ 'navigates to' ];
@@ -462,6 +462,10 @@ export default function getLanguageMeaning(
 				result.methodType = NLMethodType.CopyTo;
 			} else if (temp.has('increments by')) {
 				result.methodType = NLMethodType.IncrementBy;
+			} else if (temp.has('concatenates list with')) {
+				result.methodType = NLMethodType.ConcatenateCollection;
+				result.parameterClauses = captureParameters('concatenates list with', temp.text(), []);
+				result.options = {};
 			} else if (temp.has('concatenates with')) {
 				result.methodType = NLMethodType.ConcatenateString;
 				result.parameterClauses = captureParameters('concatenates with', temp.text(), [ 'with spaces' ]);
@@ -727,6 +731,7 @@ export enum NLMethodType {
 	Reference = 'Reference',
 	ComplexValidations = 'ComplexValidations',
 	ConcatenateString = 'ConcatenateString',
+	ConcatenateCollection = 'ConcatenateCollection',
 	Navigate = 'Navigate'
 }
 

@@ -15,7 +15,7 @@ import {
 	CheckExistenceConfig,
 	SetupConfigInstanceInformation,
 	ValidationColors,
-	ExistenceCheckConfig,
+	GetOrExistenceCheckConfig,
 	CheckExistenceCheck,
 	HalfRelation,
 	ConnectionChainItem,
@@ -28,6 +28,7 @@ import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectC
 import ReturnSettings from './returnsettings';
 import { NodesByType } from '../methods/graph_methods';
 import { NodeTypes } from '../constants/nodetypes';
+import TreeViewGroupButton from './treeviewgroupbutton';
 
 export default class ConnectionChainItemComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -37,6 +38,7 @@ export default class ConnectionChainItemComponent extends Component<any, any> {
 
 	render() {
 		let item: ConnectionChainItem = this.props.item;
+		let previousModel: string = this.props.previousModel;
 		if (!item) {
 			return <span>No existence check</span>;
 		}
@@ -52,8 +54,37 @@ export default class ConnectionChainItemComponent extends Component<any, any> {
 				error={!valid}
 				active
 				greyed={!valid}
-				title={Titles.CheckExistence}
+				title={`${UIA.GetNodeTitle(previousModel)}.${UIA.GetNodeTitle(
+					item.previousModelProperty
+				)} => ${UIA.GetNodeTitle(item.model)}.${UIA.GetNodeTitle(item.modelProperty)}`}
 			>
+				<TreeViewButtonGroup>
+					<TreeViewGroupButton
+						title={`${Titles.Delete}`}
+						onClick={() => {
+							if (this.props.onDelete) {
+								this.props.onDelete();
+							}
+						}}
+						icon="fa fa-minus"
+					/>
+				</TreeViewButtonGroup>
+				<TreeViewItemContainer>
+					<SelectInput
+						label={Titles.Property}
+						options={UIA.GetModelCodeProperties(previousModel).toNodeSelect()}
+						value={item.previousModelProperty}
+						onChange={(value: string) => {
+							item.previousModelProperty = value;
+							this.setState({
+								turn: UIA.GUID()
+							});
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
+						}}
+					/>
+				</TreeViewItemContainer>
 				<TreeViewItemContainer>
 					<SelectInput
 						label={Titles.Model}

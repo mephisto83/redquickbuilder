@@ -72,10 +72,21 @@ export default class AfterEffectSetupProperty extends Component<any, any> {
 				break;
 			case SetPropertyType.Property:
 				showSetProperty = true;
-				value =
-					setProperty.relationType == RelationType.Agent
-						? setProperty.agentProperty
-						: setProperty.modelProperty;
+				switch (setProperty.relationType) {
+					case RelationType.Agent:
+						value = setProperty.agentProperty;
+						break;
+					case RelationType.Model:
+						value = setProperty.modelProperty;
+						break;
+					case RelationType.ModelOutput:
+						value = setProperty.modelOutputProperty;
+						break;
+					case RelationType.Parent:
+						value = setProperty.parentProperty;
+						break;
+				}
+
 				targetProperty = setProperty.targetProperty;
 				valueTitle = Titles.Property;
 				break;

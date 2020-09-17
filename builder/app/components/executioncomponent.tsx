@@ -11,7 +11,9 @@ import {
 	MethodDescription,
 	CreateCopyConfig,
 	RelationType,
-	CreateConcatenateStringConfig
+	CreateConcatenateStringConfig,
+	CreateValueOperationConfig,
+	ValueOperationType
 } from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
@@ -58,6 +60,33 @@ export default class ExecutionComponent extends Component<any, any> {
 							executionConfig.summary = meaning.text;
 							copyConfig.enabled = true;
 							executionConfig.name = `Copy ${UIA.GetNodeTitle(meaning.targetClause.property)}`;
+						}
+						break;
+					case NLMethodType.ConcatenateCollection:
+						let concatenateCollection = CreateValueOperationConfig(
+							ValueOperationType.CollectionConcatenation
+						);
+						if (meaning.actorClause.relationType) {
+							concatenateCollection.relationType = meaning.actorClause.relationType;
+							setupRelation(concatenateCollection, meaning.actorClause);
+							if (meaning.parameterClauses) {
+								executionConfig.summary = meaning.text;
+								concatenateCollection.enabled = true;
+								concatenateCollection.parameters = meaning.parameterClauses
+									.filter((v) => v.agent && v.property)
+									.map((v) => ({
+										agent: v.agent,
+										property: v.property,
+										relationType: v.relationType
+									}))
+									.map((v: any) => v);
+								executionConfig.name = `Concatenate ${UIA.GetNodeTitle(
+									meaning.actorClause.property
+								)} with ${concatenateCollection.parameters
+									.map((v) => `${UIA.GetNodeTitle(v.agent)}'s ${UIA.GetNodeTitle(v.property)}`)
+									.join(', ')}.`;
+								executionConfig.dataChainOptions.concatenateCollection = concatenateCollection;
+							}
 						}
 						break;
 					case NLMethodType.ConcatenateString:

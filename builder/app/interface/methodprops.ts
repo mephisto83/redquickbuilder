@@ -98,7 +98,8 @@ export interface AutoSetupConfiguration {
 	executionAutoCopy: boolean;
 }
 export interface DataChainConfiguration {
-	concatenateString?: ConcatenateStringConfig;
+	concatenateCollection?: ValueOperationConfig;
+	concatenateString?: ValueOperationConfig;
 	checkExistence?: CheckExistenceConfig;
 	simpleValidation?: SimpleValidationConfig;
 	simpleValidationConfiguration?: SimpleValidationsConfiguration;
@@ -121,7 +122,8 @@ export interface DataChainConfiguration {
 }
 
 export interface NextStepConfiguration extends ConfigItem {
-	existenceCheck: ExistenceCheckConfig;
+	existenceCheck: GetOrExistenceCheckConfig;
+	getExisting: GetOrExistenceCheckConfig;
 	constructModel: ConstructModelConfig;
 	sendMessageToLakeConfig: SendMessageToLakeConfig;
 }
@@ -163,7 +165,8 @@ export function CreateNextStepConfiguration(): NextStepConfiguration {
 		name: '',
 		constructModel: CreateConstructModelConfig(),
 		sendMessageToLakeConfig: CreateSendMessageToLakeConfig(),
-		existenceCheck: CreateExistenceCheck()
+		existenceCheck: CreateExistenceCheck(),
+		getExisting: CreateExistenceCheck()
 	};
 }
 export function CheckNextStepsConfiguration(config: NextStepsConfiguration): boolean {
@@ -176,8 +179,7 @@ export function CheckNextStepsConfiguration(config: NextStepsConfiguration): boo
 export function CheckNextStepConfiguration(config: NextStepConfiguration): boolean {
 	if (config && config.enabled) {
 		return (
-			(!config.existenceCheck ||
-				CheckExistenceCheck(config.existenceCheck)) &&
+			(!config.existenceCheck || CheckExistenceCheck(config.existenceCheck)) &&
 			config.constructModel &&
 			CheckConstructModel(config.constructModel) &&
 			config.sendMessageToLakeConfig &&
@@ -252,6 +254,7 @@ export function CheckAfterEffectDataChainConfiguration(options: DataChainConfigu
 		(!options.copyEnumeration || CheckCopyEnumeration(options.copyEnumeration)) &&
 		(!options.setProperties || CheckSetProperties(options.setProperties)) &&
 		(!options.concatenateString || CheckConcatenateStringConfig(options.concatenateString)) &&
+		(!options.concatenateCollection || CheckValueOperationConfigConfig(options.concatenateCollection)) &&
 		(!options.setInteger || CheckSetter(options.setInteger)) &&
 		(!options.setBoolean || CheckSetter(options.setBoolean)) &&
 		(!options.incrementDouble || CheckSetter(options.incrementDouble)) &&
@@ -375,7 +378,14 @@ export function CreateBranch(): BranchConfig {
 		name: ''
 	};
 }
-export function CheckConcatenateStringConfig(concatenateStringConfig: ConcatenateStringConfig): boolean {
+
+export function CheckValueOperationConfigConfig(concatenateStringConfig: ValueOperationConfig): boolean {
+	if (concatenateStringConfig.enabled) {
+		return !!CheckRelation(concatenateStringConfig) && concatenateStringConfig.parameters.length >= 1;
+	}
+	return true;
+}
+export function CheckConcatenateStringConfig(concatenateStringConfig: ValueOperationConfig): boolean {
 	if (concatenateStringConfig.enabled) {
 		return !!CheckRelation(concatenateStringConfig) && concatenateStringConfig.parameters.length > 1;
 	}
@@ -426,7 +436,12 @@ export function CreateCopyConfig(): CopyConfig {
 		targetProperty: ''
 	};
 }
-export interface ConcatenateStringConfig extends HalfRelation {
+export enum ValueOperationType {
+	StringConcatentation = 'StringConcatenation',
+	CollectionConcatenation = 'CollectionConcatenation'
+}
+export interface ValueOperationConfig extends HalfRelation {
+	operation: ValueOperationType;
 	parameters: DirectRelation[];
 	with?: string;
 }
@@ -435,11 +450,12 @@ export interface DirectRelation {
 	agent: string;
 	property: string;
 }
-export function CreateConcatenateStringConfig(): ConcatenateStringConfig {
+export function CreateValueOperationConfig(operationType: ValueOperationType): ValueOperationConfig {
 	return {
 		agent: '',
 		agentProperty: '',
 		model: '',
+		operation: operationType,
 		modelProperty: '',
 		modelOutput: '',
 		modelOutputProperty: '',
@@ -450,6 +466,9 @@ export function CreateConcatenateStringConfig(): ConcatenateStringConfig {
 		parameters: [],
 		relationType: RelationType.Agent
 	};
+}
+export function CreateConcatenateStringConfig(): ValueOperationConfig {
+	return CreateValueOperationConfig(ValueOperationType.StringConcatentation);
 }
 export function CreateCopyEnumerationConfig(): CopyEnumerationConfig {
 	return {
@@ -840,6 +859,9 @@ export function SetupConfigInstanceInformation(
 	dataChainOptions.simpleValidation.isNotContained =
 		dataChainOptions.simpleValidation.isNotContained || CreateAreEqual();
 	dataChainOptions.concatenateString = dataChainOptions.concatenateString || CreateConcatenateStringConfig();
+	dataChainOptions.concatenateCollection =
+		dataChainOptions.concatenateCollection ||
+		CreateValueOperationConfig(ValueOperationType.CollectionConcatenation);
 	dataChainOptions.simpleValidationConfiguration =
 		dataChainOptions.simpleValidationConfiguration || CreateSimpleValidationComposition();
 	dataChainOptions.simpleValidations = dataChainOptions.simpleValidations || [];
@@ -993,7 +1015,16 @@ export function CheckConnectionChain(chain: ConnectionChainItem[]): boolean {
 export function CheckConnectionChainItem(config: ConnectionChainItem): boolean {
 	return !!config && !!config.model && !!config.modelProperty;
 }
-export function CreateExistenceCheck(): ExistenceCheckConfig {
+export function CreateConnectionChainItem(): ConnectionChainItem {
+	return {
+		enabled: true,
+		id: GUID(),
+		model: '',
+		modelProperty: '',
+		previousModelProperty: ''
+	};
+}
+export function CreateExistenceCheck(): GetOrExistenceCheckConfig {
 	return {
 		head: CreateHalf(),
 		orderedCheck: [],
@@ -1001,13 +1032,14 @@ export function CreateExistenceCheck(): ExistenceCheckConfig {
 		id: GUID()
 	};
 }
-export interface ExistenceCheckConfig extends ConfigItem {
+export interface GetOrExistenceCheckConfig extends ConfigItem {
 	head: HalfRelation;
 	orderedCheck: ConnectionChainItem[];
 }
 export interface ConnectionChainItem extends ConfigItem {
 	model: string;
 	modelProperty: string;
+	previousModelProperty: string;
 }
 export interface BranchConfig {
 	name: string;
@@ -1257,7 +1289,7 @@ export function CheckCopyEnumeration(copyEnumeration: CopyEnumerationConfig): bo
 	}
 	return true;
 }
-export function CheckExistenceCheck(config: ExistenceCheckConfig) {
+export function CheckExistenceCheck(config: GetOrExistenceCheckConfig) {
 	if (config && config.enabled) {
 		return !!config.head && !!config.orderedCheck && !!config.orderedCheck.length;
 	}

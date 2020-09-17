@@ -8,8 +8,8 @@ import {
 	NextStepConfiguration,
 	CheckNextStepConfiguration,
 	ValidationColors,
-  MethodDescription,
-  CreateExistenceCheck
+	MethodDescription,
+	CreateExistenceCheck
 } from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import CheckExistanceConfig from './checkexistenceconfig';
@@ -25,8 +25,9 @@ export default class AfterEffectNextStep extends Component<any, any> {
 		let nextStepConfig: NextStepConfiguration = this.props.nextStepConfig;
 		if (!nextStepConfig) {
 			return <span />;
-    }
-    nextStepConfig.existenceCheck = nextStepConfig.existenceCheck || CreateExistenceCheck();
+		}
+		nextStepConfig.existenceCheck = nextStepConfig.existenceCheck || CreateExistenceCheck();
+		nextStepConfig.getExisting = nextStepConfig.getExisting || CreateExistenceCheck();
 		let methodDescription: MethodDescription = this.props.methodDescription;
 		if (!methodDescription) {
 			return <span />;
@@ -59,6 +60,13 @@ export default class AfterEffectNextStep extends Component<any, any> {
 					existenceCheck={nextStepConfig.existenceCheck}
 					onChange={onchange}
 				/>
+				<CheckExistanceConfigComponent
+					title={Titles.GetExisting}
+					dataChainType={this.props.dataChainType}
+					methodDescription={methodDescription}
+					existenceCheck={nextStepConfig.getExisting}
+					onChange={onchange}
+				/>
 				<ConstructModelConfiguration
 					dataChainType={this.props.dataChainType}
 					targetMountingDescription={this.props.targetMountingDescription}
@@ -66,7 +74,6 @@ export default class AfterEffectNextStep extends Component<any, any> {
 					constructModel={nextStepConfig.constructModel}
 					onChange={onchange}
 				/>
-				<TreeViewButtonGroup />
 			</TreeViewMenu>
 		);
 	}

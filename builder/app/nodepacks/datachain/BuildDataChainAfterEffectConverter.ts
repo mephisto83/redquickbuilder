@@ -22,7 +22,7 @@ import {
 	CopyConfig,
 	CopyEnumerationConfig,
 	ValidationConfig,
-	ConcatenateStringConfig
+	ValueOperationConfig
 } from '../../interface/methodprops';
 import { MethodFunctions, bindTemplate } from '../../constants/functiontypes';
 import {
@@ -113,6 +113,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 	let staticMethods: string[] = [];
 	let guts: string = '';
 	let copy_config: string = '';
+	let concat_collection: string = '';
 	let concat_config: string = '';
 	let outputType: string = '';
 	let simplevalidation: string = '';
@@ -133,6 +134,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			compareEnumeration,
 			compareEnumerations,
 			concatenateString,
+			concatenateCollection,
 			copyConfig,
 			copyEnumeration
 		} = dataChainConfigOptions;
@@ -154,6 +156,12 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				tempLambdaInsertArgumentValues,
 				to,
 				outputType
+			}));
+		}
+		if (concatenateCollection && concatenateCollection.enabled) {
+			({ concat_collection } = setConcatenateCollectionConfig({
+				concatenateCollection,
+				tempLambdaInsertArgumentValues
 			}));
 		}
 		if (copyConfig && copyConfig.enabled) {
@@ -443,6 +451,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
               {{simplevalidation}}
               {{copy_config}}
               {{concat_config}}
+              {{concat_collection}}
           };
 
            await func(model, agent, change);
@@ -503,7 +512,8 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		get_existing,
 		compare_enumeration,
 		route_config,
-		set_properties,
+    set_properties,
+    concat_collection,
 		copy_config,
 		concat_config,
 		guts,
@@ -584,6 +594,73 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		}
 	}
 }
+function setConcatenateCollectionConfig({
+	concatenateCollection,
+	tempLambdaInsertArgumentValues
+}: {
+	concatenateCollection: ValueOperationConfig;
+	tempLambdaInsertArgumentValues: any;
+}): { concat_collection: string } {
+	let {
+		parameters,
+		relationType,
+		agentProperty,
+		modelProperty,
+		modelOutputProperty,
+		parentProperty
+	} = concatenateCollection;
+	let internalFunctionProp = ConvertToFunctionProp(relationType);
+
+	setupLambdaInsertArgs(tempLambdaInsertArgumentValues, GetRelationProp(concatenateCollection), 'result');
+	let init_section = `
+  result.#{${captureTemplate(
+		GetRelationProp(concatenateCollection),
+		'result',
+		GetRelationProp(concatenateCollection)
+	)}}# = result.#{${captureTemplate(
+		GetRelationProp(concatenateCollection),
+		'result',
+		GetRelationProp(concatenateCollection)
+	)}}# ?? new List<string>{};
+`;
+	let resultSection = `result.#{${captureTemplate(
+		GetRelationProp(concatenateCollection),
+		'result',
+		GetRelationProp(concatenateCollection)
+	)}}#`;
+	let concat_section = '';
+	if (parameters) {
+		concat_section = parameters
+			.map((parameter) => {
+				let { relationType, property } = parameter;
+				let internalFunctionProp = ConvertToFunctionProp(relationType);
+				setupLambdaInsertArgs(tempLambdaInsertArgumentValues, property, internalFunctionProp);
+				return `
+          if(${internalFunctionProp}.#{${captureTemplate(
+					property,
+					internalFunctionProp,
+					property
+				)}}# != null && ${internalFunctionProp}.#{${captureTemplate(
+					property,
+					internalFunctionProp,
+					property
+				)}}#.Any()) {
+        ${resultSection} = ${resultSection}.Concat(${internalFunctionProp}.#{${captureTemplate(
+					property,
+					internalFunctionProp,
+					property
+				)}}#).ToList();
+          }`;
+			})
+			.join(NEW_LINE);
+	}
+
+	return {
+		concat_collection: `
+    ${init_section}
+   ${concat_section};`
+	};
+}
 
 function setConcatenateConfig({
 	concatenateString,
@@ -592,7 +669,7 @@ function setConcatenateConfig({
 	to,
 	outputType
 }: {
-	concatenateString: ConcatenateStringConfig;
+	concatenateString: ValueOperationConfig;
 	from: MethodDescription;
 	tempLambdaInsertArgumentValues: any;
 	to: MethodDescription | undefined;

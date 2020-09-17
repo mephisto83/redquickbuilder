@@ -15,7 +15,7 @@ import {
 	CheckExistenceConfig,
 	SetupConfigInstanceInformation,
 	ValidationColors,
-	ExistenceCheckConfig,
+	GetOrExistenceCheckConfig,
 	CheckExistenceCheck,
 	HalfRelation
 } from '../interface/methodprops';
@@ -37,7 +37,7 @@ export default class CheckExistanceConfigComponent extends Component<any, any> {
 			return <span />;
 		}
 
-		let existenceCheck: ExistenceCheckConfig = this.props.existenceCheck;
+		let existenceCheck: GetOrExistenceCheckConfig = this.props.existenceCheck;
 		if (!existenceCheck) {
 			return <span>No existence check</span>;
 		}
@@ -54,12 +54,17 @@ export default class CheckExistanceConfigComponent extends Component<any, any> {
 				error={!valid}
 				active
 				greyed={!existenceCheck.enabled}
-				title={Titles.CheckExistence}
+				title={this.props.title || Titles.CheckExistence}
 			>
 				<TreeViewItemContainer>
 					<CheckBox
 						label={Titles.Enabled}
+						color={
+							existenceCheck && existenceCheck.enabled ? ValidationColors.Ok : ValidationColors.Neutral
+						}
 						value={existenceCheck.enabled}
+						greyed={!existenceCheck.enabled}
+						error={!valid}
 						onChange={(value: boolean) => {
 							existenceCheck.enabled = value;
 							this.setState({
@@ -79,7 +84,10 @@ export default class CheckExistanceConfigComponent extends Component<any, any> {
 						this.setState({ config: !this.state.config });
 					}}
 					active
-					greyed={existenceCheck.enabled}
+					color={existenceCheck && existenceCheck.enabled ? ValidationColors.Ok : ValidationColors.Neutral}
+					value={existenceCheck.enabled}
+					greyed={!existenceCheck.enabled}
+					error={!valid}
 					title={Titles.RelationType}
 				>
 					<TreeViewItemContainer>
@@ -102,38 +110,11 @@ export default class CheckExistanceConfigComponent extends Component<any, any> {
 								}
 							}}
 						/>
-					</TreeViewItemContainer>{' '}
-					<TreeViewItemContainer>
-						<SelectInput
-							label={Titles.Property}
-							options={properties}
-							value={this.getHeadProperty(existenceCheck.head)}
-							onChange={(value: string) => {
-								let { head } = existenceCheck;
-								switch (head.relationType) {
-									case RelationType.Agent:
-										head.agentProperty = value;
-										break;
-									case RelationType.Model:
-										head.modelProperty = value;
-										break;
-									case RelationType.Parent:
-										head.parentProperty = value;
-										break;
-									case RelationType.ModelOutput:
-										head.modelOutputProperty = value;
-										break;
-								}
-								this.setState({
-									turn: UIA.GUID()
-								});
-								if (this.props.onChange) {
-									this.props.onChange();
-								}
-							}}
-						/>
 					</TreeViewItemContainer>
-          <ConnectionChainComponent chain={existenceCheck.orderedCheck} />
+					<ConnectionChainComponent
+						head={this.getHeadModel(existenceCheck.head)}
+						chain={existenceCheck.orderedCheck}
+					/>
 				</TreeViewMenu>
 			</TreeViewMenu>
 		);
@@ -161,13 +142,25 @@ export default class CheckExistanceConfigComponent extends Component<any, any> {
 			case RelationType.ModelOutput:
 				if (methodDescription.properties.model_output) {
 					head.modelOutput = methodDescription.properties.model_output;
-        }
-        break;
+				}
+				break;
 			case RelationType.Parent:
 				if (methodDescription.properties.parent) {
 					head.parent = methodDescription.properties.parent;
 				}
 				break;
+		}
+	}
+	getHeadModel(head: HalfRelation) {
+		switch (head.relationType) {
+			case RelationType.Agent:
+				return head.agent;
+			case RelationType.Model:
+				return head.model;
+			case RelationType.ModelOutput:
+				return head.modelOutput;
+			case RelationType.Parent:
+				return head.parent;
 		}
 	}
 	getHeadProperties(head: HalfRelation) {

@@ -114,7 +114,8 @@ export default class ConstructModelConfiguration extends Component<any, any> {
 							<AfterEffectSetupProperty
 								key={setProperty.id}
 								setProperty={setProperty}
-								targetProperties={targetProperties}
+                targetProperties={targetProperties}
+                modelProperties={modelProperties}
 								parentProperties={parentProperties}
 								agentProperties={agentProperties}
 								modelOutputProperties={modelOutputProperties}

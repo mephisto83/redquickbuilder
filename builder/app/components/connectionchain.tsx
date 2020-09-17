@@ -15,13 +15,17 @@ import {
 	CheckExistenceConfig,
 	SetupConfigInstanceInformation,
 	ValidationColors,
-	ExistenceCheckConfig,
+	GetOrExistenceCheckConfig,
 	CheckExistenceCheck,
 	HalfRelation,
 	ConnectionChainItem,
-	CheckConnectionChain
+	CheckConnectionChain,
+	CreateConnectionChainItem
 } from '../interface/methodprops';
 import ConnectionChainItemComponent from './connectionchainitemcomponent';
+import TreeViewButtonGroup from './treeviewbuttongroup';
+import TreeViewGroupButton from './treeviewgroupbutton';
+import { head } from './editor.main.css';
 
 export default class ConnectionChainComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -33,6 +37,10 @@ export default class ConnectionChainComponent extends Component<any, any> {
 		let chain: ConnectionChainItem[] = this.props.chain;
 		if (!chain) {
 			return <span>No existence check</span>;
+		}
+		let head: string = this.props.head;
+		if (!head) {
+			return <span>No Head set</span>;
 		}
 		let valid = CheckConnectionChain(chain);
 		return (
@@ -48,7 +56,40 @@ export default class ConnectionChainComponent extends Component<any, any> {
 				greyed={!valid}
 				title={Titles.CheckExistence}
 			>
-				{chain.map((v) => <ConnectionChainItemComponent key={v.id} item={v} />)}
+				<TreeViewButtonGroup>
+					<TreeViewGroupButton
+						title={`${Titles.NextStep}`}
+						onClick={() => {
+							chain.push(CreateConnectionChainItem());
+							this.setState({ turn: UIA.GUID() });
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
+						}}
+						icon="fa fa-plus"
+					/>
+				</TreeViewButtonGroup>
+				{chain.map((v, index) => (
+					<ConnectionChainItemComponent
+
+						previousModel={index ? chain[index - 1].model : head}
+						onChange={() => {
+							this.setState({ turn: UIA.GUID() });
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
+						}}
+						onDelete={() => {
+							chain.splice(index, 1);
+							this.setState({ turn: UIA.GUID() });
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
+						}}
+						key={v.id}
+						item={v}
+					/>
+				))}
 			</TreeViewMenu>
 		);
 	}

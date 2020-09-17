@@ -481,6 +481,7 @@ class AgentAccessView extends Component<any, any> {
 												},
 												graph
 											);
+											context.methods = null;
 											this.setState({
 												agents: onlyAgents.map((v) => v.id),
 												models: NodesByType(null, NodeTypes.Model).map((d: Node) => d.id),
@@ -573,7 +574,6 @@ class AgentAccessView extends Component<any, any> {
 									>
 										Auto Update Mounting
 									</a>
-
 								</FormControl>
 							</Box>
 							<Box title={'Errors'}>{this.calculateErrors()}</Box>
@@ -2113,14 +2113,6 @@ class AgentAccessView extends Component<any, any> {
 		let hasEffects = false;
 		if (effect && effect.effects) {
 			hasEffects = !!effect.effects.length;
-			if (context.methods) {
-				methods = context.methods;
-			} else {
-				this.state.agents.map((_: any, index: number) => {
-					this.collectMethods(index, methods);
-				});
-				context.methods = methods;
-			}
 		}
 		return (
 			<div className="btn-group">
@@ -2129,6 +2121,15 @@ class AgentAccessView extends Component<any, any> {
 					style={this.getSelectedButtonStyle(`${onlyAgents[agentIndex].id} ${model} ${v}`)}
 					type="button"
 					onClick={() => {
+						let methods: any[] = [];
+						let hasEffects = false;
+						if (effect && effect.effects) {
+							hasEffects = !!effect.effects.length;
+
+							this.state.agents.map((_: any, index: number) => {
+								this.collectMethods(index, methods);
+							});
+						}
 						this.setState({ selectedButton: `${onlyAgents[agentIndex].id} ${model} ${v}` });
 						this.props.setVisual(EFFECT_CONTEXT_MENU, {
 							agentIndex,

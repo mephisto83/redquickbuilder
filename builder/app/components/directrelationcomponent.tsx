@@ -108,14 +108,12 @@ export default class DirectRelationComponent extends Component<any, any> {
 		let properties = getRelationProperties(methodDescription, relation);
 		return (
 			<TreeViewMenu
-				hide={!this.props.enabled}
-				open={this.state.config && this.props.enabled}
+				open={this.state.open}
 				icon={this.props.valid ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
 				onClick={() => {
-					this.setState({ config: !this.state.config });
+					this.setState({ open: !this.state.open });
 				}}
 				active
-				greyed={!this.props.enabled}
 				title={property && title ? `${title}${UIA.GetNodeTitle(property)}` : Titles.RelationType}
 			>
 				<TreeViewItemContainer hide={this.props.hideModelAgent}>

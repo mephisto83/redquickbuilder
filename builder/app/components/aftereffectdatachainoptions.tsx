@@ -54,6 +54,7 @@ export default class AfterEffectDataChainOptions extends Component<any, any> {
 			<AfterEffectDataChainOption onChange={onchange}
 				previousMethodDescription={previousMethodDescription}
         currentMethodDescription={currentMethodDescription}
+        methodDescription={this.props.methodDescription}
         routes={this.props.routes}
         methods={this.props.methods}
 				dataChainOptions={afterEffect.dataChainOptions}

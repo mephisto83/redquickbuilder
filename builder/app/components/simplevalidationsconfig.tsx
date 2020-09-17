@@ -37,7 +37,8 @@ import {
 	ChangeNodeProp,
 	AddNewSimpleValidationConfigToGraph,
 	GetSimpleValidationId,
-	CheckAfterEffectDataChainConfiguration
+	CheckAfterEffectDataChainConfiguration,
+	CheckSimpleValidations
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
@@ -102,7 +103,9 @@ export default class SimpleValidationsComponent extends Component<any, any> {
 				NodeProperties.NODEType,
 				simpleValidationConfiguration.composition.graph
 			) !== NodeTypes.LeafNode;
-		let valid = CheckAfterEffectDataChainConfiguration(dataChainOptions);
+		let valid = dataChainOptions.simpleValidations
+			? CheckSimpleValidations(dataChainOptions.simpleValidations)
+			: true;
 		return (
 			<TreeViewMenu
 				open={this.state.open}

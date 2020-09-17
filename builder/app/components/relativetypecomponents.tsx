@@ -12,7 +12,7 @@ import {
 	SetupConfigInstanceInformation,
 	CheckHalfRelation,
 	ValidationColors,
-	ConcatenateStringConfig,
+	ValueOperationConfig,
 	CheckConcatenateStringConfig,
 	CheckRelation
 } from '../interface/methodprops';
@@ -45,7 +45,7 @@ export default class RelativeTypeComponents extends Component<any, any> {
 			targetProperties,
 			properties
 		}: {
-			concatenateString: ConcatenateStringConfig;
+			concatenateString: ValueOperationConfig;
 			methodDescription: MethodDescription;
 			targetProperties: any[];
 			properties: any[];

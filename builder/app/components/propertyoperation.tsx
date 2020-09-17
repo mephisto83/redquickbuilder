@@ -12,15 +12,15 @@ import {
 	SetupConfigInstanceInformation,
 	CheckHalfRelation,
 	ValidationColors,
-	CheckConcatenateStringConfig,
-  ValueOperationConfig
+	ValueOperationConfig,
+	CheckValueOperationConfigConfig
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import RelativeTypeComponent from './relativetypecomponent';
 import RelativeTypeComponents from './relativetypecomponents';
 
-export default class ConcatenateStringConfigComponent extends Component<any, any> {
+export default class PropertyOperation extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
 		this.state = {};
@@ -39,37 +39,42 @@ export default class ConcatenateStringConfigComponent extends Component<any, any
 		}
 
 		let {
-			concatenateString,
 			methodDescription,
 			targetProperties,
 			properties
 		}: {
-			concatenateString: ValueOperationConfig;
 			methodDescription: MethodDescription;
 			targetProperties: any[];
 			properties: any[];
 		} = this.setupInstanceInfo(dataChainOptions);
 
-		let valid = CheckConcatenateStringConfig(concatenateString);
+		let valueOperationConfig: ValueOperationConfig = this.props.getOperationConfig(dataChainOptions);
+		let valid = CheckValueOperationConfigConfig(valueOperationConfig);
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				icon={concatenateString.enabled ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+				icon={valueOperationConfig.enabled ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
-				color={concatenateString && concatenateString.enabled ? ValidationColors.Ok : ValidationColors.Neutral}
+				color={
+					valueOperationConfig && valueOperationConfig.enabled ? (
+						ValidationColors.Ok
+					) : (
+						ValidationColors.Neutral
+					)
+				}
 				active
 				error={!valid}
-				greyed={!concatenateString.enabled}
-				title={Titles.Concatenate}
+				greyed={!valueOperationConfig.enabled}
+				title={this.props.title || Titles.Concatenate}
 			>
 				<TreeViewItemContainer>
 					<CheckBox
 						label={Titles.Enabled}
-						value={concatenateString.enabled}
+						value={valueOperationConfig.enabled}
 						onChange={(value: boolean) => {
-							concatenateString.enabled = value;
+							valueOperationConfig.enabled = value;
 							this.setState({
 								turn: UIA.GUID()
 							});
@@ -81,7 +86,7 @@ export default class ConcatenateStringConfigComponent extends Component<any, any
 				</TreeViewItemContainer>
 				<RelativeTypeComponent
 					methodDescription={methodDescription}
-					relations={concatenateString}
+					relations={valueOperationConfig}
 					valid={valid}
 					onChange={() => {
 						this.setState({
@@ -92,14 +97,14 @@ export default class ConcatenateStringConfigComponent extends Component<any, any
 						}
 					}}
 					dataChainOptions={dataChainOptions}
-					enabled={concatenateString.enabled}
+					enabled={valueOperationConfig.enabled}
 					properties={properties}
 					targetProperties={targetProperties}
 					dataChainType={this.props.dataChainType}
 				/>
 				<RelativeTypeComponents
 					methodDescription={methodDescription}
-					parameters={concatenateString.parameters}
+					parameters={valueOperationConfig.parameters}
 					valid={valid}
 					onChange={() => {
 						this.setState({
@@ -110,7 +115,7 @@ export default class ConcatenateStringConfigComponent extends Component<any, any
 						}
 					}}
 					dataChainOptions={dataChainOptions}
-					enabled={concatenateString.enabled}
+					enabled={valueOperationConfig.enabled}
 					properties={properties}
 					targetProperties={targetProperties}
 					dataChainType={this.props.dataChainType}

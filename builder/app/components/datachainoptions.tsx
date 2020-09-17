@@ -25,6 +25,7 @@ import CopyEnumeration from './copyenumeration';
 import CompareEnumerations from './compareenumerations';
 import SimpleValidationsComponent from './simplevalidationsconfig';
 import ConcatenateStringConfigComponent from './concatenatstringconfigcomponent';
+import PropertyOperation from './propertyoperation';
 
 export default class DataChainOptions extends Component<any, any> {
 	constructor(props: any) {
@@ -82,6 +83,16 @@ export default class DataChainOptions extends Component<any, any> {
 					onChange={onchange}
 				/>
 				<ConcatenateStringConfigComponent
+					dataChainType={this.props.dataChainType}
+					methodDescription={methodDescription}
+					dataChainOptions={dataChainOptions}
+					onChange={onchange}
+				/>
+				<PropertyOperation
+					getOperationConfig={(dataChainOptions: DataChainConfiguration) => {
+						return dataChainOptions.concatenateCollection;
+          }}
+          title={Titles.ConcatenateCollection}
 					dataChainType={this.props.dataChainType}
 					methodDescription={methodDescription}
 					dataChainOptions={dataChainOptions}
