@@ -35,9 +35,8 @@ import {
 	GetDispatchFunc,
 	GetStateFunc,
 	updateComponentProperty,
-	GetJSCodeName,
-	GetNodeById,
 	GetCodeName,
+	GetNodeById,
 	GetNodeTitle,
 	GetPropertyModel,
 	GetNodeByProperties,
@@ -304,7 +303,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				switch (relationType) {
 					case RelationType.Model:
 					case RelationType.Agent:
-						get_existing = `(await toArbiter#{{"key":"model"}}#.GetBy(v => v.#{{"key":"model.${GetJSCodeName(
+						get_existing = `(await toArbiter#{{"key":"model"}}#.GetBy(v => v.#{{"key":"model.${GetCodeName(
 							targetProperty
 						)}","type":"property","model":"model"}}# == ${relationType == RelationType.Agent
 							? 'agent'
@@ -331,11 +330,11 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 						relationType
 					} = afterEffectSetupProperty;
 					let model_to = type === DataChainType.AfterEffect ? 'tomodel' : 'model';
-					let prop_string = `value.#{{"key":"${model_to}.${GetJSCodeName(
+					let prop_string = `value.#{{"key":"${model_to}.${GetCodeName(
 						targetProperty
 					)}","type":"property","model":"${model_to}"}}#`;
 					let targetModel = GetPropertyModel(targetProperty);
-					tempLambdaInsertArgumentValues[`${model_to}.${GetJSCodeName(targetProperty)}`] = {
+					tempLambdaInsertArgumentValues[`${model_to}.${GetCodeName(targetProperty)}`] = {
 						property: targetProperty,
 						model: targetModel ? targetModel.id : '',
 						type: ReferenceInsertType.Property
@@ -359,14 +358,14 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 							let enumProp: { value: string; id: string } = enumprops.find(
 								(v: { id: string }) => v.id === enumerationValue
 							);
-							tempLambdaInsertArgumentValues[GetJSCodeName(enumeration)] = { enumeration: enumeration };
-							tempLambdaInsertArgumentValues[`${GetJSCodeName(enumeration)}.${enumProp.value}`] = {
+							tempLambdaInsertArgumentValues[GetCodeName(enumeration)] = { enumeration: enumeration };
+							tempLambdaInsertArgumentValues[`${GetCodeName(enumeration)}.${enumProp.value}`] = {
 								enumeration,
 								enumerationvalue: enumerationValue
 							};
-							return `${prop_string} = #{{"key":"${GetJSCodeName(
+							return `${prop_string} = #{{"key":"${GetCodeName(
 								enumeration
-							)}","type":"enumeration" }}#.#{{"key":"${GetJSCodeName(
+							)}","type":"enumeration" }}#.#{{"key":"${GetCodeName(
 								enumeration
 							)}.${enumProp.value}","type":"enumerationvalue"}}#;`;
 						case SetPropertyType.String:
@@ -377,8 +376,8 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 						case SetPropertyType.Property:
 							let fromPropModel = relationType === RelationType.Agent ? 'agent' : 'model';
 							let keyname = `${fromPropModel}.${relationType === RelationType.Agent
-								? GetJSCodeName(agentProperty)
-								: GetJSCodeName(modelProperty)}`;
+								? GetCodeName(agentProperty)
+								: GetCodeName(modelProperty)}`;
 							let agent = GetPropertyModel(agentProperty);
 							let model = GetPropertyModel(modelProperty);
 							tempLambdaInsertArgumentValues[keyname] = {
@@ -493,6 +492,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 `;
 			break;
 		case DataChainType.AfterEffect:
+			can_complete = true;
 			from_parameter_template = `
       public static async Task Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change = null)
       {
@@ -803,8 +803,8 @@ function setupCopyConfig(
 				targetTemplate2 = `{"key":"${relProp}.${GetCodeName(props)}","type":"model"}`;
 				break;
 			case NodeTypes.Property:
-				targetTemplate = `{"key":"result.${GetJSCodeName(targetProperty)}","type":"property","model":"result"}`;
-				targetTemplate2 = `{"key":"${relProp}.${GetJSCodeName(props)}","type":"property","model":"${relProp}"}`;
+				targetTemplate = `{"key":"result.${GetCodeName(targetProperty)}","type":"property","model":"result"}`;
+				targetTemplate2 = `{"key":"${relProp}.${GetCodeName(props)}","type":"property","model":"${relProp}"}`;
 				break;
 		}
 	}
@@ -819,7 +819,7 @@ function captureTemplate(targetProperty: string, relProp: string, props: string)
 				template = `{"key":"${relProp}.${GetCodeName(props)}","type":"model"}`;
 				break;
 			case NodeTypes.Property:
-				template = `{"key":"${relProp}.${GetJSCodeName(props)}","type":"property","model":"${relProp}"}`;
+				template = `{"key":"${relProp}.${GetCodeName(props)}","type":"property","model":"${relProp}"}`;
 				break;
 		}
 	}
@@ -836,18 +836,18 @@ function setupCopyEnumeration(
 ) {
 	let { targetProperty } = copyEnumeration;
 	let enumeration = copyEnumeration.enumerationType;
-	tempLambdaInsertArgumentValues[GetJSCodeName(enumeration)] = { enumeration: enumeration };
+	tempLambdaInsertArgumentValues[GetCodeName(enumeration)] = { enumeration: enumeration };
 	let enumertions: { id: string; value: string }[] = GetNodeProp(enumeration, NodeProperties.Enumeration) || [];
 	let enum_set: string = '';
 	let enumProp = enumertions.find((e) => e.id == copyEnumeration.enumeration);
 	if (enumProp) {
-		tempLambdaInsertArgumentValues[`${GetJSCodeName(enumeration)}.${enumProp.value}`] = {
+		tempLambdaInsertArgumentValues[`${GetCodeName(enumeration)}.${enumProp.value}`] = {
 			enumeration,
 			enumerationvalue: copyEnumeration.enumeration
 		};
-		copy_config = `return #{{"key":"${GetJSCodeName(
+		copy_config = `return #{{"key":"${GetCodeName(
 			enumeration
-		)}","type":"enumeration" }}#.#{{"key":"${GetJSCodeName(
+		)}","type":"enumeration" }}#.#{{"key":"${GetCodeName(
 			enumeration
 		)}.${enumProp.value}","type":"enumerationvalue"}}#`;
 	}
@@ -982,7 +982,7 @@ function GenerateSimpleValidations(
 						break;
 				}
 				// tempLambdaInsertArgumentValues[
-				// 	`${agentOrModel}.${GetJSCodeName(simpleValidation.referencesExisting.modelProperty)}`
+				// 	`${agentOrModel}.${GetCodeName(simpleValidation.referencesExisting.modelProperty)}`
 				// ] = {
 				// 	property: simpleValidation.referencesExisting.modelProperty,
 				// 	model: simpleValidation.referencesExisting.agent,
@@ -1005,7 +1005,7 @@ function GenerateSimpleValidations(
 						componentType: NodeTypes.Model
 					});
 					if (modelType) {
-						classModelKey = `class.${GetJSCodeName(modelType)}`;
+						classModelKey = `class.${GetCodeName(modelType)}`;
 						tempLambdaInsertArgumentValues[classModelKey] = {
 							model: modelType.id
 						};
@@ -1014,7 +1014,7 @@ function GenerateSimpleValidations(
 				let refExists: any;
 				switch (GetNodeProp(simpleValidation.referencesExisting.model, NodeProperties.NODEType)) {
 					case NodeTypes.Model:
-						classModelKey = `class.${GetJSCodeName(simpleValidation.referencesExisting.model)}`;
+						classModelKey = `class.${GetCodeName(simpleValidation.referencesExisting.model)}`;
 						tempLambdaInsertArgumentValues[classModelKey] = {
 							model: simpleValidation.referencesExisting.model
 						};
@@ -1284,18 +1284,18 @@ function GenerateOneOf(valuePropString: string, oneOf: EnumerationConfig, tempLa
 	let result: string = '';
 	if (oneOf.enabled) {
 		let enumeration = oneOf.enumerationType;
-		tempLambdaInsertArgumentValues[GetJSCodeName(enumeration)] = { enumeration: enumeration };
+		tempLambdaInsertArgumentValues[GetCodeName(enumeration)] = { enumeration: enumeration };
 		let enumertions: { id: string; value: string }[] = GetNodeProp(enumeration, NodeProperties.Enumeration) || [];
 		let enum_set: string[] = [];
 		oneOf.enumerations.forEach((eni: string) => {
 			let enumProp = enumertions.find((e) => e.id == eni);
 			if (enumProp) {
-				tempLambdaInsertArgumentValues[`${GetJSCodeName(enumeration)}.${enumProp.value}`] = {
+				tempLambdaInsertArgumentValues[`${GetCodeName(enumeration)}.${enumProp.value}`] = {
 					enumeration,
 					enumerationvalue: eni
 				};
 				enum_set.push(
-					` #{{"key":"${GetJSCodeName(enumeration)}","type":"enumeration" }}#.#{{"key":"${GetJSCodeName(
+					` #{{"key":"${GetCodeName(enumeration)}","type":"enumeration" }}#.#{{"key":"${GetCodeName(
 						enumeration
 					)}.${enumProp.value}","type":"enumerationvalue"}}#`
 				);
@@ -1311,7 +1311,7 @@ function GenerateCodePath(if_: BranchConfig) {
 }
 function GetCheckModelExistPart(relationType: RelationType, targetProperty: string, stretchClause: string) {
 	let rel = relationType == RelationType.Agent ? 'agent' : 'fromModel';
-	let getClause = ` (await arbiter#{{"key":"tomodel"}}#Static.GetBy(v => v.#{{"key":"tomodel.${GetJSCodeName(
+	let getClause = ` (await arbiter#{{"key":"tomodel"}}#Static.GetBy(v => v.#{{"key":"tomodel.${GetCodeName(
 		targetProperty
 	)}","type":"property","model":"tomodel"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault()`;
 	return ` var exists = false;
@@ -1584,7 +1584,7 @@ function checkExistenceFunction(
 					let ifvalue = skipSettings === SkipSettings.SkipIfFlase ? '!' : '';
 					if (skipSettings !== SkipSettings.DontSkip) {
 						let rel = relationType == RelationType.Agent ? 'agent' : 'fromModel';
-						let getClause = ` (await toArbiter#{{"key":"tomodel"}}#.GetBy(v => v.#{{"key":"tomodel.${GetJSCodeName(
+						let getClause = ` (await toArbiter#{{"key":"tomodel"}}#.GetBy(v => v.#{{"key":"tomodel.${GetCodeName(
 							targetProperty
 						)}","type":"property","model":"tomodel"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault()`;
 						checking_existence = `
@@ -1599,7 +1599,7 @@ function checkExistenceFunction(
 				: ''}
         `;
 					} else if (returnSetting.enabled) {
-						let getModelClause = `(await toArbiter#{{"key":"tomodel"}}#.GetBy(v => v.#{{"key":"tomodel.${GetJSCodeName(
+						let getModelClause = `(await toArbiter#{{"key":"tomodel"}}#.GetBy(v => v.#{{"key":"tomodel.${GetCodeName(
 							targetProperty
 						)}","type":"property","model":"model"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();`;
 						checking_existence = `
@@ -1627,7 +1627,7 @@ function checkExistenceFunction(
 					let rel = relationType == RelationType.Agent ? 'agent' : 'fromModel';
 					checking_existence = `
           var exists = false;
-          var checkModel = (await toArbiter#{{"key":"model"}}#.GetBy(v => v.#{{"key":"model.${GetJSCodeName(
+          var checkModel = (await toArbiter#{{"key":"model"}}#.GetBy(v => v.#{{"key":"model.${GetCodeName(
 				targetProperty
 			)}","type":"property","model":"model"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();
           exists  = checkModel != null;
@@ -1640,7 +1640,7 @@ function checkExistenceFunction(
 					let rel = relationType == RelationType.Agent ? 'agent' : 'model';
 					checking_existence = `
           var exists = false;
-          var checkModel = (await toArbiter#{{"key":"model"}}#.GetBy(v => v.#{{"key":"model.${GetJSCodeName(
+          var checkModel = (await toArbiter#{{"key":"model"}}#.GetBy(v => v.#{{"key":"model.${GetCodeName(
 				targetProperty
 			)}","type":"property","model":"model"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();
           exists  = checkModel != null;
@@ -1699,7 +1699,7 @@ function setupLambdaInsertArgs(tempLambdaInsertArgumentValues: any, targetProper
 			break;
 		case NodeTypes.Property:
 			let targetModel = GetPropertyModel(targetProperty);
-			tempLambdaInsertArgumentValues[`${key}.${GetJSCodeName(targetProperty)}`] = {
+			tempLambdaInsertArgumentValues[`${key}.${GetCodeName(targetProperty)}`] = {
 				[ReferenceInsertType.Property]: targetProperty,
 				[ReferenceInsertType.Model]: targetModel ? targetModel.id : '',
 				type: ReferenceInsertType.Property
@@ -1710,6 +1710,12 @@ function setupLambdaInsertArgs(tempLambdaInsertArgumentValues: any, targetProper
 			};
 			break;
 	}
+}
+function setupLambdaModelArgs(tempLambdaInsertArgumentValues: any, model: string) {
+	tempLambdaInsertArgumentValues[`${GetCodeName(model)}`] = {
+		[ReferenceInsertType.Model]: model,
+		type: ReferenceInsertType.Model
+	};
 }
 
 function CompareEnumerationFunc(compareEnumeration: CompareEnumeration, tempLambdaInsertArgumentValues: any) {
@@ -1745,15 +1751,15 @@ function CompareEnumerationFunc(compareEnumeration: CompareEnumeration, tempLamb
 			let enumprops = GetNodeProp(enumNode, NodeProperties.Enumeration) || [];
 			let propName = GetCodeName(prop_string);
 			let enumProp: { value: string; id: string } = enumprops.find((v: { id: string }) => v.id === value);
-			tempLambdaInsertArgumentValues[GetJSCodeName(enumeration)] = { enumeration: enumeration };
-			tempLambdaInsertArgumentValues[`${GetJSCodeName(enumeration)}.${enumProp.value}`] = {
+			tempLambdaInsertArgumentValues[GetCodeName(enumeration)] = { enumeration: enumeration };
+			tempLambdaInsertArgumentValues[`${GetCodeName(enumeration)}.${enumProp.value}`] = {
 				enumeration,
 				enumerationvalue: value
 			};
 			tempLambdaInsertArgumentValues[`${relative_type_name}.${propName}`] = { property: prop_string };
-			compare_enumeration = `if(${relative_type_name}.#{{"key":"${relative_type_name}.${propName}","type":"property","model":"${relative_type_name}"}}# != #{{"key":"${GetJSCodeName(
+			compare_enumeration = `if(${relative_type_name}.#{{"key":"${relative_type_name}.${propName}","type":"property","model":"${relative_type_name}"}}# != #{{"key":"${GetCodeName(
 				enumeration
-			)}","type":"enumeration" }}#.#{{"key":"${GetJSCodeName(
+			)}","type":"enumeration" }}#.#{{"key":"${GetCodeName(
 				enumeration
 			)}.${enumProp.value}","type":"enumerationvalue"}}#) {
           return false;
@@ -1803,7 +1809,6 @@ function setupAfterEffect(
 					step.constructModel &&
 					step.constructModel.enabled &&
 					step.constructModel.setProperties &&
-					step.constructModel.setProperties.enabled &&
 					step.constructModel.setProperties.properties
 				) {
 					next_steps += `
@@ -1838,11 +1843,11 @@ function setupSetProperties(
 				} = setupProperty;
 
 				let targetModel = GetPropertyModel(targetProperty);
-				let prop_string = `${outputModelName}.#{{"key":"${GetCodeName(targetModel)}.${GetJSCodeName(
+				let prop_string = `${outputModelName}.#{{"key":"${GetCodeName(targetModel)}.${GetCodeName(
 					targetProperty
 				)}","type":"property","model":"${GetCodeName(targetModel)}"}}#`;
 
-				tempLambdaInsertArgumentValues[`${GetCodeName(targetModel)}.${GetJSCodeName(targetProperty)}`] = {
+				tempLambdaInsertArgumentValues[`${GetCodeName(targetModel)}.${GetCodeName(targetProperty)}`] = {
 					property: targetProperty,
 					model: targetModel ? targetModel.id : '',
 					type: ReferenceInsertType.Property
@@ -1866,14 +1871,14 @@ function setupSetProperties(
 						let enumProp: { value: string; id: string } = enumprops.find(
 							(v: { id: string }) => v.id === enumerationValue
 						);
-						tempLambdaInsertArgumentValues[GetJSCodeName(enumeration)] = { enumeration: enumeration };
-						tempLambdaInsertArgumentValues[`${GetJSCodeName(enumeration)}.${enumProp.value}`] = {
+						tempLambdaInsertArgumentValues[GetCodeName(enumeration)] = { enumeration: enumeration };
+						tempLambdaInsertArgumentValues[`${GetCodeName(enumeration)}.${enumProp.value}`] = {
 							enumeration,
 							enumerationvalue: enumerationValue
 						};
-						return `${prop_string} = #{{"key":"${GetJSCodeName(
+						return `${prop_string} = #{{"key":"${GetCodeName(
 							enumeration
-						)}","type":"enumeration" }}#.#{{"key":"${GetJSCodeName(
+						)}","type":"enumeration" }}#.#{{"key":"${GetCodeName(
 							enumeration
 						)}.${enumProp.value}","type":"enumerationvalue"}}#;`;
 					case SetPropertyType.String:
@@ -1912,13 +1917,17 @@ function setupExistenceCheck(
 	let name = '';
 	if (existenceCheck && existenceCheck.enabled) {
 		let item = existenceCheck.orderedCheck[existenceCheck.orderedCheck.length - 1];
-		name = existenceCheck.name || `CheckingFor${GetCodeName(item.model)}By${GetModelName(existenceCheck.head)}`;
+		name =
+			existenceCheck.name ||
+			`${outputAs === OutputType.Existence ? 'CheckingFor' : 'Getting'}${GetCodeName(item.model)}By${GetModelName(
+				existenceCheck.head
+			)}`;
+
+		setupLambdaModelArgs(tempLambdaInsertArgumentValues, GetModel(existenceCheck.head));
+
 		result = `${name}(${RelationToVariable(existenceCheck.head.relationType)});`;
-		setupLambdaInsertArgs(
-			tempLambdaInsertArgumentValues,
-			GetModelPropertyName(existenceCheck.head),
-			RelationToVariable(existenceCheck.head.relationType)
-		);
+		let headProperty = existenceCheck.orderedCheck ? existenceCheck.orderedCheck[0].previousModelProperty : '';
+		setupLambdaInsertArgs(tempLambdaInsertArgumentValues, headProperty, GetModelName(existenceCheck.head));
 		let arbiters: string[] = [];
 		let steps: string[] = [];
 		existenceCheck.orderedCheck.forEach((item: ConnectionChainItem, index: number) => {
@@ -1930,20 +1939,23 @@ function setupExistenceCheck(
 			);
 			let prev =
 				index === 0
-					? `${RelationToVariable(existenceCheck.head.relationType)}.#{{"key":"${RelationToVariable(
-							existenceCheck.head.relationType
-						)}.${GetModelPropertyName(
+					? `${RelationToVariable(existenceCheck.head.relationType)}.#{{"key":"${GetModelName(
 							existenceCheck.head
-						)}","type":"property","model":"${GetModelPropertyName(existenceCheck.head)}"}}#`
+						)}.${GetCodeName(headProperty)}","type":"property","model":"${GetModelName(
+							existenceCheck.head
+						)}"}}#`
 					: `step${index - 1}.#{{"key":"${GetCodeName(
 							existenceCheck.orderedCheck[index - 1].model
-						)}.${GetCodeName(
-							existenceCheck.orderedCheck[index - 1].modelProperty
-						)}","type":"property","model":"${GetCodeName(existenceCheck.orderedCheck[index - 1].model)}"}}#`;
+						)}.${GetCodeName(item.previousModelProperty)}","type":"property","model":"${GetCodeName(
+							existenceCheck.orderedCheck[index - 1].model
+						)}"}}#`;
+			setupLambdaModelArgs(tempLambdaInsertArgumentValues, item.model);
 
 			steps.push(`let step${index} = ${index
 				? `step${index - 1}`
-				: `${RelationToVariable(existenceCheck.head.relationType)}`} != null ? (await arbiter#{{"key":"${GetCodeName(
+				: `${RelationToVariable(
+						existenceCheck.head.relationType
+					)}`} != null ? (await arbiter#{{"key":"${GetCodeName(
 				item.model
 			)}"}}#.GetBy(v => v.#{{"key":"${GetCodeName(item.model)}.${GetCodeName(
 				item.modelProperty
@@ -1958,8 +1970,8 @@ function setupExistenceCheck(
       ${steps.join(NEW_LINE)}
 
       ${outputAs === OutputType.Existence
-			? 'return step' + (steps.length - 1) + ' == null;'
-			: 'return step' + (steps.length - 1) + ';'}
+			? 'return step' + (steps.length - 1) + ' == null'
+			: 'return step' + (steps.length - 1) + ''}
     }`);
 	}
 
@@ -1991,6 +2003,18 @@ function GetModelName(half: HalfRelation): string {
 			return GetCodeName(half.modelOutput);
 		case RelationType.Parent:
 			return GetCodeName(half.parent);
+	}
+}
+function GetModel(half: HalfRelation): string {
+	switch (half.relationType) {
+		case RelationType.Agent:
+			return half.agent;
+		case RelationType.Model:
+			return half.model;
+		case RelationType.ModelOutput:
+			return half.modelOutput;
+		case RelationType.Parent:
+			return half.parent;
 	}
 }
 function GetModelPropertyName(half: HalfRelation): string {
