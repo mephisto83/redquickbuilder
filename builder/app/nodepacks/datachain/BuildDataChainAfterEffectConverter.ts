@@ -22,7 +22,11 @@ import {
 	CopyConfig,
 	CopyEnumerationConfig,
 	ValidationConfig,
-	ValueOperationConfig
+	ValueOperationConfig,
+	NextStepConfiguration,
+	GetOrExistenceCheckConfig,
+	ConnectionChainItem,
+	SetPropertiesConfig
 } from '../../interface/methodprops';
 import { MethodFunctions, bindTemplate } from '../../constants/functiontypes';
 import {
@@ -117,6 +121,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 	let concat_config: string = '';
 	let outputType: string = '';
 	let simplevalidation: string = '';
+	let next_steps: string = '';
 	let route_config: string = '';
 	let can_complete = false;
 	let arbiterModels: string[] = [];
@@ -184,6 +189,15 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 				to,
 				outputType,
 				copy_config
+			));
+		}
+
+		if (afterEffect) {
+			({ next_steps, staticMethods } = setupAfterEffect(
+				afterEffect,
+				staticMethods,
+				methods,
+				tempLambdaInsertArgumentValues
 			));
 		}
 
@@ -479,6 +493,19 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 `;
 			break;
 		case DataChainType.AfterEffect:
+			from_parameter_template = `
+      public static async Task Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change = null)
+      {
+          Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# fromModel, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
+
+          {{next_steps}}
+      };
+
+       await func(agent, model, change);
+      }
+      ${staticMethods.join(NEW_LINE)}
+  `;
+			break;
 		default:
 			if (to && to.functionType) {
 				if (from && from.functionType) {
@@ -512,8 +539,9 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 		get_existing,
 		compare_enumeration,
 		route_config,
-    set_properties,
-    concat_collection,
+		set_properties,
+		next_steps,
+		concat_collection,
 		copy_config,
 		concat_config,
 		guts,
@@ -1453,7 +1481,7 @@ function GenerateIfBranch(
 	}
 }
 function GeneratePushChange(args: {
-	afterEffect: AfterEffect;
+	afterEffect?: AfterEffect;
 	methods: MountingDescription[];
 	name: string;
 }): string[] {
@@ -1482,23 +1510,24 @@ function CreateStreamProcessFunc(
 	mountDescription: MountingDescription,
 	funcName: any,
 	ifAfterEffect: string,
-	route: AfterEffect,
-	ops: { updatePath: boolean }
+	route?: AfterEffect,
+	ops?: { updatePath: boolean }
 ) {
 	let methodType = 'Create';
 	if (mountDescription) {
 		methodType = mountDescription.viewType;
 	}
+	ops = ops || { updatePath: false };
 	let updatePath = ops.updatePath
 		? `  #{{"key":"tomodel"}}#ChangeBy#{{"key":"agent"}}#.UpdatePath(parameters, AfterEffectChains.{{after_effect_parent}}.${codeTypeWord(
-				route.name
+				route ? route.name : ''
 			)});`
 		: '';
 	let method = `
         public static async Task ${funcName}(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change${ifAfterEffect}) {
           var value = checkModel;
           var parameters = #{{"key":"tomodel"}}#ChangeBy#{{"key":"agent"}}#.${methodType}(agent, value, FunctionName.#{{"key":"${codeTypeWord(
-		route.name
+		route ? route.name : ''
 	)}","type":"method"}}#);
 
             ${updatePath}
@@ -1639,62 +1668,12 @@ function setLambdaProperties(
 ) {
 	let agent = agentProperty ? GetPropertyModel(agentProperty) : null;
 	let model = modelProperty ? GetPropertyModel(modelProperty) : null;
-	// if (agent) {
-	// 	tempLambdaInsertArgumentValues['agent'] = {
-	// 		model: agent ? agent.id : null,
-	// 		type: ReferenceInsertType.Model
-	// 	};
-	// }
-	// tempLambdaInsertArgumentValues['agent.prop'] = {
-	// 	property: agentProperty,
-	// 	model: agent ? agent.id : null,
-	// 	type: ReferenceInsertType.Property
-	// };
+
 	setupLambdaInsertArgs(tempLambdaInsertArgumentValues, agentProperty, 'agent');
-
-	// if (model) {
-	// 	tempLambdaInsertArgumentValues['model'] = {
-	// 		model: model ? model.id : null,
-	// 		type: ReferenceInsertType.Model
-	// 	};
-	// }
-
-	// tempLambdaInsertArgumentValues['model.prop'] = {
-	// 	property: modelProperty,
-	// 	model: model ? model.id : null,
-	// 	type: ReferenceInsertType.Property
-	// };
-
 	setupLambdaInsertArgs(tempLambdaInsertArgumentValues, modelProperty, 'model');
-	// if (relationsConfig && relationsConfig.parentProperty) {
-	// 	tempLambdaInsertArgumentValues['parent.prop'] = {
-	// 		property: relationsConfig.parentProperty,
-	// 		model: relationsConfig.parent,
-	// 		type: ReferenceInsertType.Property
-	// 	};
-	// }
 	setupLambdaInsertArgs(tempLambdaInsertArgumentValues, relationsConfig.parentProperty, 'parent');
-	// if (relationsConfig && relationsConfig.parent) {
-	// 	tempLambdaInsertArgumentValues['parent'] = {
-	// 		model: relationsConfig.parent,
-	// 		type: ReferenceInsertType.Model
-	// 	};
-	// }
-
-	// if (modelOutput) {
-	// 	tempLambdaInsertArgumentValues['model_output'] = {
-	// 		model: modelOutput,
-	// 		type: ReferenceInsertType.Model
-	// 	};
-	// }
-	// if (modelOutputProperty) {
-	// 	tempLambdaInsertArgumentValues['model_output.prop'] = {
-	// 		property: modelOutputProperty,
-	// 		model: modelOutput,
-	// 		type: ReferenceInsertType.Property
-	// 	};
-	// }
 	setupLambdaInsertArgs(tempLambdaInsertArgumentValues, modelOutputProperty, 'model_output');
+
 	if (targetProperty && ops && ops.to && ops.to.properties) {
 		let target = targetProperty ? GetPropertyModel(targetProperty) : null;
 		tempLambdaInsertArgumentValues[`tomodel.prop`] = {
@@ -1782,4 +1761,259 @@ function CompareEnumerationFunc(compareEnumeration: CompareEnumeration, tempLamb
 		}
 	}
 	return compare_enumeration;
+}
+
+function setupAfterEffect(
+	afterEffect: AfterEffect,
+	staticMethods: string[],
+	methods: MountingDescription[],
+	tempLambdaInsertArgumentValues: any
+): { next_steps: string; staticMethods: string[] } {
+	let next_steps: string = '';
+
+	if (afterEffect) {
+		if (afterEffect.dataChainOptions && afterEffect.dataChainOptions.nextStepsConfiguration) {
+			afterEffect.dataChainOptions.nextStepsConfiguration.steps.forEach((step: NextStepConfiguration) => {
+				if (step.existenceCheck && step.existenceCheck.enabled) {
+					let { result } = setupExistenceCheck(
+						step.existenceCheck,
+						staticMethods,
+						tempLambdaInsertArgumentValues,
+						OutputType.Existence
+					);
+
+					next_steps += `
+          if(!(await ${result})) {
+            return;
+          }`;
+				}
+				if (step.getExisting && step.getExisting.enabled) {
+					let { result } = setupExistenceCheck(
+						step.getExisting,
+						staticMethods,
+						tempLambdaInsertArgumentValues,
+						OutputType.Model
+					);
+
+					next_steps += `
+          let existing = await ${result};
+          `;
+				}
+				if (
+					step.constructModel &&
+					step.constructModel.enabled &&
+					step.constructModel.setProperties &&
+					step.constructModel.setProperties.enabled &&
+					step.constructModel.setProperties.properties
+				) {
+					next_steps += `
+          ${setupSetProperties('existing', step.constructModel.setProperties, tempLambdaInsertArgumentValues)}`;
+				}
+			});
+		}
+	}
+
+	return { next_steps, staticMethods };
+}
+
+function setupSetProperties(
+	outputModelName: string,
+	setProperties: SetPropertiesConfig,
+	tempLambdaInsertArgumentValues: any
+) {
+	if (setProperties && setProperties.enabled) {
+		let set_properties = setProperties.properties
+			.map((setupProperty: SetProperty) => {
+				let {
+					setPropertyType,
+					stringValue,
+					doubleValue,
+					integerValue,
+					booleanValue,
+					floatValue,
+					enumerationValue,
+					targetProperty,
+					enumeration,
+					relationType
+				} = setupProperty;
+
+				let targetModel = GetPropertyModel(targetProperty);
+				let prop_string = `${outputModelName}.#{{"key":"${GetCodeName(targetModel)}.${GetJSCodeName(
+					targetProperty
+				)}","type":"property","model":"${GetCodeName(targetModel)}"}}#`;
+
+				tempLambdaInsertArgumentValues[`${GetCodeName(targetModel)}.${GetJSCodeName(targetProperty)}`] = {
+					property: targetProperty,
+					model: targetModel ? targetModel.id : '',
+					type: ReferenceInsertType.Property
+				};
+
+				tempLambdaInsertArgumentValues[`${GetCodeName(targetModel)}`] = {
+					model: targetModel ? targetModel.id : '',
+					type: ReferenceInsertType.Model
+				};
+
+				switch (setPropertyType) {
+					case SetPropertyType.Integer:
+						return `${prop_string} = ${integerValue};`;
+					case SetPropertyType.Float:
+						return `${prop_string} = ${floatValue};`;
+					case SetPropertyType.Double:
+						return `${prop_string} = ${doubleValue};`;
+					case SetPropertyType.Enumeration:
+						let enumNode = GetNodeById(enumeration);
+						let enumprops = GetNodeProp(enumNode, NodeProperties.Enumeration) || [];
+						let enumProp: { value: string; id: string } = enumprops.find(
+							(v: { id: string }) => v.id === enumerationValue
+						);
+						tempLambdaInsertArgumentValues[GetJSCodeName(enumeration)] = { enumeration: enumeration };
+						tempLambdaInsertArgumentValues[`${GetJSCodeName(enumeration)}.${enumProp.value}`] = {
+							enumeration,
+							enumerationvalue: enumerationValue
+						};
+						return `${prop_string} = #{{"key":"${GetJSCodeName(
+							enumeration
+						)}","type":"enumeration" }}#.#{{"key":"${GetJSCodeName(
+							enumeration
+						)}.${enumProp.value}","type":"enumerationvalue"}}#;`;
+					case SetPropertyType.String:
+						// TODO: Escape string value for C#;
+						return `${prop_string} = ${stringValue ? `"${stringValue}"` : 'string.Empty'};`;
+					case SetPropertyType.Boolean:
+						return `${prop_string} = ${booleanValue};`;
+					case SetPropertyType.Property:
+						let fromPropModel = RelationToVariable(relationType);
+						let keyname = `${GetModelName(setupProperty)}.${GetModelProperty(setupProperty)}`;
+						setupLambdaInsertArgs(
+							tempLambdaInsertArgumentValues,
+							GetModelProperty(setupProperty),
+							GetModelName(setupProperty)
+						);
+						return `${prop_string} = ${fromPropModel}.#{{"key":"${keyname}","type":"property","model":"${GetModelName(
+							setupProperty
+						)}"}}#;`;
+				}
+			})
+			.join(NEW_LINE);
+
+		return set_properties;
+	}
+
+	return '';
+}
+
+function setupExistenceCheck(
+	existenceCheck: GetOrExistenceCheckConfig,
+	staticMethods: string[],
+	tempLambdaInsertArgumentValues: any,
+	outputAs: OutputType
+): { name: string; result: string } {
+	let result = '';
+	let name = '';
+	if (existenceCheck && existenceCheck.enabled) {
+		let item = existenceCheck.orderedCheck[existenceCheck.orderedCheck.length - 1];
+		name = existenceCheck.name || `CheckingFor${GetCodeName(item.model)}By${GetModelName(existenceCheck.head)}`;
+		result = `${name}(${RelationToVariable(existenceCheck.head.relationType)});`;
+		setupLambdaInsertArgs(
+			tempLambdaInsertArgumentValues,
+			GetModelPropertyName(existenceCheck.head),
+			RelationToVariable(existenceCheck.head.relationType)
+		);
+		let arbiters: string[] = [];
+		let steps: string[] = [];
+		existenceCheck.orderedCheck.forEach((item: ConnectionChainItem, index: number) => {
+			setupLambdaInsertArgs(tempLambdaInsertArgumentValues, item.modelProperty, GetCodeName(item.model));
+			arbiters.push(
+				`let arbiter#{{"key":"${GetCodeName(
+					item.model
+				)}"}}# = RedStrapper.Resolve<IRedArbiter<#{{"key":"${GetCodeName(item.model)}"}}#>>();`
+			);
+			let prev =
+				index === 0
+					? `${RelationToVariable(existenceCheck.head.relationType)}.#{{"key":"${RelationToVariable(
+							existenceCheck.head.relationType
+						)}.${GetModelPropertyName(
+							existenceCheck.head
+						)}","type":"property","model":"${GetModelPropertyName(existenceCheck.head)}"}}#`
+					: `step${index - 1}.#{{"key":"${GetCodeName(
+							existenceCheck.orderedCheck[index - 1].model
+						)}.${GetCodeName(
+							existenceCheck.orderedCheck[index - 1].modelProperty
+						)}","type":"property","model":"${GetCodeName(existenceCheck.orderedCheck[index - 1].model)}"}}#`;
+
+			steps.push(`let step${index} = ${index
+				? `step${index - 1}`
+				: `${RelationToVariable(existenceCheck.head.relationType)}`} != null ? (await arbiter#{{"key":"${GetCodeName(
+				item.model
+			)}"}}#.GetBy(v => v.#{{"key":"${GetCodeName(item.model)}.${GetCodeName(
+				item.modelProperty
+			)}","type":"property","model":"${GetCodeName(item.model)}"}}# == ${prev})) : null;
+      `);
+		});
+		staticMethods.push(`static Task<bool> ${name}(#{{"key":"${RelationToVariable(
+			existenceCheck.head.relationType
+		)}"}}# ${RelationToVariable(existenceCheck.head.relationType)}) {
+      ${arbiters.unique().join(NEW_LINE)}
+
+      ${steps.join(NEW_LINE)}
+
+      ${outputAs === OutputType.Existence
+			? 'return step' + (steps.length - 1) + ' == null;'
+			: 'return step' + (steps.length - 1) + ';'}
+    }`);
+	}
+
+	return { name, result };
+}
+enum OutputType {
+	Existence = 'Existence',
+	Model = 'Model'
+}
+function RelationToVariable(relationType: RelationType): string {
+	switch (relationType) {
+		case RelationType.Agent:
+			return 'agent';
+		case RelationType.Model:
+			return 'model';
+		case RelationType.ModelOutput:
+			return 'data';
+		case RelationType.Parent:
+			return 'parent';
+	}
+}
+function GetModelName(half: HalfRelation): string {
+	switch (half.relationType) {
+		case RelationType.Agent:
+			return GetCodeName(half.agent);
+		case RelationType.Model:
+			return GetCodeName(half.model);
+		case RelationType.ModelOutput:
+			return GetCodeName(half.modelOutput);
+		case RelationType.Parent:
+			return GetCodeName(half.parent);
+	}
+}
+function GetModelPropertyName(half: HalfRelation): string {
+	switch (half.relationType) {
+		case RelationType.Agent:
+			return GetCodeName(half.agentProperty);
+		case RelationType.Model:
+			return GetCodeName(half.modelProperty);
+		case RelationType.ModelOutput:
+			return GetCodeName(half.modelOutputProperty);
+		case RelationType.Parent:
+			return GetCodeName(half.parentProperty);
+	}
+}
+function GetModelProperty(half: HalfRelation): string {
+	switch (half.relationType) {
+		case RelationType.Agent:
+			return half.agentProperty;
+		case RelationType.Model:
+			return half.modelProperty;
+		case RelationType.ModelOutput:
+			return half.modelOutputProperty;
+		case RelationType.Parent:
+			return half.parentProperty;
+	}
 }

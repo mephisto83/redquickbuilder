@@ -288,7 +288,12 @@ export function CreateSetProperty(): SetProperty {
 		enumerationValue: '',
 		booleanValue: 'false',
 		modelOutputProperty: '',
-		parentProperty: ''
+		parentProperty: '',
+		agent: '',
+		enabled: true,
+		model: '',
+		modelOutput: '',
+		parent: ''
 	};
 }
 export function CheckSetProperties(setProperties: SetPropertiesConfig) {
@@ -320,7 +325,7 @@ export function CheckSetProperty(setProperty: SetProperty): boolean {
 	}
 	return false;
 }
-export interface SetProperty {
+export interface SetProperty extends HalfRelation {
 	setPropertyType: SetPropertyType;
 	relationType: RelationType;
 	agentProperty: string; // The property used to find the model.
