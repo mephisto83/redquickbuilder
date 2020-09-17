@@ -31,6 +31,8 @@ import SimpleValidationsComponent from './simplevalidationsconfig';
 import ConcatenateStringConfigComponent from './concatenatstringconfigcomponent';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import AfterEffectSetupProperty from './aftereffectsetproperty';
+import TreeViewItemContainer from './treeviewitemcontainer';
+import CheckBox from './checkbox';
 
 export default class ConstructModelConfiguration extends Component<any, any> {
 	constructor(props: any) {
@@ -108,6 +110,31 @@ export default class ConstructModelConfiguration extends Component<any, any> {
 						icon="fa fa-plus"
 					/>
 				</TreeViewButtonGroup>
+				<TreeViewItemContainer>
+					<CheckBox
+						label={Titles.Enabled}
+						color={
+							constructModel && constructModel.setProperties && constructModel.setProperties.enabled ? (
+								ValidationColors.Ok
+							) : (
+								ValidationColors.Neutral
+							)
+						}
+						value={constructModel.setProperties.enabled}
+						greyed={!constructModel.setProperties.enabled}
+						error={!valid}
+						onChange={(value: boolean) => {
+							constructModel.enabled = value;
+							constructModel.setProperties.enabled = value;
+							this.setState({
+								turn: UIA.GUID()
+							});
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
+						}}
+					/>
+				</TreeViewItemContainer>
 				{constructModel.setProperties.properties ? (
 					constructModel.setProperties.properties.map((setProperty: SetProperty) => {
 						return (

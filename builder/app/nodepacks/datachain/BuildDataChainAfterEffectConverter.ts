@@ -68,6 +68,7 @@ import { equal } from 'assert';
 import { Node, Graph } from '../../methods/graph_types';
 import { LinkType } from '../../../app/constants/nodetypes';
 import { stringify } from 'querystring';
+import { NodeAttributePropertyTypes, NodePropertyTypes } from '../../../visi_blend/dist/app/actions/uiactions';
 
 export interface AfterEffectConvertArgs {
 	from: MethodDescription;
@@ -845,9 +846,7 @@ function setupCopyEnumeration(
 			enumeration,
 			enumerationvalue: copyEnumeration.enumeration
 		};
-		copy_config = `return #{{"key":"${GetCodeName(
-			enumeration
-		)}","type":"enumeration" }}#.#{{"key":"${GetCodeName(
+		copy_config = `return #{{"key":"${GetCodeName(enumeration)}","type":"enumeration" }}#.#{{"key":"${GetCodeName(
 			enumeration
 		)}.${enumProp.value}","type":"enumerationvalue"}}#`;
 	}
@@ -1793,6 +1792,7 @@ function setupAfterEffect(
             return;
           }`;
 				}
+				let resultVariable = 'existing';
 				if (step.getExisting && step.getExisting.enabled) {
 					let { result } = setupExistenceCheck(
 						step.getExisting,
@@ -1802,7 +1802,7 @@ function setupAfterEffect(
 					);
 
 					next_steps += `
-          let existing = await ${result};
+          let ${resultVariable} = await ${result};
           `;
 				}
 				if (
@@ -1812,7 +1812,60 @@ function setupAfterEffect(
 					step.constructModel.setProperties.properties
 				) {
 					next_steps += `
-          ${setupSetProperties('existing', step.constructModel.setProperties, tempLambdaInsertArgumentValues)}`;
+          ${setupSetProperties(
+				`${resultVariable}`,
+				step.constructModel.setProperties,
+				tempLambdaInsertArgumentValues
+			)}`;
+				}
+
+				if (step.sendMessageToLakeConfig && step.sendMessageToLakeConfig.enabled) {
+					let targetModel = '';
+					let targetAgent = '';
+					let functionName = '';
+					if (
+						afterEffect.dataChainOptions.nextStepsConfiguration &&
+						afterEffect.dataChainOptions.nextStepsConfiguration.descriptionId
+					) {
+						let { descriptionId } = afterEffect.dataChainOptions.nextStepsConfiguration;
+						methods.forEach((value: MountingDescription) => {
+							if (value.id === descriptionId) {
+								if (value.methodDescription) {
+									functionName = value.name;
+									let { model, parent, agent } = value.methodDescription.properties;
+									if (model) {
+										targetModel = model;
+									} else if (parent) {
+										targetModel = parent;
+									}
+									if (agent) {
+										targetAgent = agent;
+									}
+
+									tempLambdaInsertArgumentValues[`${GetCodeName(targetAgent)}`] = {
+										model: targetAgent ? targetAgent : '',
+										type: ReferenceInsertType.Model
+									};
+									tempLambdaInsertArgumentValues[`${GetCodeName(targetModel)}`] = {
+										model: targetModel ? targetModel : '',
+										type: ReferenceInsertType.Model
+									};
+								}
+							}
+						});
+					}
+
+					next_steps += `
+
+          var parameters = #{{"key":"${GetCodeName(targetModel)}"}}#ChangeBy#{{"key":"${GetCodeName(
+						targetAgent
+					)}"}}#.Update(agent, ${resultVariable}, FunctionName.#{{"key":"${codeTypeWord(
+						functionName
+					)}","type":"method"}}#);
+          await StreamProcess.#{{"key":"${GetCodeName(targetModel)}"}}#_#{{"key":"${GetCodeName(
+						targetAgent
+					)}"}}#(parameters);
+        `;
 				}
 			});
 		}
@@ -1846,7 +1899,8 @@ function setupSetProperties(
 				let prop_string = `${outputModelName}.#{{"key":"${GetCodeName(targetModel)}.${GetCodeName(
 					targetProperty
 				)}","type":"property","model":"${GetCodeName(targetModel)}"}}#`;
-
+				let isStringList: boolean =
+					GetNodeProp(targetProperty, NodeProperties.UIAttributeType) === NodePropertyTypes.LISTOFSTRINGS;
 				tempLambdaInsertArgumentValues[`${GetCodeName(targetModel)}.${GetCodeName(targetProperty)}`] = {
 					property: targetProperty,
 					model: targetModel ? targetModel.id : '',
@@ -1888,12 +1942,26 @@ function setupSetProperties(
 						return `${prop_string} = ${booleanValue};`;
 					case SetPropertyType.Property:
 						let fromPropModel = RelationToVariable(relationType);
-						let keyname = `${GetModelName(setupProperty)}.${GetModelProperty(setupProperty)}`;
+						let keyname = `${GetModelName(setupProperty)}.${GetModelPropertyName(setupProperty)}`;
 						setupLambdaInsertArgs(
 							tempLambdaInsertArgumentValues,
 							GetModelProperty(setupProperty),
 							GetModelName(setupProperty)
 						);
+						if (isStringList) {
+							let func = 'Add';
+							if (
+								GetNodeProp(GetModelProperty(setupProperty), NodeProperties.UIAttributeType) ===
+								NodePropertyTypes.LISTOFSTRINGS
+							) {
+								func = 'AddRange';
+							}
+							return `
+              ${prop_string} = ${prop_string} ?? new List<string>();
+              ${prop_string}.${func}(${fromPropModel}.#{{"key":"${keyname}","type":"property","model":"${GetModelName(
+								setupProperty
+							)}"}}#);`;
+						}
 						return `${prop_string} = ${fromPropModel}.#{{"key":"${keyname}","type":"property","model":"${GetModelName(
 							setupProperty
 						)}"}}#;`;
@@ -1925,7 +1993,7 @@ function setupExistenceCheck(
 
 		setupLambdaModelArgs(tempLambdaInsertArgumentValues, GetModel(existenceCheck.head));
 
-		result = `${name}(${RelationToVariable(existenceCheck.head.relationType)});`;
+		result = `${name}(${RelationToVariable(existenceCheck.head.relationType)})`;
 		let headProperty = existenceCheck.orderedCheck ? existenceCheck.orderedCheck[0].previousModelProperty : '';
 		setupLambdaInsertArgs(tempLambdaInsertArgumentValues, headProperty, GetModelName(existenceCheck.head));
 		let arbiters: string[] = [];
@@ -1996,13 +2064,15 @@ function RelationToVariable(relationType: RelationType): string {
 function GetModelName(half: HalfRelation): string {
 	switch (half.relationType) {
 		case RelationType.Agent:
-			return GetCodeName(half.agent);
+			return half.agent ? GetCodeName(half.agent) : GetCodeName(GetPropertyModel(half.agentProperty));
 		case RelationType.Model:
-			return GetCodeName(half.model);
+			return half.model ? GetCodeName(half.model) : GetCodeName(GetPropertyModel(half.modelProperty));
 		case RelationType.ModelOutput:
-			return GetCodeName(half.modelOutput);
+			return half.modelOutput
+				? GetCodeName(half.modelOutput)
+				: GetCodeName(GetPropertyModel(half.modelOutputProperty));
 		case RelationType.Parent:
-			return GetCodeName(half.parent);
+			return half.parent ? GetCodeName(half.parent) : GetCodeName(GetPropertyModel(half.parentProperty));
 	}
 }
 function GetModel(half: HalfRelation): string {

@@ -195,10 +195,13 @@ export function CheckSendMessageToLakeConfig(config: SendMessageToLakeConfig): b
 	return true;
 }
 export function CheckConstructModel(constructModel: ConstructModelConfig): boolean {
-	if (constructModel && constructModel.enabled) {
-		return (
-			!!constructModel.model && !!constructModel.setProperties && CheckSetProperties(constructModel.setProperties)
-		);
+	if (
+		constructModel &&
+		constructModel.enabled &&
+		constructModel.setProperties &&
+		constructModel.setProperties.enabled
+	) {
+		return !!constructModel.setProperties && CheckSetProperties(constructModel.setProperties);
 	}
 	return true;
 }
