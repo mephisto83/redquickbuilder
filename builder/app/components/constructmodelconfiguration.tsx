@@ -14,7 +14,7 @@ import {
 	CheckConstructModel,
 	SetProperty,
 	CreateSetProperty,
-  ValidationColors
+	ValidationColors
 } from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import CheckExistanceConfig from './checkexistenceconfig';
@@ -114,8 +114,8 @@ export default class ConstructModelConfiguration extends Component<any, any> {
 							<AfterEffectSetupProperty
 								key={setProperty.id}
 								setProperty={setProperty}
-                targetProperties={targetProperties}
-                modelProperties={modelProperties}
+								targetProperties={targetProperties}
+								modelProperties={modelProperties}
 								parentProperties={parentProperties}
 								agentProperties={agentProperties}
 								modelOutputProperties={modelOutputProperties}
@@ -124,6 +124,9 @@ export default class ConstructModelConfiguration extends Component<any, any> {
 									constructModel.setProperties.properties = constructModel.setProperties.properties.filter(
 										(v) => v.id !== setProperty.id
 									);
+									this.setState({
+										turn: UIA.GUID()
+									});
 								}}
 							/>
 						);
