@@ -299,13 +299,13 @@ export function CreateSetProperty(): SetProperty {
 		parent: ''
 	};
 }
-export function CheckSetProperties(setProperties: SetPropertiesConfig) {
+export function CheckSetProperties(setProperties: SetPropertiesConfig): boolean {
 	if (!setProperties.enabled) {
 		return true;
 	}
 
 	if (setProperties && setProperties.properties) {
-		return !setProperties.properties.find(CheckSetProperty);
+		return !!!setProperties.properties.find((v) => !CheckSetProperty(v));
 	}
 	return false;
 }
@@ -320,9 +320,18 @@ export function CheckSetProperty(setProperty: SetProperty): boolean {
 		case SetPropertyType.Integer:
 			return isNaN(parseInt(setProperty.integerValue));
 		case SetPropertyType.Property:
-			return setProperty.relationType === RelationType.Agent
-				? !!!setProperty.agentProperty || !setProperty.targetProperty
-				: !!!setProperty.modelProperty || !setProperty.targetProperty;
+			switch (setProperty.relationType) {
+				case RelationType.Agent:
+					return !!setProperty.agentProperty && !!setProperty.targetProperty;
+				case RelationType.Model:
+					return !!setProperty.modelProperty && !!setProperty.targetProperty;
+				case RelationType.ModelOutput:
+					return !!setProperty.modelOutputProperty && !!setProperty.targetProperty;
+				case RelationType.Parent:
+					return !!setProperty.parentProperty && !!setProperty.targetProperty;
+				default:
+					return false;
+			}
 		case SetPropertyType.String:
 			return !(setProperty.stringValue !== undefined && setProperty.stringValue !== null);
 	}
