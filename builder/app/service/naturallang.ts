@@ -392,11 +392,33 @@ export function getTextEditorSuggestions(text: string, editorContext: string) {
 					insertText: argtype
 				});
 			});
-		} else if (Cache.context.properties && temp.has('property')) {
+		} else if (temp.has('property')) {
 			let context = _nlp(editorContext);
 			if (context.has('#Model')) {
-        let modelTerms = context.match('#Model').terms();
-
+				let modelTerms: any = context.match('#Model').terms().map((v: any): string => v.text().trim());
+				if (modelTerms && modelTerms.length) {
+					let models = NodesByType(null, NodeTypes.Model);
+					modelTerms.forEach((text: string) => {
+						let model = models.find((vnode: Node) => {
+							return (
+								text === GetNodeTitle(vnode) ||
+								text === GetCodeName(vnode) ||
+								text === GetCodeName(vnode).toLocaleLowerCase() ||
+								text === GetCodeName(vnode).toLocaleUpperCase()
+							);
+						});
+						if (model) {
+							let properties = GetModelCodeProperties(model.id);
+							properties.forEach((prop: Node) => {
+								suggestions.push({
+									label: `property: ${GetCodeName(model)} ${GetCodeName(prop)}`,
+									kind: monaco.languages.CompletionItemKind.Text,
+									insertText: GetCodeName(prop)
+								});
+							});
+						}
+					});
+				}
 			}
 		}
 	return suggestions;

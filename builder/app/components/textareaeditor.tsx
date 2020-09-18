@@ -246,12 +246,14 @@ function getGlobalSuggestions(): any[] {
 		{
 			label: 'Execute func',
 			kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+			insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 			insertText: [ 'Execute the function "${1:method}"' ].join(''),
 			documentation: 'Define which method will be called in an after effect'
 		},
 		{
 			label: 'Check existing',
 			kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+			insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 			insertText: [
 				'Check for an existing ${1:model} instance with an ${2:agent} ${3:property} equaling the ${4:model} ${5:property} property.'
 			].join(''),
@@ -260,6 +262,7 @@ function getGlobalSuggestions(): any[] {
 		{
 			label: 'Find existing',
 			kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+			insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 			insertText: [
 				'Find an existing ${1:model} instance with an ${2:agent} ${3:property} equaling the ${4:model} ${5:property} property.'
 			].join(''),

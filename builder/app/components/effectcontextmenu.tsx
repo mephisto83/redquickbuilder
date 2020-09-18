@@ -602,7 +602,7 @@ class EffectContextMenu extends Component<any, any> {
 		const defaultMenus = this.getDefaultMenu(menuMode);
 		const large =
 			this.state.large || this.state.pLarger || this.state.vLarger || this.state.aLarger || this.state.eLarger;
-		const menu_width = large ? 755 : 350;
+		const menu_width = large ? 1055 : 350;
 		let icon_expando: any = {
 			fontSize: `1.4rem`,
 			paddingLeft: 5,
