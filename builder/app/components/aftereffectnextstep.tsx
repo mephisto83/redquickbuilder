@@ -9,12 +9,14 @@ import {
 	CheckNextStepConfiguration,
 	ValidationColors,
 	MethodDescription,
-	CreateExistenceCheck
+	CreateExistenceCheck,
+	CreateBoolean
 } from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import CheckExistanceConfig from './checkexistenceconfig';
 import ConstructModelConfiguration from './constructmodelconfiguration';
 import CheckExistanceConfigComponent from './checkexistenceconfigcomponent';
+import BooleanConfigComponent from './booleanconfigcomponent';
 
 export default class AfterEffectNextStep extends Component<any, any> {
 	constructor(props: any) {
@@ -28,6 +30,7 @@ export default class AfterEffectNextStep extends Component<any, any> {
 		}
 		nextStepConfig.existenceCheck = nextStepConfig.existenceCheck || CreateExistenceCheck();
 		nextStepConfig.getExisting = nextStepConfig.getExisting || CreateExistenceCheck();
+		nextStepConfig.createNew = nextStepConfig.createNew || CreateBoolean();
 		let methodDescription: MethodDescription = this.props.methodDescription;
 		if (!methodDescription) {
 			return <span />;
@@ -66,6 +69,11 @@ export default class AfterEffectNextStep extends Component<any, any> {
 					methodDescription={methodDescription}
 					existenceCheck={nextStepConfig.getExisting}
 					onChange={onchange}
+				/>
+				<BooleanConfigComponent
+					enabled
+					title={Titles.CreateNew}
+					booleanConfig={nextStepConfig.createNew}
 				/>
 				<ConstructModelConfiguration
 					dataChainType={this.props.dataChainType}

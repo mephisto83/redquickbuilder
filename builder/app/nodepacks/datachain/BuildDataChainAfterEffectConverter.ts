@@ -1805,6 +1805,38 @@ function setupAfterEffect(
           let ${resultVariable} = await ${result};
           `;
 				}
+
+				if (step.createNew && step.createNew.enabled) {
+					let targetModel = '';
+					if (
+						afterEffect.dataChainOptions.nextStepsConfiguration &&
+						afterEffect.dataChainOptions.nextStepsConfiguration.descriptionId
+					) {
+						let { descriptionId } = afterEffect.dataChainOptions.nextStepsConfiguration;
+						methods.forEach((value: MountingDescription) => {
+							if (value.id === descriptionId) {
+								if (value.methodDescription) {
+									let { model, parent } = value.methodDescription.properties;
+									if (model) {
+										targetModel = model;
+									} else if (parent) {
+										targetModel = parent;
+									}
+
+									tempLambdaInsertArgumentValues[`${GetCodeName(targetModel)}`] = {
+										model: targetModel ? targetModel : '',
+										type: ReferenceInsertType.Model
+									};
+								}
+							}
+						});
+					}
+
+					next_steps += `
+            let ${resultVariable} =  #{{"key":"${GetCodeName(targetModel)}"}}#.GetDefaultModel();
+            `;
+				}
+
 				if (
 					step.constructModel &&
 					step.constructModel.enabled &&

@@ -125,6 +125,7 @@ export interface NextStepConfiguration extends ConfigItem {
 	existenceCheck: GetOrExistenceCheckConfig;
 	getExisting: GetOrExistenceCheckConfig;
 	constructModel: ConstructModelConfig;
+	createNew: BooleanConfig;
 	sendMessageToLakeConfig: SendMessageToLakeConfig;
 }
 export interface ConstructModelConfig extends ConfigItem {
@@ -165,6 +166,7 @@ export function CreateNextStepConfiguration(): NextStepConfiguration {
 		name: '',
 		constructModel: CreateConstructModelConfig(),
 		sendMessageToLakeConfig: CreateSendMessageToLakeConfig(),
+		createNew: CreateBoolean(),
 		existenceCheck: CreateExistenceCheck(),
 		getExisting: CreateExistenceCheck()
 	};

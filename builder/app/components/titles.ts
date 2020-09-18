@@ -616,6 +616,7 @@ export const EnableComposition = 'Enable composition';
 export const Float = 'Float';
 export const Integer = 'Integer';
 export const Viewer = 'Viewer';
+export const CreateNew = 'Create New';
 export const AutoCalculate = 'Auto calculate';
 export const String = 'String';
 export const SetPropertyType = 'Set Property type';
