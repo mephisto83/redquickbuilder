@@ -36,6 +36,9 @@ const _nlp = nlp.extend((Doc: any, world: any) => {
 		[SCREEN_PARAMETER]: {
 			isA: 'Noun'
 		},
+		Comparison: {
+			isA: 'Verb'
+		},
 		Agent: {
 			isA: 'Model'
 		},
@@ -186,6 +189,7 @@ export function updateWorld() {
 	webDictionary['models'] = [ MODEL, POSSESIVE ];
 	webDictionary['is a valid'] = [ IS_A ];
 	webDictionary['must be a valid'] = [ IS_A ];
+	webDictionary['equaling'] = [ 'Comparison' ];
 	Object.keys(ViewTypes).map((v: string) => {
 		webDictionary[v] = webDictionary[v] || [];
 		webDictionary[v.toLowerCase()] = webDictionary[v.toLowerCase()] || [];
@@ -276,7 +280,13 @@ export function updateWorld() {
 export interface NLOptions {
 	withSpaces?: boolean;
 }
+export interface CheckForExistingNL {
+	existingModelType: any;
+	agentClause: Clause;
+	targetClause: Clause;
+}
 export interface NLMeaning {
+	checkForExisting: CheckForExistingNL;
 	viewType?: string;
 	parameterClauses?: Clause[];
 	text: string;
@@ -284,6 +294,7 @@ export interface NLMeaning {
 	options?: NLOptions;
 	targetClause: Clause;
 	methodType?: NLMethodType;
+	functionName: string;
 	validation: { [str: string]: boolean };
 }
 export interface RoutingArgs {
@@ -300,8 +311,18 @@ let inAEnumeration = [ 'is in an enumeration', 'is an enumeration', 'is in a set
 let executionStuff = [ 'copies to', 'increments by', 'concatenates with', 'concatenates list with' ];
 let referenceStuff = [ 'must connect to a real' ];
 let validationStuff = [ 'must conform to a' ];
+let afterEffectStuff = [
+	'Execute the function',
+	'Check for an existing',
+	'Find an existing',
+	'Append the',
+	'Increment the',
+	'Decrement the',
+	'Set the'
+];
 let navigationStuff = [ 'navigates to' ];
 let all = [
+	...afterEffectStuff,
 	...navigationStuff,
 	...validationStuff,
 	...referenceStuff,
@@ -484,6 +505,28 @@ export default function getLanguageMeaning(
 			result.methodType = NLMethodType.IsTrue;
 		} else if (intersects.find((item: string) => temp.has(item))) {
 			result.methodType = NLMethodType.Intersects;
+		} else if (afterEffectStuff.find((item: string) => temp.has(item))) {
+			if (temp.has('Execute the function')) {
+				result.methodType = NLMethodType.ExecuteFunction;
+				result.functionName = temp.quotations().text();
+			}
+			if (temp.has('Check for an existing')) {
+				let afterExistingClause: string = temp_.match('Check for an existing').lookAfter().text();
+				let afterTemp: any = _nlp(afterExistingClause);
+				let existingModelType = afterTemp.match('instance').lookAfter().text();
+				let comparison = _nlp(afterExistingClause).match('#Comparison');
+				let t: any = _nlp(existingModelType);
+				let firstCompareClause = t.match('equaling').lookBefore();
+				let fcc = buildClause(firstCompareClause.text(), {});
+				let secondCompareClause = t.match('equaling').lookAfter();
+				let scc = buildClause(secondCompareClause.text(), {});
+				result.checkForExisting = {
+					existingModelType,
+					agentClause: fcc,
+					targetClause: scc
+				};
+				debugger;
+			}
 		} else if (executionStuff.find((item: string) => temp.has(item))) {
 			if (temp.has('copies to')) {
 				result.methodType = NLMethodType.CopyTo;
@@ -754,6 +797,7 @@ export enum NLMethodType {
 	IsFalse = 'IsFalse',
 	MatchEnumeration = 'MatchEnumeration',
 	CopyTo = 'CopyTo',
+	ExecuteFunction = 'ExecuteFunction',
 	IncrementBy = 'IncrementBy',
 	Reference = 'Reference',
 	ComplexValidations = 'ComplexValidations',

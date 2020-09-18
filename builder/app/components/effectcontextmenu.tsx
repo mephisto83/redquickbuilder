@@ -459,7 +459,8 @@ class EffectContextMenu extends Component<any, any> {
 									methodDescription={effectItem.methodDescription}
 								/>
 								<AfterEffectsComponent
-									agent={agent}
+                  agent={agent}
+                  model={model}
 									mountingItem={effectItem}
 									onContext={(msg: { largerPlease: boolean }) => {
 										if (msg) this.setState({ aLarger: msg.largerPlease });

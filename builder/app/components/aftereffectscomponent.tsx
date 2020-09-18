@@ -26,7 +26,7 @@ export default class AfterEffectsComponent extends Component<any, any> {
 				}}
 				title={Titles.AfterEffects}
 			>
-        <AfterEffectInput afterEffects={afterEffects} />
+				<AfterEffectInput model={this.props.model} agent={this.props.agent} afterEffects={afterEffects} />
 				<TreeViewButtonGroup>
 					<TreeViewGroupButton
 						title={`${Titles.AddAfterMethods}`}

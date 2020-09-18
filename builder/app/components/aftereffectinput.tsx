@@ -118,7 +118,7 @@ export default class AfterEffectInput extends Component<any, any> {
 					<TextInput
 						texteditor
 						active={this.state.open}
-						label={'Sentences'}
+            label={'Sentences'}
 						immediate
 						value={this.state.sentences}
 						onChange={(val: string) => {
