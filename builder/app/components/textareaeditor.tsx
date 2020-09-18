@@ -121,36 +121,13 @@ export default class TextAreaEditor extends Component<any, any> {
 									});
 									let lastIndex = textUntilPosition.lastIndexOf(' ');
 									let searchText = textUntilPosition.substring(lastIndex);
-									let suggestions = getTextEditorSuggestions(searchText);
+									let suggestions = getTextEditorSuggestions(searchText, textUntilPosition);
 									if (suggestions && suggestions.length) {
 										return {
-											suggestions: [
-												...suggestions,
-											]
+											suggestions: [ ...suggestions ]
 										};
 									}
-									suggestions = [
-                    {
-                      label: 'Navigate to dashboard',
-                      kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                      insertTextRules:
-                        monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                      insertText: [
-                        'The ${1:agent} navigates to the dashboard ${2:dashboard}.'
-                      ].join(''),
-                      documentation: 'Navigates to the dashboard.'
-                    },
-                    {
-                      label: 'Navigates to the agent page',
-                      kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                      insertTextRules:
-                        monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                      insertText: [
-                        'The ${1:agent} navigates to the ${2:model} ${3:viewtype} screen with the ${4:model}\'s ${3:property} as ${3:argtype}.'
-                      ].join(''),
-                      documentation: 'Navigates to the agent page.'
-                    }
-									];
+									suggestions = getGlobalSuggestions();
 									return { suggestions: suggestions };
 								}
 							});
@@ -247,4 +224,62 @@ interface ComponentState {
 		}
 		return lambdaValue;
 	}
+}
+function getGlobalSuggestions(): any[] {
+	return [
+		{
+			label: 'Navigate to dashboard',
+			kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+			insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+			insertText: [ 'The ${1:agent} navigates to the dashboard ${2:dashboard}.' ].join(''),
+			documentation: 'Navigates to the dashboard.'
+		},
+		{
+			label: 'Navigates to the agent page',
+			kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+			insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+			insertText: [
+				"The ${1:agent} navigates to the ${2:model} ${3:viewtype} screen with the ${4:model}'s ${3:property} as ${3:argtype}."
+			].join(''),
+			documentation: 'Navigates to the agent page.'
+		},
+		{
+			label: 'Execute func',
+			kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+			insertText: [ 'Execute the function "${1:method}"' ].join(''),
+			documentation: 'Define which method will be called in an after effect'
+		},
+		{
+			label: 'Check existing',
+			kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+			insertText: [
+				'Check for an existing ${1:model} instance with an ${2:agent} ${3:property} equaling the ${4:model} ${5:property} property.'
+			].join(''),
+			documentation: 'Checks for an existing model, exiting if not found.'
+		},
+		{
+			label: 'Find existing',
+			kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+			insertText: [
+				'Find an existing ${1:model} instance with an ${2:agent} ${3:property} equaling the ${4:model} ${5:property} property.'
+			].join(''),
+			documentation: 'Checks for an existing model, exiting if not found.'
+		},
+		{
+			label: 'Append to models list property',
+			kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+			insertText: [ 'Append the output ${1:property} property to the existing ${2:model} ${3:property}.' ].join(
+				''
+			),
+			documentation: 'Append a valud to a list property.'
+		},
+		{
+			label: 'Set to models property with property',
+			kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+			insertText: [ 'Set the output ${1:property} property to the existing ${2:model} ${3:property}.' ].join(
+				''
+			),
+			documentation: 'Set to models property to a model property.'
+		}
+	];
 }

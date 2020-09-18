@@ -7,6 +7,7 @@ import { AfterEffect, TargetMethodType } from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import AfterEffectComponent from './aftereffectcomponent';
+import AfterEffectInput from './aftereffectinput';
 
 export default class AfterEffectsComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -25,6 +26,7 @@ export default class AfterEffectsComponent extends Component<any, any> {
 				}}
 				title={Titles.AfterEffects}
 			>
+        <AfterEffectInput afterEffects={afterEffects} />
 				<TreeViewButtonGroup>
 					<TreeViewGroupButton
 						title={`${Titles.AddAfterMethods}`}

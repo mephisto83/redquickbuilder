@@ -347,7 +347,7 @@ export function cacheSuggestionData() {
 	Cache.context = context;
 }
 
-export function getTextEditorSuggestions(text: string, editorContext?: { model: string }) {
+export function getTextEditorSuggestions(text: string, editorContext: string) {
 	let temp = _nlp(text);
 
 	let suggestions: any[] = [];
@@ -393,6 +393,11 @@ export function getTextEditorSuggestions(text: string, editorContext?: { model: 
 				});
 			});
 		} else if (Cache.context.properties && temp.has('property')) {
+			let context = _nlp(editorContext);
+			if (context.has('#Model')) {
+        let modelTerms = context.match('#Model').terms();
+
+			}
 		}
 	return suggestions;
 }

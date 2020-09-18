@@ -129,6 +129,7 @@ export interface NextStepConfiguration extends ConfigItem {
 	sendMessageToLakeConfig: SendMessageToLakeConfig;
 }
 export interface ConstructModelConfig extends ConfigItem {
+	description: string;
 	model: string;
 	setProperties: SetPropertiesConfig;
 }
@@ -150,6 +151,7 @@ export function CreateConstructModelConfig(): ConstructModelConfig {
 		enabled: false,
 		id: GUID(),
 		model: '',
+		description: '',
 		setProperties: CreateSetProperties()
 	};
 }
@@ -279,6 +281,7 @@ export function CheckSimpleValidations(validations: SimpleValidationConfig[]): b
 }
 export function CreateSetProperty(): SetProperty {
 	return {
+		description: '',
 		agentProperty: '',
 		doubleValue: '',
 		enumeration: '',
@@ -340,6 +343,7 @@ export function CheckSetProperty(setProperty: SetProperty): boolean {
 	return false;
 }
 export interface SetProperty extends HalfRelation {
+	description: string;
 	setPropertyType: SetPropertyType;
 	relationType: RelationType;
 	agentProperty: string; // The property used to find the model.
@@ -1048,10 +1052,12 @@ export function CreateExistenceCheck(): GetOrExistenceCheckConfig {
 		head: CreateHalf(),
 		orderedCheck: [],
 		enabled: false,
-		id: GUID()
+		id: GUID(),
+		description: ''
 	};
 }
 export interface GetOrExistenceCheckConfig extends ConfigItem {
+	description: string;
 	head: HalfRelation;
 	orderedCheck: ConnectionChainItem[];
 }
