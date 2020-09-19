@@ -66,6 +66,7 @@ export default class TextInput extends Component<any, any> {
 					{this.props.inputgroup ? null : <label>{this.label()}</label>}
 					<TextAreaEditor
             active={this.props.active}
+            context={this.props.context}
 						className="form-control"
 						style={{ height: 250 }}
 						onBlur={() => {

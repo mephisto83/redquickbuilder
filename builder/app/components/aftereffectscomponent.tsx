@@ -26,7 +26,19 @@ export default class AfterEffectsComponent extends Component<any, any> {
 				}}
 				title={Titles.AfterEffects}
 			>
-				<AfterEffectInput model={this.props.model} agent={this.props.agent} afterEffects={afterEffects} />
+				<AfterEffectInput
+					model={this.props.model}
+					methods={this.props.methods}
+					agent={this.props.agent}
+					afterEffects={afterEffects}
+					onNewAfterEffects={(newEffects: AfterEffect[]) => {
+						if (afterEffects) {
+							afterEffects.length = 0;
+							afterEffects.push(...newEffects);
+							this.setState({ turn: UIA.GUID() });
+						}
+					}}
+				/>
 				<TreeViewButtonGroup>
 					<TreeViewGroupButton
 						title={`${Titles.AddAfterMethods}`}

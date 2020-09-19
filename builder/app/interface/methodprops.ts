@@ -1348,9 +1348,22 @@ export interface AfterEffect {
 	name: string;
 	autoCalculate: boolean;
 	dataChain: string;
-	targetType: TargetMethodType;
+	targetType: TargetMethodType; // mostlikey unknown
 	target: string;
 	afterEffectNode?: string;
+}
+
+export function CreateAfterEffect(): AfterEffect {
+	return {
+		dataChainOptions: {},
+		autoCalculate: true,
+		dataChain: '',
+		id: GUID(),
+		name: '',
+		target: '',
+		targetType: TargetMethodType.Effect,
+		afterEffectNode: ''
+	};
 }
 
 export interface PermissionConfig extends ValidationConfig {}

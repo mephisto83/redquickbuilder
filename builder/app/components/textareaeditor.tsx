@@ -121,7 +121,7 @@ export default class TextAreaEditor extends Component<any, any> {
 									});
 									let lastIndex = textUntilPosition.lastIndexOf(' ');
 									let searchText = textUntilPosition.substring(lastIndex);
-									let suggestions = getTextEditorSuggestions(searchText, textUntilPosition);
+									let suggestions = getTextEditorSuggestions(searchText, textUntilPosition, this.props.context);
 									if (suggestions && suggestions.length) {
 										return {
 											suggestions: [ ...suggestions ]
@@ -247,7 +247,7 @@ function getGlobalSuggestions(): any[] {
 			label: 'Execute func',
 			kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 			insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-			insertText: [ 'Execute the function "${1:method}"' ].join(''),
+			insertText: [ 'Execute the function ${1:method}' ].join(''),
 			documentation: 'Define which method will be called in an after effect'
 		},
 		{
@@ -271,6 +271,7 @@ function getGlobalSuggestions(): any[] {
 		{
 			label: 'Append to models list property',
 			kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+			insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 			insertText: [ 'Append the output ${1:property} property to the existing ${2:model} ${3:property}.' ].join(
 				''
 			),
@@ -279,9 +280,8 @@ function getGlobalSuggestions(): any[] {
 		{
 			label: 'Set to models property with property',
 			kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-			insertText: [ 'Set the output ${1:property} property to the existing ${2:model} ${3:property}.' ].join(
-				''
-			),
+			insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+			insertText: [ 'Set the output ${1:property} property to the existing ${2:model} ${3:property}.' ].join(''),
 			documentation: 'Set to models property to a model property.'
 		}
 	];

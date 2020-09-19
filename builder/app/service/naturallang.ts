@@ -20,6 +20,7 @@ const MODEL = 'Model';
 const SCREEN_PARAMETER = 'ScreenParameter';
 const USER = 'User';
 const POSSESIVE = 'Possesive';
+const SET_PROPERTY_ACTION = 'SetPropertyAction';
 const ViewType = 'ViewType';
 const DASHBOARD = 'Dashboard';
 const ENUMERATION = 'Enumeration';
@@ -35,6 +36,9 @@ const _nlp = nlp.extend((Doc: any, world: any) => {
 		},
 		[SCREEN_PARAMETER]: {
 			isA: 'Noun'
+		},
+		SetPropertyAction: {
+			isA: 'Verb'
 		},
 		Comparison: {
 			isA: 'Verb'
@@ -190,6 +194,10 @@ export function updateWorld() {
 	webDictionary['is a valid'] = [ IS_A ];
 	webDictionary['must be a valid'] = [ IS_A ];
 	webDictionary['equaling'] = [ 'Comparison' ];
+	actionStuff.forEach((action: string) => {
+		webDictionary[action] = webDictionary[action] || [];
+		webDictionary[action].push(SET_PROPERTY_ACTION);
+	});
 	Object.keys(ViewTypes).map((v: string) => {
 		webDictionary[v] = webDictionary[v] || [];
 		webDictionary[v.toLowerCase()] = webDictionary[v.toLowerCase()] || [];
@@ -280,13 +288,15 @@ export function updateWorld() {
 export interface NLOptions {
 	withSpaces?: boolean;
 }
-export interface CheckForExistingNL {
+export interface QueryResultNL {
 	existingModelType: any;
 	agentClause: Clause;
 	targetClause: Clause;
 }
 export interface NLMeaning {
-	checkForExisting: CheckForExistingNL;
+	setProperty?: SetPropertyClause;
+	findAnExisting?: QueryResultNL;
+	checkForExisting?: QueryResultNL;
 	viewType?: string;
 	parameterClauses?: Clause[];
 	text: string;
@@ -294,7 +304,7 @@ export interface NLMeaning {
 	options?: NLOptions;
 	targetClause: Clause;
 	methodType?: NLMethodType;
-	functionName: string;
+	functionName?: string;
 	validation: { [str: string]: boolean };
 }
 export interface RoutingArgs {
@@ -311,15 +321,8 @@ let inAEnumeration = [ 'is in an enumeration', 'is an enumeration', 'is in a set
 let executionStuff = [ 'copies to', 'increments by', 'concatenates with', 'concatenates list with' ];
 let referenceStuff = [ 'must connect to a real' ];
 let validationStuff = [ 'must conform to a' ];
-let afterEffectStuff = [
-	'Execute the function',
-	'Check for an existing',
-	'Find an existing',
-	'Append the',
-	'Increment the',
-	'Decrement the',
-	'Set the'
-];
+let actionStuff = [ 'Append the', 'Increment the', 'Decrement the', 'Set the' ];
+let afterEffectStuff = [ ...actionStuff, 'Execute the function', 'Check for an existing', 'Find an existing' ];
 let navigationStuff = [ 'navigates to' ];
 let all = [
 	...afterEffectStuff,
@@ -368,10 +371,67 @@ export function cacheSuggestionData() {
 	Cache.context = context;
 }
 
-export function getTextEditorSuggestions(text: string, editorContext: string) {
+export function getTextEditorSuggestions(text: string, editorContext: string, context: any) {
 	let temp = _nlp(text);
 
 	let suggestions: any[] = [];
+	if (context) {
+		if (context.model) {
+			suggestions.push({
+				label: `model: ${GetCodeName(context.model)}`,
+				kind: monaco.languages.CompletionItemKind.Text,
+				insertText: GetCodeName(context.model)
+			});
+		}
+		if (context.agent) {
+			suggestions.push({
+				label: `agent: ${GetCodeName(context.agent)}`,
+				kind: monaco.languages.CompletionItemKind.Text,
+				insertText: GetCodeName(context.agent)
+			});
+		}
+		if (context.methodContext) {
+			context.methodContext.forEach((item: any) => {
+				if (item) {
+					if (item.agent) {
+						suggestions.push({
+							label: `agent: ${GetCodeName(item.agent)}`,
+							kind: monaco.languages.CompletionItemKind.Text,
+							insertText: GetCodeName(item.agent)
+						});
+					}
+					if (item.method) {
+						suggestions.push({
+							label: `method: ${item.method}`,
+							kind: monaco.languages.CompletionItemKind.Text,
+							insertText: item.method
+						});
+					}
+					if (item.model) {
+						suggestions.push({
+							label: `model: ${GetCodeName(item.model)}`,
+							kind: monaco.languages.CompletionItemKind.Text,
+							insertText: GetCodeName(item.model)
+						});
+					}
+					if (item.parent) {
+						suggestions.push({
+							label: `parent: ${GetCodeName(item.parent)}`,
+							kind: monaco.languages.CompletionItemKind.Text,
+							insertText: GetCodeName(item.parent)
+						});
+					}
+					if (item.model_output) {
+						suggestions.push({
+							label: `output: ${GetCodeName(item.model_output)}`,
+							kind: monaco.languages.CompletionItemKind.Text,
+							insertText: GetCodeName(item.model_output)
+						});
+					}
+				}
+			});
+		}
+	}
 	if (Cache.context)
 		if (Cache.context.agents && temp.has(`agent`)) {
 			Cache.context.agents.map((agent: Node) => {
@@ -508,24 +568,21 @@ export default function getLanguageMeaning(
 		} else if (afterEffectStuff.find((item: string) => temp.has(item))) {
 			if (temp.has('Execute the function')) {
 				result.methodType = NLMethodType.ExecuteFunction;
-				result.functionName = temp.quotations().text();
+				result.functionName = secondClause.trim();
 			}
 			if (temp.has('Check for an existing')) {
+				result.methodType = NLMethodType.CheckForExisting;
 				let afterExistingClause: string = temp_.match('Check for an existing').lookAfter().text();
-				let afterTemp: any = _nlp(afterExistingClause);
-				let existingModelType = afterTemp.match('instance').lookAfter().text();
-				let comparison = _nlp(afterExistingClause).match('#Comparison');
-				let t: any = _nlp(existingModelType);
-				let firstCompareClause = t.match('equaling').lookBefore();
-				let fcc = buildClause(firstCompareClause.text(), {});
-				let secondCompareClause = t.match('equaling').lookAfter();
-				let scc = buildClause(secondCompareClause.text(), {});
-				result.checkForExisting = {
-					existingModelType,
-					agentClause: fcc,
-					targetClause: scc
-				};
-				debugger;
+				result.checkForExisting = checkExistingParse(afterExistingClause, buildClause);
+			}
+			if (temp.has('Find an existing')) {
+				result.methodType = NLMethodType.FindAnExisting;
+				let afterExistingClause: string = temp_.match('Find an existing').lookAfter().text();
+				result.findAnExisting = checkExistingParse(afterExistingClause, buildClause);
+			}
+			if (actionStuff.find((v) => temp.has(v))) {
+				result.methodType = NLMethodType.SetProperty;
+				result.setProperty = CreateSetPropertyNL(actionStuff.find((v) => temp.has(v)) || '', temp, buildClause);
 			}
 		} else if (executionStuff.find((item: string) => temp.has(item))) {
 			if (temp.has('copies to')) {
@@ -563,21 +620,32 @@ export default function getLanguageMeaning(
 		}
 		function buildClause(subClause: string, clause: Clause): Clause {
 			let targetProperties: Node[] = [];
-			if (_nlp(subClause).has(`#Agent`)) {
+			let nlpSubClause = _nlp(subClause);
+			if (nlpSubClause.has(`#Agent`)) {
 				clause.relationType = RelationType.Agent;
 				clause.agent = context ? context.agent : '';
 				targetProperties = findPotentialProperties(context && context.agent ? context.agent : undefined);
-			} else if (_nlp(subClause).has(`#Model`)) {
+			} else if (nlpSubClause.has(`#Model`)) {
 				clause.relationType = RelationType.Model;
 				clause.agent = context ? context.model : '';
-				targetProperties = findPotentialProperties(context && context.model ? context.model : undefined);
+				let bestModel = nlpSubClause
+					.termList()
+					.map((v) => ({ text: v.text, tags: v.tags }))
+					.find((v) => v.tags.Model && !v.tags.Property);
+				if (bestModel) {
+					let node = findModelByName(bestModel.text);
+					if (node && node.id !== clause.agent) {
+						clause.agent = node.id;
+					}
+				}
+				targetProperties = findPotentialProperties(clause.agent);
 			}
-			if (_nlp(subClause).has(`#Parent`)) {
+			if (nlpSubClause.has(`#Parent`)) {
 				clause.relationType = RelationType.Parent;
 				clause.agent = context ? context.parent : '';
 				targetProperties = findPotentialProperties(context && context.parent ? context.parent : undefined);
 			}
-			if (_nlp(subClause).has(`#Target`)) {
+			if (nlpSubClause.has(`#Target`)) {
 				clause.relationType = RelationType.Model;
 				clause.agent = context ? context.model : '';
 				targetProperties = findPotentialProperties(context && context.model ? context.model : undefined);
@@ -803,6 +871,9 @@ export enum NLMethodType {
 	ComplexValidations = 'ComplexValidations',
 	ConcatenateString = 'ConcatenateString',
 	ConcatenateCollection = 'ConcatenateCollection',
+	CheckForExisting = 'CheckForExisting',
+	FindAnExisting = 'FindAnExisting',
+	SetProperty = 'SetProperty',
 	Navigate = 'Navigate'
 }
 
@@ -1009,3 +1080,59 @@ export const NLValidationClauses = {
 		}
 	}
 };
+function checkExistingParse(
+	afterExistingClause: string,
+	buildClause: (subClause: string, clause: Clause) => Clause
+): QueryResultNL {
+	let afterTemp: any = _nlp(afterExistingClause);
+	let existingModelType = afterTemp.match('instance').lookAfter().text();
+	let comparison = _nlp(afterExistingClause).match('#Comparison');
+	let t: any = _nlp(existingModelType);
+	let firstCompareClause = t.match('equaling').lookBefore();
+	let fcc = buildClause(firstCompareClause.text(), {});
+	let secondCompareClause = t.match('equaling').lookAfter();
+	let scc = buildClause(secondCompareClause.text(), {});
+	return {
+		existingModelType,
+		agentClause: fcc,
+		targetClause: scc
+	};
+}
+
+function CreateSetPropertyNL(
+	actionClause: string,
+	temp: any,
+	buildClause: (subClause: string, clause: Clause) => Clause
+): SetPropertyClause {
+	let secondClauseText = '';
+	let firstClauseText = '';
+	let tvx = actionStuff.find((v) => actionClause.startsWith(v));
+	if (tvx) {
+		secondClauseText = temp.match(tvx).lookAfter().match('to the').lookAfter().text();
+		let t: any = _nlp(temp.match(tvx).lookAfter().text()).match('to the');
+		firstClauseText = t.lookBefore().text();
+	}
+
+	let scc = buildClause(secondClauseText, {});
+	let fcc = buildClause(firstClauseText, {});
+
+	return {
+		targetClause: fcc,
+		agentClause: scc
+	};
+}
+
+export interface SetPropertyClause {
+	targetClause: Clause;
+	agentClause: Clause;
+}
+
+function findModelByName(txt: string) {
+	return NodesByType(null, NodeTypes.Model).find(
+		(vnode: Node) =>
+			GetNodeTitle(vnode) === txt ||
+			GetCodeName(vnode) === txt ||
+			GetCodeName(vnode).toLocaleLowerCase() === txt ||
+			GetCodeName(vnode).toLocaleUpperCase() === txt
+	);
+}
