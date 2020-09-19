@@ -107,7 +107,7 @@ export default class AfterEffectComponent extends Component<any, any> {
 				{afterEffect && afterEffect.dataChain ? (
 					<AfterEffectDataChainOptions
 						methods={this.props.methods}
-            dataChainType={this.props.dataChainType}
+						dataChainType={this.props.dataChainType}
 						methodDescription={this.props.methodDescription}
 						currentDescription={currentDescription}
 						previousEffect={this.props.previousEffect}
@@ -156,76 +156,7 @@ export default class AfterEffectComponent extends Component<any, any> {
 					<TreeViewGroupButton
 						title={`Build Datachain`}
 						onClick={() => {
-							if (afterEffect && afterEffect.target) {
-								if (currentDescription) {
-									if (this.props.methodDescription) {
-										let methodDescription: MethodDescription = this.props.methodDescription;
-										if (methodDescription && currentDescription.methodDescription) {
-											BuildDataChainAfterEffectConverter(
-												{
-													name: afterEffect.name,
-													from: methodDescription,
-													afterEffect,
-													dataChain: afterEffect.dataChain,
-													methods: this.props.methods,
-													type: DataChainType.AfterEffect,
-													to: currentDescription.methodDescription,
-													currentDescription,
-													routes: this.props.routes || [],
-													afterEffectChild: afterEffect.name,
-													afterEffectParent: this.props.mountingItem.name,
-													afterEffectOptions: afterEffect.dataChainOptions,
-													override: this.state.override
-												},
-												(dataChain: Node) => {
-													afterEffect.dataChain = dataChain.id;
-													this.setState({
-														turn: UIA.GUID()
-													});
-												}
-											);
-										}
-									} else if (this.props.previousEffect) {
-										let previousEffect: AfterEffect = this.props.previousEffect;
-										if (previousEffect && previousEffect.target && this.props.methods) {
-											let description: MountingDescription = this.props.methods.find(
-												(method: MountingDescription) => {
-													return method.id === previousEffect.target;
-												}
-											);
-											if (
-												description &&
-												currentDescription.methodDescription &&
-												description.methodDescription
-											) {
-												BuildDataChainAfterEffectConverter(
-													{
-														name: afterEffect.name,
-														from: currentDescription.methodDescription,
-														dataChain: afterEffect.dataChain,
-														currentDescription,
-														afterEffect,
-														methods: this.props.methods,
-														to: currentDescription.methodDescription,
-														routes: this.props.routes || [],
-														afterEffectChild: afterEffect.name,
-														type: DataChainType.AfterEffect,
-														afterEffectParent: this.props.mountingItem.name,
-														afterEffectOptions: afterEffect.dataChainOptions,
-														override: this.state.override
-													},
-													(dataChain: Node) => {
-														afterEffect.dataChain = dataChain.id;
-														this.setState({
-															turn: UIA.GUID()
-														});
-													}
-												);
-											}
-										}
-									}
-								}
-							}
+							this.buildDataChain(afterEffect, currentDescription);
 						}}
 						icon="fa fa-gears"
 					/>
@@ -240,6 +171,80 @@ export default class AfterEffectComponent extends Component<any, any> {
 					</TreeViewItemContainer>
 				</TreeViewButtonGroup>
 			</TreeViewMenu>
+		);
+	}
+
+	private buildDataChain(afterEffect: AfterEffect, currentDescription: MountingDescription) {
+		if (afterEffect && afterEffect.target) {
+			if (currentDescription) {
+				if (this.props.methodDescription) {
+					let routes = this.props.routes || [];
+					let methods = this.props.methods;
+					let mountingItem = this.props.mountingItem;
+					let override = this.state.override;
+					let methodDescription: MethodDescription = this.props.methodDescription;
+					let callback = () => {
+						this.setState({
+							turn: UIA.GUID()
+						});
+					};
+					buildAfterEffectDataChain({
+						methodDescription,
+						currentDescription,
+						afterEffect,
+						methods,
+						routes,
+						mountingItem,
+						override,
+						callback
+					});
+				}
+			}
+		}
+	}
+}
+export function buildAfterEffectDataChain({
+	methodDescription,
+	currentDescription,
+	afterEffect,
+	methods,
+	routes,
+	mountingItem,
+	override,
+	callback
+}: {
+	methodDescription: MethodDescription;
+	currentDescription: MountingDescription;
+	afterEffect: AfterEffect;
+	methods: any;
+	routes: any;
+	mountingItem: any;
+	override: any;
+	callback: () => void;
+}) {
+	if (methodDescription && currentDescription.methodDescription) {
+		BuildDataChainAfterEffectConverter(
+			{
+				name: afterEffect.name,
+				from: methodDescription,
+				afterEffect,
+				dataChain: afterEffect.dataChain,
+				methods,
+				type: DataChainType.AfterEffect,
+				to: currentDescription.methodDescription,
+				currentDescription,
+				routes,
+				afterEffectChild: afterEffect.name,
+				afterEffectParent: mountingItem.name,
+				afterEffectOptions: afterEffect.dataChainOptions,
+				override
+			},
+			(dataChain: Node) => {
+				afterEffect.dataChain = dataChain.id;
+				if (callback) {
+					callback();
+				}
+			}
 		);
 	}
 }

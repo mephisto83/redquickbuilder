@@ -177,7 +177,8 @@ export default class AfterEffectInput extends Component<any, any> {
 
 		if (results) {
 			let afterEffects: AfterEffect[] = [];
-			let currentAfterEffect: AfterEffect = CreateAfterEffect();
+      let currentAfterEffect: AfterEffect = CreateAfterEffect();
+      currentAfterEffect.dataChainOptions.directExecute = true;
 			currentAfterEffect.dataChainOptions.nextStepsConfiguration = CreateNextStepsConfiguration();
 			let nextStepConfiguration = CreateNextStepConfiguration();
 			currentAfterEffect.dataChainOptions.nextStepsConfiguration.steps.push(nextStepConfiguration);
@@ -216,7 +217,10 @@ export default class AfterEffectInput extends Component<any, any> {
 							if (meaning.setProperty) {
 								let { setProperty } = meaning;
 								nextStepConfiguration.constructModel = CreateConstructModelConfig();
+								nextStepConfiguration.enabled = true;
+								nextStepConfiguration.constructModel.enabled = true;
 								nextStepConfiguration.constructModel.description = meaning.text;
+								nextStepConfiguration.constructModel.setProperties.enabled = true;
 								nextStepConfiguration.constructModel.setProperties.properties.push(
 									CreateSetupProperty(setProperty)
 								);

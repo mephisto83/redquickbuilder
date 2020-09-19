@@ -3,10 +3,10 @@ import React, { Component } from 'react';
 import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
 import TreeViewMenu from './treeviewmenu';
-import { AfterEffect, TargetMethodType } from '../interface/methodprops';
+import { AfterEffect, TargetMethodType, MountingDescription } from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
-import AfterEffectComponent from './aftereffectcomponent';
+import AfterEffectComponent, { buildAfterEffectDataChain } from './aftereffectcomponent';
 import AfterEffectInput from './aftereffectinput';
 
 export default class AfterEffectsComponent extends Component<any, any> {
@@ -33,8 +33,32 @@ export default class AfterEffectsComponent extends Component<any, any> {
 					afterEffects={afterEffects}
 					onNewAfterEffects={(newEffects: AfterEffect[]) => {
 						if (afterEffects) {
-							afterEffects.length = 0;
+							do {
+								removeAfterEffect({ afterEffects, afterEffect: afterEffects[0] });
+							} while (afterEffects.length);
+
 							afterEffects.push(...newEffects);
+							let methodDescription = this.props.methodDescription;
+							let methods = this.props.methods;
+							let mountingItem = this.props.mountingItem;
+							let routes = newEffects;
+							newEffects.forEach((afterEffect: AfterEffect) => {
+								let currentDescription: MountingDescription = (this.props.methods || [])
+									.find((method: MountingDescription) => {
+										return afterEffect && method.id === afterEffect.target;
+									});
+
+								buildAfterEffectDataChain({
+									afterEffect,
+									callback: () => {},
+									currentDescription,
+									methodDescription,
+									methods,
+									mountingItem,
+									override: true,
+									routes
+								});
+							});
 							this.setState({ turn: UIA.GUID() });
 						}
 					}}
@@ -63,7 +87,6 @@ export default class AfterEffectsComponent extends Component<any, any> {
 						<AfterEffectComponent
 							key={afterEffect.id}
 							methodDescription={this.props.methodDescription}
-							previousEffect={false ? afterEffects[index - 1] : null}
 							api={this.props.api}
 							dataChainType={this.props.dataChainType}
 							mountingItem={this.props.mountingItem}
@@ -87,14 +110,8 @@ export default class AfterEffectsComponent extends Component<any, any> {
 							}}
 							agent={this.props.agent}
 							onDelete={() => {
-								let index: number = afterEffects.findIndex((v) => v.id === afterEffect.id);
-								if (index !== -1 && afterEffects) {
-									if (afterEffect.dataChain) {
-										UIA.removeNodeById(afterEffect.dataChain);
-									}
-									afterEffects.splice(index, 1);
-									this.setState({ turn: UIA.GUID() });
-								}
+								removeAfterEffect({ afterEffects, afterEffect });
+								this.setState({ turn: UIA.GUID() });
 							}}
 							afterEffect={afterEffect}
 							routes={afterEffects}
@@ -103,5 +120,15 @@ export default class AfterEffectsComponent extends Component<any, any> {
 				})}
 			</TreeViewMenu>
 		);
+	}
+}
+
+function removeAfterEffect({ afterEffects, afterEffect }: { afterEffects: AfterEffect[]; afterEffect: AfterEffect }) {
+	let index: number = afterEffects.findIndex((v) => v.id === afterEffect.id);
+	if (index !== -1 && afterEffects) {
+		if (afterEffect.dataChain) {
+			UIA.removeNodeById(afterEffect.dataChain);
+		}
+		afterEffects.splice(index, 1);
 	}
 }
