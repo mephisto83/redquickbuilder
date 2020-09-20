@@ -468,7 +468,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
               {{concat_collection}}
           };
 
-           await func(model, agent, change);
+           await func();
       }
   `;
 			break;
