@@ -29,7 +29,8 @@ import {
 	AGENT_SCREENEFFECT_CONTEXT_MENU,
 	DASHBOARD_SCREENEFFECT_CONTEXT_MENU,
 	GUID,
-	GetNodeById
+	GetNodeById,
+  removeNodeById
 } from '../actions/uiactions';
 import Box from './box';
 import FormControl from './formcontrol';
@@ -79,7 +80,8 @@ import MethodProps, {
 	ScreenEffectApi,
 	EffectDescription,
 	RouteSourceType,
-	AfterEffect
+	AfterEffect,
+	ExecutionConfig
 } from '../interface/methodprops';
 import { Node, GraphLink } from '../methods/graph_types';
 import ContentInfo from './contentinfo';
@@ -89,6 +91,7 @@ import { mount } from 'enzyme';
 import getLanguageMeaning from '../service/naturallang';
 import { effectAutoGeneratePVF } from './effectcontextmenu';
 import { mountingAutoGeneratePVF } from './mountingcontextmenu';
+import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 
 const AGENT_ACCESS_VIEW_TAB = 'agent -access-view-tab';
 const context: { methods: any[] | null } = {
@@ -559,20 +562,7 @@ class AgentAccessView extends Component<any, any> {
 											return false;
 										}}
 									>
-										Auto Update Effects
-									</a>
-									<a
-										className="btn btn-default btn-primary"
-										onClick={(evt) => {
-											evt.stopPropagation();
-											this.autoUpdateMounting({
-												onlyAgents,
-												models: NodesByType(null, NodeTypes.Model).map((d: Node) => d.id)
-											});
-											return false;
-										}}
-									>
-										Auto Update Mounting
+										Auto Update
 									</a>
 								</FormControl>
 							</Box>
@@ -2071,6 +2061,8 @@ class AgentAccessView extends Component<any, any> {
 		this.state.agents.map((_: any, index: number) => {
 			this.collectMethods(index, methods);
 		});
+
+		let executionDataChains: string[] = [];
 		Object.keys(ViewTypes).forEach((v: string) => {
 			models.forEach((model, modelIndex) => {
 				onlyAgents.forEach((agent, agentIndex) => {
@@ -2095,11 +2087,64 @@ class AgentAccessView extends Component<any, any> {
 								},
 								methodDescription
 							);
+							if (effectItem.executions) {
+								effectItem.executions.forEach((exe: ExecutionConfig) => {
+									if (exe.dataChain) executionDataChains.push(exe.dataChain);
+								});
+							}
 						});
 					}
 				});
 			});
 		});
+		Object.keys(ViewTypes).forEach((v: string) => {
+			models.forEach((model, modelIndex) => {
+				onlyAgents.forEach((agent, agentIndex) => {
+					let effect: ViewMounting = this.getMountingDescription(agentIndex, modelIndex, v);
+					if (effect) {
+						effect.mountings.forEach((effectItem: MountingDescription) => {
+							let { methodDescription } = effectItem;
+							mountingAutoGeneratePVF(
+								effectItem,
+								{
+									mode: {
+										agentIndex,
+										agent: onlyAgents[agentIndex].id,
+										model,
+										modelIndex,
+										viewType: v,
+										methods,
+										outState: this.state,
+										effect: effect,
+										callback: (value: Effect) => {}
+									}
+								},
+								methodDescription,
+								v
+							);
+							if (effectItem.executions) {
+								effectItem.executions.forEach((exe: ExecutionConfig) => {
+									if (exe.dataChain) executionDataChains.push(exe.dataChain);
+								});
+							}
+						});
+					}
+				});
+			});
+		});
+		let unusedExecutionDataChains = GetNodesByProperties(
+			{
+				[NodeProperties.DataChainTypeCategory]: DataChainType.Execution
+			},
+			GetCurrentGraph()
+		).filter((v) => executionDataChains.indexOf(v.id) === -1);
+
+		if (unusedExecutionDataChains && unusedExecutionDataChains.length) {
+			debugger;
+			unusedExecutionDataChains.forEach((node: Node) => {
+				removeNodeById(node.id);
+			});
+		}
 	}
 	private createEffectDescriptionButton(
 		agentIndex: number,

@@ -1302,6 +1302,7 @@ export function GenerateCSChainFunction(id: string) {
 	if (GetNodeProp(id, NodeProperties.CompleteFunction)) {
 		method = `public class ${GetCodeName(id)}
               {
+                // ${id}
               ${arbiterProperties}
               ${arbiterPropertiesStatic}
               ${arbiterInterfacesStatic}
@@ -1314,6 +1315,7 @@ export function GenerateCSChainFunction(id: string) {
 	} else {
 		method = `public class ${GetCodeName(id)}
             {
+              // ${id}
             ${arbiterProperties}
                 public ${GetCodeName(id)}(${arbiterInterfaces}) {
             ${arbiterSets}
@@ -2764,7 +2766,9 @@ export function GetCombinedCondition(id: any, language = NodeConstants.Programmi
 						.filter((v) => v)
 						.join('.');
 					clauses.push(
-						`var {{result}} = await ${namespace ? `${ns}.` : ''}${GetCodeName(dataChain)}.Execute(${validationParameters
+						`var {{result}} = await ${namespace ? `${ns}.` : ''}${GetCodeName(
+							dataChain
+						)}.Execute(${validationParameters
 							.map((v: any) => {
 								// return `${v.paramName}: ${v.value}`;
 								if (v && v.value && v.value.key) {
