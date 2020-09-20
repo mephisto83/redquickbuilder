@@ -45,7 +45,7 @@ export default class DataChainGenerator {
 			let dcnamespace = '';
 			dcnamespace = getDataChainNameSpace(dataChain);
 			let relativefilePath = getDataChainNameSpace(dataChain, true);
-			result[GetNodeProp(dataChain, NodeProperties.CodeName)] = {
+			result[`${dcnamespace} ${GetNodeProp(dataChain, NodeProperties.CodeName)}`] = {
 				id: GetNodeProp(dataChain, NodeProperties.CodeName),
 				name: GetNodeProp(dataChain, NodeProperties.CodeName),
 				relativeFilePath: relativefilePath,
@@ -96,9 +96,9 @@ export default class DataChainGenerator {
 			const cfunc = isInLanguage ? GenerateChainFunctions({ language, collection: nc.id }) : null;
 			const collectionsInLanguage = isInLanguage
 				? GetDataChainCollections({
-					language,
-					collection: nc.id
-				})
+						language,
+						collection: nc.id
+					})
 				: null;
 			if (!isInLanguage) {
 				return false;

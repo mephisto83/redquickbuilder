@@ -16,7 +16,9 @@ import {
 	TargetMethodType,
 	EffectDescription,
 	MountingDescription,
-	MethodDescription
+	MethodDescription,
+	CheckAfterEffectDataChainConfiguration,
+  ValidationColors
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties } from '../constants/nodetypes';
@@ -46,10 +48,13 @@ export default class AfterEffectComponent extends Component<any, any> {
 		let currentDescription: MountingDescription = (this.props.methods || []).find((method: MountingDescription) => {
 			return afterEffect && method.id === afterEffect.target;
 		});
+
+		let valid = afterEffect ? CheckAfterEffectDataChainConfiguration(afterEffect.dataChainOptions) : true;
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				icon={'fa fa-circle-o'}
+				icon={valid ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+				color={valid ? ValidationColors.Ok : ValidationColors.Neutral}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}

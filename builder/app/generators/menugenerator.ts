@@ -101,7 +101,7 @@ export default class MenuGenerator {
 	static constructMenu(root: Node, menuObj: MenuObject, graph: Graph, parent: string): MenuObject {
 		menuObj = menuObj || createMenuObj();
 
-		if (!menuObj.items[root.id]) {
+		if (menuObj.items && root && !menuObj.items[root.id]) {
 			menuObj.items[root.id] = createMenuItem(root, graph, parent);
 
 			let submenuItems = GraphMethods.GetNodesLinkedTo(graph, {

@@ -45,8 +45,8 @@ const installExtensions = async () => {
 const createObjectViewerWindow = async (onclose: Function): Promise<BrowserWindow | null> => {
 	let objectViewerWindow: BrowserWindow | null = new BrowserWindow({
 		show: false,
-		width: 400,
-		height: 400,
+		width: 800,
+		height: 800,
 		frame: false,
 		webPreferences:
 			process.env.NODE_ENV === 'development' || process.env.E2E_BUILD === 'true'

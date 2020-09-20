@@ -10,7 +10,8 @@ import {
 	MethodDescription,
 	CheckAfterEffectDataChainConfiguration,
 	DataChainConfiguration,
-	CreateRouteConfig
+	CreateRouteConfig,
+	ValidationColors
 } from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import AfterEffectCheckExistanceConfig from './aftereffectcheckexistanceconfig';
@@ -47,12 +48,12 @@ export default class AfterEffectDataChainOption extends Component<any, any> {
 				this.props.onChange();
 			}
 		};
+		let valid = CheckAfterEffectDataChainConfiguration(dataChainOptions);
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				icon={
-					CheckAfterEffectDataChainConfiguration(dataChainOptions) ? 'fa fa-check-circle-o' : 'fa fa-circle-o'
-				}
+				icon={valid ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+				color={valid ? ValidationColors.Ok : ValidationColors.Neutral}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}

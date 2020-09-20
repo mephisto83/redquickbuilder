@@ -4,7 +4,7 @@ import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
 import CheckBox from './checkbox';
 import TreeViewMenu from './treeviewmenu';
-import { BooleanConfig } from '../interface/methodprops';
+import { BooleanConfig, ValidationColors } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 
 export default class BooleanConfigComponent extends Component<any, any> {
@@ -26,6 +26,7 @@ export default class BooleanConfigComponent extends Component<any, any> {
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
+				color={booleanConfig.enabled ? ValidationColors.Ok : ValidationColors.Neutral}
 				active
 				hide={!this.props.enabled}
 				greyed={!booleanConfig.enabled}

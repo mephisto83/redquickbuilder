@@ -251,11 +251,29 @@ function getGlobalSuggestions(): any[] {
 			documentation: 'Define which method will be called in an after effect'
 		},
 		{
+			label: 'Create new',
+			kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+			insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+			insertText: [
+				'Create a new ${0:model}.'
+			].join(''),
+			documentation: 'Create a new instance of a model.'
+		},
+		{
 			label: 'Check existing',
 			kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 			insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 			insertText: [
 				'Check for an existing ${1:model} instance with an ${2:agent} ${3:property} equaling the ${4:model} ${5:property} property.'
+			].join(''),
+			documentation: 'Checks for an existing model, exiting if not found.'
+		},
+		{
+			label: `Check doesn't existing`,
+			kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+			insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+			insertText: [
+				'Check for a nonexisting ${1:model} instance with an ${2:agent} ${3:property} equaling the ${4:model} ${5:property} property.'
 			].join(''),
 			documentation: 'Checks for an existing model, exiting if not found.'
 		},
@@ -275,7 +293,7 @@ function getGlobalSuggestions(): any[] {
 			insertText: [ 'Append the output ${1:property} property to the existing ${2:model} ${3:property}.' ].join(
 				''
 			),
-			documentation: 'Append a valud to a list property.'
+			documentation: 'Append a value to a list property.'
 		},
 		{
 			label: 'Set to models property with property',

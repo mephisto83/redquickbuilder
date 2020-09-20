@@ -68,7 +68,7 @@ import { equal } from 'assert';
 import { Node, Graph } from '../../methods/graph_types';
 import { LinkType } from '../../../app/constants/nodetypes';
 import { stringify } from 'querystring';
-import { NodeAttributePropertyTypes, NodePropertyTypes } from '../../../visi_blend/dist/app/actions/uiactions';
+import { NodePropertyTypes } from '../../actions/uiactions';
 
 export interface AfterEffectConvertArgs {
 	from: MethodDescription;
@@ -409,7 +409,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
       public static async Task<bool> Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null)
       {
 
-        Func<#{{"key":"model"}}#, #{{"key":"agent"}}#, Task<bool>> func = async (#{{"key":"model"}}# model, #{{"key":"agent"}}# agent) => {
+        Func<Task<bool>> func = async () => {
           // build model value here.
 
           {{compare_enumeration}}
@@ -417,7 +417,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
           return true;
         };
 
-        return await func(model, agent);
+        return await func();
       }
   `;
 			break;
@@ -439,7 +439,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			from_parameter_template = `
       public static async Task<bool> Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change_parameter = null)
       {
-        Func<#{{"key":"model"}}#, #{{"key":"agent"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task<bool>> func = async (#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change_parameter) => {
+        Func<Task<bool>> func = async () => {
 
           {{checking_existence}}
           // build model value here.
@@ -451,7 +451,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
           return true;
        };
 
-       return await func(model, agent, change_parameter);
+       return await func();
       }
   `;
 			break;
@@ -460,8 +460,8 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			from_parameter_template = `
       public static async Task Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change = null, #{{"key":"result"}}# result = null)
       {
-          Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task> func =
-            async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# model, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
+          Func<Task> func =
+            async () => {
               {{simplevalidation}}
               {{copy_config}}
               {{concat_config}}
@@ -497,12 +497,12 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			from_parameter_template = `
       public static async Task Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change = null)
       {
-          Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# fromModel, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
+          Func<Task> func = async () => {
 
           {{next_steps}}
       };
 
-       await func(agent, model, change);
+       await func();
       }
       ${staticMethods.join(NEW_LINE)}
   `;
@@ -516,7 +516,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 			from_parameter_template = `
       public static async Task Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change = null)
       {
-          Func<#{{"key":"agent"}}#, #{{"key":"model"}}#, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}#, Task> func = async (#{{"key":"agent"}}# agent, #{{"key":"model"}}# fromModel, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change) => {
+          Func<Task> func = async () => {
 
           {{checking_existence}}
 
@@ -528,7 +528,7 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
           {{route_config}}
        };
 
-       await func(agent, model, change);
+       await func();
       }
       ${staticMethods.join(NEW_LINE)}
   `;
@@ -1792,6 +1792,7 @@ function setupAfterEffect(
             return;
           }`;
 				}
+
 				let resultVariable = 'existing';
 				if (step.getExisting && step.getExisting.enabled) {
 					let { result } = setupExistenceCheck(
@@ -2030,6 +2031,7 @@ function setupExistenceCheck(
 		setupLambdaInsertArgs(tempLambdaInsertArgumentValues, headProperty, GetModelName(existenceCheck.head));
 		let arbiters: string[] = [];
 		let steps: string[] = [];
+		let lastModelType = '';
 		existenceCheck.orderedCheck.forEach((item: ConnectionChainItem, index: number) => {
 			setupLambdaInsertArgs(tempLambdaInsertArgumentValues, item.modelProperty, GetCodeName(item.model));
 			arbiters.push(
@@ -2050,7 +2052,7 @@ function setupExistenceCheck(
 							existenceCheck.orderedCheck[index - 1].model
 						)}"}}#`;
 			setupLambdaModelArgs(tempLambdaInsertArgumentValues, item.model);
-
+			lastModelType = GetCodeName(item.model);
 			steps.push(`let step${index} = ${index
 				? `step${index - 1}`
 				: `${RelationToVariable(
@@ -2062,7 +2064,9 @@ function setupExistenceCheck(
 			)}","type":"property","model":"${GetCodeName(item.model)}"}}# == ${prev})) : null;
       `);
 		});
-		staticMethods.push(`static Task<bool> ${name}(#{{"key":"${RelationToVariable(
+		let test = existenceCheck.opposite ? '!=' : '==';
+		let outputType = outputAs === OutputType.Existence ? 'bool' : `#{{"key":"${lastModelType}"}}#`;
+		staticMethods.push(`static Task<${outputType}> ${name}(#{{"key":"${RelationToVariable(
 			existenceCheck.head.relationType
 		)}"}}# ${RelationToVariable(existenceCheck.head.relationType)}) {
       ${arbiters.unique().join(NEW_LINE)}
@@ -2070,7 +2074,7 @@ function setupExistenceCheck(
       ${steps.join(NEW_LINE)}
 
       ${outputAs === OutputType.Existence
-			? 'return step' + (steps.length - 1) + ' == null'
+			? 'return step' + (steps.length - 1) + ` ${test} null`
 			: 'return step' + (steps.length - 1) + ''}
     }`);
 	}

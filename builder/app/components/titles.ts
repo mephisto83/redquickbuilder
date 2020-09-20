@@ -604,6 +604,7 @@ export const SetPropertiesConfig = 'Set Properties Config';
 export const DefaultSubGraphTitle = 'Red Quick Sub Graph';
 export const ClearPinned = 'Clear Pinned';
 export const GetExisting = 'Get existing';
+export const CheckNonExistant = 'Check non-existant';
 export const Stretch = 'Stretch';
 export const OneOf = 'One of';
 export const Filter = 'Filter';

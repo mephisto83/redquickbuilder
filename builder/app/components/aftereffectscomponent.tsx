@@ -3,7 +3,13 @@ import React, { Component } from 'react';
 import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
 import TreeViewMenu from './treeviewmenu';
-import { AfterEffect, TargetMethodType, MountingDescription } from '../interface/methodprops';
+import {
+	AfterEffect,
+	TargetMethodType,
+	MountingDescription,
+	ValidationColors,
+	CheckAfterEffectDataChainConfiguration
+} from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import AfterEffectComponent, { buildAfterEffectDataChain } from './aftereffectcomponent';
@@ -17,10 +23,16 @@ export default class AfterEffectsComponent extends Component<any, any> {
 	render() {
 		let afterEffects: AfterEffect[] = this.props.afterEffects;
 
+		let valid = afterEffects
+			? !!!afterEffects.find(
+					(afterEffect) => !CheckAfterEffectDataChainConfiguration(afterEffect.dataChainOptions)
+				)
+			: true;
 		return (
 			<TreeViewMenu
 				open={this.state.open}
 				active
+				color={valid ? ValidationColors.Ok : ValidationColors.Neutral}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
@@ -29,7 +41,8 @@ export default class AfterEffectsComponent extends Component<any, any> {
 				<AfterEffectInput
 					model={this.props.model}
 					methods={this.props.methods}
-					agent={this.props.agent}
+          agent={this.props.agent}
+          viewType={this.props.viewType}
 					afterEffects={afterEffects}
 					onNewAfterEffects={(newEffects: AfterEffect[]) => {
 						if (afterEffects) {

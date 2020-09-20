@@ -460,6 +460,7 @@ class EffectContextMenu extends Component<any, any> {
 								/>
 								<AfterEffectsComponent
                   agent={agent}
+                  viewType={mode.viewType}
                   model={model}
 									mountingItem={effectItem}
 									onContext={(msg: { largerPlease: boolean }) => {

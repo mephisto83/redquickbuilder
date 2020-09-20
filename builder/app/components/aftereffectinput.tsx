@@ -19,7 +19,9 @@ import {
 	CreateConnectionChainItem,
 	GetOrExistenceCheckConfig,
 	CreateConstructModelConfig,
-	RelationType
+	RelationType,
+	CreateNameSpaceConfig,
+	CreateBoolean
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import TextInput from './textinput';
@@ -55,6 +57,10 @@ function captureStepSentences(step: NextStepConfiguration): string[] {
 		if (step.existenceCheck && step.existenceCheck.enabled) {
 			if (step.existenceCheck.description) result.push(step.existenceCheck.description);
 		}
+		if (step.nonExistenceCheck && step.nonExistenceCheck.enabled) {
+			if (step.nonExistenceCheck.description) result.push(step.nonExistenceCheck.description);
+		}
+
 		if (step.getExisting && step.getExisting.enabled) {
 			if (step.getExisting.description) result.push(step.getExisting.description);
 		}
@@ -177,9 +183,17 @@ export default class AfterEffectInput extends Component<any, any> {
 
 		if (results) {
 			let afterEffects: AfterEffect[] = [];
-      let currentAfterEffect: AfterEffect = CreateAfterEffect();
-      currentAfterEffect.dataChainOptions.directExecute = true;
+			let currentAfterEffect: AfterEffect = CreateAfterEffect();
+			currentAfterEffect.dataChainOptions.directExecute = true;
 			currentAfterEffect.dataChainOptions.nextStepsConfiguration = CreateNextStepsConfiguration();
+			currentAfterEffect.dataChainOptions.namespaceConfig = CreateNameSpaceConfig({
+				space: [
+					'AfterEffect',
+					UIA.GetCodeNamespace(this.props.agent),
+					UIA.GetCodeNamespace(this.props.model),
+					this.props.viewType
+				]
+			});
 			let nextStepConfiguration = CreateNextStepConfiguration();
 			currentAfterEffect.dataChainOptions.nextStepsConfiguration.steps.push(nextStepConfiguration);
 			results
@@ -195,6 +209,21 @@ export default class AfterEffectInput extends Component<any, any> {
 									if (meaning.functionName) currentAfterEffect.name = meaning.functionName;
 									currentAfterEffect.target = method.id;
 								}
+							}
+							break;
+						case NLMethodType.CreateNew:
+							if (meaning.createNew) {
+								nextStepConfiguration.createNew = CreateBoolean();
+								nextStepConfiguration.createNew.enabled = true;
+							}
+							break;
+						case NLMethodType.CheckForNonExisting:
+							if (meaning.checkForNonExisting) {
+								nextStepConfiguration.nonExistenceCheck = CreateExistenceCheck();
+								let { nonExistenceCheck } = nextStepConfiguration;
+								nonExistenceCheck.opposite = true;
+								nonExistenceCheck.description = meaning.text;
+								setupGetOrExistenceCheck(nonExistenceCheck, meaning.checkForNonExisting);
 							}
 							break;
 						case NLMethodType.CheckForExisting:
@@ -231,10 +260,18 @@ export default class AfterEffectInput extends Component<any, any> {
 								afterEffects.push(currentAfterEffect);
 								currentAfterEffect = CreateAfterEffect();
 								currentAfterEffect.dataChainOptions.nextStepsConfiguration = CreateNextStepsConfiguration();
-								let nextStepConfiguration = CreateNextStepConfiguration();
+								nextStepConfiguration = CreateNextStepConfiguration();
 								currentAfterEffect.dataChainOptions.nextStepsConfiguration.steps.push(
 									nextStepConfiguration
 								);
+								currentAfterEffect.dataChainOptions.namespaceConfig = CreateNameSpaceConfig({
+									space: [
+										'AfterEffect',
+										UIA.GetCodeNamespace(this.props.agent),
+										UIA.GetCodeNamespace(this.props.model),
+										this.props.viewType
+									]
+								});
 							} else {
 								if (nextStepsConfiguration) {
 									nextStepsConfiguration.name = meaning.text;

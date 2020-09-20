@@ -13,7 +13,8 @@ import {
 	GetCurrentGraph,
 	GetState,
 	GetNodeById,
-	getDataChainNameSpace
+	getDataChainNameSpace,
+	GetNameSpace
 } from '../actions/uiactions';
 import {
 	LinkType,
@@ -409,10 +410,14 @@ export default class ExecutorGenerator {
 				dataChains.map((dataChain: Node) => {
 					let targetProperty = GetNodeProp(dataChain, NodeProperties.TargetProperty);
 					if (targetProperty) {
+						let ns = `${GetNameSpace()}${NameSpace.Controllers}.${getDataChainNameSpace(dataChain)}`
+							.split('.')
+							.filter((v) => v)
+							.join('.');
+						let nodeNameSpace = `${ns}.`;
 						propertyValidationStatements +=
-							`result.${GetCodeName(targetProperty)} = await ${GetCodeName(
-								dataChain
-							)}.Execute(data, agent, change, result);` + NEW_LINE;
+							`await ${nodeNameSpace}${GetCodeName(dataChain)}.Execute(data, agent, change, result);` +
+							NEW_LINE;
 					}
 					return null;
 				});

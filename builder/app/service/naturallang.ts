@@ -297,6 +297,8 @@ export interface NLMeaning {
 	setProperty?: SetPropertyClause;
 	findAnExisting?: QueryResultNL;
 	checkForExisting?: QueryResultNL;
+	checkForNonExisting?: QueryResultNL;
+	createNew?: Clause;
 	viewType?: string;
 	parameterClauses?: Clause[];
 	text: string;
@@ -322,7 +324,14 @@ let executionStuff = [ 'copies to', 'increments by', 'concatenates with', 'conca
 let referenceStuff = [ 'must connect to a real' ];
 let validationStuff = [ 'must conform to a' ];
 let actionStuff = [ 'Append the', 'Increment the', 'Decrement the', 'Set the' ];
-let afterEffectStuff = [ ...actionStuff, 'Execute the function', 'Check for an existing', 'Find an existing' ];
+let afterEffectStuff = [
+	...actionStuff,
+	'Execute the function',
+	'Check for an existing',
+	'Check for a nonexisting',
+	'Create a new',
+	'Find an existing'
+];
 let navigationStuff = [ 'navigates to' ];
 let all = [
 	...afterEffectStuff,
@@ -574,6 +583,16 @@ export default function getLanguageMeaning(
 				result.methodType = NLMethodType.CheckForExisting;
 				let afterExistingClause: string = temp_.match('Check for an existing').lookAfter().text();
 				result.checkForExisting = checkExistingParse(afterExistingClause, buildClause);
+			}
+			if (temp.has('Check for a nonexisting')) {
+				result.methodType = NLMethodType.CheckForNonExisting;
+				let afterExistingClause: string = temp_.match('Check for a nonexisting').lookAfter().text();
+				result.checkForNonExisting = checkExistingParse(afterExistingClause, buildClause);
+			}
+			if (temp.has('Create a new')) {
+				result.methodType = NLMethodType.CreateNew;
+				let afterExistingClause: string = temp_.match('Create a new').lookAfter().text();
+				result.createNew = buildClause(afterExistingClause, {});
 			}
 			if (temp.has('Find an existing')) {
 				result.methodType = NLMethodType.FindAnExisting;
@@ -872,6 +891,8 @@ export enum NLMethodType {
 	ConcatenateString = 'ConcatenateString',
 	ConcatenateCollection = 'ConcatenateCollection',
 	CheckForExisting = 'CheckForExisting',
+	CheckForNonExisting = 'CheckForNonExisting',
+	CreateNew = 'CreateNew',
 	FindAnExisting = 'FindAnExisting',
 	SetProperty = 'SetProperty',
 	Navigate = 'Navigate'

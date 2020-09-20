@@ -55,7 +55,7 @@ import StaticParametersComponent from './staticparameterscomponent';
 import { autoNameGenerateDataChain } from './validationcomponentitem';
 import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import { mount } from 'enzyme';
-import { autoNameExecutionConfig } from './executioncomponentitem';
+import { autoNameExecutionConfig, buildDataChain } from './executioncomponentitem';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -727,15 +727,7 @@ export function mountingAutoGeneratePVF(
 			.filter((v) => v.autoCalculate || v.autoCalculate === undefined)
 			.forEach((executionConfig: ExecutionConfig) => {
 				if (methodDescription) {
-					autoNameExecutionConfig(
-						executionConfig,
-						viewType,
-						mountingItem,
-						methodDescription,
-						mountingItem.name,
-						mode.methods,
-						true
-					);
+					buildDataChain(executionConfig, mountingItem, mode.methods, true);
 				}
 			});
 	}

@@ -31,6 +31,8 @@ export default class AfterEffectNextStep extends Component<any, any> {
 		nextStepConfig.existenceCheck = nextStepConfig.existenceCheck || CreateExistenceCheck();
 		nextStepConfig.getExisting = nextStepConfig.getExisting || CreateExistenceCheck();
 		nextStepConfig.createNew = nextStepConfig.createNew || CreateBoolean();
+    nextStepConfig.nonExistenceCheck = nextStepConfig.nonExistenceCheck || CreateExistenceCheck();
+
 		let methodDescription: MethodDescription = this.props.methodDescription;
 		if (!methodDescription) {
 			return <span />;
@@ -64,17 +66,23 @@ export default class AfterEffectNextStep extends Component<any, any> {
 					onChange={onchange}
 				/>
 				<CheckExistanceConfigComponent
+					title={Titles.CheckNonExistant}
+					dataChainType={this.props.dataChainType}
+					methodDescription={methodDescription}
+					existenceCheck={nextStepConfig.nonExistenceCheck}
+					onChange={() => {
+						nextStepConfig.nonExistenceCheck.opposite = true;
+						onchange();
+					}}
+				/>
+				<CheckExistanceConfigComponent
 					title={Titles.GetExisting}
 					dataChainType={this.props.dataChainType}
 					methodDescription={methodDescription}
 					existenceCheck={nextStepConfig.getExisting}
 					onChange={onchange}
 				/>
-				<BooleanConfigComponent
-					enabled
-					title={Titles.CreateNew}
-					booleanConfig={nextStepConfig.createNew}
-				/>
+				<BooleanConfigComponent enabled title={Titles.CreateNew} booleanConfig={nextStepConfig.createNew} />
 				<ConstructModelConfiguration
 					dataChainType={this.props.dataChainType}
 					targetMountingDescription={this.props.targetMountingDescription}

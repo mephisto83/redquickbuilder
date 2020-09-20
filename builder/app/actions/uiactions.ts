@@ -820,6 +820,9 @@ export function GetCssName(node: any): string {
 	}
 	return GetNodeProp(node, NodeProperties.CssName) || GetJSCodeName(node);
 }
+export function GetCodeNamespace(node: any): string {
+	return `${GetCodeName(node)}NS`;
+}
 export function GetCodeName(node: any, options?: any): string {
 	const graph = GetCurrentGraph(GetState());
 	if (typeof node === 'string') {
@@ -1614,7 +1617,10 @@ export function GenerateChainFunctions(options: { cs?: any; language: any; colle
 			(v: any, index: number) =>
 				cs ? { node: v, class: GenerateCSChainFunction(v) } : GenerateChainFunction(v, options)
 		)
-		.unique((x: any, index: number) => x);
+		.unique((x: any, index: number) => {
+			if (typeof x === 'string') x;
+			return x.node;
+		});
 	// sorry this is bad.
 	if (cs) {
 		return temp;
@@ -2606,13 +2612,15 @@ export function getDataChainNameSpace(dataChain: any, asFilePath?: boolean) {
 	if (dataChainNameSpace) {
 		if (asFilePath) {
 			return path.join(
-				...dataChainNameSpace.map((v) => {
-					let temp = GetCodeName(v);
-					if (temp !== Titles.Unknown && temp) {
-						return temp;
-					}
-					return v;
-				})
+				...dataChainNameSpace
+					.map((v) => {
+						let temp = GetCodeName(v);
+						if (temp !== Titles.Unknown && temp) {
+							return temp;
+						}
+						return v;
+					})
+					.filter((v) => v)
 			);
 		}
 		dcnamespace = `${dataChainNameSpace
@@ -2623,6 +2631,7 @@ export function getDataChainNameSpace(dataChain: any, asFilePath?: boolean) {
 				}
 				return v;
 			})
+			.filter((v) => v)
 			.join('.')}`;
 	}
 	return dcnamespace;
@@ -2747,8 +2756,15 @@ export function GetCombinedCondition(id: any, language = NodeConstants.Programmi
 					throw new Error('missing permission parameters: GetCombinedCondition');
 				}
 				if (language === NodeConstants.ProgrammingLanguages.CSHARP) {
+					let namespace = getDataChainNameSpace(dataChain);
+					let ns = `${GetNameSpace()}${NodeConstants.NameSpace.Controllers}.${getDataChainNameSpace(
+						dataChain
+					)}`
+						.split('.')
+						.filter((v) => v)
+						.join('.');
 					clauses.push(
-						`var {{result}} = await ${GetCodeName(dataChain)}.Execute(${validationParameters
+						`var {{result}} = await ${namespace ? `${ns}.` : ''}${GetCodeName(dataChain)}.Execute(${validationParameters
 							.map((v: any) => {
 								// return `${v.paramName}: ${v.value}`;
 								if (v && v.value && v.value.key) {
@@ -2776,8 +2792,15 @@ export function GetCombinedCondition(id: any, language = NodeConstants.Programmi
 				if (!permissionParameters) {
 					throw new Error('missing permission parameters: GetCombinedCondition');
 				}
+				let namespace = getDataChainNameSpace(dataChain);
+				let ns = `${GetNameSpace()}${NodeConstants.NameSpace.Controllers}.${getDataChainNameSpace(dataChain)}`
+					.split('.')
+					.filter((v) => v)
+					.join('.');
 				clauses.push(
-					`var {{result}} = await ${GetCodeName(dataChain)}.Execute(${permissionParameters
+					`var {{result}} = await  ${namespace ? `${ns}.` : ''}${GetCodeName(
+						dataChain
+					)}.Execute(${permissionParameters
 						.map((v: any) => {
 							// return `${v.paramName}: ${v.value}`;
 							return `${v.value}: ${v.value}`;
