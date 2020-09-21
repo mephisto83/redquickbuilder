@@ -94,8 +94,7 @@ function SetupEffectDescription(effectDescription: EffectDescription, screen: No
 		}
 		let cellId = AddButtonToComponentLayout({ button, component: subcomponent });
 		AddComponentAutoStyles(subcomponent, effectDescription, cellId);
-  });
-
+	});
 }
 function SetupValidations(args: { screenOption: Node; effectDescription: EffectDescription }) {
 	console.log('setup validations');
@@ -171,7 +170,14 @@ function SetupModelObjectSelector(
 	screen: Node,
 	information: SetupInformation
 ): { modelDataChain: Node | null } {
-	let modelDataChain: Node | null = null;
+	let modelDataChain: Node | null | any = null;
+	if (effectDescription && effectDescription.id) {
+		modelDataChain = GetNodeByProperties({ [NodeProperties.DataChainPurpose]: effectDescription.id });
+		if (modelDataChain) {
+			return { modelDataChain };
+		}
+	}
+
 	graphOperation(
 		GetModelObjectFromSelector({
 			model: GetNodeTitle(screen),
@@ -180,6 +186,12 @@ function SetupModelObjectSelector(
 			}
 		})
 	)(GetDispatchFunc(), GetStateFunc());
+	if (effectDescription && effectDescription.id && modelDataChain) {
+		if (modelDataChain) {
+			updateComponentProperty(modelDataChain.id, NodeProperties.DataChainPurpose, effectDescription.id);
+			updateComponentProperty(modelDataChain.id, NodeProperties.UIAgnostic, true);
+		}
+	}
 	return { modelDataChain };
 }
 

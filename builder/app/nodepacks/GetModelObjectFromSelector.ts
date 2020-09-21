@@ -110,6 +110,20 @@ export default function(args: { callback?: Function; model: string; viewPackages
 			];
 		},
 
+
+		function() {
+			return [
+				{
+					operation: 'CHANGE_NODE_PROPERTY',
+					options: {
+          prop: NodeProperties.DataChainSourceFile,
+						id: context.node0,
+						value: 'GetModelObjectFromSelector'
+					}
+				}
+			];
+		},
+
 		function() {
 			return [
 				{

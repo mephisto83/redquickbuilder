@@ -1620,7 +1620,9 @@ export function GenerateChainFunctions(options: { cs?: any; language: any; colle
 				cs ? { node: v, class: GenerateCSChainFunction(v) } : GenerateChainFunction(v, options)
 		)
 		.unique((x: any, index: number) => {
-			if (typeof x === 'string') x;
+			if (typeof x === 'string') {
+				return x;
+			}
 			return x.node;
 		});
 	// sorry this is bad.
