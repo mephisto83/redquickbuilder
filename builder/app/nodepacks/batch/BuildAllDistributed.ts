@@ -46,6 +46,7 @@ import UpdateScreenParameters from '../screens/UpdateScreenParameters';
 import ApplyPermissionChains from './ApplyPermissionChains';
 import ApplyExecutionChains from './ApplyExecutionChains';
 import ApplyValidationChains from './ApplyValidationChains';
+import SetupAuthenticationButtons from './SetupAuthenticationButtons';
 
 interface BuildStep {
 	progress?: number;
@@ -198,6 +199,7 @@ export const CollectionScreenNodes = 'CollectionScreenNodes';
 export const CollectionConnectDataChainCollection = 'CollectionConnectDataChainCollection';
 export const APPLY_PERMISSION_CHAINS = 'Apply Permission Chains';
 export const APPLY_VALIDATION_CHAINS = 'Apply Validation Chains';
+export const AUTHENTICATION_BUTTONS = 'Authentication Buttons';
 export const APPLY_EXECUTION_CHAINS = 'Apply Execution Chains';
 
 const Collect_Into_Graph = 'Collect_Into_Graph';
@@ -248,6 +250,7 @@ const buildAllProgress = [
 	{ name: APPLY_PERMISSION_CHAINS },
 	{ name: APPLY_EXECUTION_CHAINS },
 	{ name: APPLY_VALIDATION_CHAINS },
+	{ name: AUTHENTICATION_BUTTONS },
 	{ name: COMPLETED_BUILD }
 ];
 export const BuildAllInfo = {
@@ -333,7 +336,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		// 	async (progresFunc: (arg0: number) => any) => {
 		// 		await JobService.WaitForJob(Create_Component_All, currentJobFile);
 		// 	}
-    // );
+		// );
 
 		await run(buildAllProgress, Update_Screen_Parameters, async (progressFunc: any) => {
 			await UpdateScreenParameters(progressFunc);
@@ -356,6 +359,10 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 
 		await run(buildAllProgress, APPLY_VALIDATION_CHAINS, async (progressFunc) => {
 			await ApplyValidationChains();
+		});
+
+		await run(buildAllProgress, AUTHENTICATION_BUTTONS, async (progressfunc) => {
+			await SetupAuthenticationButtons();
 		});
 
 		await run(buildAllProgress, Add_Filters_To_Get_All, async (progresFunc: any) => {

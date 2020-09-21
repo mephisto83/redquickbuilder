@@ -133,7 +133,7 @@ export default class MenuGenerator {
 	}
 	static convertToMenuCode(menuObj: MenuObject): string {
 		let result = `
-    let result = [];
+    let result: any[] = [];
 
 {{code}}
 

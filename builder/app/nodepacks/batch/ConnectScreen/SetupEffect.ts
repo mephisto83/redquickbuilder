@@ -96,9 +96,13 @@ function SetupEffectDescription(effectDescription: EffectDescription, screen: No
 		AddComponentAutoStyles(subcomponent, effectDescription, cellId);
 	});
 }
-function SetupValidations(args: { screenOption: Node; effectDescription: EffectDescription }) {
+export function SetupValidations(args: {
+	screenOption: Node;
+	effectDescription?: EffectDescription;
+	methodId?: string;
+}) {
 	console.log('setup validations');
-	let { screenOption, effectDescription } = args;
+	let { screenOption, effectDescription, methodId } = args;
 	let graph = GetCurrentGraph();
 	const components = GetNodesLinkedTo(graph, {
 		id: screenOption.id,
@@ -117,13 +121,17 @@ function SetupValidations(args: { screenOption: Node; effectDescription: EffectD
 				component,
 				InstanceUpdate: true,
 				screen_option: screenOption,
-				method: effectDescription.methodDescription ? effectDescription.methodDescription.methodId : null
+				method:
+					methodId ||
+					(effectDescription && effectDescription.methodDescription
+						? effectDescription.methodDescription.methodId
+						: null)
 			})
 		)(GetDispatchFunc(), GetStateFunc());
 	});
 }
 
-function SetupPostMethod(args: { eventInstance: string; method: string }) {
+export function SetupPostMethod(args: { eventInstance: string; method: string }) {
 	let { method, eventInstance } = args;
 	console.log('setup post method');
 
@@ -134,7 +142,7 @@ function SetupPostMethod(args: { eventInstance: string; method: string }) {
 		})
 	)(GetDispatchFunc(), GetStateFunc());
 }
-function SetInstanceUpdateOnLlink(args: { eventInstance: string; eventHandler: string }) {
+export function SetInstanceUpdateOnLlink(args: { eventInstance: string; eventHandler: string }) {
 	let { eventInstance, eventHandler } = args;
 	console.log('set instance update on link');
 
@@ -156,7 +164,8 @@ function SetInstanceUpdateOnLlink(args: { eventInstance: string; eventHandler: s
 		}
 	])(GetDispatchFunc(), GetStateFunc());
 }
-function GetModelSelectorNode(screen: Node): { modelSelectorNode: Node } {
+
+export function GetModelSelectorNode(screen: Node): { modelSelectorNode: Node } {
 	const modelSelectorNode = GetNodeByProperties({
 		[NodeProperties.NODEType]: NodeTypes.Selector,
 		[NodeProperties.Model]: GetNodeProp(screen, NodeProperties.Model)
@@ -164,11 +173,11 @@ function GetModelSelectorNode(screen: Node): { modelSelectorNode: Node } {
 
 	return { modelSelectorNode };
 }
-function SetupModelObjectSelector(
+export function SetupModelObjectSelector(
 	effectDescription: EffectDescription,
 	screenOption: Node,
 	screen: Node,
-	information: SetupInformation
+	information?: SetupInformation
 ): { modelDataChain: Node | null } {
 	let modelDataChain: Node | null | any = null;
 	if (effectDescription && effectDescription.id) {
@@ -192,6 +201,21 @@ function SetupModelObjectSelector(
 			updateComponentProperty(modelDataChain.id, NodeProperties.UIAgnostic, true);
 		}
 	}
+	return { modelDataChain };
+}
+
+export function SetupModelObjectSelectorOnScreen(screen: Node): { modelDataChain: Node | null } {
+	let modelDataChain: Node | null | any = null;
+
+	graphOperation(
+		GetModelObjectFromSelector({
+			model: GetNodeTitle(screen),
+			callback: (newContext: { entry: string }, tempGraph: Graph) => {
+				modelDataChain = GetNodeById(newContext.entry, tempGraph);
+			}
+		})
+	)(GetDispatchFunc(), GetStateFunc());
+
 	return { modelDataChain };
 }
 

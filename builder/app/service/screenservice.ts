@@ -480,7 +480,7 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 
 			cssJsFile = buildStyleJS(node);
 
-      cssImport = `import './${(GetCodeName(node) || '').toJavascriptName()}.scss'
+			cssImport = `import './${(GetCodeName(node) || '').toJavascriptName()}.scss'
       import styles from './${(GetCodeName(node) || '').toJavascriptName()}_css'`;
 			break;
 		case UITypes.ReactNative:
@@ -2100,11 +2100,11 @@ export function GetScreens() {
 function GenerateElectronIORoutes(screens: any[], language: string) {
 	const template = `<Route path={routes.{{route_name}}} render={({ match, history, location }: any) => {
     console.log(match.params);
-    let {{{screenApiParams}}} = match.params;
+    let {{{screenApiParamsWithDefaults}}} = match.params;
     {{overrides}}
     setParameters({{{screenApiParams}}});
     return <{{component}} {{screenApi}} />}} />
-  }`;
+  `;
 	let routefile;
 	switch (language) {
 		case UITypes.ReactWeb:
@@ -2139,13 +2139,22 @@ function GenerateElectronIORoutes(screens: any[], language: string) {
 			}
 		}
 		const screenApiParams = screenApis.map((v) => `${GetJSCodeName(v)}`).join();
-
+		const screenApiParamsWithDefaults = screenApis
+			.map((v: Node | null | any) => {
+				let code = GetJSCodeName(v);
+				if (code === 'viewModel') {
+					code = `${code} = viewmodels.${GetCodeName(screen)}`;
+				}
+				return `${code}`;
+			})
+			.join();
 		routes.push(
 			bindTemplate(template, {
 				route_name: `${GetCodeName(screen)}`,
 				overrides,
 				component: GetCodeName(screen),
-				screenApiParams,
+        screenApiParams,
+        screenApiParamsWithDefaults,
 				screenApi
 			})
 		);

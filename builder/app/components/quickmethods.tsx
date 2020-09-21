@@ -63,6 +63,7 @@ import ApplyValidationChains from '../nodepacks/batch/ApplyValidationChains';
 import { SetPause } from '../methods/graph_methods';
 import SetupViewTypes from '../nodepacks/batch/SetupViewTypes';
 import { graphOperation, GetDispatchFunc, GetStateFunc } from '../actions/uiactions';
+import SetupAuthenticationButtons from '../nodepacks/batch/SetupAuthenticationButtons';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -225,9 +226,9 @@ class QuickMethods extends Component<any, any, any> {
 									title="Create Component Shared All"
 									onClick={() => {
 										SetPause(true);
-										CreateComponentSharedAll(() => {}, null, (v:Node)=>{
-                     return true; // return v.id === currentNode.id;
-                    }).then(() => {
+										CreateComponentSharedAll(() => {}, null, (v: Node) => {
+											return true; // return v.id === currentNode.id;
+										}).then(() => {
 											SetPause(false);
 										});
 									}}
@@ -310,7 +311,12 @@ class QuickMethods extends Component<any, any, any> {
 										ApplyValidationChains();
 									}}
 								/>
-
+								<TreeViewMenu
+									title="Setup Authentication Buttons"
+									onClick={() => {
+										SetupAuthenticationButtons();
+									}}
+								/>
 								<TreeViewMenu
 									title={StartJob.title}
 									icon="fa fa-play"

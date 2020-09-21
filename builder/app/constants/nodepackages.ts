@@ -614,7 +614,7 @@ export const CreateLoginModels = {
 			user: NodesByType(GetState(), NodeTypes.Model).find((x: any) => GetNodeProp(x, NodeProperties.IsUser)),
 			httpMethod: HTTP_METHODS.POST,
 			functionType: FunctionTypes.Register,
-			functionName: `Register`
+			functionName: `Register User`
 		})({ dispatch: GetDispatchFunc(), getState: GetStateFunc() });
 
 		const loginResult = CreateAgentFunction({
