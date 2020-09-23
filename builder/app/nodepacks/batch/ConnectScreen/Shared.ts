@@ -32,9 +32,11 @@ import { Node, ComponentLayoutContainer } from '../../../methods/graph_types';
 import CreateHideComponentStyle from '../../screens/CreateHideComponentStyle';
 import { CreateComponentStyle } from '../../../components/componentstyle';
 import { RouteDescription } from '../../../interface/methodprops';
+import { ViewTypes } from '../../../constants/viewtypes';
 
 export function AddButtonToSubComponent(
-	screenOption: Node
+	screenOption: Node,
+	options?: { onItemSelection: boolean }
 ): {
 	button: string;
 	event: string;
@@ -45,13 +47,18 @@ export function AddButtonToSubComponent(
 	let eventInstance: string = '';
 	let event: string = '';
 	let graph = GetCurrentGraph();
-
-	const components = GetNodesLinkedTo(graph, {
-		id: screenOption.id,
-		link: LinkType.Component
-	}).filter((component: Node) => {
-		return GetNodeProp(component, NodeProperties.Layout);
-	});
+	let viewType = GetNodeProp(screenOption, NodeProperties.ViewType);
+	let components: Node[] = [];
+	if (viewType === ViewTypes.GetAll && !(options && options.onItemSelection)) {
+		components = [ screenOption ];
+	} else {
+		components = GetNodesLinkedTo(graph, {
+			id: screenOption.id,
+			link: LinkType.Component
+		}).filter((component: Node) => {
+			return GetNodeProp(component, NodeProperties.Layout);
+		});
+	}
 
 	let button: string = '';
 	components.subset(0, 1).forEach((component: Node) => {
@@ -136,7 +143,11 @@ export function AddButtonToComponentLayout(args: { button: string; component: st
 	let root = GetFirstCell(layout);
 	let rootChildren = GetChildren(layout, root);
 	let cellCount = rootChildren.length;
-	layout = SetCellsLayout(layout, cellCount + 1, root);
+	if (GetNodeProp(component, NodeProperties.NODEType) === NodeTypes.ScreenOption) {
+		layout = SetCellsLayout(layout, cellCount + 2, root);
+	} else {
+		layout = SetCellsLayout(layout, cellCount + 1, root);
+	}
 	let lastCell = GetLastCell(layout, root ? root : null);
 	if (!lastCell) {
 		throw new Error('couldnt get the last cell: Setup Effect');

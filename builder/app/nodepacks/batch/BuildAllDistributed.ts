@@ -47,6 +47,7 @@ import ApplyPermissionChains from './ApplyPermissionChains';
 import ApplyExecutionChains from './ApplyExecutionChains';
 import ApplyValidationChains from './ApplyValidationChains';
 import SetupAuthenticationButtons from './SetupAuthenticationButtons';
+import { ConnectScreenListRoutes } from './ConnectScreens';
 
 interface BuildStep {
 	progress?: number;
@@ -200,6 +201,7 @@ export const CollectionConnectDataChainCollection = 'CollectionConnectDataChainC
 export const APPLY_PERMISSION_CHAINS = 'Apply Permission Chains';
 export const APPLY_VALIDATION_CHAINS = 'Apply Validation Chains';
 export const AUTHENTICATION_BUTTONS = 'Authentication Buttons';
+export const GETALL_LIST_ROUTES = 'GETALL_LIST_ROUTES';
 export const APPLY_EXECUTION_CHAINS = 'Apply Execution Chains';
 
 const Collect_Into_Graph = 'Collect_Into_Graph';
@@ -250,6 +252,7 @@ const buildAllProgress = [
 	{ name: APPLY_PERMISSION_CHAINS },
 	{ name: APPLY_EXECUTION_CHAINS },
 	{ name: APPLY_VALIDATION_CHAINS },
+	{ name: GETALL_LIST_ROUTES },
 	{ name: AUTHENTICATION_BUTTONS },
 	{ name: COMPLETED_BUILD }
 ];
@@ -283,6 +286,10 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 
 		await run(buildAllProgress, AddTitleService, async (progressFunc: any) => {
 			graphOperation([ addTitleService({ newItems: {} }) ])(GetDispatchFunc(), GetStateFunc());
+		});
+
+		await run(buildAllProgress, GETALL_LIST_ROUTES, async (progressFunc: any) => {
+			await ConnectScreenListRoutes(progressFunc);
 		});
 
 		await run(buildAllProgress, Add_Agent_Methods, async (progresFunc: any) => {

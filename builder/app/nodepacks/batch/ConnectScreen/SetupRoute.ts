@@ -35,14 +35,21 @@ import {
 	AddApiToButton,
 	AddInternalComponentApi,
 	GetHideStyle,
-  AddComponentAutoStyles
+	AddComponentAutoStyles
 } from './Shared';
 import CreateNavigateToScreenDC from '../../CreateNavigateToScreenDC';
+import { GetScreenOption } from '../../../service/screenservice';
+import { ViewTypes } from '../../../constants/viewtypes';
 
-export default function SetupRoute(screen: Node, routing: Routing, information: SetupInformation) {
+export default function SetupRoute(
+	screen: Node,
+	routing: Routing,
+	information: SetupInformation,
+	onlyGetAll?: boolean
+) {
 	console.log('setup route');
 	routing.routes.forEach((routeDescription: RouteDescription) => {
-		SetupRouteDescription(routeDescription, screen, information);
+		SetupRouteDescription(routeDescription, screen, information, onlyGetAll);
 	});
 }
 
@@ -72,7 +79,12 @@ function AttachEventArguments(eventInstance: string, paramName: string, routeSou
 	return result;
 }
 
-function SetupRouteDescription(routeDescription: RouteDescription, screen: Node, information: SetupInformation) {
+function SetupRouteDescription(
+	routeDescription: RouteDescription,
+	screen: Node,
+	information: SetupInformation,
+	onlyGetAll?: boolean
+) {
 	console.log('setup route description');
 	let graph = GetCurrentGraph();
 	let setup_options = GetNodesLinkedTo(graph, {
@@ -80,7 +92,14 @@ function SetupRouteDescription(routeDescription: RouteDescription, screen: Node,
 		link: LinkType.ScreenOptions
 	});
 	setup_options.forEach((screenOption: Node) => {
-		let { eventInstance, event, button, subcomponent } = AddButtonToSubComponent(screenOption);
+		if (onlyGetAll && GetNodeProp(screenOption, NodeProperties.ViewType) !== ViewTypes.GetAll) {
+			return;
+		} else if (!onlyGetAll && GetNodeProp(screenOption, NodeProperties.ViewType) !== ViewTypes.GetAll) {
+			return;
+		}
+		let { eventInstance, event, button, subcomponent } = AddButtonToSubComponent(screenOption, {
+			onItemSelection: routeDescription.isItemized || false
+		});
 
 		updateComponentProperty(button, NodeProperties.UIText, routeDescription.name || GetNodeTitle(button));
 		let targetScreen: Node | null = null;

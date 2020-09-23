@@ -186,6 +186,81 @@ export default async function ConnectScreens(progresFunc: any, filter?: any) {
 	SetPause(paused);
 }
 
+export async function ConnectScreenListRoutes(progresFunc: any, filter?: any) {
+	const allscreens = NodesByType(null, NodeTypes.Screen);
+	const screens = allscreens.filter(ScreenOptionFilter);
+	let paused = Paused();
+	SetPause(true);
+	await screens
+		.filter((screen: any) => (filter ? filter(screen) : true))
+		.forEachAsync(async (screen: Node, index: number, total: number) => {
+			const viewType = GetNodeProp(screen, NodeProperties.ViewType);
+			const agent = GetNodeProp(screen, NodeProperties.Agent);
+			const model = GetNodeProp(screen, NodeProperties.Model);
+
+			// Get Agent Access Description
+			let agentAccessDescription: Node | null = GetAgentAccessDescriptionNode(agent, model, viewType);
+			if (agentAccessDescription) {
+				let agentLink = GetAgentAccessDescriptionAgentLink(agent, model, viewType);
+				if (agentLink) {
+
+					let routingProps: RoutingProps = GetLinkProperty(agentLink, LinkPropertyKeys.RoutingProps);
+					let route: Routing | null = GetRoute(routingProps, viewType);
+					if (route) {
+						SetupRoute(screen, route, { agent, model, viewType, agentAccessDescription });
+					}
+				} else {
+					console.log('Agent link missing, this should never happen');
+					throw new Error('agent link missing');
+				}
+			} else {
+				if (GetNodeProp(screen, NodeProperties.IsDashboard)) {
+					let navigationScreen = GetNavigationScreen(screen);
+					if (navigationScreen) {
+						let dashboardAccesses: Node[] = GetNodesLinkedTo(GetCurrentGraph(), {
+							id: navigationScreen.id,
+							link: LinkType.DashboardAccess
+						});
+						dashboardAccesses.forEach((dashboardAccess: Node) => {
+							let agent = GetNodeLinkedTo(GetCurrentGraph(), {
+								id: dashboardAccess.id,
+								link: LinkType.AgentAccess
+							});
+							if (agent) {
+								let agentLink = findLink(GetCurrentGraph(), {
+									source: agent.id,
+									target: dashboardAccess.id
+								});
+								if (agentLink) {
+									let routingProps: Routing = GetLinkProperty(
+										agentLink,
+										LinkPropertyKeys.DashboardRoutingProps
+									);
+									let route: Routing = routingProps;
+									if (route) {
+										SetupRoute(screen, route, {
+											agent,
+											model,
+											viewType,
+											agentAccessDescription: dashboardAccess
+										});
+									}
+								}
+							}
+						});
+					}
+				} else {
+					console.log(
+						`No agent access description for agent: ${GetNodeTitle(agent)} model: ${GetNodeTitle(
+							agent
+						)} viewType: ${viewType}`
+					);
+				}
+			}
+		});
+	SetPause(paused);
+}
+
 function GetNavigationScreen(screen: Node) {
 	let screenImplemenetation = GetNodeLinkedTo(GetCurrentGraph(), {
 		id: screen.id,
