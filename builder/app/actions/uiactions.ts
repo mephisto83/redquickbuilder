@@ -1313,6 +1313,7 @@ export function GenerateCSChainFunction(id: string) {
                   ${lastNodeName}
               }`;
 	} else {
+		let out_type = alternateOutputType || outputType ? `<${alternateOutputType || GetCodeName(outputType)}>` : '';
 		method = `public class ${GetCodeName(id)}
             {
               // ${id}
@@ -1320,7 +1321,7 @@ export function GenerateCSChainFunction(id: string) {
                 public ${GetCodeName(id)}(${arbiterInterfaces}) {
             ${arbiterSets}
                 }
-                public async Task<${alternateOutputType || GetCodeName(outputType)}> Execute(${_arguments}) {
+                public async Task${out_type} Execute(${_arguments}) {
                   ${lastNodeName}
                 }
             }`;

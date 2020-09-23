@@ -331,6 +331,17 @@ class DataChainActvityMenu extends Component<any, any> {
 							UIA.updateComponentProperty(currentNode.id, UIA.NodeProperties.IsUserOfAgentType, value);
 						}}
 					/>
+					<CheckBox
+						label={Titles.ClaimServiceUpdateAgentMethod}
+						value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.UpdateAgentPostRegistrationMethod)}
+						onChange={(value: any) => {
+							UIA.updateComponentProperty(
+								currentNode.id,
+								UIA.NodeProperties.UpdateAgentPostRegistrationMethod,
+								value
+							);
+						}}
+					/>
 					<SelectInput
 						onChange={(value: any) => {
 							let createdNode: any;

@@ -171,7 +171,7 @@ export default class MenuGenerator {
             result.push({
               id: '${item}',
               disabled: ${disabledFunc},
-              title: titleService.get('${item}', '${GetNodeTitle(item)}'),
+              title: titleService.get(\`${item}\`, '${GetNodeTitle(item)}'),
               parent: ${parent ? `'${parent}'` : 'null'}
             });
           ${shouldShowPart2}

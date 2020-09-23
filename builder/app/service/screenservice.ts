@@ -1295,7 +1295,7 @@ function WriteDescribedApiProperties(node: GraphMethods.Node | null, options: an
 
 			let innerValue = '';
 			if (titleService) {
-				innerValue = `titleService.get('${GetNodeProp(node, NodeProperties.Label)}')`;
+				innerValue = `titleService.get(\`${GetNodeProp(node, NodeProperties.Label)}\`)`;
 			} else if (externalConnection || query) {
 				if (query && GetNodeProp(query, NodeProperties.QueryParameterObject)) {
 					innerValue = `GetScreenParam('query')`;

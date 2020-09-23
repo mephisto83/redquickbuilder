@@ -74,7 +74,12 @@ export default class RoutingInput extends Component<any, any> {
 						texteditor
 						active={this.state.open}
 						label={'Sentences'}
-						immediate
+            immediate
+            context={{
+							agent: this.props.agent,
+							model: this.props.model,
+							methodContext: []
+						}}
 						value={this.state.sentences}
 						onChange={(val: string) => {
 							this.setState({ sentences: val });

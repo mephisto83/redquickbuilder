@@ -48,7 +48,8 @@ import {
 	VISUAL,
 	UIC,
 	setPinned,
-	handleCodeWindowMessage
+	handleCodeWindowMessage,
+	GetNodesByProperties
 } from './uiactions';
 import { GraphKeys, GetNodesLinkedTo } from '../methods/graph_methods';
 import { HandlerEvents } from '../ipc/handler-events';
@@ -416,6 +417,14 @@ export function scaffoldProject(options: any = {}) {
 											parameters[FunctionTemplateKeys.Model],
 											model.toLowerCase()
 										);
+										const dataChainsForClaimUpdate = GetNodesByProperties(
+											{
+												[NodeProperties.UpdateAgentPostRegistrationMethod]: true
+											},
+											GetCurrentGraph()
+										).map((dataChain: Node) => {
+											return `await ${GetCodeName(dataChain)}.Execute(${model.toLowerCase()}: ${model.toLowerCase()}, ${user.toLowerCase()}: user);`;
+										}).join(NEW_LINE);
 										if (maestro) {
 											const controller = GetControllerNode(maestro.id);
 											if (controller) {
@@ -428,6 +437,7 @@ export function scaffoldProject(options: any = {}) {
                     }`);
 												post_registrations.push(`
                     var  ${model.toLowerCase()} =  ${model}.Create();
+                    ${dataChainsForClaimUpdate}
                     ${modelPropertyDefaults}
                     ${model.toLowerCase()}.Owner = user.Id;
                     ${model.toLowerCase()} = await Create(user, ${model.toLowerCase()});

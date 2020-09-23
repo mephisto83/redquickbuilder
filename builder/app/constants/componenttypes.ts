@@ -661,7 +661,7 @@ Object.keys(ComponentTypes.ReactNative).map((key) => {
 		ComponentTypes.ReactNative[key].properties = ComponentTypes.ReactNative[key].properties || {};
 		ComponentTypes.ReactNative[key].properties.label = ComponentTypes.ReactNative[key].properties.label || {
 			nodeProperty: NodeProperties.Label,
-			template: `{titleService.get('{{value}}')}`,
+			template: `{titleService.get(\`{{value}}\`)}`,
 			ui: true
 		};
 	}
