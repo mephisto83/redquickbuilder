@@ -52,7 +52,7 @@ import { Node } from '../methods/graph_types';
 import RedressProperties from '../nodepacks/batch/RedressProperties';
 import AddAgentAccessMethods from '../nodepacks/batch/AddAgentAccessMethods';
 import UpdateScreenParameters from '../nodepacks/screens/UpdateScreenParameters';
-import ConnectScreens from '../nodepacks/batch/ConnectScreens';
+import ConnectScreens, { ConnectScreenListRoutes } from '../nodepacks/batch/ConnectScreens';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import SelectInput from './selectinput';
 import { NodesByType, GetNodeProp } from '../methods/graph_methods';
@@ -309,6 +309,12 @@ class QuickMethods extends Component<any, any, any> {
 									title="Apply Validation Chains"
 									onClick={() => {
 										ApplyValidationChains();
+									}}
+								/>
+								<TreeViewMenu
+									title="Connect Screen List Routes"
+									onClick={() => {
+										ConnectScreenListRoutes(() => {});
 									}}
 								/>
 								<TreeViewMenu

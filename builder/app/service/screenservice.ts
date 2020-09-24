@@ -1301,9 +1301,12 @@ function WriteDescribedApiProperties(node: GraphMethods.Node | null, options: an
 					innerValue = `GetScreenParam('query')`;
 				} else if (options.listItem) {
 					const listItemAttribute = GetJSCodeName(externalConnection);
-					innerValue = !GetNodeProp(externalConnection, NodeProperties.AsLocalContext)
-						? `this.state.${listItemAttribute}`
-						: listItemAttribute;
+					const notRequiredListItemAttribute =
+						[ 'value', 'separators', 'index' ].indexOf(listItemAttribute) === -1;
+					innerValue =
+						notRequiredListItemAttribute && !GetNodeProp(externalConnection, NodeProperties.AsLocalContext)
+							? `this.state.${listItemAttribute}`
+							: listItemAttribute;
 				} else {
 					const defaulComponentValue =
 						GetNodeProp(externalConnection, NodeProperties.DefaultComponentApiValue) || '';
@@ -2143,7 +2146,7 @@ function GenerateElectronIORoutes(screens: any[], language: string) {
 			.map((v: Node | null | any) => {
 				let code = GetJSCodeName(v);
 				if (code === 'viewModel') {
-					code = `${code} = viewmodels.${GetCodeName(screen)}`;
+					code = `${code} = ViewModelKeys.${GetCodeName(screen)}`;
 				}
 				return `${code}`;
 			})
@@ -2153,8 +2156,8 @@ function GenerateElectronIORoutes(screens: any[], language: string) {
 				route_name: `${GetCodeName(screen)}`,
 				overrides,
 				component: GetCodeName(screen),
-        screenApiParams,
-        screenApiParamsWithDefaults,
+				screenApiParams,
+				screenApiParamsWithDefaults,
 				screenApi
 			})
 		);

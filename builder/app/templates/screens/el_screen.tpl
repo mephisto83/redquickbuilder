@@ -7,7 +7,7 @@ import Models from '../model_keys';
 import { GetItems, navigate, GetScreenParam, setNavigate, GetItem, GetC } from '../actions/uiactions';
 import * as ScreenInstance from '../actions/screenInstances';
 import { Content, StyleProvider } from '../html-components';
-import ViewModelKeys from '../viewmodel_keys';
+import { ViewModelKeys } from '../viewmodel_keys';
 import {
   MultiSelectList, MultiViewList, Container,
   Dropdown,

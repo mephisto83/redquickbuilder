@@ -215,7 +215,7 @@ export default class MenuGenerator {
           import * as RedLists from '../${rel}actions/lists';
           import StateKeys from '../${rel}state_keys';
           import ModelKeys from '../${rel}model_keys';
-          import ViewModelKeys from '../${rel}viewmodel_keys';
+          import { ViewModelKeys } from '../${rel}viewmodel_keys';
           import Models from '../${rel}model_keys';
           import RedObservable from '../${rel}actions/observable';
           import RedGraph from '../${rel}actions/redgraph';

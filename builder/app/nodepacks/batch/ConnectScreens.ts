@@ -207,7 +207,7 @@ export async function ConnectScreenListRoutes(progresFunc: any, filter?: any) {
 					let routingProps: RoutingProps = GetLinkProperty(agentLink, LinkPropertyKeys.RoutingProps);
 					let route: Routing | null = GetRoute(routingProps, viewType);
 					if (route) {
-						SetupRoute(screen, route, { agent, model, viewType, agentAccessDescription });
+						SetupRoute(screen, route, { agent, model, viewType, agentAccessDescription }, true);
 					}
 				} else {
 					console.log('Agent link missing, this should never happen');
@@ -243,7 +243,7 @@ export async function ConnectScreenListRoutes(progresFunc: any, filter?: any) {
 											model,
 											viewType,
 											agentAccessDescription: dashboardAccess
-										});
+										}, true);
 									}
 								}
 							}

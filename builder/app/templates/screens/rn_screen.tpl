@@ -10,7 +10,7 @@ import * as ScreenInstance from '../actions/screenInstances';
 import material from '../../native-base-theme/variables/variables';
 import { DrawerActions } from 'react-navigation-drawer';
 import { Content, StyleProvider } from 'native-base';
-import ViewModelKeys from '../viewmodel_keys';
+import { ViewModelKeys } from '../viewmodel_keys';
 import {
   Dropdown, Container, ListItem, Header, Title, Footer, FooterTab,H3,H1, H2, Button, Left, Right, Body, Icon, Text, View } from 'native-base';
 import { NavigationActions } from 'react-navigation';

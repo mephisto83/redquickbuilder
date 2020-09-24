@@ -94,9 +94,14 @@ function SetupRouteDescription(
 	setup_options.forEach((screenOption: Node) => {
 		if (onlyGetAll && GetNodeProp(screenOption, NodeProperties.ViewType) !== ViewTypes.GetAll) {
 			return;
-		} else if (!onlyGetAll && GetNodeProp(screenOption, NodeProperties.ViewType) !== ViewTypes.GetAll) {
+		} else if (
+			!onlyGetAll &&
+			!GetNodeProp(screen, NodeProperties.IsDashboard) &&
+			GetNodeProp(screenOption, NodeProperties.ViewType) !== ViewTypes.GetAll
+		) {
 			return;
-		}
+    }
+
 		let { eventInstance, event, button, subcomponent } = AddButtonToSubComponent(screenOption, {
 			onItemSelection: routeDescription.isItemized || false
 		});
