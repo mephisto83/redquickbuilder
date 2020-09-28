@@ -96,11 +96,11 @@ function SetupRouteDescription(
 			return;
 		} else if (
 			!onlyGetAll &&
-			!GetNodeProp(screen, NodeProperties.IsDashboard) &&
-			GetNodeProp(screenOption, NodeProperties.ViewType) !== ViewTypes.GetAll
+			GetNodeProp(screenOption, NodeProperties.ViewType) === ViewTypes.GetAll &&
+			!GetNodeProp(screen, NodeProperties.IsDashboard)
 		) {
 			return;
-    }
+		}
 
 		let { eventInstance, event, button, subcomponent } = AddButtonToSubComponent(screenOption, {
 			onItemSelection: routeDescription.isItemized || false
