@@ -139,6 +139,7 @@ export default function SetupViewTypeForGetAll(args: any = {}) {
           if (!item && id && typeof id === 'string') {
             fetchModel(Models.#{{"key":"modelProperty"}}#, id);
           }
+          return item && item.id ? item.id : item;
       });
   }
 
