@@ -7,7 +7,7 @@ import {
 	ComponentApiKeys,
 	GetNodeByProperties,
 	UPDATE_LINK_PROPERTY,
-  GetNodeById
+	GetNodeById
 } from '../../actions/uiactions';
 import {
 	LinkType,
@@ -210,16 +210,35 @@ export default function SetupViewTypeForCreate(args: any = {}) {
 SetupViewTypeForCreate.title = 'Setup View Type For Create';
 SetupViewTypeForCreate.description = `Setup view-type nodes for create. Adds an onChange event, and sets the dataChain for viewmodel.`;
 
-export function GetViewTypeModelType(node: any) {
+export function GetViewTypeModelType(viewTypeNodeId: string) {
 	const graph = GetCurrentGraph();
 
+	let sourceNode = GetNodesLinkedTo(graph, {
+		id: viewTypeNodeId,
+		link: LinkType.DefaultViewType,
+		linkProperties: [ 'source' ]
+	}).find((v: Node) => v);
+
+	let targetNode = GetNodesLinkedTo(graph, {
+		id: viewTypeNodeId,
+		link: LinkType.DefaultViewType,
+		linkProperties: [ 'target' ]
+	}).find((v: Node) => v);
+	if (sourceNode && targetNode) {
+		return {
+			model: sourceNode,
+			property: targetNode,
+			modelType: targetNode
+		};
+	}
+
 	const properties = GetNodesLinkedTo(graph, {
-		id: node,
+		id: viewTypeNodeId,
 		link: LinkType.DefaultViewType,
 		componentType: NodeTypes.Property
 	});
 	const models = GetNodesLinkedTo(graph, {
-		id: node,
+		id: viewTypeNodeId,
 		link: LinkType.DefaultViewType
 	}).filter((x: any) => GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.Model);
 
@@ -230,14 +249,14 @@ export function GetViewTypeModelType(node: any) {
 	if (!property) {
 		// console.debug('no property');
 		const modelOptions = GetNodesLinkedTo(graph, {
-			id: node,
+			id: viewTypeNodeId,
 			link: LinkType.DefaultViewType,
 			componentType: NodeTypes.Model
 		});
 		if (modelOptions.length === 2) {
 			if (
 				existsLinkBetween(graph, {
-					id: node,
+					id: viewTypeNodeId,
 					link: LinkType.LogicalChildren,
 					source: modelOptions[0].id,
 					target: modelOptions[1].id
@@ -246,7 +265,7 @@ export function GetViewTypeModelType(node: any) {
 				[ model, property ] = modelOptions;
 			} else if (
 				existsLinkBetween(graph, {
-					id: node,
+					id: viewTypeNodeId,
 					link: LinkType.LogicalChildren,
 					source: modelOptions[1].id,
 					target: modelOptions[0].id
@@ -275,8 +294,8 @@ export function GetViewTypeModelType(node: any) {
 				{
 					model,
 					property,
-          modelType,
-          node: GetNodeById(node)
+					modelType,
+					node: GetNodeById(viewTypeNodeId)
 				},
 				null,
 				4

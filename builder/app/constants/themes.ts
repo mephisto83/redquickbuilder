@@ -167,7 +167,8 @@ export const CssPseudoSelectors = {
 	[':required']: ':required',
 	[':last-child']: ':last-child',
 	[':focus']: ':focus',
-	[':read-only']: ':read-only'
+	[':read-only']: ':read-only',
+	['[data-selected]']: '[data-selected]'
 };
 
 const cssProperties = Object.keys({ ...StyleLib.css }).map((v) => {

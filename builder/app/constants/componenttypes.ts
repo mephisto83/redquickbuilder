@@ -600,7 +600,7 @@ export const ComponentTypes: any = {
 							includeNameSpace: true
 						});
 						if (GetNodeProp(node, 'component-as-label')) {
-							return `titleService.get('${GetNodeProp(node, NodeProperties.Label)}')`;
+							return `titleService.get(\`${GetNodeProp(node, NodeProperties.Label)}\`)`;
 						}
 						if (func) {
 							return bindTemplate(`DC.{{function}}({{value}})`, {

@@ -5,8 +5,9 @@ import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import { buildReducers } from './reducers/index';
 import { RootStack } from './navigationstack';
-import * as fetchservice from './util/fetchService';
+import fetchservice from './util/fetchService';
 
+fetchservice();
 // A very simple store
 let store = createStore(buildReducers(), applyMiddleware(thunk));
 
@@ -16,11 +17,11 @@ let Navigation = createAppContainer(RootStack);
 
 // Render the app container component with the provider around it
 export default class App extends React.Component {
-    render() {
-        return (
-            <Provider store={store}>
-                <Navigation />
-            </Provider>
-        );
-    }
+	render() {
+		return (
+			<Provider store={store}>
+				<Navigation />
+			</Provider>
+		);
+	}
 }

@@ -23,14 +23,22 @@ export default class MultiSelectList extends React.Component<{ [index: string]: 
 						if (this.props.renderItem) {
 							let key = this.props.keyExtractor(item);
 							let res = this.props.renderItem({ item, index, key });
+							let instanceProps: any = {};
+							if ((this.props.value || []).indexOf(item) !== -1) {
+								instanceProps['data-selected'] = true;
+							}
+
 							return (
 								<li
 									key={key}
+									{...instanceProps}
 									onClick={() => {
-										const values = this.props.value || [];
+										let values = this.props.value || [];
 										if (Array.isArray(values)) {
 											if (values.indexOf(item) === -1) {
 												values.unshift(item);
+											} else {
+												values = values.filter((v) => v !== item);
 											}
 											if (this.props.onClick) {
 												this.props.onClick(item);

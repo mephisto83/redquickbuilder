@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 // ExecuteButtonWorkoutStationsComponent
 let navigationInstance: any;
 
-export default class MultiSelectList extends React.Component {
+export default class MultiViewList extends React.Component<any, any> {
 	constructor(props: any) {
 		super(props);
 
@@ -23,8 +23,24 @@ export default class MultiSelectList extends React.Component {
 						.map((item: any, index: any) => {
 							if (this.props.renderItem) {
 								let res = this.props.renderItem({ item, index });
-								res.key = this.props.keyExtractor(item);
-								return res;
+								let key = this.props.keyExtractor(item);
+								return (
+									<li
+										key={key || item}
+										onClick={() => {
+											if (this.props.onClick) {
+												this.props.onClick(item);
+											}
+											if (this.props.onChange) {
+												this.props.onChange({
+													nativeEvent: { value: item, text: item }
+												});
+											}
+										}}
+									>
+										{res}
+									</li>
+								);
 							}
 						})
 						.filter((x: any) => x)}

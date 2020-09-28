@@ -19,7 +19,7 @@ export default function StoreFetchResults(args: any = {}) {
 				{
 					operation: 'NEW_NODE',
 					options: {
-						callback: function(node: { id: any; }) {
+						callback: function(node: { id: any }) {
 							context.node0 = node.id;
 						}
 					}
@@ -113,7 +113,7 @@ export default function StoreFetchResults(args: any = {}) {
 							}
 						},
 						links: [],
-						callback: function(node: { id: any; }, graph: any, group: any) {
+						callback: function(node: { id: any }, graph: any, group: any) {
 							context.node1 = node.id;
 							context.group0 = group;
 						}
@@ -312,106 +312,23 @@ export default function StoreFetchResults(args: any = {}) {
 					options: {
 						prop: 'Lambda',
 						id: context.node1,
-						value:
-							'(x: any) => {\n  if(x) {\n    Object.keys(x).forEach(model=> {\n Batch(\n\n}) \n  ]\n\n}'
-					}
-				}
-			];
-		},
-
-		function() {
-			return [
-				{
-					operation: 'CHANGE_NODE_PROPERTY',
-					options: {
-						prop: 'Lambda',
-						id: context.node1,
-						value:
-							'(x: any) => {\n  if(x) {\n    Object.keys(x).forEach(model=> {\n Batch(\n     x[model].map((item, index) => {\n  )\n}) \n  ]\n\n}'
-					}
-				}
-			];
-		},
-
-		function() {
-			return [
-				{
-					operation: 'CHANGE_NODE_PROPERTY',
-					options: {
-						prop: 'Lambda',
-						id: context.node1,
-						value:
-							'(x: any) => {\n  if(x) {\n    Object.keys(x).forEach(model=> {\n Batch(\n     x[model].map((item: any, index: Number) => {\n}\n  )\n}) \n  ]\n\n}'
-					}
-				}
-			];
-		},
-
-		function() {
-			return [
-				{
-					operation: 'CHANGE_NODE_PROPERTY',
-					options: {
-						prop: 'Lambda',
-						id: context.node1,
-						value:
-							'(x: any) => {\n  if(x) {\n    Object.keys(x).forEach(model=> {\n Batch(\n     x[model].map((item: any, index: Number) => {\n return \n}\n  )\n}) \n  ]\n\n}'
-					}
-				}
-			];
-		},
-
-		function() {
-			return [
-				{
-					operation: 'CHANGE_NODE_PROPERTY',
-					options: {
-						prop: 'Lambda',
-						id: context.node1,
-						value:
-							'(x: any) => {\n  if(x) {\n    Object.keys(x).forEach(model=> {\n Batch(\n     x[model].map((item: any, index: Number) => {\n return UIModels(\n}\n  )\n}) \n  ]\n\n}'
-					}
-				}
-			];
-		},
-
-		function() {
-			return [
-				{
-					operation: 'CHANGE_NODE_PROPERTY',
-					options: {
-						prop: 'Lambda',
-						id: context.node1,
-						value:
-							'(x: any) => {\n  if(x) {\n   Object.keys(x).forEach((model: any) => {\n dispatch(Batch(\n     UIModels(model, x[model])));\n}) \n  ]\n\n}'
-					}
-				}
-			];
-		},
-
-		function() {
-			return [
-				{
-					operation: 'CHANGE_NODE_PROPERTY',
-					options: {
-						prop: 'Lambda',
-						id: context.node1,
-						value:
-							'(x: any) => {\n  if(x) {\n   \nObject.keys(x).forEach((model: any) => {\n dispatch(Batch(\n     UIModels(model, x[model])));\n}) \n  ]\n\n}'
-					}
-				}
-			];
-		},
-
-		function() {
-			return [
-				{
-					operation: 'CHANGE_NODE_PROPERTY',
-					options: {
-						prop: 'Lambda',
-						id: context.node1,
-						value:
-							'(x: any) => {\n  if(x) {\n   \nconst dispatch = GetDispatch();\nObject.keys(x).forEach((model: any) => {\n dispatch(Batch(\n     UIModels(model, x[model])));\n}) \n  }\n\n}'
+						value: `(x: any) => {
+              if (x) {
+                const dispatch = GetDispatch();
+                Object.keys(ModelKeys).forEach((model: any) => {
+                  let key = model
+                    .split('')
+                    .map((v: string, index: number) => {
+                      if (index) {
+                        return v;
+                      }
+                      return v.toLocaleLowerCase();
+                    })
+                    .join('');
+                  if (x && key && x[key]) dispatch(Batch(UIModels(model, x[key])));
+                });
+              }
+            }`
 					}
 				}
 			];

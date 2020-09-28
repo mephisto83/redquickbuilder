@@ -514,19 +514,22 @@ class ContextMenu extends Component<any, any> {
 					switch (key) {
 						case FunctionTemplateKeys.Agent:
 							if (methodDescription) {
-								methodDescription.properties.agent = mountingItem.agent;
+								methodDescription.properties.agent =
+									methodDescription.properties.agent || mountingItem.agent;
 							}
 							break;
 						case FunctionTemplateKeys.Model:
 							if (methodDescription) {
 								methodDescription.properties.model_output =
 									methodDescription.properties.model_output || mountingItem.model;
-								methodDescription.properties.model = mountingItem.model;
+								methodDescription.properties.model =
+									methodDescription.properties.model || mountingItem.model;
 							}
 							break;
 						case FunctionTemplateKeys.ModelProperty:
 							if (methodDescription) {
-								methodDescription.properties.model_output = mountingItem.model;
+								methodDescription.properties.model_output =
+									methodDescription.properties.model_output || mountingItem.model;
 							}
 							break;
 					}

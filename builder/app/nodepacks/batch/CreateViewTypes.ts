@@ -11,6 +11,7 @@ import { NodeTypes, LinkType, NodeProperties, LinkProperties } from '../../const
 import { GetNodesLinkedTo, existsLinkBetween } from '../../methods/graph_methods';
 import { ViewTypes } from '../../constants/viewtypes';
 import { uuidv4 } from '../../utils/array';
+import { Node } from '../../methods/graph_types';
 
 export default async function CreateViewTypes(progress: any) {
 	const models = NodesByType(null, NodeTypes.Model);
@@ -38,7 +39,7 @@ export default async function CreateViewTypes(progress: any) {
 				modelLinkedNodes,
 				(x: any, y: any) => y.id === x.id
 			);
-			const isProperty = GetNodeProp(child, NodeProperties.UseModelAsType);
+			const isProperty = !!modelProperties.find((v: Node) => v.id === child.id); /// GetNodeProp(child, NodeProperties.UseModelAsType);
 			Object.keys(ViewTypes)
 				.filter((x) => !commonViewTypes.some((cvt: any) => GetNodeProp(cvt, NodeProperties.ViewType) === x))
 				.forEach((viewType) => {
@@ -50,7 +51,7 @@ export default async function CreateViewTypes(progress: any) {
 						createViewTypes[
 							`${isProperty ? model.id : child.id} ${isProperty ? child.id : model.id} ${viewType}`
 						] = true;
-						let isPluralComponent = GetNodeProp(child, NodeProperties.NODEType) === NodeTypes.Model;
+						let isPluralComponent = !isProperty;
 
 						result.push(
 							...setupDefaultViewType({
@@ -136,8 +137,8 @@ export function setupDefaultViewType(args: any) {
 							properties: {
 								[NodeProperties.IsPluralComponent]: isPluralComponent,
 								[NodeProperties.ViewType]: viewType,
-								[NodeProperties.UIText]: `[${viewType}] ${GetNodeTitle(target)} => ${GetNodeTitle(
-									source
+								[NodeProperties.UIText]: `[${viewType}] ${GetNodeTitle(source)} => ${GetNodeTitle(
+									target
 								)} ${isPluralComponent ? 'Plural' : ''}`
 							},
 							...useModelAsType ? { parent: target, groupProperties: {} } : {},

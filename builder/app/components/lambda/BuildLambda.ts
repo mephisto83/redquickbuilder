@@ -11,6 +11,7 @@ export interface ReferenceInsert {
 	model?: string;
 	property?: string;
 	enumeration?: string;
+	js?: boolean;
 	enumerationvalue?: string;
 	type?: ReferenceInsertType;
 	types?: string[];

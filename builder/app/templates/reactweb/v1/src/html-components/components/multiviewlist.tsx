@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 // ExecuteButtonWorkoutStationsComponent
 let navigationInstance;
 
-export default class MultiSelectList extends React.Component<{ [index: string]: any }, { [index: string]: any }> {
+export default class MultiViewList extends React.Component<{ [index: string]: any }, { [index: string]: any }> {
 	constructor(props: any) {
 		super(props);
 
@@ -18,14 +18,14 @@ export default class MultiSelectList extends React.Component<{ [index: string]: 
 		delete props.children;
 		return (
 			<ul className={'list-group'}>
-				{(this.props.data || [])
+        {(this.props.value || this.props.data || [])
 					.map((item: any, index: any) => {
 						if (this.props.renderItem) {
 							let key = this.props.keyExtractor(item);
 							let res = this.props.renderItem({ item, index, key });
 							return (
 								<li
-									key={key}
+									key={key || item}
 									onClick={() => {
 										if (this.props.onClick) {
 											this.props.onClick(item);

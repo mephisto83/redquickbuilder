@@ -107,7 +107,10 @@ function GenerateGlobalCss(options: any) {
 
 				if (spaceThemeRules[mq]) {
 					Object.keys(spaceThemeRules[mq] || {}).forEach((key) => {
-						if (HTMLElementGroups.some((v: any) => v.type[`${key}`.split(':')[0]])) {
+						if (
+							HTMLElementGroups.some((v: any) => v.type[`${key}`.split(':')[0]]) ||
+							HTMLElementGroups.some((v: any) => v.type[`${key}`.split('[')[0]])
+						) {
 							selectors.push(key.toLowerCase());
 							htmlselector.push(key.toLowerCase());
 						} else {
@@ -123,7 +126,10 @@ function GenerateGlobalCss(options: any) {
 								.map((key) => {
 									let res: any = false;
 
-									if (HTMLElementGroups.some((v: any) => v.type[`${key}`.split(':')[0]])) {
+									if (
+										HTMLElementGroups.some((v: any) => v.type[`${key}`.split(':')[0]]) ||
+										HTMLElementGroups.some((v: any) => v.type[`${key}`.split('[')[0]])
+									) {
 										if (selector === key.toLowerCase()) {
 											res = `
               ${spaceThemeRules[mq][key]}

@@ -916,17 +916,17 @@ export function QuickStore(key: string, value: any) {
 export function GetModelCodeProperties(id: string) {
 	const propertyNodes = GetModelPropertyNodes(id);
 	let graph = GetCurrentGraph();
-	// const logicalChildren = skipLogicalChildren ? [] : GetLogicalChildren(id);
-	const logicalParents = GraphMethods.GetNodesLinkedTo(graph, {
-		id,
-		direction: GraphMethods.TARGET,
-		link: NodeConstants.LinkType.LogicalChildren
-	});
+	const logicalChildren = GetLogicalChildren(id);
+	// const logicalParents = GraphMethods.GetNodesLinkedTo(graph, {
+	// 	id,
+	// 	direction: GraphMethods.TARGET,
+	// 	link: NodeConstants.LinkType.LogicalChildren
+	// });
 	let userModels = [];
 	if (GetNodeProp(id, NodeProperties.NODEType) === NodeTypes.Model || GetNodeProp(id, NodeProperties.IsUser)) {
 		userModels = GetUserReferenceNodes(id);
 	}
-	return [ ...userModels, ...propertyNodes, ...logicalParents ]
+	return [ ...userModels, ...propertyNodes, ...logicalChildren ]
 		.filter((x) => x.id !== id)
 		.unique((v: { id: any }) => v.id);
 }
@@ -2093,59 +2093,7 @@ export function GenerateCDDataChainMethod(id: string) {
 	switch (functionType) {
 		case DataChainFunctionKeys.Lambda:
 			let lambdaText = GetNodeProp(id, functionType);
-			let temp = GetJSONReferenceInsertsMap(lambdaText);
-			if (temp) {
-				Object.values(temp).map((v: { template: string; insert: ReferenceInsert }) => {
-					let { key, type = ReferenceInsertType.Model } = v.insert;
-					let valueKey = key;
-					if (
-						lambdaInsertArguments &&
-						lambdaInsertArguments[valueKey] &&
-						lambdaInsertArguments[valueKey][type]
-					) {
-						let codeName = GetCodeName(lambdaInsertArguments[valueKey][type]);
-						if (type == ReferenceInsertType.EnumerationValue) {
-							let enumerationValues =
-								GetNodeProp(
-									lambdaInsertArguments[key]
-										? lambdaInsertArguments[key][ReferenceInsertType.Enumeration]
-										: null,
-									NodeProperties.Enumeration
-								) || [];
-							let temp: any = enumerationValues.find(
-								(v: { id: string }) => v.id === lambdaInsertArguments[valueKey][type]
-							);
-							if (temp) {
-								codeName = `${temp.value}`.toUpperCase();
-							}
-						} else if (type === ReferenceInsertType.PropertyType) {
-							let uiType = GetNodeProp(
-								lambdaInsertArguments[key]
-									? lambdaInsertArguments[key][ReferenceInsertType.PropertyType]
-									: null,
-								NodeProperties.UIAttributeType
-							);
-							if (
-								!uiType &&
-								GetNodeProp(
-									lambdaInsertArguments[key]
-										? lambdaInsertArguments[key][ReferenceInsertType.PropertyType]
-										: null,
-									NodeProperties.NODEType
-								) === NodeTypes.Model
-							) {
-								uiType = 'STRING';
-							}
-							if (uiType) {
-								codeName = NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][uiType];
-							}
-						}
-						lambda = bindReferenceJSONTemplates(lambda, {
-							[v.template]: codeName
-						});
-					}
-				});
-			}
+			lambda = processLambdaFunction(lambdaText, lambdaInsertArguments, lambda);
 
 			getReferenceInserts(lambda).map((v) => v.substr(2, v.length - 3)).unique().map((_insert: string) => {
 				const temp = _insert.split('@');
@@ -2184,6 +2132,63 @@ export function GenerateCDDataChainMethod(id: string) {
 			throw `${GetNodeTitle(node)} ${node.id} - ${functionType} is not a defined function type.`;
 	}
 }
+function processLambdaFunction(lambdaText: any, lambdaInsertArguments: any, lambda: any) {
+	let temp = GetJSONReferenceInsertsMap(lambdaText);
+	if (temp) {
+		Object.values(temp).map((v: { template: string; insert: ReferenceInsert }) => {
+			let { key, js, type = ReferenceInsertType.Model } = v.insert;
+			let valueKey = key;
+			if (lambdaInsertArguments && lambdaInsertArguments[valueKey] && lambdaInsertArguments[valueKey][type]) {
+				let codeName = GetCodeName(lambdaInsertArguments[valueKey][type]);
+				if (type == ReferenceInsertType.EnumerationValue) {
+					let enumerationValues =
+						GetNodeProp(
+							lambdaInsertArguments[key]
+								? lambdaInsertArguments[key][ReferenceInsertType.Enumeration]
+								: null,
+							NodeProperties.Enumeration
+						) || [];
+					let temp: any = enumerationValues.find(
+						(v: { id: string }) => v.id === lambdaInsertArguments[valueKey][type]
+					);
+					if (temp) {
+						codeName = `${temp.value}`.toUpperCase();
+					}
+				} else if (type === ReferenceInsertType.PropertyType) {
+					let uiType = GetNodeProp(
+						lambdaInsertArguments[key]
+							? lambdaInsertArguments[key][ReferenceInsertType.PropertyType]
+							: null,
+						NodeProperties.UIAttributeType
+					);
+					if (
+						!uiType &&
+						GetNodeProp(
+							lambdaInsertArguments[key]
+								? lambdaInsertArguments[key][ReferenceInsertType.PropertyType]
+								: null,
+							NodeProperties.NODEType
+						) === NodeTypes.Model
+					) {
+						uiType = 'STRING';
+					}
+					if (uiType) {
+						codeName = NodePropertyTypesByLanguage[ProgrammingLanguages.CSHARP][uiType];
+					}
+        }
+        if (js && codeName) {
+          codeName = codeName.toJavascriptName();
+        }
+
+				lambda = bindReferenceJSONTemplates(lambda, {
+					[v.template]: codeName
+				});
+			}
+		});
+	}
+	return lambda;
+}
+
 export function GenerateDataChainMethod(id: string, options: { language: any }) {
 	const node: any = GetNodeById(id);
 	const model: any = GetNodeProp(node, NodeProperties.UIModelType);
@@ -2302,6 +2307,11 @@ export function GenerateDataChainMethod(id: string, options: { language: any }) 
 					[insert]: bindValue
 				});
 			});
+
+			// const lambdaInsertArguments = GetNodeProp(node, NodeProperties.LambdaInsertArguments);
+			if (lambdaInsertArguments) {
+				lambda = processLambdaFunction(lambda, lambdaInsertArguments, lambda);
+			}
 			return `${lambda}`;
 		case DataChainFunctionKeys.Merge:
 			return `() => {
@@ -3395,6 +3405,9 @@ export function GetMethodOptions(methodProps: { [x: string]: string }) {
 
 export function GetLinkProperty(link: GraphLink, prop: any) {
 	return link && link.properties && link.properties[prop];
+}
+export function HasLinkProperty(link: GraphLink, prop: any) {
+	return link && link.properties && link.properties.hasOwnProperty(prop);
 }
 export function GetLink(linkId: any) {
 	const graph = GetCurrentGraph();

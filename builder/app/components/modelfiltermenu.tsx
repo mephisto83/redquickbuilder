@@ -50,7 +50,7 @@ class ModelFilterMenu extends Component<any, any> {
     let propnodes = [];
     if (currentNode) {
       let model = UIA.GetNodeProp(currentNode, NodeProperties.FilterModel);
-      propnodes = UIA.GetModelPropertyChildren(model);
+      propnodes = UIA.GetModelCodeProperties(model);
       properties = propnodes.map(t => {
         return (
           <CheckBox

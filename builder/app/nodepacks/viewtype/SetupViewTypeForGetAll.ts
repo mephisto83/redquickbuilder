@@ -14,6 +14,9 @@ import CreateModelKeyDC from './CreateModelKeyDC';
 import { uuidv4 } from '../../utils/array';
 import { GetViewTypeModelType } from './SetupViewTypeForCreate';
 import CreateModelPropertyGetterDC from '../CreateModelPropertyGetterDC';
+import { CreateNewNode } from '../../actions/uiactions';
+import { DataChainFunctionKeys } from '../../constants/datachain';
+import { Node } from '../../methods/graph_types';
 
 export default function SetupViewTypeForGetAll(args: any = {}) {
 	const { node } = args;
@@ -70,7 +73,7 @@ export default function SetupViewTypeForGetAll(args: any = {}) {
 			id: viewModelExternalNode.id,
 			link: LinkType.DataChainLink,
 			componentType: NodeTypes.DataChain
-		}).map((dc: { id: any; }) => ({
+		}).map((dc: { id: any }) => ({
 			operation: REMOVE_LINK_BETWEEN_NODES,
 			options: {
 				target: dc.id,
@@ -84,7 +87,7 @@ export default function SetupViewTypeForGetAll(args: any = {}) {
 			model: `${GetNodeTitle(node)} ${GetNodeTitle(property)}`,
 			modelId: model.id,
 			viewPackages,
-			callback: (modelKeyContext: { entry: any; }) => {
+			callback: (modelKeyContext: { entry: any }) => {
 				modelKeyDC = modelKeyContext.entry;
 			}
 		}),
@@ -107,7 +110,7 @@ export default function SetupViewTypeForGetAll(args: any = {}) {
 			id: valueExternalNode.id,
 			link: LinkType.DataChainLink,
 			componentType: NodeTypes.DataChain
-		}).map((dc: { id: any; }) => ({
+		}).map((dc: { id: any }) => ({
 			operation: REMOVE_LINK_BETWEEN_NODES,
 			options: {
 				target: dc.id,
@@ -117,32 +120,126 @@ export default function SetupViewTypeForGetAll(args: any = {}) {
 	);
 
 	let temp: any;
-	result.push(
-		...CreateModelPropertyGetterDC({
-			model: propertyModel.id,
-			viewPackages,
-			property: property.id,
-			propertyName: `${GetNodeTitle(node)}${GetNodeTitle(property.id)}`,
-			modelName: GetNodeTitle(propertyModel),
-			callback: (context: { entry: any; }) => {
-				temp = context.entry;
-			}
-		}),
-		{
-			operation: ADD_LINK_BETWEEN_NODES,
-			options() {
-				return {
-					source: valueExternalNode.id,
-					target: temp,
-					properties: { ...LinkProperties.DataChainLink }
-				};
-			}
-		}
-	);
+	// If the property is a reference to a model, then we can assume it will be an array of strings referencing the instances.
+	if (GetNodeProp(property, NodeProperties.NODEType) === NodeTypes.Model) {
+		let dataChainTemplate = `
+    function load#{{"key":"modelProperty"}}#PropertiesFrom#{{"key":"model"}}#s($obj: { blur: any, dirty: any, focus: any, focused: any, object: #{{"key":"model"}}# }) {
+      if(!$obj || !$obj.object) {
+          return [];
+      }
 
+      let { #{{"key":"modelPropertyJs","js":true}}# } = $obj.object;
+
+      if(!Array.isArray(#{{"key":"modelPropertyJs","js":true}}#)) {
+        return [];
+      }
+
+      return (#{{"key":"modelPropertyJs","js":true}}# || []).map((id:string)=>{
+          let item = GetItem(Models.#{{"key":"modelProperty"}}#, id);
+          if (!item && id && typeof id === 'string') {
+            fetchModel(Models.#{{"key":"modelProperty"}}#, id);
+          }
+      });
+  }
+
+  `;
+		result.push(
+			() => {
+				let lambdaInsertArgumentValues = {
+					model: { model: model.id },
+					modelProperty: { model: property.id },
+					modelPropertyJs: { model: property.id }
+				};
+				let name = `Load ${GetNodeTitle(property)} Properties From ${GetNodeTitle(model)}`;
+				let found = GetNodeByProperties({
+					[NodeProperties.DataChainPurpose]: name,
+					[NodeProperties.NODEType]: NodeTypes.DataChain
+				});
+				if (found) {
+					temp = found.id;
+					return [];
+				}
+				return [
+					CreateNewNode(
+						{
+							[NodeProperties.UIText]: name,
+							[NodeProperties.NODEType]: NodeTypes.DataChain,
+							[NodeProperties.AutoCalculate]: true,
+							[NodeProperties.AsOutput]: true,
+							[NodeProperties.EntryPoint]: true,
+							[NodeProperties.DataChainPurpose]: name,
+							[NodeProperties.DataChainFunctionType]: DataChainFunctionKeys.Lambda,
+							[NodeProperties.LambdaInsertArguments]: lambdaInsertArgumentValues,
+							[NodeProperties.Lambda]: dataChainTemplate
+						},
+						(res: Node) => {
+							temp = res.id;
+						}
+					),
+					function() {
+						return {
+							operation: ADD_LINK_BETWEEN_NODES,
+							options: {
+								target: property.id,
+								source: temp,
+								properties: { ...LinkProperties.LambdaInsertArguments }
+							}
+						};
+					},
+					function() {
+						return {
+							operation: ADD_LINK_BETWEEN_NODES,
+							options: {
+								target: model.id,
+								source: temp,
+								properties: { ...LinkProperties.LambdaInsertArguments }
+							}
+						};
+					}
+				];
+			},
+			{
+				operation: ADD_LINK_BETWEEN_NODES,
+				options() {
+					return {
+						source: valueExternalNode.id,
+						target: temp,
+						properties: { ...LinkProperties.DataChainLink }
+					};
+				}
+			}
+		);
+	} else {
+		result.push(
+			...CreateModelPropertyGetterDC({
+				model: propertyModel.id,
+				viewPackages,
+				property: property.id,
+				propertyName: `${GetNodeTitle(node)}${GetNodeTitle(property.id)}`,
+				modelName: GetNodeTitle(propertyModel),
+				callback: (context: { entry: any }) => {
+					temp = context.entry;
+				}
+			}),
+			{
+				operation: ADD_LINK_BETWEEN_NODES,
+				options() {
+					return {
+						source: valueExternalNode.id,
+						target: temp,
+						properties: { ...LinkProperties.DataChainLink }
+					};
+				}
+			}
+		);
+	}
+	let selectorModelType: Node = modelType;
+	if (GetNodeProp(property, NodeProperties.NODEType) === NodeTypes.Model) {
+		selectorModelType = model;
+	}
 	const selector = GetNodeByProperties({
 		[NodeProperties.NODEType]: NodeTypes.Selector,
-		[NodeProperties.Model]: modelType.id
+		[NodeProperties.Model]: selectorModelType.id
 	});
 
 	if (selector) {

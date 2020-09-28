@@ -69,6 +69,7 @@ export default function ConnectComponentDidMount(args: {
 	let cycleInstances: any[] = [];
 	methods.forEach((method: string) => {
 		let result: any[] = [];
+		let methodProperties = GetNodeProp(method, NodeProperties.MethodProps);
 		lifeCylcleMethods
 			.filter((x: any) => GetNodeProp(x, NodeProperties.UIText) === ComponentLifeCycleEvents.ComponentDidMount)
 			.map((lifeCylcleMethod: { id: any }) => {
@@ -163,6 +164,47 @@ export default function ConnectComponentDidMount(args: {
 											}
 										};
 									}
+								}
+							]
+						: []),
+					//Returns a LIST and is an instanceType[IS edit]
+					//Assuming these are helper models, that will be used to fill in the form.
+					...(returnsAList && instanceType
+						? [
+								!(methodProperties && (methodProperties.model || methodProperties.model_output))
+									? []
+									: StoreModelArrayStandard({
+											viewPackages,
+											model: methodProperties.model_output || methodProperties.model,
+											modelText: GetNodeTitle(
+												methodProperties.model_output || methodProperties.model
+											),
+											state_key: `${GetNodeTitle(
+												GetNodeProp(screen, NodeProperties.Model)
+											)} ${GetNodeTitle(
+												methodProperties.model_output || methodProperties.model
+											)} State`,
+											callback: (context: { entry: any }) => {
+												storeModelDataChain = context.entry;
+											}
+										}),
+								() => {
+									return [
+										{
+											operation: ADD_LINK_BETWEEN_NODES,
+											options() {
+												return {
+													target: storeModelDataChain,
+													source: cycleInstance ? cycleInstance.id : null,
+													properties: {
+														...LinkProperties.DataChainLink,
+														singleLink: true,
+														nodeTypes: [ NodeTypes.DataChain ]
+													}
+												};
+											}
+										}
+									];
 								}
 							]
 						: []),

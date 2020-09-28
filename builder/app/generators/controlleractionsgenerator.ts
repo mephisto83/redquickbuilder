@@ -206,27 +206,29 @@ import * as Util from "../actions/util";
 import service from './controllerService';
 export const FETCH_CALL = 'FETCH_CALL';
 
-setFetchServiceFunction(function(body: any) {
-  return Promise.resolve().then(() => {
-      let dispatch = GetDispatch();
-      let getState = GetState();
-      return  (Util.simple(
-        service.${GetJSCodeName(fetchService)},
-        { body },
-        {
-          loading: FETCH_CALL
-        },
-        (result: any) => {
-          let dataChain = ${GetCodeName(datachain)};
-          if (dataChain) {
-            return dataChain(result);
-          } else {
-            console.log("missing data chain");
+export default function() {
+  setFetchServiceFunction(function(body: any) {
+    return Promise.resolve().then(() => {
+        let dispatch = GetDispatch();
+        let getState = GetState();
+        return  (Util.simple(
+          service.${GetJSCodeName(fetchService)},
+          { body },
+          {
+            loading: FETCH_CALL
+          },
+          (result: any) => {
+            let dataChain = ${GetCodeName(datachain)};
+            if (dataChain) {
+              return dataChain(result);
+            } else {
+              console.log("missing data chain");
+            }
           }
-        }
-      ))(dispatch, getState);
+        ))(dispatch, getState);
+    });
   });
-});
+}
       `;
 			return {
 				template: service,

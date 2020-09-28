@@ -6,7 +6,8 @@ import {
 	NodeTypes,
 	GetRootGraph,
 	GetNodeTitle,
-	GetMethodsProperties
+	GetMethodsProperties,
+	GetModelCodeProperties
 } from '../actions/uiactions';
 import {
 	LinkType,
@@ -27,6 +28,7 @@ import { bindTemplate, FunctionTemplateKeys } from '../constants/functiontypes';
 import { NodeType } from '../components/titles';
 import NamespaceGenerator from './namespacegenerator';
 import { enumerate } from '../utils/utils';
+import { Node } from '../methods/graph_types';
 
 const RETURN_GET_CLASS = './app/templates/models/returns/returns_class.tpl';
 const RETURN_GET_FUNCTION = './app/templates/models/returns/returns_funcs.tpl';
@@ -63,11 +65,7 @@ export default class ModelReturnGenerator {
 							methodProps[FunctionTemplateKeys.Model] ||
 							methodProps[FunctionTemplateKeys.Agent]
 					);
-					let properties = GraphMethods.getNodesByLinkType(graph, {
-						id: model.id,
-						direction: GraphMethods.SOURCE,
-						type: LinkType.PropertyLink
-					})
+					let properties = GetModelCodeProperties(model.id)
 						.filter((x: any) => x.id !== model.id)
 						.filter(
 							(t: any) =>
@@ -75,7 +73,7 @@ export default class ModelReturnGenerator {
 									? GetNodeProp(filterNode, NodeProperties.FilterPropreties)[t.id]
 									: ''
 						)
-						.map((t) => {
+						.map((t: Node) => {
 							return `           result.${GetNodeProp(t, NodeProperties.CodeName)} = model.${GetNodeProp(
 								t,
 								NodeProperties.CodeName

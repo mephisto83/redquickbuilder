@@ -17,10 +17,13 @@ export default class NodeViewer extends Component<any, any> {
 		if (node) {
 			return Object.entries(node.properties).map((items, index) => {
 				let [ key, value ] = items;
+				if (typeof value === 'object' && value) {
+					value = JSON.stringify(value, null, 4);
+				}
 				return (
 					<tr key={index}>
 						<td>{key}</td>
-						<td>{`${value}`}</td>
+						<td><pre>{`${value}`}</pre></td>
 						<td>{node.propertyVersions ? node.propertyVersions[key] : '-'}</td>
 					</tr>
 				);

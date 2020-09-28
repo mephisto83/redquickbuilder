@@ -102,10 +102,10 @@ export async function CreateComponentSharedAll(progressFunc: any, filter?: any, 
 			}
 
 			CreateComponentModel({
-				model: model.id,
+				model: property.id,
 				viewTypeModelId: viewType.id,
 				viewTypes: [ GetNodeProp(viewType, NodeProperties.ViewType) ],
-				connectedModel: property.id,
+				connectedModel: model.id,
 				isSharedComponent: true,
 				isDefaultComponent: true
 			});
@@ -226,19 +226,6 @@ export function CreateComponentModel(args: any = {}) {
 				agentAccess && !args.isSharedComponent
 					? findLink(graph, { target: agentAccess.id, source: args.agentId })
 					: null;
-
-			// if (!args.isSharedComponent && navigableScreens.length) {
-			// 	let naviScreen = navigableScreens.find((navigableScreen: Node) => {
-			// 		let navAgent = GetNodeProp(navigableScreen, NodeProperties.Agent);
-			// 		let navViewType = GetNodeProp(navigableScreen, NodeProperties.ViewType);
-			// 		let navModel = GetNodeProp(navigableScreen, NodeProperties.Model);
-
-			// 		return model === navModel && navAgent === args.agentId && navViewType === viewType;
-			// 	});
-			// 	if (!naviScreen) {
-			// 		return;
-			// 	}
-			// }
 
 			if (args.isSharedComponent || (agentCreds && GetLinkProperty(agentCreds, viewType))) {
 				operations.push({

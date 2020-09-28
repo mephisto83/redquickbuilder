@@ -1352,6 +1352,25 @@ function WriteDescribedApiProperties(node: GraphMethods.Node | null, options: an
 		})
 		.filter((x: any) => x);
 
+	if (options.listItem && result.indexOf('value={value}') === -1) {
+		result.push('value={value}');
+	}
+	if (
+		options.listItem &&
+		GetNodeProp(node, NodeProperties.SharedComponent) &&
+		result.indexOf('viewModel={this.state.viewModel}') !== -1
+	) {
+		let tempIndex = result.indexOf('viewModel={this.state.viewModel}');
+		result.splice(tempIndex, 1);
+	}
+	if (
+		options.listItem &&
+		GetNodeProp(node, NodeProperties.SharedComponent) &&
+		!result.find((v: string) => v.indexOf('selected=') !== -1)
+	) {
+		result.push('selected={((this.props.value||[]).indexOf(value) !== -1)}');
+	}
+
 	const res = componentEventHandlers
 		.unique((x: GraphMethods.Node) => GetJSCodeName(x))
 		.map((componentEventHandler: { id: any }) => {

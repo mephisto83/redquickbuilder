@@ -27,7 +27,8 @@ import {
 	GetNodeById,
 	GetCodeName,
 	GetNodeByProperties,
-	GetLink
+	GetLink,
+	HasLinkProperty
 } from '../actions/uiactions';
 import { uuidv4 } from '../utils/array';
 import {
@@ -2508,11 +2509,18 @@ export function GetLinksForNode(graph: any, options: any): any {
 
 export function GetNodesLinkedTo(
 	graph: any,
-	options: { id?: any; direction?: any; link?: any; componentType?: any; properties?: any }
+	options: {
+		id?: any;
+		direction?: any;
+		link?: any;
+		componentType?: any;
+		properties?: any;
+		linkProperties?: string[] | { [key: string]: any };
+	}
 ): any {
 	if (options) {
 		graph = graph || GetCurrentGraph();
-		const { id, direction, link, componentType, properties } = options;
+		const { id, direction, link, componentType, properties, linkProperties } = options;
 		if (graph && graph.nodeConnections && id) {
 			const nodeLinks = graph.nodeConnections[id];
 			if (nodeLinks) {
@@ -2526,6 +2534,14 @@ export function GetNodesLinkedTo(
 							if (properties) {
 								for (const prop in properties) {
 									if (properties[prop] !== GetLinkProperty(graph.linkLib[_id], prop)) {
+										return null;
+									}
+								}
+							}
+							if (linkProperties) {
+								if (Array.isArray(linkProperties)) {
+									let array: string[] = linkProperties;
+									if (array.find((x: string) => !HasLinkProperty(graph.linkLib[_id], x))) {
 										return null;
 									}
 								}
@@ -3204,7 +3220,7 @@ export function updateNodeProperty(graph: any, options: any) {
 			});
 
 		if (NodePropertiesDirtyChain[prop]) {
-      const temps = NodePropertiesDirtyChain[prop];
+			const temps = NodePropertiesDirtyChain[prop];
 			temps.forEach((temp: any) => {
 				if (!graph.nodeLib[id].dirty[temp.chainProp]) {
 					additionalChange[temp.chainProp] = temp.chainFunc(value, graph.nodeLib[id]);

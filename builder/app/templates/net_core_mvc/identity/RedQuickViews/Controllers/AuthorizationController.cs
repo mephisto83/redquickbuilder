@@ -69,7 +69,7 @@ namespace {{namespace}}.Web.Controllers
         }
 
         [AllowAnonymous]
-        [Route("register")]
+        [Route("register/user")]
         [HttpPost]
         public override Task<bool> Register(RedRegisterViewModel model, string returnUrl = null)
         {

@@ -5,8 +5,10 @@ import { ViewModelKeys } from './viewmodel_keys';
 import * as DC from './actions/data-chain';
 import App from './containers/App';
 import { setParameters } from './actions/redutils';
-import * as fetchservice from './util/fetchService';
+import fetchservice from './util/fetchService';
 {{route_imports}}
+
+fetchservice();
 
 export default () => (
   <App>
