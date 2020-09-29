@@ -53,6 +53,9 @@ export function updateModels(state: any, action: any) {
 	let newstate = { ...state };
 	newstate[type] = newstate[type] || {};
 	newstate[type][model] = newstate[type][model] || {};
+	if (!Array.isArray(value)) {
+		value = [ value ];
+	}
 	(value || []).map((val: { id: string | number; version: number }) => {
 		if (
 			newstate[type][model][val.id] &&

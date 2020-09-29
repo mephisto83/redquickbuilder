@@ -1452,7 +1452,8 @@ export enum RouteSourceType {
 	Model = 'model', // The value should be retrieved from the model for the page
 	Agent = 'agent', // The value should be retrieved from the agent for the page
 	Body = 'body',
-	UrlParameter = 'urlParameter' // The value should be retrieved from the url parameters for the page
+  UrlParameter = 'urlParameter', // The value should be retrieved from the url parameters for the page
+  Item = 'item' // In a list, each item has values that can be used.
 }
 
 export interface MethodDescription {

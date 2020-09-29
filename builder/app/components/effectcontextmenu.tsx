@@ -169,6 +169,48 @@ class EffectContextMenu extends Component<any, any> {
 													/>
 												);
 											}),
+										mode.viewType === ViewTypes.GetAll ? (
+											<TreeViewMenu
+												icon={value !== model ? 'fa fa-square-o' : 'fa fa-square'}
+												title={`${UIA.GetNodeTitle(model)}(item)`}
+												active
+												key={`url-item-k-modle`}
+												open={this.state[model]}
+												toggle={() => {
+													this.setState({ [model]: !this.state[model] });
+												}}
+											>
+												{modelPropertyOptions.map((modelPropertyOption: Node) => {
+													let value =
+														effectItem.source && effectItem.source[urlParameter]
+															? effectItem.source[urlParameter].model
+															: null;
+													return (
+														<TreeViewMenu
+															icon={
+																value !== modelPropertyOption.id ? (
+																	'fa fa-square-o'
+																) : (
+																	'fa fa-square'
+																)
+															}
+															title={UIA.GetNodeTitle(modelPropertyOption)}
+															onClick={() => {
+																effectItem.source = effectItem.source || {};
+																effectItem.source[urlParameter] = {
+																	model,
+																	property: modelPropertyOption.id,
+																	type: RouteSourceType.Item
+																};
+																callback(effect);
+																this.setState({ turn: UIA.GUID() });
+															}}
+															key={`url-gf-k-${modelPropertyOption.id}`}
+														/>
+													);
+												})}
+											</TreeViewMenu>
+										) : null,
 										<TreeViewMenu
 											icon={value !== model ? 'fa fa-square-o' : 'fa fa-square'}
 											title={`${UIA.GetNodeTitle(model)}(model)`}
@@ -459,9 +501,9 @@ class EffectContextMenu extends Component<any, any> {
 									methodDescription={effectItem.methodDescription}
 								/>
 								<AfterEffectsComponent
-                  agent={agent}
-                  viewType={mode.viewType}
-                  model={model}
+									agent={agent}
+									viewType={mode.viewType}
+									model={model}
 									mountingItem={effectItem}
 									onContext={(msg: { largerPlease: boolean }) => {
 										if (msg) this.setState({ aLarger: msg.largerPlease });

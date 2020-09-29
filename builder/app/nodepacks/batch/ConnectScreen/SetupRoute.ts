@@ -179,6 +179,7 @@ function NavigateTo(
 						case RouteSourceType.Model:
 						case RouteSourceType.Agent:
 						case RouteSourceType.UrlParameter:
+						case RouteSourceType.Item:
 						case RouteSourceType.Body:
 							AttachEventArguments(button, sourceKey, temp, screen);
 							break;

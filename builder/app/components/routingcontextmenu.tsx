@@ -144,6 +144,54 @@ class ContextMenu extends Component<any, any> {
 												/>
 											);
 										}),
+									mode.viewType === ViewTypes.GetAll ? (
+										<TreeViewMenu
+											icon={value !== sourceModel ? 'fa fa-square-o' : 'fa fa-square'}
+											title={`${UIA.GetNodeTitle(sourceModel)}(item)`}
+											active
+											key={`url-parma-k-item`}
+											open={this.state[`${sourceModel}-item`]}
+											toggle={() => {
+												this.setState({
+													[`${sourceModel}-item`]: !this.state[`${sourceModel}-item`]
+												});
+											}}
+										>
+											{modelPropertyOptions.map((modelPropertyOption: Node) => {
+												// let value = route.source ? route.source.property : null;
+												let value = UIA.ensureRouteSource(route, urlParameter, 'property');
+												return (
+													<TreeViewMenu
+														icon={
+															value !== modelPropertyOption.id ? (
+																'fa fa-square-o'
+															) : (
+																'fa fa-square'
+															)
+														}
+														title={UIA.GetNodeTitle(modelPropertyOption)}
+														onClick={() => {
+															// route.source = {
+															// 	model: sourceModel,
+															// 	property: modelPropertyOption.id,
+															// 	type: RouteSourceType.Model
+															// };
+															UIA.setRouteSource(
+																route,
+																urlParameter,
+																sourceModel,
+																RouteSourceType.Item,
+																modelPropertyOption.id
+															);
+															callback(routing);
+															this.setState({ turn: UIA.GUID() });
+														}}
+														key={`url-fasd-k-${modelPropertyOption.id}`}
+													/>
+												);
+											})}
+										</TreeViewMenu>
+									) : null,
 									<TreeViewMenu
 										icon={value !== sourceModel ? 'fa fa-square-o' : 'fa fa-square'}
 										title={`${UIA.GetNodeTitle(sourceModel)}(model)`}
@@ -234,7 +282,7 @@ class ContextMenu extends Component<any, any> {
 											);
 										})}
 									</TreeViewMenu>
-								];
+								].filter((v) => v);
 								return (
 									<TreeViewMenu
 										key={routeKey}
@@ -540,7 +588,7 @@ class ContextMenu extends Component<any, any> {
 										<RoutingInput
 											agent={menuMode.agent}
 											viewType={menuMode.viewType}
-                      routing={menuMode.routing}
+											routing={menuMode.routing}
 											model={menuMode.model}
 											onNewRoutes={(newRoutes: RouteDescription[]) => {
 												let routing: Routing = menuMode.routing;

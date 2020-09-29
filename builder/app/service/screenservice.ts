@@ -1879,13 +1879,21 @@ function createInternalApiArgumentsCode(
 						case RouteSourceType.Model:
 							methodParamNames.push(paramName);
 							return `${paramName}: (() => {
-              let model = GetC(this.props.state, SITE, Models.${GetCodeName(routeSource.model)});
-              if(model) {
-                return model.${GetJSCodeName(routeSource.property)};
-              }
-              return null;
-            })()`;
-							break;
+                let model = GetC(this.props.state, SITE, Models.${GetCodeName(routeSource.model)});
+                if(model) {
+                  return model.${GetJSCodeName(routeSource.property)};
+                }
+                return null;
+              })()`;
+						case RouteSourceType.Item:
+							methodParamNames.push(paramName);
+							return `${paramName}: (() => {
+                let model = GetItem(Models.${GetCodeName(routeSource.model)}, this.state.value);
+                if(model) {
+                  return model.${GetJSCodeName(routeSource.property)};
+                }
+                return null;
+              })()`;
 						case RouteSourceType.UrlParameter:
 							methodParamNames.push(paramName);
 							return `${paramName}: this.state.${`${routeSource.model}`.toJavascriptName()}`;
