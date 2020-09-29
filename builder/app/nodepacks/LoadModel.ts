@@ -267,13 +267,13 @@ export default function LoadModel(args: any = {}) {
 		},
 
 		function(_graph: any) {
-			let apiNodes = GetComponentExternalApiNodes(context.screen)
+			let temp = GetComponentExternalApiNodes(context.screen)
 				.filter((x: Node) => GetNodeProp(x, NodeProperties.IsUrlParameter))
 				.map((x: Node) => {
 					return GetNodeTitle(x);
-				})
-				.filter((x: string) => x !== 'value')
-				.join(', ');
+				});
+			let hasModel = !!temp.find((v) => v === 'model');
+			let apiNodes = temp.filter((x: string) => x !== 'value').join(', ');
 			return [
 				{
 					operation: 'CHANGE_NODE_PROPERTY',
@@ -285,9 +285,11 @@ export default function LoadModel(args: any = {}) {
 							(apiNodes ? `${apiNodes},` : '') +
 							' value, viewModel ' +
 							(context.screen ? `= ViewModelKeys.${GetCodeName(context.screen)}` : '') +
-							' } = params;\n   let dispatch = GetDispatch();\n   let getState = GetState();\n   let currentItem = GetK(getState(), UI_MODELS, ' +
+							' } = params;\n   let dispatch = GetDispatch();\n   let getState = GetState();\n   let currentItem = GetItem(' +
 							args.model_item +
-							', value);\n   if(currentItem) {\n\tdispatch(clearScreenInstance(viewModel, currentItem?currentItem.id:null, currentItem)); \n\tdispatch(updateScreenInstanceObject(viewModel,currentItem?currentItem.id:null, { ...currentItem }));\n   }\n\n   return params;\n}'
+							`, ${hasModel
+								? 'model ||'
+								: ''} value);\n   if(currentItem) {\n\tdispatch(clearScreenInstance(viewModel, currentItem?currentItem.id:null, currentItem)); \n\tdispatch(updateScreenInstanceObject(viewModel,currentItem?currentItem.id:null, { ...currentItem }));\n   }\n\n   return params;\n}`
 					}
 				}
 			];

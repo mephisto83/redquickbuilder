@@ -23,7 +23,8 @@ import {
 	SOURCE,
 	Paused,
 	SetPause,
-	GetCellProperties
+	GetCellProperties,
+	GetNodeLinkedTo
 } from '../../../methods/graph_methods';
 import { LinkType, NodeProperties, NodeTypes, LinkProperties } from '../../../constants/nodetypes';
 import SetupApiBetweenComponent from '../../../nodepacks/SetupApiBetweenComponents';
@@ -58,6 +59,22 @@ export function AddButtonToSubComponent(
 		}).filter((component: Node) => {
 			return GetNodeProp(component, NodeProperties.Layout);
 		});
+		if (options && options.onItemSelection) {
+			let componentWithListItem = components.find((v) =>
+				GetNodeLinkedTo(graph, {
+					id: v.id,
+					link: LinkType.ListItem
+				})
+			);
+			if (componentWithListItem) {
+				components = [
+					GetNodeLinkedTo(graph, {
+						id: componentWithListItem.id,
+						link: LinkType.ListItem
+					})
+				];
+			}
+		}
 	}
 
 	let button: string = '';

@@ -30,7 +30,7 @@ import {
 	DASHBOARD_SCREENEFFECT_CONTEXT_MENU,
 	GUID,
 	GetNodeById,
-  removeNodeById
+	removeNodeById
 } from '../actions/uiactions';
 import Box from './box';
 import FormControl from './formcontrol';
@@ -2442,6 +2442,7 @@ function validateRouteDescription(routing: RouteDescription, messages: string[])
 				switch (routing.source[key].type) {
 					case RouteSourceType.Agent:
 					case RouteSourceType.Model:
+					case RouteSourceType.Item:
 						if (!routing.isDashboard && !routing.source[key].model) {
 							messages.push(`Missing ${routing.source[key].type}`);
 						}

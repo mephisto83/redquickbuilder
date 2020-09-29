@@ -1485,13 +1485,12 @@ function getEventArgumentNames(calculateEventArguments: _.Node[]): string[] {
 		switch (GetNodeProp(node, NodeProperties.EventArgumentType)) {
 			case NodeConstants.EventArgumentTypes.RouteSource:
 				let routeSource: RouteSource = GetNodeProp(node, NodeProperties.RouteSource);
-				let screen = GetNodeProp(node, NodeProperties.Screen);
-				let viewType = GetNodeProp(screen, NodeProperties.ViewType);
 				let paramName = GetNodeProp(node, NodeProperties.ParameterName).toJavascriptName();
 				switch (routeSource.type) {
 					case RouteSourceType.Agent:
 					case RouteSourceType.Model:
 					case RouteSourceType.UrlParameter:
+					case RouteSourceType.Item:
 					case RouteSourceType.Body:
 						methodParamNames.push(paramName);
 						break;
