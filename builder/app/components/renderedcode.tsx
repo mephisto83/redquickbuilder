@@ -37,9 +37,9 @@ export default class RenderedCode extends Component<any, any> {
 		const currentNode = UIA.Node(state, UIA.Visual(state, SELECTED_NODE));
 		let value: string = this.props.value || '';
 		return (
-			<Box title={'Editor'}>
+			<Box stretch title={'Editor'}>
 				<MonacoEditor
-					height="700"
+					height="100%"
 					width={'100%'}
 					editorWillMount={(editor) => {
 						monaco.editor.setTheme('vs-dark');

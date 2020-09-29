@@ -14,7 +14,7 @@ export default class TopViewer extends Component<any, any> {
 		var style = {
 			position: 'relative',
 			width: '100%',
-			height: '100vh',
+			height: 'calc(100vh - 50px)',
 			...this.props.style || {}
 		};
 		let active = this.active();
@@ -25,7 +25,7 @@ export default class TopViewer extends Component<any, any> {
 					style={{
 						position: 'absolute',
 						width: '100%',
-						height: 'calc(100vh - 200px)',
+						height: 'calc(100vh - 50px)',
 						transition: 'all 1s',
 						pointerEvents: active ? 'all' : 'none',
 						top: active ? 0 : '-2000px',

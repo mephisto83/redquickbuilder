@@ -33,6 +33,7 @@ import Typeahead from './typeahead';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import { GetJSONReferenceInserts, ReferenceInsert, ReferenceInsertType } from './lambda/BuildLambda';
+import { viewCode } from '../actions/remoteActions';
 
 class DataChainActvityMenu extends Component<any, any> {
 	getLambdaVariableTree() {
@@ -444,6 +445,9 @@ class DataChainActvityMenu extends Component<any, any> {
 									this.props.setVisual(UIA.CODE_EDITOR_INIT_VALUE, UIA.GUID());
 
 									this.props.setVisual(MAIN_CONTENT, CODE_EDITOR);
+									if (currentNode && currentNode.id) {
+										viewCode(UIA.GenerateCSChainFunction(currentNode.id));
+									}
 								}}
 								icon="fa  fa-cloud-upload"
 							/>

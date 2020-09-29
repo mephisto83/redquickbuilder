@@ -20,6 +20,10 @@ export const HandlerEvents = {
 		message: 'code-window-command',
 		reply: 'code-window-command-reply'
 	},
+	flowCodeWindowCommand: {
+		message: 'flow-code-window-command',
+		reply: 'flow-code-window-command-reply'
+	},
 	electron: {
 		message: 'electron-project',
 		reply: 'electron-project-reply'

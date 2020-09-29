@@ -31,10 +31,13 @@ export default class Box extends Component<any, any> {
 	render() {
 		const style: any = {};
 		const styleAll: any = {};
-		const maxStyle = {};
+		let maxStyle: any = {};
 		if (this.props.maxheight) {
 			style.maxHeight = `${this.props.maxheight}px`;
 			style.overflowY = 'auto';
+		}
+		if (this.props.stretch) {
+			maxStyle = { height: 'calc(100vh - 50px)' }
 		}
 
 		if (this.backgroundColor()) {

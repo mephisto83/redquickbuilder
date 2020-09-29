@@ -105,6 +105,7 @@ export const AddComponentDidMount = 'Add Event ComponentDidMount';
 export const SelectorType = 'Selector Type';
 export const AuthorizedDashboard = 'Authorized Dashboard';
 export const GraphPropertiesMenu = 'Graph Properties';
+export const FlowCode = 'Flow Code';
 export const Execute = 'Ok';
 export const Cancel = 'Cancel';
 export const CopyToAll = 'Copy To All';

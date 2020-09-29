@@ -196,7 +196,7 @@ export default class ModelGenerator {
 		//   type: LinkType.LogicalChildren,
 		//   direction: GraphMethods.TARGET
 		// }).filter(x => x.id !== node.id);
-		connectedProperties = [ ...connectedProperties, ...logicalParents ];
+		connectedProperties = [...connectedProperties, ...logicalParents];
 		const propertyTemplate = fs_readFileSync(MODEL_PROPERTY_TEMPLATE, 'utf8');
 		const attributeTemplate = fs_readFileSync(MODEL_ATTRIBUTE_TEMPLATE, 'utf8');
 		const staticFunctionTemplate = fs_readFileSync(MODEL_STATIC_TEMPLATES, 'utf8');
@@ -322,7 +322,7 @@ export default class ModelGenerator {
 									}).map((vnodeItem) => {
 										validations.push(
 											`ValidationRules.${ReverseRules[
-												GetNodeProp(vnodeItem, NodeProperties.UIValidationType)
+											GetNodeProp(vnodeItem, NodeProperties.UIValidationType)
 											]}`
 										);
 									});
@@ -342,21 +342,21 @@ export default class ModelGenerator {
 							const options2 =
 								optionsList && optionsList.length
 									? bindTemplate(`Options = new string[] { {{options_list}} },`, {
-											options_list: optionsList.map((t: any) => `${t}`).join(', ')
-										})
+										options_list: optionsList.map((t: any) => `${t}`).join(', ')
+									})
 									: '';
 
 							const validationRules =
 								validations && validations.length
 									? bindTemplate(`ValidationRules = new string[] { {{validation_list}} },`, {
-											validation_list: validations.map((t) => `${t}`).join(', ')
-										})
+										validation_list: validations.map((t) => `${t}`).join(', ')
+									})
 									: '';
 
 							const choiceType = choiceName
 								? bindTemplate('ChoiceType = {{choice_type}}.Name,', {
-										choice_type: choiceName
-									})
+									choice_type: choiceName
+								})
 								: '';
 
 							const attributeSwapDictionary = {
@@ -412,13 +412,13 @@ export default class ModelGenerator {
 						return `if(a.${GetCodeName(v)} == null) {
               model.${GetCodeName(v)} = b.${GetCodeName(v)};
             }`;
-          }
-          switch(propType){
-            case NodePropertyTypes.STRING:
-              return `if(string.IsNullOrEmpty(a.${GetCodeName(v)})){
+					}
+					switch (propType) {
+						case NodePropertyTypes.STRING:
+							return `if(string.IsNullOrEmpty(a.${GetCodeName(v)})){
               model.${GetCodeName(v)} = b.${GetCodeName(v)};
             }`;
-          }
+					}
 					return `if(a.${GetCodeName(v)} == null || a.${GetCodeName(v)}.Count == 0) {
             model.${GetCodeName(v)} = b.${GetCodeName(v)};
           }`;
@@ -482,7 +482,7 @@ export default class ModelGenerator {
 			name: GetNodeProp(node, NodeProperties.CodeName),
 			template: NamespaceGenerator.Generate({
 				template: modelTemplate,
-				usings: [ ...usings, `RedQuickCore.Identity`, ...STANDARD_CONTROLLER_USING ],
+				usings: [...usings, `RedQuickCore.Identity`, ...STANDARD_CONTROLLER_USING],
 				namespace,
 				space: NameSpace.Model
 			})
@@ -560,7 +560,7 @@ ${items}
 		templateSwapDictionary.attributes = '';
 		let connectedProperties = GetModelPropertyChildren(node.id); //Get all properties including link to other models
 		const logicalParents: any[] = []; // No more having parents referencing back.
-		connectedProperties = [ ...connectedProperties, ...logicalParents ];
+		connectedProperties = [...connectedProperties, ...logicalParents];
 		const propertyTemplate = fs_readFileSync(MODEL_PROPERTY_TEMPLATE_TS, 'utf8');
 		const staticFunctionTemplate = fs_readFileSync(MODEL_STATIC_TEMPLATES, 'utf8');
 
@@ -685,13 +685,17 @@ ${items}
 	}
 }
 
-export function fs_readFileSync(pa:string, typ:string){
-  try{
-    return fs.readFileSync(pa, typ);
-  }
-  catch{
-    if(pa.indexOf('./app') !== -1){
-      return fs.readFileSync('./'+pa.substring('./app'.length));
-    }
-  }
+export function fs_readFileSync(pa: string, typ: string) {
+	try {
+		return fs.readFileSync(pa, typ);
+	}
+	catch {
+		if (pa.indexOf('./app') !== -1) {
+			try {
+				return fs.readFileSync('./' + pa.substring('./app'.length));
+			} catch (e) {
+				return '';
+			}
+		}
+	}
 }

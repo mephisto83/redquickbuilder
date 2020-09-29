@@ -163,7 +163,7 @@ import { Graph, Node } from '../methods/graph_types';
 import DashboardScreenNavigation from '../nodepacks/DashboardScreenNavigation';
 import CheckBoxProperty from './checkboxproperty';
 import AddShouldShowDataChain from '../nodepacks/screens/menus/AddShouldShowDataChain';
-import { startSequence, runSequence } from '../actions/remoteActions';
+import { startSequence, runSequence, viewFlowCode } from '../actions/remoteActions';
 
 const { clipboard } = require('electron');
 
@@ -205,7 +205,7 @@ class Dashboard extends Component<any, any> {
 						onClick: () => {
 							this.props.setVisual(CONNECTING_NODE, {
 								...LinkProperties.MaestroLink,
-								nodeTypes: [ NodeTypes.Maestro ]
+								nodeTypes: [NodeTypes.Maestro]
 							});
 						},
 						icon: 'fa  fa-music',
@@ -217,7 +217,7 @@ class Dashboard extends Component<any, any> {
 						onClick: () => {
 							this.props.setVisual(CONNECTING_NODE, {
 								...LinkProperties.FunctionLink,
-								nodeTypes: [ NodeTypes.Method ]
+								nodeTypes: [NodeTypes.Method]
 							});
 						},
 						icon: 'fa  fa-music',
@@ -273,7 +273,7 @@ class Dashboard extends Component<any, any> {
 							onClick: () => {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.AgentAccess,
-									nodeTypes: [ NodeTypes.Model ],
+									nodeTypes: [NodeTypes.Model],
 									properties: {
 										[NodeProperties.IsAgent]: true
 									}
@@ -286,7 +286,7 @@ class Dashboard extends Component<any, any> {
 							onClick: () => {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.ModelAccess,
-									nodeTypes: [ NodeTypes.Model ]
+									nodeTypes: [NodeTypes.Model]
 								});
 							},
 							icon: 'fa  fa-object-ungroup',
@@ -300,7 +300,7 @@ class Dashboard extends Component<any, any> {
 							onClick: () => {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.ClaimServiceAuthorizationMethod,
-									nodeTypes: [ NodeTypes.Method ]
+									nodeTypes: [NodeTypes.Method]
 								});
 							},
 							icon: 'fa fa-gears',
@@ -310,7 +310,7 @@ class Dashboard extends Component<any, any> {
 							onClick: () => {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.ClaimServiceUpdateUserMethod,
-									nodeTypes: [ NodeTypes.Method ]
+									nodeTypes: [NodeTypes.Method]
 								});
 							},
 							icon: 'fa fa-truck',
@@ -336,7 +336,7 @@ class Dashboard extends Component<any, any> {
 						onClick: () => {
 							this.props.setVisual(CONNECTING_NODE, {
 								...LinkProperties.DataChainLink,
-								nodeTypes: [ NodeTypes.DataChain ]
+								nodeTypes: [NodeTypes.DataChain]
 							});
 						},
 						icon: 'fa fa-chain',
@@ -365,7 +365,7 @@ class Dashboard extends Component<any, any> {
 							onClick: () => {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.Style,
-									nodeTypes: [ NodeTypes.Style ]
+									nodeTypes: [NodeTypes.Style]
 								});
 							},
 							icon: 'fa fa-css3',
@@ -397,7 +397,7 @@ class Dashboard extends Component<any, any> {
 							this.props.setVisual(CONNECTING_NODE, {
 								...LinkProperties.ComponentApiConnection,
 								singleLink: true,
-								nodeTypes: [ NodeTypes.DataChain ]
+								nodeTypes: [NodeTypes.DataChain]
 							});
 						},
 						icon: 'fa  fa-contao',
@@ -411,7 +411,7 @@ class Dashboard extends Component<any, any> {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.Style,
 									singleLink: false,
-									nodeTypes: [ NodeTypes.Style ]
+									nodeTypes: [NodeTypes.Style]
 								});
 							},
 							icon: 'fa fa-css3',
@@ -422,7 +422,7 @@ class Dashboard extends Component<any, any> {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.DataChainStyleLink,
 									singleLink: true,
-									nodeTypes: [ NodeTypes.DataChain ]
+									nodeTypes: [NodeTypes.DataChain]
 								});
 							},
 							icon: 'fa fa-chain',
@@ -433,7 +433,7 @@ class Dashboard extends Component<any, any> {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.StyleArgument,
 									singleLink: false,
-									nodeTypes: [ NodeTypes.ComponentApi, NodeTypes.ComponentExternalApi ]
+									nodeTypes: [NodeTypes.ComponentApi, NodeTypes.ComponentExternalApi]
 								});
 							},
 							icon: 'fa fa-th-large',
@@ -446,7 +446,7 @@ class Dashboard extends Component<any, any> {
 							onClick: () => {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.Lists,
-									nodeTypes: [ NodeTypes.Screen ]
+									nodeTypes: [NodeTypes.Screen]
 								});
 							},
 							icon: 'fa  fa-list',
@@ -457,7 +457,7 @@ class Dashboard extends Component<any, any> {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.Lists,
 									allOfType: true,
-									nodeTypes: [ NodeTypes.Screen ]
+									nodeTypes: [NodeTypes.Screen]
 								});
 							},
 							icon: 'fa fa-list',
@@ -470,7 +470,7 @@ class Dashboard extends Component<any, any> {
 							onClick: () => {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.FetchService,
-									nodeTypes: [ NodeTypes.Method ]
+									nodeTypes: [NodeTypes.Method]
 								});
 							},
 							icon: 'fa fa-bicycle',
@@ -481,7 +481,7 @@ class Dashboard extends Component<any, any> {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.FetchServiceOuput,
 									singleLink: true,
-									nodeTypes: [ NodeTypes.Model ]
+									nodeTypes: [NodeTypes.Model]
 								});
 							},
 							icon: 'fa fa-plug',
@@ -492,7 +492,7 @@ class Dashboard extends Component<any, any> {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.FetchSserviceAgent,
 									singleLink: true,
-									nodeTypes: [ NodeTypes.Model ],
+									nodeTypes: [NodeTypes.Model],
 									properties: {
 										[NodeProperties.IsAgent]: true
 									}
@@ -506,7 +506,7 @@ class Dashboard extends Component<any, any> {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.DataChainLink,
 									singleLink: true,
-									nodeTypes: [ NodeTypes.DataChain ]
+									nodeTypes: [NodeTypes.DataChain]
 								});
 							},
 							icon: 'fa fa-share-alt',
@@ -521,7 +521,7 @@ class Dashboard extends Component<any, any> {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.DataChainLink,
 									singleLink: true,
-									nodeTypes: [ NodeTypes.DataChain ]
+									nodeTypes: [NodeTypes.DataChain]
 								});
 							},
 							icon: 'fa fa-share-alt',
@@ -531,7 +531,7 @@ class Dashboard extends Component<any, any> {
 							onClick: () => {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.ComponentExternalConnection,
-									nodeTypes: [ NodeTypes.ComponentApi ]
+									nodeTypes: [NodeTypes.ComponentApi]
 								});
 							},
 							icon: 'fa fa-external-link-square',
@@ -542,7 +542,7 @@ class Dashboard extends Component<any, any> {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.ComponentInternalConnection,
 									singleLink: true,
-									nodeTypes: [ NodeTypes.ComponentApi ]
+									nodeTypes: [NodeTypes.ComponentApi]
 								});
 							},
 							icon: 'fa fa-search-plus',
@@ -553,7 +553,7 @@ class Dashboard extends Component<any, any> {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.SelectorLink,
 									singleLink: true,
-									nodeTypes: [ NodeTypes.Selector ]
+									nodeTypes: [NodeTypes.Selector]
 								});
 							},
 							icon: 'fa fa-reply',
@@ -564,7 +564,7 @@ class Dashboard extends Component<any, any> {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.TitleServiceLink,
 									singleLink: true,
-									nodeTypes: [ NodeTypes.TitleService ]
+									nodeTypes: [NodeTypes.TitleService]
 								});
 							},
 							icon: 'fa  fa-font',
@@ -583,7 +583,7 @@ class Dashboard extends Component<any, any> {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.QueryLink,
 									singleLink: true,
-									nodeTypes: [ NodeTypes.MethodApiParameters ]
+									nodeTypes: [NodeTypes.MethodApiParameters]
 								});
 							},
 							icon: 'fa fa-question',
@@ -598,7 +598,7 @@ class Dashboard extends Component<any, any> {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.DataChainLink,
 									singleLink: true,
-									nodeTypes: [ NodeTypes.DataChain ]
+									nodeTypes: [NodeTypes.DataChain]
 								});
 							},
 							icon: 'fa fa-share-alt',
@@ -609,7 +609,7 @@ class Dashboard extends Component<any, any> {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.ComponentInternalConnection,
 									singleLink: true,
-									nodeTypes: [ NodeTypes.ComponentExternalApi ]
+									nodeTypes: [NodeTypes.ComponentExternalApi]
 								});
 							},
 							icon: 'fa fa-search-plus',
@@ -620,7 +620,7 @@ class Dashboard extends Component<any, any> {
 								this.props.setVisual(CONNECTING_NODE, {
 									...LinkProperties.SelectorLink,
 									singleLink: true,
-									nodeTypes: [ NodeTypes.Selector ]
+									nodeTypes: [NodeTypes.Selector]
 								});
 							},
 							icon: 'fa fa-reply',
@@ -825,7 +825,7 @@ class Dashboard extends Component<any, any> {
 					this.props.setVisual(CONNECTING_NODE, {
 						...LinkProperties.ComponentApi,
 						singleLink: true,
-						nodeTypes: [ NodeTypes.ComponentApi ]
+						nodeTypes: [NodeTypes.ComponentApi]
 					});
 				},
 				icon: 'fa fa-genderless',
@@ -922,7 +922,7 @@ class Dashboard extends Component<any, any> {
 					this.props.setVisual(CONNECTING_NODE, {
 						...LinkProperties.ComponentApi,
 						singleLink: true,
-						nodeTypes: [ NodeTypes.ComponentApi ]
+						nodeTypes: [NodeTypes.ComponentApi]
 					});
 				},
 				icon: 'fa fa-genderless',
@@ -933,7 +933,7 @@ class Dashboard extends Component<any, any> {
 					this.props.setVisual(CONNECTING_NODE, {
 						...LinkProperties.DataChainLink,
 						singleLink: true,
-						nodeTypes: [ NodeTypes.DataChain ]
+						nodeTypes: [NodeTypes.DataChain]
 					});
 				},
 				icon: 'fa fa-chain',
@@ -944,7 +944,7 @@ class Dashboard extends Component<any, any> {
 					this.props.setVisual(CONNECTING_NODE, {
 						...LinkProperties.PreDataChainLink,
 						singleLink: true,
-						nodeTypes: [ NodeTypes.DataChain ]
+						nodeTypes: [NodeTypes.DataChain]
 					});
 				},
 				icon: 'fa fa-chain',
@@ -955,7 +955,7 @@ class Dashboard extends Component<any, any> {
 					this.props.setVisual(CONNECTING_NODE, {
 						...LinkProperties.CallDataChainLink,
 						singleLink: true,
-						nodeTypes: [ NodeTypes.DataChain ]
+						nodeTypes: [NodeTypes.DataChain]
 					});
 				},
 				icon: 'fa fa-chain',
@@ -993,7 +993,7 @@ class Dashboard extends Component<any, any> {
 					this.props.setVisual(CONNECTING_NODE, {
 						...LinkProperties.EventHandler,
 						singleLink: true,
-						nodeTypes: [ NodeTypes.EventHandler ]
+						nodeTypes: [NodeTypes.EventHandler]
 					});
 				},
 				icon: 'fa fa-vimeo',
@@ -1004,7 +1004,7 @@ class Dashboard extends Component<any, any> {
 					this.props.setVisual(CONNECTING_NODE, {
 						...LinkProperties.DataChainLink,
 						singleLink: true,
-						nodeTypes: [ NodeTypes.DataChain ]
+						nodeTypes: [NodeTypes.DataChain]
 					});
 				},
 				icon: 'fa fa-chain',
@@ -1015,7 +1015,7 @@ class Dashboard extends Component<any, any> {
 					this.props.setVisual(CONNECTING_NODE, {
 						...LinkProperties.ComponentApi,
 						singleLink: true,
-						nodeTypes: [ NodeTypes.ComponentApi ]
+						nodeTypes: [NodeTypes.ComponentApi]
 					});
 				},
 				icon: 'fa fa-genderless',
@@ -1117,7 +1117,7 @@ class Dashboard extends Component<any, any> {
 					this.props.setVisual(CONNECTING_NODE, {
 						...LinkProperties.Style,
 						singleLink: false,
-						nodeTypes: [ NodeTypes.Style ]
+						nodeTypes: [NodeTypes.Style]
 					});
 				},
 				icon: 'fa fa-css3',
@@ -1128,7 +1128,7 @@ class Dashboard extends Component<any, any> {
 					this.props.setVisual(CONNECTING_NODE, {
 						...LinkProperties.DataChainLink,
 						singleLink: false,
-						nodeTypes: [ NodeTypes.DataChain ]
+						nodeTypes: [NodeTypes.DataChain]
 					});
 				},
 				icon: 'fa fa-chain',
@@ -1150,7 +1150,7 @@ class Dashboard extends Component<any, any> {
 						this.props.setVisual(CONNECTING_NODE, {
 							...LinkProperties.EnumerationLink,
 							singleLink: true,
-							nodeTypes: [ NodeTypes.Enumeration ]
+							nodeTypes: [NodeTypes.Enumeration]
 						});
 					},
 					icon: 'fa fa-puzzle-piece',
@@ -1161,7 +1161,7 @@ class Dashboard extends Component<any, any> {
 						this.props.setVisual(CONNECTING_NODE, {
 							...LinkProperties.PropertyLink,
 							singleLink: true,
-							nodeTypes: [ NodeTypes.Property ]
+							nodeTypes: [NodeTypes.Property]
 						});
 					},
 					icon: 'fa fa-circle',
@@ -1172,7 +1172,7 @@ class Dashboard extends Component<any, any> {
 						this.props.setVisual(CONNECTING_NODE, {
 							...LinkProperties.AgentLink,
 							singleLink: true,
-							nodeTypes: [ NodeTypes.Model ]
+							nodeTypes: [NodeTypes.Model]
 						});
 					},
 					icon: 'fa  fa-square',
@@ -1182,7 +1182,7 @@ class Dashboard extends Component<any, any> {
 					onClick: () => {
 						this.props.setVisual(CONNECTING_NODE, {
 							...LinkProperties.ModelTypeLink,
-							nodeTypes: [ NodeTypes.Model ]
+							nodeTypes: [NodeTypes.Model]
 						});
 					},
 					icon: 'fa  fa-heartbea',
@@ -1204,7 +1204,7 @@ class Dashboard extends Component<any, any> {
 					this.props.setVisual(CONNECTING_NODE, {
 						...LinkProperties.AgentLink,
 						singleLink: true,
-						nodeTypes: [ NodeTypes.Model ],
+						nodeTypes: [NodeTypes.Model],
 						properties: {
 							[NodeProperties.IsAgent]: true
 						}
@@ -1217,14 +1217,14 @@ class Dashboard extends Component<any, any> {
 				onClick: () => {
 					this.props.setVisual(CONNECTING_NODE, {
 						...LinkProperties.ModelTypeLink,
-						nodeTypes: [ NodeTypes.Model ]
+						nodeTypes: [NodeTypes.Model]
 					});
 				},
 				icon: 'fa fa-genderless',
 				title: Titles.Models
 			},
 			...Object.keys(ConditionTypes).map((key, index) => {
-				let icons = [ 'fa fa-rss-square', 'fa fa-object-ungroup', 'fa fa-plane' ];
+				let icons = ['fa fa-rss-square', 'fa fa-object-ungroup', 'fa fa-plane'];
 				return {
 					onClick: () => {
 						this.props.graphOperation([
@@ -1268,14 +1268,14 @@ class Dashboard extends Component<any, any> {
 			onClick: () => {
 				this.props.setVisual(CONNECTING_NODE, {
 					...LinkProperties.NavigationScreen,
-					nodeTypes: [ NodeTypes.NavigationScreen ]
+					nodeTypes: [NodeTypes.NavigationScreen]
 				});
 			},
 			icon: 'fa fa-external-link-square',
 			title: 'Navigate to'
 		});
 		// /
-		let icons = [ 'fa fa-angellist', 'fa fa-bitbucket', 'fa fa-btc', 'fa  fa-cc-discover', 'fa fa-connectdevelop' ];
+		let icons = ['fa fa-angellist', 'fa fa-bitbucket', 'fa fa-btc', 'fa  fa-cc-discover', 'fa fa-connectdevelop'];
 		Object.values(ViewTypes).map((v, index) => {
 			let viewType = v;
 			result.push({
@@ -1375,7 +1375,7 @@ class Dashboard extends Component<any, any> {
 			onClick: () => {
 				this.props.setVisual(CONNECTING_NODE, {
 					...LinkProperties.DataChainAfterEffectConverter,
-					nodeTypes: [ NodeTypes.DataChain ]
+					nodeTypes: [NodeTypes.DataChain]
 				});
 			},
 			icon: 'fa fa-chain',
@@ -1386,7 +1386,7 @@ class Dashboard extends Component<any, any> {
 			onClick: () => {
 				this.props.setVisual(CONNECTING_NODE, {
 					...LinkProperties.DataChainAfterEffectConverterTarget,
-					nodeTypes: [ NodeTypes.Method ]
+					nodeTypes: [NodeTypes.Method]
 				});
 			},
 			icon: 'fa fa-chain',
@@ -1441,7 +1441,7 @@ class Dashboard extends Component<any, any> {
 				this.props.setVisual(CONNECTING_NODE, {
 					...LinkProperties.EnumerationLink,
 					singleLink: true,
-					nodeTypes: [ NodeTypes.Enumeration ]
+					nodeTypes: [NodeTypes.Enumeration]
 				});
 			},
 			icon: 'fa fa-magnet',
@@ -1596,7 +1596,7 @@ class Dashboard extends Component<any, any> {
 				onClick: () => {
 					this.props.setVisual(CONNECTING_NODE, {
 						...LinkProperties.DataChainInputLink,
-						nodeTypes: [ NodeTypes.ComponentApi, NodeTypes.ComponentExternalApi ]
+						nodeTypes: [NodeTypes.ComponentApi, NodeTypes.ComponentExternalApi]
 					});
 				},
 				icon: 'fa fa-chain',
@@ -1616,7 +1616,7 @@ class Dashboard extends Component<any, any> {
 				onClick: () => {
 					this.props.setVisual(CONNECTING_NODE, {
 						...LinkProperties.Style,
-						nodeTypes: [ NodeTypes.Style ]
+						nodeTypes: [NodeTypes.Style]
 					});
 				},
 				icon: 'fa fa-css3',
@@ -1626,7 +1626,7 @@ class Dashboard extends Component<any, any> {
 				onClick: () => {
 					this.props.setVisual(CONNECTING_NODE, {
 						...LinkProperties.SelectorLink,
-						nodeTypes: [ NodeTypes.Selector ]
+						nodeTypes: [NodeTypes.Selector]
 					});
 				},
 				icon: 'fa fa-fire',
@@ -2031,6 +2031,16 @@ class Dashboard extends Component<any, any> {
 								) : null}
 								{UIA.Visual(state, 'MAIN_NAV') ? (
 									<TreeViewMenu
+										active
+										title={Titles.FlowCode}
+										icon="fa-paint-brush"
+										onClick={() => {
+											viewFlowCode({})
+										}}
+									/>
+								) : null}
+								{UIA.Visual(state, 'MAIN_NAV') ? (
+									<TreeViewMenu
 										active={mainContent === TRANSLATION_VIEW}
 										title={Titles.Titles}
 										icon="fa fa-sort-alpha-asc"
@@ -2069,7 +2079,7 @@ class Dashboard extends Component<any, any> {
 										this.setState({ calculatedCost: this.getCalculatedCost() });
 									}}
 								/>
-								<SideBarHeader title={<span>{this.state.calculatedCost}</span>} onClick={() => {}} />
+								<SideBarHeader title={<span>{this.state.calculatedCost}</span>} onClick={() => { }} />
 
 								<TreeViewMenu
 									open={UIA.Visual(state, VC.ApplicationMenu)}
@@ -2103,7 +2113,7 @@ class Dashboard extends Component<any, any> {
 											this.props.dashboardShot(
 												applicationConfig
 													? applicationConfig[JobServiceConstants.JOBS_FILE_PATH] ||
-														Titles.JobsFilePath
+													Titles.JobsFilePath
 													: Titles.JobsFilePath
 											);
 										}}
@@ -2162,9 +2172,9 @@ class Dashboard extends Component<any, any> {
 												})
 												.then(() => {
 													return runSequence(NodeTypes.Model, requestNodes, {
-														exclusiveLinkTypes: [ LinkType.PropertyLink ],
+														exclusiveLinkTypes: [LinkType.PropertyLink],
 														level1: LinkType.PropertyLink,
-														level2: [ LinkType.AttributeLink, LinkType.Enumeration ],
+														level2: [LinkType.AttributeLink, LinkType.Enumeration],
 														prefix: 'model-property',
 														centerMindMap: (args: any) => {
 															centerMindMap(args);
@@ -2208,8 +2218,8 @@ class Dashboard extends Component<any, any> {
 												applicationConfig ? (
 													applicationConfig[JobServiceConstants.JOB_PATH] || Titles.JobPath
 												) : (
-													Titles.JobPath
-												)
+														Titles.JobPath
+													)
 											}
 											icon="fa fa-info"
 											onClick={() => {
@@ -2223,8 +2233,8 @@ class Dashboard extends Component<any, any> {
 													applicationConfig[JobServiceConstants.JOBS_FILE_PATH] ||
 													Titles.JobsFilePath
 												) : (
-													Titles.JobsFilePath
-												)
+														Titles.JobsFilePath
+													)
 											}
 											icon="fa fa-info"
 											onClick={() => {
@@ -2499,7 +2509,7 @@ class Dashboard extends Component<any, any> {
 											}
 											this.props.setVisual(CONNECTING_NODE, false);
 											this.props.setVisual(UIA.SELECTED_NODE, null);
-										} else if ([ UIA.Visual(state, UIA.SELECTED_NODE) ].indexOf(nodeId) === -1) {
+										} else if ([UIA.Visual(state, UIA.SELECTED_NODE)].indexOf(nodeId) === -1) {
 											// this.props.SelectedNode(nodeId);
 											// this.props.setVisual(UIA.SELECTED_NODE_BB, boundingBox);
 											// this.props.setVisual(SIDE_PANEL_OPEN, true);
@@ -2519,8 +2529,8 @@ class Dashboard extends Component<any, any> {
 									typeWidths={{ [NodeTypes.Concept]: 450 }}
 									selectedColor={UIA.Colors.SelectedNode}
 									markedColor={UIA.Colors.MarkedNode}
-									selectedLinks={[ UIA.Visual(state, UIA.SELECTED_LINK) ].filter((x) => x)}
-									selectedNodes={[ UIA.Visual(state, UIA.SELECTED_NODE) ].filter((x) => x)}
+									selectedLinks={[UIA.Visual(state, UIA.SELECTED_LINK)].filter((x) => x)}
+									selectedNodes={[UIA.Visual(state, UIA.SELECTED_NODE)].filter((x) => x)}
 									markedNodes={graph ? graph.markedSelectedNodeIds : []}
 									graph={vgraph || graph}
 								/>
@@ -2560,133 +2570,133 @@ class Dashboard extends Component<any, any> {
 								/>
 							</SideBarTabs>
 							{currentNode &&
-							!ExcludeDefaultNode[UIA.GetNodeProp(currentNode, NodeProperties.NODEType)] ? (
-								<SideMenuContainer
-									active
-									tab={DEFAULT_TAB}
-									key="node-properties"
-									title={Titles.NodeProperties}
-								>
-									<FormControl>
-										<SideBarMenu>
-											<SideBarHeader
-												onClick={() => {
-													clipboard.writeText(UIA.Visual(state, UIA.SELECTED_NODE));
-												}}
-												title={UIA.Visual(state, UIA.SELECTED_NODE)}
-											/>
-										</SideBarMenu>
-										<ChoiceListItemActivityMenu />
-										{/* <ConditionActivityMenu /> */}
-										<DataChainActvityMenu />
-										<SwaggerActivity />
-										<TextInput
-											label={Titles.NodeLabel}
-											value={currentNode.properties ? currentNode.properties.text : ''}
-											onChange={(value) => {
-												this.props.graphOperation(UIA.CHANGE_NODE_TEXT, {
-													id: currentNode.id,
-													value
-												});
-											}}
-										/>
-										{NotSelectableNodeTypes[
-											currentNode.properties
-												? UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType)
-												: null
-										] ? null : (
-											<SelectInput
-												disabled={!UIA.CanChangeType(currentNode)}
-												label={Titles.NodeType}
-												options={Object.keys(UIA.NodeTypes)
-													.filter((x) => !NotSelectableNodeTypes[UIA.NodeTypes[x]])
-													.sort((a, b) => a.localeCompare(b))
-													.map((x) => ({
-														value: UIA.NodeTypes[x],
-														title: x
-													}))}
+								!ExcludeDefaultNode[UIA.GetNodeProp(currentNode, NodeProperties.NODEType)] ? (
+									<SideMenuContainer
+										active
+										tab={DEFAULT_TAB}
+										key="node-properties"
+										title={Titles.NodeProperties}
+									>
+										<FormControl>
+											<SideBarMenu>
+												<SideBarHeader
+													onClick={() => {
+														clipboard.writeText(UIA.Visual(state, UIA.SELECTED_NODE));
+													}}
+													title={UIA.Visual(state, UIA.SELECTED_NODE)}
+												/>
+											</SideBarMenu>
+											<ChoiceListItemActivityMenu />
+											{/* <ConditionActivityMenu /> */}
+											<DataChainActvityMenu />
+											<SwaggerActivity />
+											<TextInput
+												label={Titles.NodeLabel}
+												value={currentNode.properties ? currentNode.properties.text : ''}
 												onChange={(value) => {
-													this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-														prop: UIA.NodeProperties.NODEType,
+													this.props.graphOperation(UIA.CHANGE_NODE_TEXT, {
 														id: currentNode.id,
 														value
 													});
 												}}
-												value={
-													currentNode.properties ? (
-														UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType)
-													) : null
-												}
 											/>
-										)}
-										<CheckBox
-											label={Titles.Collapsed}
-											value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Collapsed)}
-											onChange={(value) => {
-												this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-													prop: UIA.NodeProperties.Collapsed,
-													id: currentNode.id,
-													value
-												});
-											}}
-										/>
-										<CheckBox
-											label={Titles.Pinned}
-											title={Titles.PinnedShortCut}
-											value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Pinned)}
-											onChange={(value) => {
-												this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-													prop: UIA.NodeProperties.Pinned,
-													id: currentNode.id,
-													value
-												});
-											}}
-										/>
-										<CheckBox
-											label={Titles.Selected}
-											title={Titles.SelectedShortCut}
-											value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Selected)}
-											onChange={(value) => {
-												this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-													prop: UIA.NodeProperties.Selected,
-													id: currentNode.id,
-													value
-												});
-											}}
-										/>
-										{UIA.GetNodeProp(currentNode, NodeProperties.NODEType) ===
-										UIA.NodeTypes.ComponentExternalApi ? (
+											{NotSelectableNodeTypes[
+												currentNode.properties
+													? UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType)
+													: null
+											] ? null : (
+													<SelectInput
+														disabled={!UIA.CanChangeType(currentNode)}
+														label={Titles.NodeType}
+														options={Object.keys(UIA.NodeTypes)
+															.filter((x) => !NotSelectableNodeTypes[UIA.NodeTypes[x]])
+															.sort((a, b) => a.localeCompare(b))
+															.map((x) => ({
+																value: UIA.NodeTypes[x],
+																title: x
+															}))}
+														onChange={(value) => {
+															this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+																prop: UIA.NodeProperties.NODEType,
+																id: currentNode.id,
+																value
+															});
+														}}
+														value={
+															currentNode.properties ? (
+																UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType)
+															) : null
+														}
+													/>
+												)}
 											<CheckBox
-												label={Titles.IsUrlParameter}
-												title={Titles.IsUrlParameter}
-												value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsUrlParameter)}
+												label={Titles.Collapsed}
+												value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Collapsed)}
 												onChange={(value) => {
 													this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-														prop: UIA.NodeProperties.IsUrlParameter,
+														prop: UIA.NodeProperties.Collapsed,
 														id: currentNode.id,
 														value
 													});
 												}}
 											/>
-										) : null}
-										{UIA.GetNodeProp(currentNode, NodeProperties.NODEType) ===
-										UIA.NodeTypes.ComponentApi ? (
 											<CheckBox
-												label={Titles.AsLocalContext}
-												title={`${Titles.AsLocalContext}, usually for listitem.`}
-												value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.AsLocalContext)}
+												label={Titles.Pinned}
+												title={Titles.PinnedShortCut}
+												value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Pinned)}
 												onChange={(value) => {
 													this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-														prop: UIA.NodeProperties.AsLocalContext,
+														prop: UIA.NodeProperties.Pinned,
 														id: currentNode.id,
 														value
 													});
 												}}
 											/>
-										) : null}
-									</FormControl>
-								</SideMenuContainer>
-							) : null}
+											<CheckBox
+												label={Titles.Selected}
+												title={Titles.SelectedShortCut}
+												value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Selected)}
+												onChange={(value) => {
+													this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+														prop: UIA.NodeProperties.Selected,
+														id: currentNode.id,
+														value
+													});
+												}}
+											/>
+											{UIA.GetNodeProp(currentNode, NodeProperties.NODEType) ===
+												UIA.NodeTypes.ComponentExternalApi ? (
+													<CheckBox
+														label={Titles.IsUrlParameter}
+														title={Titles.IsUrlParameter}
+														value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsUrlParameter)}
+														onChange={(value) => {
+															this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+																prop: UIA.NodeProperties.IsUrlParameter,
+																id: currentNode.id,
+																value
+															});
+														}}
+													/>
+												) : null}
+											{UIA.GetNodeProp(currentNode, NodeProperties.NODEType) ===
+												UIA.NodeTypes.ComponentApi ? (
+													<CheckBox
+														label={Titles.AsLocalContext}
+														title={`${Titles.AsLocalContext}, usually for listitem.`}
+														value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.AsLocalContext)}
+														onChange={(value) => {
+															this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+																prop: UIA.NodeProperties.AsLocalContext,
+																id: currentNode.id,
+																value
+															});
+														}}
+													/>
+												) : null}
+										</FormControl>
+									</SideMenuContainer>
+								) : null}
 
 							{UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (
 								<ConditionFilterMenu methodDefinitionKey="validation" />
