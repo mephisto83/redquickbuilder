@@ -23,7 +23,8 @@ import {
 	GetComponentInternalApiNode,
 	GetNodeById,
 	AddLinkBetweenNodes,
-	CreateNewNode
+	CreateNewNode,
+	GetModelCodeProperties
 } from '../../../actions/uiactions';
 import { GetNodesLinkedTo, GetNodeLinkedTo, GetCellProperties } from '../../../methods/graph_methods';
 import { LinkType, LinkProperties, NodeProperties, NodeTypes, EventArgumentTypes } from '../../../constants/nodetypes';
@@ -78,7 +79,18 @@ function AttachEventArguments(eventInstance: string, paramName: string, routeSou
 
 	return result;
 }
+function IsRouteForArrayProperty(routeDescription: RouteDescription, screen: Node): boolean {
+	if (GetNodeProp(screen, NodeProperties.IsDashboard)) {
+		return false;
+	}
 
+	let model = GetNodeProp(screen, NodeProperties.Model);
+	if (model) {
+		let childProperties = GetModelCodeProperties(screen.id);
+		return !!childProperties.find((v: Node) => v.id === routeDescription.model);
+	}
+	return false;
+}
 function SetupRouteDescription(
 	routeDescription: RouteDescription,
 	screen: Node,
@@ -103,7 +115,8 @@ function SetupRouteDescription(
 		}
 
 		let { eventInstance, event, button, subcomponent } = AddButtonToSubComponent(screenOption, {
-			onItemSelection: routeDescription.isItemized || false
+      onItemSelection: routeDescription.isItemized || false,
+      isArrayProperty: IsRouteForArrayProperty(routeDescription, screen)
 		});
 
 		updateComponentProperty(button, NodeProperties.UIText, routeDescription.name || GetNodeTitle(button));

@@ -37,7 +37,7 @@ import { ViewTypes } from '../../../constants/viewtypes';
 
 export function AddButtonToSubComponent(
 	screenOption: Node,
-	options?: { onItemSelection: boolean }
+	options?: { onItemSelection: boolean; isArrayProperty?: boolean }
 ): {
 	button: string;
 	event: string;
