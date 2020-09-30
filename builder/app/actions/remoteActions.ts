@@ -51,7 +51,7 @@ import { IfFalse } from '../components/titles';
 import { platform } from 'os';
 import { NodeTypeColors } from '../constants/nodetypes';
 import { HandlerEvents } from '../ipc/handler-events';
-import { SELECTED_LINK } from '../../visi_blend/dist/app/actions/uiactions';
+import { SELECTED_LINK } from '../actions/uiactions';
 // import { loadConfigs } from './ipcActions';
 // import { loadConfigs } from './ipcActions';
 const ipcRenderer = require('electron').ipcRenderer;

@@ -86,8 +86,22 @@ function IsRouteForArrayProperty(routeDescription: RouteDescription, screen: Nod
 
 	let model = GetNodeProp(screen, NodeProperties.Model);
 	if (model) {
-		let childProperties = GetModelCodeProperties(screen.id);
-		return !!childProperties.find((v: Node) => v.id === routeDescription.model);
+		let childProperties = GetModelCodeProperties(screen.id).filter(
+			(v: Node) =>
+				GetNodeProp(v, NodeProperties.IsTypeList) || GetNodeProp(v, NodeProperties.NODEType) === NodeTypes.Model
+		);
+		return !!childProperties.find((v: Node) => {
+			if (routeDescription.source) {
+				let temp = routeDescription.source['model'];
+				if (temp && temp.model) {
+					switch (temp.type) {
+						case RouteSourceType.Model:
+							return v.id === temp.model;
+					}
+				}
+			}
+			return false;
+		});
 	}
 	return false;
 }
@@ -113,10 +127,10 @@ function SetupRouteDescription(
 		) {
 			return;
 		}
-
+		let isArrayProperty = IsRouteForArrayProperty(routeDescription, screen);
 		let { eventInstance, event, button, subcomponent } = AddButtonToSubComponent(screenOption, {
-      onItemSelection: routeDescription.isItemized || false,
-      isArrayProperty: IsRouteForArrayProperty(routeDescription, screen)
+			onItemSelection: routeDescription.isItemized || false,
+			isArrayProperty
 		});
 
 		updateComponentProperty(button, NodeProperties.UIText, routeDescription.name || GetNodeTitle(button));
@@ -147,8 +161,10 @@ function SetupRouteDescription(
 			console.log(JSON.stringify(routeDescription, null, 4));
 			throw new Error('missing targetScreen');
 		}
-		let cellId = AddButtonToComponentLayout({ button, component: subcomponent });
-		AddComponentAutoStyles(subcomponent, routeDescription, cellId);
+		if (!isArrayProperty) {
+			let cellId = AddButtonToComponentLayout({ button, component: subcomponent });
+			AddComponentAutoStyles(subcomponent, routeDescription, cellId);
+		}
 	});
 }
 
