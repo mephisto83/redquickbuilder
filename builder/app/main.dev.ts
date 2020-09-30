@@ -25,6 +25,7 @@ export default class AppUpdater {
 let mainWindow: BrowserWindow | null = null;
 let objectViewerWindow: BrowserWindow | null = null;
 let codeViewWindow: BrowserWindow | null = null;
+let flowCodeWindow: BrowserWindow | null = null;
 
 if (process.env.NODE_ENV === 'production' || true) {
 	const sourceMapSupport = require('source-map-support');
@@ -38,7 +39,7 @@ if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true' 
 const installExtensions = async () => {
 	const installer = require('electron-devtools-installer');
 	const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-	const extensions = [ 'REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS' ];
+	const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
 
 	return Promise.all(extensions.map((name) => installer.default(installer[name], forceDownload))).catch(console.log);
 };
@@ -47,16 +48,15 @@ const createObjectViewerWindow = async (onclose: Function): Promise<BrowserWindo
 		show: false,
 		width: 800,
 		height: 800,
-		frame: false,
 		webPreferences:
 			process.env.NODE_ENV === 'development' || process.env.E2E_BUILD === 'true'
 				? {
-						nodeIntegration: true
-					}
+					nodeIntegration: true
+				}
 				: {
-						nodeIntegration: true,
-						preload: path.join(__dirname, 'dist', 'renderer.prod.js')
-					}
+					nodeIntegration: true,
+					preload: path.join(__dirname, 'dist', 'renderer.prod.js')
+				}
 	});
 	objectViewerWindow.loadURL(`file://${__dirname}/app.html`);
 	objectViewerWindow.webContents.on('did-finish-load', () => {
@@ -69,16 +69,6 @@ const createObjectViewerWindow = async (onclose: Function): Promise<BrowserWindo
 	return objectViewerWindow;
 };
 const createWindow = async () => {
-	if (objectViewerWindow === null) {
-		objectViewerWindow = await createObjectViewerWindow(() => {
-			objectViewerWindow = null;
-		});
-	}
-	if (codeViewWindow === null) {
-		codeViewWindow = await createObjectViewerWindow(() => {
-			codeViewWindow = null;
-		});
-	}
 
 	if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
 		await installExtensions();
@@ -91,12 +81,12 @@ const createWindow = async () => {
 		webPreferences:
 			process.env.NODE_ENV === 'development' || process.env.E2E_BUILD === 'true'
 				? {
-						nodeIntegration: true
-					}
+					nodeIntegration: true
+				}
 				: {
-						nodeIntegration: true,
-						preload: path.join(__dirname, 'dist', 'renderer.prod.js')
-					}
+					nodeIntegration: true,
+					preload: path.join(__dirname, 'dist', 'renderer.prod.js')
+				}
 	});
 
 	mainWindow.loadURL(`file://${__dirname}/app.html`);
@@ -108,9 +98,34 @@ const createWindow = async () => {
 			throw new Error('"mainWindow" is not defined');
 		}
 		IPCHandlers.setup(mainWindow, {
-			mainWindow: mainWindow,
-			objectViewerWindow: objectViewerWindow,
-			codeViewWindow: codeViewWindow
+			mainWindow: async () => {
+				return mainWindow
+			},
+			objectViewerWindow: async function () {
+				if (objectViewerWindow)
+					return objectViewerWindow;
+				objectViewerWindow = await createObjectViewerWindow(() => {
+					objectViewerWindow = null;
+				});
+				return objectViewerWindow;
+			},
+
+			flowCodeWindow: async function () {
+				if (flowCodeWindow)
+					return flowCodeWindow;
+				flowCodeWindow = await createObjectViewerWindow(() => {
+					flowCodeWindow = null;
+				});
+				return flowCodeWindow;
+			},
+			codeViewWindow: async function () {
+				if (codeViewWindow)
+					return codeViewWindow;
+				codeViewWindow = await createObjectViewerWindow(() => {
+					codeViewWindow = null;
+				});
+				return codeViewWindow;
+			}
 		});
 
 		if (process.env.START_MINIMIZED) {
@@ -127,6 +142,9 @@ const createWindow = async () => {
 		}
 		if (codeViewWindow) {
 			codeViewWindow.close();
+		}
+		if (flowCodeWindow) {
+			flowCodeWindow.close();
 		}
 		mainWindow = null;
 	});

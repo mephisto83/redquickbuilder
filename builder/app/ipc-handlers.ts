@@ -60,7 +60,7 @@ const MenuItems: any = {
 	4: { label: 'Menu 4' }
 };
 export default class IPCHandlers {
-	static setup(mainWindow: any, windowCollections: { [str: string]: BrowserWindow | null }) {
+	static setup(mainWindow: any, windowCollections: { [str: string]: () => Promise<BrowserWindow | null> }) {
 		let submenu: any = [];
 		ipcMain.on('message', (event, arg) => {
 			let msg = JSON.parse(arg);
@@ -75,7 +75,7 @@ export default class IPCHandlers {
 						})
 					);
 				})
-				.catch((v) => {});
+				.catch((v) => { });
 		});
 		ipcMain.on('load-configs', (event, args) => {
 			console.log('load-configs');
@@ -152,7 +152,7 @@ export default class IPCHandlers {
 
 		Menu.setApplicationMenu(menu2);
 	}
-	static tearDown() {}
+	static tearDown() { }
 }
 
 export function ensureDirectorySync(dir: any) {
@@ -225,7 +225,7 @@ export function loadApplicationConfig() {
 
 const throttle: any = (func: any, limit: any, context: any) => {
 	let inThrottle: any;
-	return function() {
+	return function () {
 		const args = arguments;
 		if (!inThrottle) {
 			func.apply(context, args);
@@ -290,7 +290,7 @@ function setCommandCenter(targetPort: number, port: number) {
 				}
 			}
 		})
-		.catch(() => {})
+		.catch(() => { })
 		.then(async () => {
 			await sleep(300000);
 		})
@@ -311,33 +311,51 @@ function updateCommandCenter(mainWindowFunc: any, args: any) {
 		console.log('no mainWindow');
 	}
 }
-function noOp() {}
-function handle(msg: any, windowCollections: { [str: string]: BrowserWindow | null }) {
+function noOp() { }
+function handle(msg: any, windowCollections: { [str: string]: () => Promise<BrowserWindow | null> }) {
 	let message = msg.msg;
 	let result = Promise.resolve();
 
 	switch (message) {
 		case HandlerEvents.viewWindow.message:
-			result = Promise.resolve().then(() => {
-				if (windowCollections.objectViewerWindow && windowCollections.objectViewerWindow.webContents) {
-					if (!windowCollections.objectViewerWindow.isVisible()) windowCollections.objectViewerWindow.show();
-					windowCollections.objectViewerWindow.webContents.send(HandlerEvents.viewWindow.message, msg);
+			result = Promise.resolve().then(async () => {
+				if (windowCollections.objectViewerWindow) {
+					let temp = await windowCollections.objectViewerWindow();
+					if (temp) {
+						if (!temp.isVisible()) temp.show();
+						temp.webContents.send(HandlerEvents.viewWindow.message, msg);
+					}
 				}
 			});
 			break;
 		case HandlerEvents.codeWindowCommand.message:
-			result = Promise.resolve().then(() => {
-				if (windowCollections.codeViewWindow && windowCollections.codeViewWindow.webContents) {
-					if (!windowCollections.codeViewWindow.isVisible()) windowCollections.codeViewWindow.show();
-					windowCollections.codeViewWindow.webContents.send(HandlerEvents.codeWindowCommand.message, msg);
+			result = Promise.resolve().then(async () => {
+				let temp = await windowCollections.codeViewWindow();
+				if (temp) {
+					if (!temp.isVisible()) temp.show();
+					temp.webContents.send(HandlerEvents.codeWindowCommand.message, msg);
+				}
+			});
+			break;
+		case HandlerEvents.flowCodeWindowCommand.message:
+			result = Promise.resolve().then(async () => {
+				let temp = await windowCollections.flowCodeWindow();
+				if (temp) {
+					if (!temp.isVisible()) temp.show();
+					temp.webContents.send(HandlerEvents.flowCodeWindowCommand.message, msg);
 				}
 			});
 			break;
 		case HandlerEvents.remoteCommand.message:
-			result = Promise.resolve().then(() => {
-				if (windowCollections.mainWindow && windowCollections.mainWindow.webContents) {
-					windowCollections.mainWindow.webContents.send(HandlerEvents.remoteCommand.message, msg);
+			result = Promise.resolve().then(async () => {
+				let temp = await windowCollections.mainWindow();
+				if (temp && temp.webContents) {
+					if (!temp.isVisible()) temp.show();
+					temp.webContents.send(HandlerEvents.remoteCommand.message, msg);
 				}
+				// if (windowCollections.mainWindow && windowCollections.mainWindow.webContents) {
+				// 	windowCollections.mainWindow.webContents.send(HandlerEvents.remoteCommand.message, msg);
+				// }
 			});
 			break;
 		case HandlerEvents.scaffold.message:
@@ -399,7 +417,7 @@ function scaffoldProject(body: any, target?: any): any {
 		.then(() => {
 			return executeSpawnCmd(
 				'powershell',
-				[ './build.ps1', '-Target', target || 'CreateWorkSpace', '-verbosity=verbose' ],
+				['./build.ps1', '-Target', target || 'CreateWorkSpace', '-verbosity=verbose'],
 				{ cwd: workspace }
 			);
 		})
@@ -435,7 +453,7 @@ function writeJsonToFile(json: any, destination: any) {
 	});
 }
 function ensureDirectory(dir: any) {
-	return new Promise(function(resolve, fail) {
+	return new Promise(function (resolve, fail) {
 		if (!fs.existsSync(dir)) {
 			console.log('doesnt exist : ' + dir);
 		} else {
@@ -453,7 +471,7 @@ function ensureDirectory(dir: any) {
 
 function executeSpawnCmd(cmd: any, args: any, options: any) {
 	console.log('execute spawn cmd');
-	return new Promise(function(resolve, fail) {
+	return new Promise(function (resolve, fail) {
 		console.log(cmd);
 		console.log(args);
 		options = { ...options || {}, shell: false };
@@ -461,25 +479,25 @@ function executeSpawnCmd(cmd: any, args: any, options: any) {
 		if (process.platform === 'win32') {
 			child = spawn(cmd, args, options);
 		} else {
-			child = spawn('sudo', [ cmd, ...args ], options);
+			child = spawn('sudo', [cmd, ...args], options);
 		}
-		options._kill = function() {
+		options._kill = function () {
 			child.kill();
 		};
-		child.stdout.on('data', function(data: any) {
+		child.stdout.on('data', function (data: any) {
 			// console.log('stdout: ' + data);
 		});
 
-		child.stderr.on('data', function(data: any) {
+		child.stderr.on('data', function (data: any) {
 			console.log('stderr: ' + data);
 		});
-		child.on('error', function(err: any) {
+		child.on('error', function (err: any) {
 			console.log(err);
 			child.stdin.pause();
 			child.kill();
 			fail();
 		});
-		child.on('exit', function(code: any) {
+		child.on('exit', function (code: any) {
 			console.log('child process exited with code ' + code);
 			child.stdin.pause();
 			child.kill();

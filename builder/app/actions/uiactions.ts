@@ -100,7 +100,7 @@ export function GetScreenUrl(op: any, overrideText: any = null) {
 	return convertToURLRoute(route);
 }
 export function convertToURLRoute(x: string) {
-	return [ ...x.split(' ') ].filter((x) => x).join('/').toLowerCase();
+	return [...x.split(' ')].filter((x) => x).join('/').toLowerCase();
 }
 export const UI_UPDATE = 'UI_UPDATE';
 export function GetC(state: any, section: any, item: any) {
@@ -142,7 +142,7 @@ export function ScreenOptionFilter(x: any) {
 	}
 
 	if (
-		[ 'Change User Password', 'Continue As', 'Forgot Login', 'Anonymous Guest', 'Authenticate', 'Register' ].some(
+		['Change User Password', 'Continue As', 'Forgot Login', 'Anonymous Guest', 'Authenticate', 'Register'].some(
 			(v) => v === GetNodeProp(x, NodeProperties.ViewPackageTitle)
 		)
 	) {
@@ -228,7 +228,7 @@ export function CopyKey(key: any) {
 export function IsCurrentNodeA(state: any, type: any) {
 	const currentNode: _.Node = Node(state, Visual(state, SELECTED_NODE));
 	if (!Array.isArray(type)) {
-		type = [ type ];
+		type = [type];
 	}
 	return currentNode && currentNode.properties && type.some((v: any) => v === currentNode.properties.nodeType);
 }
@@ -641,7 +641,7 @@ export function connectLifeCycleMethod(args: { properties: any; target: any; sou
 
 export function addComponentEventTo(node: any, apiName: any) {
 	return (dispatch: any, getState: any) => {
-		graphOperation([ ComponentEventTo(node, apiName) ])(dispatch, getState);
+		graphOperation([ComponentEventTo(node, apiName)])(dispatch, getState);
 	};
 }
 export function ComponentEventTo(node: any, apiName: any, callback?: Function) {
@@ -851,9 +851,9 @@ export function GetRelativeDataChainPath(node: any): any {
 		direction: GraphMethods.SOURCE
 	});
 	if (collections && collections.length) {
-		return [ ...GetRelativeDataChainPath(collections[0]), GetJSCodeName(node) ];
+		return [...GetRelativeDataChainPath(collections[0]), GetJSCodeName(node)];
 	}
-	return [ GetJSCodeName(node) ];
+	return [GetJSCodeName(node)];
 }
 
 export function computeNamespace(node: any) {
@@ -898,7 +898,7 @@ export function GetModelPropertyChildren(id: string, options: any = {}) {
 	if (GetNodeProp(id, NodeProperties.NODEType) === NodeTypes.Model || GetNodeProp(id, NodeProperties.IsUser)) {
 		userModels = GetUserReferenceNodes(id);
 	}
-	return [ ...userModels, ...propertyNodes, ...logicalChildren ]
+	return [...userModels, ...propertyNodes, ...logicalChildren]
 		.filter((x) => x.id !== id)
 		.unique((v: { id: any }) => v.id);
 }
@@ -926,7 +926,7 @@ export function GetModelCodeProperties(id: string) {
 	if (GetNodeProp(id, NodeProperties.NODEType) === NodeTypes.Model || GetNodeProp(id, NodeProperties.IsUser)) {
 		userModels = GetUserReferenceNodes(id);
 	}
-	return [ ...userModels, ...propertyNodes, ...logicalChildren ]
+	return [...userModels, ...propertyNodes, ...logicalChildren]
 		.filter((x) => x.id !== id)
 		.unique((v: { id: any }) => v.id);
 }
@@ -1342,7 +1342,7 @@ export function GenerateChainFunction(id: any, options: { language: any }) {
 		let interface_type: string = generateContextInterfaces(GetNodeById(id), anyType);
 		if (interface_type) {
 			anyType = `: ${interface_type}`;
-			overridArg = [ '$internalComponentState' ];
+			overridArg = ['$internalComponentState'];
 		}
 	}
 
@@ -1399,7 +1399,7 @@ function GetExtraArgs(id: string) {
 		let calculateEventArguments = GetEventArguments(argumentSource.id);
 		// let internalApiArgs = createInternalApiArgumentsCode(apiInternalNodes, calculateEventArguments);
 
-		return [ createInternalApiArguments(apiInternalNodes, calculateEventArguments) ];
+		return [createInternalApiArguments(apiInternalNodes, calculateEventArguments)];
 	}
 	return [];
 }
@@ -1448,13 +1448,13 @@ function generateContextInterfaces(currentNode: GraphTypes.Node, anyType?: strin
 	}
 	if (currentNode && (screenEffectApis.length || contextParameters.length)) {
 		result = `{
-${[ ...screenEffectApis, ...contextParameters, ...eventArgNames, ...possibleDataChainParams, 'viewModel', 'value' ]
-			.filter((x: string) => x)
-			.unique()
-			.map((param: string) => {
-				return `${param}?: string | number | null`;
-			})
-			.join(`,${NodeConstants.NEW_LINE}`)}
+${[...screenEffectApis, ...contextParameters, ...eventArgNames, ...possibleDataChainParams, 'viewModel', 'value']
+				.filter((x: string) => x)
+				.unique()
+				.map((param: string) => {
+					return `${param}?: string | number | null`;
+				})
+				.join(`,${NodeConstants.NEW_LINE}`)}
 }
     `;
 	}
@@ -1582,7 +1582,7 @@ export function GetDataChainArgs(id: string) {
 		if (merge) {
 			return Object.keys(ui);
 		}
-		return [ '$id?' ];
+		return ['$id?'];
 	}
 	return [];
 }
@@ -1694,14 +1694,14 @@ export function GetDataChainCollections(options: { language: any; collection: an
 	const graph = GetCurrentGraph();
 	const temp = collection
 		? GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
-				id: collection,
-				link: NodeConstants.LinkType.DataChainCollection,
-				direction: GraphMethods.TARGET
-			}).filter(
-				(x: any) =>
-					GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.DataChainCollection &&
-					CollectionIsInLanguage(graph, x.id, language)
-			)
+			id: collection,
+			link: NodeConstants.LinkType.DataChainCollection,
+			direction: GraphMethods.TARGET
+		}).filter(
+			(x: any) =>
+				GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.DataChainCollection &&
+				CollectionIsInLanguage(graph, x.id, language)
+		)
 		: [];
 
 	return NodesByType(null, NodeTypes.DataChainCollection)
@@ -1819,7 +1819,7 @@ export function GenerateChainFunctionSpecs(options: { language: any; collection:
 			return !collections || !collections.length;
 		});
 
-	const basicentryvalues = [ undefined, null, 0, {}, 'a string', 1.1, [], [ 1 ], [ '1' ], [ '1', 1 ] ];
+	const basicentryvalues = [undefined, null, 0, {}, 'a string', 1.1, [], [1], ['1'], ['1', 1]];
 
 	entryNodes.map((entryNode: any) => {
 		basicentryvalues.map((val) => {
@@ -1829,7 +1829,7 @@ export function GenerateChainFunctionSpecs(options: { language: any; collection:
 	return result;
 }
 export function GenerateSimpleTest(node: any, val: {} | null | undefined) {
-	let _value = [ 'object', 'string' ].some((v) => typeof val === v && val !== undefined && val !== null)
+	let _value = ['object', 'string'].some((v) => typeof val === v && val !== undefined && val !== null)
 		? JSON.stringify(val)
 		: val;
 	if (val === undefined) {
@@ -1911,9 +1911,9 @@ export function GetDataChainNextId(id: any, graph?: any) {
 	return next && next.id;
 }
 export function GetDataChainParts(id: any, result?: any) {
-	result = result || [ id ];
+	result = result || [id];
 	result.push(id);
-	result = [ ...result ].unique();
+	result = [...result].unique();
 	const node = GetNodeById(id);
 	const nodeGroup = GetNodeProp(node, NodeProperties.Groups) || {};
 	let groups = Object.values(nodeGroup);
@@ -1926,7 +1926,7 @@ export function GetDataChainParts(id: any, result?: any) {
 		);
 		result.push(...dc.map((v: { id: any }) => v.id));
 		dc.map((_dc: any) => {
-			groups = [ ...groups, ...Object.values(GetNodeProp(_dc, NodeProperties.Groups) || {}) ];
+			groups = [...groups, ...Object.values(GetNodeProp(_dc, NodeProperties.Groups) || {})];
 		});
 		groups.map((g) => {
 			const nodes = GetNodesInGroup(g);
@@ -1941,7 +1941,7 @@ export function GetNodesInGroup(groupId: unknown) {
 	return GraphMethods.GetNodesInGroup(GetCurrentGraph(_getState()), groupId);
 }
 export function GetDataChainFrom(id: any) {
-	const result = [ id ];
+	const result = [id];
 	let current = id;
 	const graph = GetRootGraph(_getState());
 	if (!graph) {
@@ -2315,8 +2315,8 @@ export function GenerateDataChainMethod(id: string, options: { language: any }) 
 		case DataChainFunctionKeys.Merge:
 			return `() => {
         ${Object.keys(funcs || {})
-			.map((key) => `let ${key}${anyType} = DC.${GetCodeName(funcs[key], { includeNameSpace: true })}();`)
-			.join(NodeConstants.NEW_LINE)}
+					.map((key) => `let ${key}${anyType} = DC.${GetCodeName(funcs[key], { includeNameSpace: true })}();`)
+					.join(NodeConstants.NEW_LINE)}
         ${lambda}
       }`;
 		case DataChainFunctionKeys.ListReference:
@@ -2485,7 +2485,7 @@ function buildModelMethodMenu(options: { language: any }) {
 		(x: any) => GetNodeProp(x, NodeProperties.ViewType) === ViewTypes.GetAll
 	);
 	const underPages = NodesByType(null, NodeTypes.Screen).filter((x: any) =>
-		[ ViewTypes.Create, ViewTypes.GetAll ].some((v) => v === GetNodeProp(x, NodeProperties.ViewType))
+		[ViewTypes.Create, ViewTypes.GetAll].some((v) => v === GetNodeProp(x, NodeProperties.ViewType))
 	);
 
 	const screens = listPages.map((v: any) => `{ title: '${GetNodeTitle(v)}', name: 'top-${GetCodeName(v)}' }`);
@@ -2505,7 +2505,7 @@ function buildModelMethodMenu(options: { language: any }) {
 }
 export function untransformLambda(value: string, currentNode: any): string {
 	if (currentNode) {
-		const models: _.Node[] = NodesByType(null, [ NodeTypes.Model, NodeTypes.Enumeration ])
+		const models: _.Node[] = NodesByType(null, [NodeTypes.Model, NodeTypes.Enumeration])
 			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromController))
 			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration));
 		models.sort((a, b) => GetCodeName(a).length - GetCodeName(b).length).forEach((item) => {
@@ -2548,7 +2548,7 @@ export function GetArbitersForNodeType(type: string) {
 		Object.values(methodProps).map((id: any) => {
 			const node = GetGraphNode(id);
 			const nodeType = GetNodeProp(node, NodeProperties.NODEType);
-			if ([ NodeTypes.Model ].some((v) => v === nodeType)) {
+			if ([NodeTypes.Model].some((v) => v === nodeType)) {
 				models.push(id);
 			}
 		});
@@ -2746,11 +2746,11 @@ export function GetCombinedCondition(id: any, language = NodeConstants.Programmi
 	conditions.map((condition: any) => {
 		const selectedConditionSetup = GetSelectedConditionSetup(id, condition);
 		const res = GetConditionsClauses(id, selectedConditionSetup, language, options);
-		clauses = [ ...clauses, ...res.map((t) => t.clause) ];
+		clauses = [...clauses, ...res.map((t) => t.clause)];
 	});
 	customMethods.map((customMethod: any) => {
 		const res = GetCustomMethodClauses(customMethod, methodNodeParameters, language);
-		clauses = [ ...clauses, ...res.map((t) => t.clause) ];
+		clauses = [...clauses, ...res.map((t) => t.clause)];
 	});
 
 	switch (GetNodeProp(node, NodeProperties.NODEType)) {
@@ -3560,7 +3560,7 @@ export function pin(ids: string[]) {
 }
 
 export function GUID() {
-	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
 		const r = (Math.random() * 16) | 0;
 
 		const v = c == 'x' ? r : (r & 0x3) | 0x8;
@@ -3596,7 +3596,7 @@ export function loadRedQuickConfiguration() {
 				}
 				let content = fs.readFileSync(path.join(redquickbuilder_folder, 'config.json'), 'utf-8');
 				let config = JSON.parse(content);
-				dispatch(Batch([ UIC(VISUAL, RED_QUICK_CONFIG, config) ]));
+				dispatch(Batch([UIC(VISUAL, RED_QUICK_CONFIG, config)]));
 			});
 		}
 	};
@@ -3628,7 +3628,7 @@ export function updateRedQuickConfiguration(config: RedQuickConfiguration) {
 				}
 				let content = fs.readFileSync(path.join(redquickbuilder_folder, 'config.json'), 'utf-8');
 				config = JSON.parse(content);
-				dispatch(Batch([ UIC(VISUAL, RED_QUICK_CONFIG, config) ]));
+				dispatch(Batch([UIC(VISUAL, RED_QUICK_CONFIG, config)]));
 			});
 		}
 	};
@@ -3677,11 +3677,25 @@ export function setCurrentViewNode(nodeId: string) {
 export const VIEW_CODE = 'VIEW_CODE';
 export function handleCodeWindowMessage(args: { code: string }) {
 	let { code } = args;
-	if (history && history.length === 1) {
+	if (history) {
 		history.push(routes.CODE_VIEWER);
 	}
 	let batchCommands: any[] = [];
 	batchCommands.push(UIC(VISUAL, VIEW_CODE, code));
+	let dispatch = GetDispatchFunc();
+	if (dispatch) {
+		dispatch(Batch(batchCommands));
+	}
+}
+
+export const FLOW_CODE = 'FLOW_CODE';
+export function handleFlowCodeMessage(args: { code: string }) {
+	let { code } = args;
+	if (history) {
+		history.push(routes.FLOW_VIEWER);
+	}
+	let batchCommands: any[] = [];
+	batchCommands.push(UIC(VISUAL, FLOW_CODE, code));
 	let dispatch = GetDispatchFunc();
 	if (dispatch) {
 		dispatch(Batch(batchCommands));
@@ -3736,7 +3750,7 @@ export const NODE_CONNECTIONS = 'NODE_CONNECTIONS';
 export function setVisual(key: string, value: any) {
 	if (key === SELECTED_NODE || key === SELECTED_NODE_BB)
 		if (GraphMethods.Paused()) {
-			return () => {};
+			return () => { };
 		}
 	return (dispatch: Function, getState: Function) => {
 		dispatch(UIC(VISUAL, key, value));
@@ -3922,7 +3936,7 @@ export function GetNodeTitle(node: any) {
 export function GetNodes(state: any) {
 	const currentGraph = GetCurrentGraph(state);
 	if (currentGraph) {
-		return [ ...currentGraph.nodes.map((t: any) => currentGraph.nodeLib[t]) ];
+		return [...currentGraph.nodes.map((t: any) => currentGraph.nodeLib[t])];
 	}
 	return [];
 }
@@ -4019,17 +4033,17 @@ export function $addComponentApiNodes(
 		},
 		externalApiId
 			? {
-					operation: ADD_LINK_BETWEEN_NODES,
-					options() {
-						return {
-							target: externalApiId,
-							source: componentExternalValue,
-							properties: {
-								...LinkProperties.ComponentExternalConnection
-							}
-						};
-					}
+				operation: ADD_LINK_BETWEEN_NODES,
+				options() {
+					return {
+						target: externalApiId,
+						source: componentExternalValue,
+						properties: {
+							...LinkProperties.ComponentExternalConnection
+						}
+					};
 				}
+			}
 			: null
 	].filter((x) => x);
 }
@@ -4086,7 +4100,7 @@ export function NodesByType(state: null, nodeType: string | any[], options: any 
 	const currentGraph = options.useRoot ? GetRootGraph(state) : GetCurrentGraph(state);
 	if (currentGraph) {
 		if (!Array.isArray(nodeType)) {
-			nodeType = [ nodeType ];
+			nodeType = [nodeType];
 		}
 		return GraphMethods.NodesByType(currentGraph, nodeType, options);
 	}
@@ -4154,7 +4168,7 @@ export const JOB_FILES = 'JOB_FILES';
 let runningGitRunPromise = false;
 let gitrunPromise = Promise.resolve();
 export function loadGitRuns() {
-	return (dispatch: Function, getState: Function) => {};
+	return (dispatch: Function, getState: Function) => { };
 }
 // }
 export const JOB_INFO = 'JOB_INFO';
@@ -4278,7 +4292,7 @@ export function pinConnectedNodesByLinkType(model: any, linkType: any) {
 }
 export function setPinned(id: string | string[], pinned: boolean = false) {
 	if (!Array.isArray(id)) {
-		id = [ id ];
+		id = [id];
 	}
 	if (id) {
 		_dispatch(
@@ -4557,8 +4571,8 @@ export function setRootGraph(key: any, value: any) {
 export function setAppsettingsAssemblyPrefixes(prefixes: any) {
 	return (dispatch: Function, getState: Function) => {
 		const rootGraph = GetRootGraph(getState(), dispatch);
-		rootGraph.appConfig.AppSettings.AssemblyPrefixes = [ 'RedQuick', prefixes ].unique((x: any) => x).join(';');
-		rootGraph.appConfig.AppSettings.DatabaseId = [ prefixes ].unique((x: any) => x).join(';');
+		rootGraph.appConfig.AppSettings.AssemblyPrefixes = ['RedQuick', prefixes].unique((x: any) => x).join(';');
+		rootGraph.appConfig.AppSettings.DatabaseId = [prefixes].unique((x: any) => x).join(';');
 		SaveGraph(rootGraph, dispatch);
 	};
 }
@@ -4703,7 +4717,7 @@ export function GetNodesLinkTypes(id: any) {
 
 export function addInstanceFunc(node: any | any, callback: any, viewPackages?: any, option: any = {}) {
 	viewPackages = viewPackages || {};
-	return function() {
+	return function () {
 		if (typeof node === 'function') {
 			node = node();
 		}
@@ -4780,7 +4794,7 @@ export function selectAllConnected(id: string) {
 			id
 		});
 		graphOperation([
-			...[ ...nodes, GetNodeById(id) ].map((t) => ({
+			...[...nodes, GetNodeById(id)].map((t) => ({
 				operation: CHANGE_NODE_PROPERTY,
 				options() {
 					return {
@@ -4800,7 +4814,7 @@ export function selectAllInViewPackage(id: string) {
 			[NodeProperties.ViewPackage]: GetNodeProp(node, NodeProperties.ViewPackage)
 		});
 		graphOperation([
-			...[ ...nodes ].map((t) => ({
+			...[...nodes].map((t) => ({
 				operation: CHANGE_NODE_PROPERTY,
 				options() {
 					return {
@@ -5097,7 +5111,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any, graph
 		}
 		let operations = operation;
 		if (!Array.isArray(operation)) {
-			operations = [ { operation, options } ];
+			operations = [{ operation, options }];
 		}
 
 		currentGraph = handleArrayOperations(
@@ -5256,7 +5270,7 @@ function handleOperation(
 							properties: {
 								...LinkProperties.TitleServiceLink,
 								singleLink: true,
-								nodeTypes: [ NodeTypes.TitleService ]
+								nodeTypes: [NodeTypes.TitleService]
 							}
 						},
 						(link: GraphLink) => {

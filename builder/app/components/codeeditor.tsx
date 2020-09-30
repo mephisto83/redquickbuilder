@@ -153,7 +153,7 @@ ${this.state.definitions}
 			}
 		return (
 			<TopViewer active={this.props.active} style={{ width: `calc(100% - ${offsetWidth}px)` }}>
-				<div style={{ position: 'relative' }}>
+				<div style={{ position: 'relative', height: '100%' }}>
 					<Box title={'Editor'}>
 						<div className="text-left" style={{ display: currentNode ? '' : 'none' }}>
 							<a

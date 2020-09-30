@@ -33,12 +33,35 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 class ObjectViewer extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
-		this.state = {};
+		const Deflayout = [
+			{ i: 'a', x: 3, y: 0, w: 9, h: 3 },
+			{ i: 'b', x: 3, y: 3, w: 7, h: 4 },
+			{ i: 'c', x: 0, y: 4, w: 3, h: 4 }
+		];
+		const layout = {
+			lg: Deflayout
+		};
+		this.state = { layout };
 	}
 
 	minified() {
 		const { state } = this.props;
 		return UIA.GetC(state, UIA.VISUAL, UIA.DASHBOARD_MENU) ? 'sidebar-collapse' : '';
+	}
+	componentDidMount() {
+		setTimeout(() => {
+			const Deflayout = [
+				{ i: 'a', x: 3, y: 0, w: 9, h: 3 },
+				{ i: 'b', x: 3, y: 3, w: 7, h: 4 },
+				{ i: 'c', x: 0, y: 4, w: 3, h: 4 }
+			];
+			const layout = {
+				lg: Deflayout
+			};
+			this.setState({
+				layout
+			})
+		}, 5000)
 	}
 
 	render() {
@@ -49,18 +72,6 @@ class ObjectViewer extends Component<any, any> {
 		if (enumerationConfig && enumerationConfig.enumerationType) {
 			enumerations = GetNodeProp(enumerationConfig.enumerationType, NodeProperties.Enumeration);
 		}
-		const Deflayout = [
-			{ i: 'a', x: 0, y: 0, w: 6, h: 6 },
-			{ i: 'b', x: 6, y: 0, w: 3, h: 6 },
-			{ i: 'c', x: 0, y: 6, w: 1, h: 2 }
-		];
-		const layout = {
-			lg: Deflayout,
-			md: Deflayout,
-			sm: Deflayout,
-			xs: Deflayout,
-			xxs: Deflayout
-		};
 		let currentViewNode: string | null = Visual(state, UIA.CURRENT_VIEW_NODE);
 		let node: Node = UIA.GetNodeForView(state, currentViewNode);
 		let connections: QuickAccess<string> = UIA.GetNodeConnectionsForView(state, currentViewNode);
@@ -68,32 +79,33 @@ class ObjectViewer extends Component<any, any> {
 		let linkConnections: QuickAccess<string> = UIA.GetNodeLinksForView(state, currentViewNode);
 		let connectedNodes = linkConnections
 			? Object.entries(linkConnections).map((item) => {
-					let [ key, value ] = item;
-					links.push(UIA.GetLinkForView(state, value));
-					return UIA.GetNodeForView(state, key);
-				})
+				let [key, value] = item;
+				links.push(UIA.GetLinkForView(state, value));
+				return UIA.GetNodeForView(state, key);
+			})
 			: [];
 		return (
 			<DashboardContainer minified={UIA.GetC(state, UIA.VISUAL, UIA.DASHBOARD_MENU)}>
 				<ResponsiveGridLayout
 					className="layout"
 					draggableHandle={'.box-header'}
+					layout={this.state.layout}
+					measureBeforeMount={false}
 					breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-					layout={layout}
 					cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
 				>
-					<div key="a">
+					<div key="a" data-grid={{x: 0, y: 0, w: 12, h: 2}} >
 						<Panel stretch title={node ? UIA.GetNodeTitle(node) : 'Current Node'}>
 							<NodeViewer node={node} />
 						</Panel>
 					</div>
-					<div key="b">
+					<div key="b" data-grid={{x: 0, y: 2, w: 6, h: 2}}>
 						<Panel stretch title={'Connecting Nodes'}>
 							{' '}
 							<NodeViewList nodes={connectedNodes} />
 						</Panel>
 					</div>
-					<div key="c">
+					<div key="c" data-grid={{x: 7, y: 2, w: 6, h: 2}}>
 						<Panel stretch title={'Links Nodes'}>
 							<LinkViewList
 								state={state}

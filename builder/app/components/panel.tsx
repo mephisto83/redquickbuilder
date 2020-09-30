@@ -16,6 +16,7 @@ export default class Panel extends Component<any, any> {
 			style.flexDirection = 'column';
 			style.position = 'relative';
 			boxBodyStyle.height = '100%';
+			boxBodyStyle.overflow = 'auto';
 		}
 		return (
 			<div className="box box-default" style={style}>
