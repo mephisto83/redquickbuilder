@@ -24,6 +24,7 @@ import Panel from './panel';
 import GridLayout from 'react-grid-layout';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import NodeViewer from './nodeview';
+import LinkViewer from './linkview';
 import { Visual } from '../actions/uiactions';
 import { QuickAccess, GraphLink } from '../methods/graph_types';
 import NodeViewList from './nodeviewlist';
@@ -73,7 +74,9 @@ class ObjectViewer extends Component<any, any> {
 			enumerations = GetNodeProp(enumerationConfig.enumerationType, NodeProperties.Enumeration);
 		}
 		let currentViewNode: string | null = Visual(state, UIA.CURRENT_VIEW_NODE);
-		let node: Node = UIA.GetNodeForView(state, currentViewNode);
+		let currentViewLink: string | null = Visual(state, UIA.CURRENT_VIEW_LINK);
+    let node: Node = UIA.GetNodeForView(state, currentViewNode);
+    let link: GraphLink = UIA.GetLinkForView(state, currentViewLink);
 		let connections: QuickAccess<string> = UIA.GetNodeConnectionsForView(state, currentViewNode);
 		let links: GraphLink[] = [];
 		let linkConnections: QuickAccess<string> = UIA.GetNodeLinksForView(state, currentViewNode);
@@ -110,8 +113,19 @@ class ObjectViewer extends Component<any, any> {
 							<LinkViewList
 								state={state}
 								links={links}
-								onSelectNode={(item) => {
+								onSelectNode={(item: any) => {
 									this.props.remoteSelectNode(item);
+								}}
+							/>
+						</Panel>
+					</div>
+					<div key="d" data-grid={{x: 7, y: 0, w: 12, h: 2}}>
+						<Panel stretch title={'Current Link'}>
+							<LinkViewer
+								state={state}
+								link={link}
+								onSelectNode={(item: any) => {
+									this.props.remoteSelectNode|(item);
 								}}
 							/>
 						</Panel>
