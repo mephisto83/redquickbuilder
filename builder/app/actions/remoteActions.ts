@@ -8,7 +8,8 @@ import {
 	setupCache,
 	getNodeLinks,
 	SOURCE,
-	NodesByType
+	NodesByType,
+	GetLinkBetween
 } from '../methods/graph_methods';
 import {
 	SaveApplication,
@@ -50,6 +51,7 @@ import { IfFalse } from '../components/titles';
 import { platform } from 'os';
 import { NodeTypeColors } from '../constants/nodetypes';
 import { HandlerEvents } from '../ipc/handler-events';
+import { SELECTED_LINK } from '../../visi_blend/dist/app/actions/uiactions';
 // import { loadConfigs } from './ipcActions';
 // import { loadConfigs } from './ipcActions';
 const ipcRenderer = require('electron').ipcRenderer;
@@ -556,8 +558,16 @@ export function sendNode(id: string) {
 					othernodes.push(GetNodeById(key));
 					return graph.linkLib[value];
 				});
+		let state = getState();
+		let selectedLink = Visual(state, SELECTED_LINK);
+
+		let currentLink = selectedLink
+			? GetLinkBetween(selectedLink.source, selectedLink.target, GetCurrentGraph())
+      : null;
+
 		viewObject([ node, ...othernodes ], links, {
 			currentNode: id,
+			currentLink: currentLink,
 			nodeLinkIds: {
 				[id]: graph.nodeLinkIds[id]
 			},
@@ -572,6 +582,7 @@ async function viewObject(
 	links: GraphLink[],
 	options?: {
 		currentNode: string;
+		currentLink: string;
 		clear?: boolean;
 		nodeLinkIds: QuickAccess<string>;
 		nodeConnections?: QuickAccess<string>;

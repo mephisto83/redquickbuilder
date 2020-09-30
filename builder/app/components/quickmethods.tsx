@@ -633,35 +633,35 @@ class QuickMethods extends Component<any, any, any> {
 								<TextBox
 									label={Titles.ViewPackage}
 									value={UIA.Visual(state, 'View Package Title')}
-									onChange={(value) => {
+									onChange={(value: any) => {
 										this.props.setVisual('View Package Title', value);
 									}}
 								/>
 								<CheckBox
 									label={Titles.SharedControl}
 									value={UIA.Visual(state, sharedcontrolkey)}
-									onChange={(value) => {
+									onChange={(value: any) => {
 										this.props.setVisual(sharedcontrolkey, value);
 									}}
 								/>
 								<CheckBox
 									label={UITypes.ElectronIO}
 									value={UIA.Visual(state, UITypes.ElectronIO)}
-									onChange={(value) => {
+									onChange={(value: any) => {
 										this.props.setVisual(UITypes.ElectronIO, value);
 									}}
 								/>
 								<CheckBox
 									label={UITypes.ReactWeb}
 									value={UIA.Visual(state, UITypes.ReactWeb)}
-									onChange={(value) => {
+									onChange={(value: any) => {
 										this.props.setVisual(UITypes.ReactWeb, value);
 									}}
 								/>
 								<CheckBox
 									label={UITypes.ReactNative}
 									value={UIA.Visual(state, UITypes.ReactNative)}
-									onChange={(value) => {
+									onChange={(value: any) => {
 										this.props.setVisual(UITypes.ReactNative, value);
 									}}
 								/>
@@ -669,7 +669,7 @@ class QuickMethods extends Component<any, any, any> {
 									<CheckBox
 										label={Titles.UseAsDefault}
 										value={UIA.Visual(state, use_as_default)}
-										onChange={(value) => {
+										onChange={(value: any) => {
 											this.props.setVisual(use_as_default, value);
 										}}
 									/>
@@ -678,7 +678,7 @@ class QuickMethods extends Component<any, any, any> {
 									<CheckBox
 										label={Titles.AsPlural}
 										value={UIA.Visual(state, use_as_plural)}
-										onChange={(value) => {
+										onChange={(value: any) => {
 											this.props.setVisual(use_as_plural, value);
 										}}
 									/>
@@ -692,13 +692,13 @@ class QuickMethods extends Component<any, any, any> {
 									}}
 									icon="fa fa-tag"
 								>
-									{UIA.GetModelPropertyChildren(currentNode ? currentNode.id : null).map((child) => (
+									{UIA.GetModelPropertyChildren(currentNode ? currentNode.id : null).map((child: { id: string | number | undefined; }) => (
 										// Could use something besides a VISUAL for this.
 										<CheckBox
 											label={UIA.GetNodeTitle(child)}
 											key={child.id}
 											value={UIA.Visual(state, UIA.ChoseModel(child.id))}
-											onChange={(value) => {
+											onChange={(value: any) => {
 												this.props.setVisual(UIA.ChoseModel(child.id), value);
 											}}
 										/>
@@ -708,13 +708,13 @@ class QuickMethods extends Component<any, any, any> {
 									<h4>Methods</h4>
 									<ButtonList
 										active
-										isSelected={(item) => this.state.selectedMethods[item.value]}
+										isSelected={(item: { value: React.ReactText; }) => this.state.selectedMethods[item.value]}
 										items={Object.keys(ViewTypes).map((x) => ({
 											id: x,
 											value: x,
 											title: x
 										}))}
-										onClick={(item) => {
+										onClick={(item: { value: React.ReactText; }) => {
 											this.setState({
 												selectedMethods: {
 													...this.state.selectedMethods || {},
