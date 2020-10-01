@@ -1,11 +1,19 @@
 import { UITypes, NEW_LINE, NodeTypes } from '../constants/nodetypes';
-import { GetNodeById, NodeProperties, GetNodeProp, GetCodeName, GetJSCodeName, GetCssName } from '../actions/uiactions';
+import {
+	GetNodeById,
+	NodeProperties,
+	GetNodeProp,
+	GetCodeName,
+	GetJSCodeName,
+	GetCssName,
+	GetCurrentGraph
+} from '../actions/uiactions';
 import { GenerateMarkupTag, ConvertViewTypeToComponentNode, GetStylesFor } from './screenservice';
 import { GetCellProperties, getComponentProperty } from '../methods/graph_methods';
 import { InstanceTypes } from '../constants/componenttypes';
 import { addNewLine } from '../utils/array';
 import * as GraphMethods from '../methods/graph_methods';
-import { ComponentLayoutContainer } from '../methods/graph_types';
+import { ComponentLayoutContainer, Node } from '../methods/graph_types';
 import { constructCellStyles } from './sharedservice';
 
 export function GetPropertyConsts(id: string, language = UITypes.ReactNative) {
@@ -105,7 +113,14 @@ export function GetRNModelConst(x: any) {
 export function GetRNModelConstValue(x: any) {
 	return `const_${(x || '').toJavascriptName()}`;
 }
+export function GetPropertyCentricComponents(nodeId: string): Node[] {
+	let nodes = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+		id: nodeId,
+		componentType: NodeTypes.ComponentNode
+	}).filter((x: Node) => GetNodeProp(x, NodeProperties.IsPropertyCentric));
 
+	return nodes;
+}
 export function GetNodeComponents(layoutObj: any, item?: any, currentRoot?: any) {
 	let imports: any = [];
 	if (!layoutObj) {
@@ -115,12 +130,13 @@ export function GetNodeComponents(layoutObj: any, item?: any, currentRoot?: any)
 	if (!currentRoot) {
 		currentRoot = layout;
 	}
-
 	Object.keys(currentRoot).map((item) => {
 		imports = [ ...imports, ...GetNodeComponents(layoutObj, item, currentRoot[item]) ];
 		if (properties[item]) {
 			const children = properties[item].children || {};
-			if (children[item]) imports.push(children[item]);
+			if (children[item]) {
+				imports.push(children[item]);
+			}
 		}
 	});
 
@@ -156,8 +172,9 @@ export function buildLayoutTree(args: {
 	node: any;
 	section?: any;
 	css: any;
+	injections: { node: Node | string; code: string }[];
 }) {
-	let { layoutObj, currentRoot, language, imports = [], node = null, css, section = 'section' } = args;
+	let { injections, layoutObj, currentRoot, language, imports = [], node = null, css, section = 'section' } = args;
 	const result: (string | undefined)[] = [];
 	const { layout, properties } = layoutObj;
 	if (!currentRoot) {
@@ -174,7 +191,8 @@ export function buildLayoutTree(args: {
 				language,
 				imports,
 				node,
-				section: `${section}_${index}`
+				section: `${section}_${index}`,
+				injections
 			})
 		);
 		if (section !== 'section') {
@@ -196,15 +214,16 @@ export function createSection(args: {
 	imports: any;
 	node: any;
 	section: any;
+	injections: { node: Node | string; code: string }[];
 }) {
-	const { layoutObj, item, currentRoot, index, language, imports, node, section, css } = args;
+	const { injections, layoutObj, item, currentRoot, index, language, imports, node, section, css } = args;
 	const { properties } = layoutObj;
 	const style = properties[item].style || {};
 	const children: any = properties[item].children || {};
-	const cellModel: any = properties[item].cellModel || {};
+	// const cellModel: any = properties[item].cellModel || {};
 	const cellRoot: any = (properties[item].cellRoot = {});
 	const layoutProperties: any = properties[item].properties || {};
-	const cellModelProperty: any = properties[item].cellModelProperty || {};
+	// const cellModelProperty: any = properties[item].cellModelProperty || {};
 	const cellStyleArray: any = properties[item].cellStyleArray || [];
 	let root = GraphMethods.GetFirstCell(layoutObj);
 	let tree = Object.keys(currentRoot).length
@@ -215,7 +234,8 @@ export function createSection(args: {
 				imports,
 				node,
 				section,
-				css
+				css,
+				injections
 			})
 		: [];
 	if (children && children[item]) {
@@ -226,7 +246,8 @@ export function createSection(args: {
 					GetNodeById(children[item]),
 					language,
 					node,
-					cellStyleArray
+					cellStyleArray,
+					{ injections }
 					// , {
 					// 	children,
 					// 	cellModel,
@@ -238,7 +259,16 @@ export function createSection(args: {
 			)
 		];
 	}
-
+	let className = '';
+	if (properties[item].injections) {
+		let { injections } = properties[item];
+		if (injections) {
+			if (injections.route) {
+        className ='route-injections'
+        tree.push(`{this.props.${injections.route} ? this.props.${injections.route}(this.state.value) : null}`)
+      }
+		}
+	}
 	const _style = {
 		...style
 	};
@@ -260,7 +290,6 @@ export function createSection(args: {
 	}
 	css[section] = { style: { ..._style } };
 	let control = 'View';
-	let className = '';
 	let toplevelCls = '';
 	if (root === item) {
 		toplevelCls = GetCssName(node) || GetCodeName(node);

@@ -55,6 +55,7 @@ export interface ComponentProperty {
 	properties: {
 		tags: string[];
 	};
+	injections: { route: string };
 	style: { [key: string]: any };
 	children: { [key: string]: any };
 	cellModel: { [key: string]: any };

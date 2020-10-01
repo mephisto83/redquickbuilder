@@ -401,10 +401,19 @@ export const EventArgumentTypes = {
 	RouteSource: 'RouteSource'
 };
 
+export const PropertyCentricTypes = {
+	Route: 'Route',
+	Effect: 'Effect'
+};
+
 export const NodeProperties = {
 	ViewPackage: 'view-package',
 	IsFetchOutput: 'IsFetchOutput',
 	HideStyle: 'HideStyle',
+	IsPropertyCentric: 'IsPropertyCentric',
+	RouteInjection: 'RouteInjection',
+	PropertyCentricType: 'PropertyCentricType',
+	PropertyBeingUsed: 'PropertyBeingUsed',
 	IsFetchParameter: 'IsFetchParameter',
 	OriginalConfig: 'OriginalConfig',
 	ViewModelKey: 'ViewModelKey',
@@ -489,8 +498,8 @@ export const NodeProperties = {
 	EntryPoint: 'EntryPoint',
 	CSEntryPoint: 'CSEntryPoint',
 	CS: 'CS',
-  IsUserOfAgentType: 'IsUserOfAgentType',
-  UpdateAgentPostRegistrationMethod:'UpdateAgentPostRegistrationMethod',
+	IsUserOfAgentType: 'IsUserOfAgentType',
+	UpdateAgentPostRegistrationMethod: 'UpdateAgentPostRegistrationMethod',
 	Property: 'Property',
 	DataChainEntry: 'DataChainEntry',
 	MergeChain: 'MergeChain',
@@ -1055,6 +1064,7 @@ export const LinkPropertyKeys = {
 	FUNCTION_ID: 'function-id',
 	InstanceUpdate: 'InstanceUpdate',
 	ComponentTag: 'ComponentTag',
+	Sibling: 'sibling',
 	ComponentStyle: 'ComponentStyle',
 	MethodProps: 'methodProps',
 	MountingProps: 'mountingProps',

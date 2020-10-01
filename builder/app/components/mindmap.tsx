@@ -132,7 +132,7 @@ export default class MindMap extends Component<any, any> {
 		const width = bb.width - 10; // 960;
 		const height = bb.height - 10; // 800;
 		const color = d3.scaleOrdinal(Object.values(NodeTypeColors) || d3.schemeCategory10);
-		me.avoidOverlaps = true;
+		me.avoidOverlaps = false;
 		const margin = 6;
 
 		const pad = 12;
@@ -521,7 +521,7 @@ export default class MindMap extends Component<any, any> {
 						d.width = Math.max(MIN_DIMENSIONAL_SIZE, bb.width);
 						d.height = Math.max(MIN_DIMENSIONAL_SIZE, bb.height);
 					}
-					if (me.avoidOverlaps) d.innerBounds = d.bounds.inflate(-margin);
+					if (d.bounds) d.innerBounds = d.bounds.inflate(-margin);
 				});
 			}
 
@@ -610,7 +610,7 @@ export default class MindMap extends Component<any, any> {
 				});
 
 			link.each((d) => {
-				//  d.route = Cola.makeEdgeBetween(rotate(d.source), rotate(d.target, -Math.PI / 2), 5);
+				// d.route = Cola.makeEdgeBetween(rotate(d.source), rotate(d.target, -Math.PI / 2), 5);
 				if (!me.avoidOverlaps) {
 					d.route = Cola.makeEdgeBetween(createRectangle(d.source), createRectangle(d.target), 5);
 				} else {

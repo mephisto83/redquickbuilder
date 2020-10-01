@@ -44,7 +44,8 @@ import {
 	MediaQueries,
 	StyleNodeProperties,
 	LinkProperties,
-	EventArgumentTypes
+	EventArgumentTypes,
+	PropertyCentricTypes
 } from '../constants/nodetypes';
 import {
 	buildLayoutTree,
@@ -52,7 +53,8 @@ import {
 	GetRNConsts,
 	GetRNModelInstances,
 	GetRNModelConst,
-	GetRNModelConstValue
+	GetRNModelConstValue,
+	GetPropertyCentricComponents
 } from './layoutservice';
 import {
 	ComponentTypes,
@@ -403,6 +405,36 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 	const extraimports: any[] = [];
 	const css = {};
 	let layoutSrc;
+	let injections: { node: GraphMethods.Node | string; code: string }[] = [];
+	if (node) {
+		let propertyCentric = GetPropertyCentricComponents(node.id);
+		imports.push(...propertyCentric.map((v) => v.id));
+		injections = propertyCentric
+			.map((propCentricComponent: GraphMethods.Node) => {
+				let cellStyleArray: any[] = [];
+				return [
+					GetNodeProp(propCentricComponent, NodeProperties.PropertyCentricType),
+					GenerateMarkupTag(propCentricComponent, language, node, cellStyleArray) || '',
+					propCentricComponent
+				];
+			})
+			.filter((v) => v[1])
+			.map((temp: (string | GraphMethods.Node)[]) => {
+				let [ type, nodeCode, tempnode ] = temp;
+				return {
+					node: tempnode,
+					code: `{
+          type: '${type}',
+          el: () => {
+            return (
+              ${nodeCode}
+            );
+          }
+      }`
+				};
+			});
+	}
+
 	if (!specialLayout) {
 		// if not a List or something like that
 		layoutSrc = layoutObj
@@ -412,7 +444,8 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 					language,
 					imports,
 					node,
-					css
+					css,
+					injections
 				}).join(NEW_LINE)
 			: GetDefaultElement();
 	} else {
@@ -424,7 +457,8 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 				language,
 				imports,
 				node,
-				css
+				css,
+				injections
 			}).join(NEW_LINE);
 		}
 		const data = GetItemData(node);
@@ -910,6 +944,10 @@ export function GenerateRNComponents(
 	const components = GetNodeComponents(layoutObj).filter(
 		(x: string) => !GetNodeProp(GetNodeById(x), NodeProperties.SharedComponent)
 	);
+	if (node) {
+		let propertyCentric = GetPropertyCentricComponents(node.id);
+		components.push(...propertyCentric.map((v) => v.id));
+	}
 	components.map((component: any) => {
 		const relPath = relative
 			? `${relative}/${(GetCodeName(node) || '').toJavascriptName()}`
@@ -984,7 +1022,13 @@ export function ConvertViewTypeToComponentNode(node: any, language: string) {
 	return node;
 }
 
-export function GenerateMarkupTag(node: any, language: any, parent: any, cellStyleArray: any[] = []) {
+export function GenerateMarkupTag(
+	node: any,
+	language: any,
+	parent: any,
+	cellStyleArray: any[] = [],
+	options?: { injections: { node: GraphMethods.Node | string; code: string }[] }
+) {
 	let viewTypeNode = null;
 	if (GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.ViewType) {
 		viewTypeNode = node;
@@ -998,13 +1042,15 @@ export function GenerateMarkupTag(node: any, language: any, parent: any, cellSty
 			if (node && parent) {
 				if (viewTypeNode) {
 					describedApi = WriteDescribedApiProperties(viewTypeNode, {
-						listitem: false,
-						parent
+						listItem: false,
+						parent,
+						...options || {}
 					});
 				}
 				if (!describedApi) {
 					describedApi = WriteDescribedApiProperties(node, {
-						listItem: GetNodeProp(node, NodeProperties.ComponentType) === ComponentTypeKeys.ListItem
+						listItem: GetNodeProp(node, NodeProperties.ComponentType) === ComponentTypeKeys.ListItem,
+						...options || {}
 					});
 				}
 			}
@@ -1222,7 +1268,16 @@ function GetDefaultComponentValue(node: any, key?: string | undefined) {
 	return result;
 }
 
-function WriteDescribedApiProperties(node: GraphMethods.Node | null, options: any = { listItem: false }) {
+function WriteDescribedApiProperties(
+	node: GraphMethods.Node | null,
+	options: {
+		parent?: any;
+		listItem: boolean;
+		injections?: { node: GraphMethods.Node | string; code: string }[];
+	} = {
+		listItem: false
+	}
+) {
 	let result: any = '';
 	if (typeof node === 'string') {
 		node = GetNodeById(node);
@@ -1369,6 +1424,44 @@ function WriteDescribedApiProperties(node: GraphMethods.Node | null, options: an
 		!result.find((v: string) => v.indexOf('selected=') !== -1)
 	) {
 		result.push('selected={((this.props.value||[]).indexOf(value) !== -1)}');
+	}
+
+	if (options && options.injections) {
+		let tempIndex = result.findIndex((v: string) => v.indexOf('routeinj=') !== -1);
+		result.splice(tempIndex, 1);
+
+		let routes = options.injections.filter((v) => {
+			let property = GetNodeProp(v.node, NodeProperties.PropertyBeingUsed);
+			let type = GetNodeProp(v.node, NodeProperties.PropertyCentricType);
+			return (
+				GetNodesLinkedTo(GetCurrentGraph(), {
+					id: node ? node.id : null,
+					link: LinkType.DefaultViewType,
+					linkProperties: {
+						[LinkPropertyKeys.Sibling]: property
+					}
+				}).find((v: GraphMethods.Node) => v.id === property) && type === PropertyCentricTypes.Route
+			);
+		});
+
+		if (routes && routes.length) {
+			let routeInjectionTemplate = `routeinj={(value: string) => {
+        return [
+          ${routes
+				.map((v) => v.code)
+				.map((v, index) => {
+					v = v.replace('value={this.state.value}', 'value={value} key={`' + index + '`}');
+					v = v.replace('model={this.state.model}', 'model={value} ');
+					return v;
+				})
+				.join(', ' + NEW_LINE)}
+        ].map((v, i) => {
+          return v.el();
+        })
+      }}`;
+
+			result.push(routeInjectionTemplate);
+		}
 	}
 
 	const res = componentEventHandlers

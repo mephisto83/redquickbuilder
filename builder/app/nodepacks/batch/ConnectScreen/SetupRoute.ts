@@ -27,7 +27,14 @@ import {
 	GetModelCodeProperties
 } from '../../../actions/uiactions';
 import { GetNodesLinkedTo, GetNodeLinkedTo, GetCellProperties } from '../../../methods/graph_methods';
-import { LinkType, LinkProperties, NodeProperties, NodeTypes, EventArgumentTypes } from '../../../constants/nodetypes';
+import {
+	LinkType,
+	LinkProperties,
+	NodeProperties,
+	NodeTypes,
+	EventArgumentTypes,
+	PropertyCentricTypes
+} from '../../../constants/nodetypes';
 import { Node, ComponentLayoutContainer } from '../../../methods/graph_types';
 import {
 	AddButtonToSubComponent,
@@ -36,11 +43,14 @@ import {
 	AddApiToButton,
 	AddInternalComponentApi,
 	GetHideStyle,
-	AddComponentAutoStyles
+	AddComponentAutoStyles,
+	SetupApiResult,
+	AddCellToComponentLayout
 } from './Shared';
 import CreateNavigateToScreenDC from '../../CreateNavigateToScreenDC';
 import { GetScreenOption } from '../../../service/screenservice';
 import { ViewTypes } from '../../../constants/viewtypes';
+import { LinkPropertyKeys } from '../../../constants/nodetypes';
 
 export default function SetupRoute(
 	screen: Node,
@@ -86,7 +96,7 @@ function IsRouteForArrayProperty(routeDescription: RouteDescription, screen: Nod
 
 	let model = GetNodeProp(screen, NodeProperties.Model);
 	if (model) {
-		let childProperties = GetModelCodeProperties(screen.id).filter(
+		let childProperties = GetModelCodeProperties(model).filter(
 			(v: Node) =>
 				GetNodeProp(v, NodeProperties.IsTypeList) || GetNodeProp(v, NodeProperties.NODEType) === NodeTypes.Model
 		);
@@ -96,7 +106,7 @@ function IsRouteForArrayProperty(routeDescription: RouteDescription, screen: Nod
 				if (temp && temp.model) {
 					switch (temp.type) {
 						case RouteSourceType.Model:
-							return v.id === temp.model;
+							return v.id === temp.property;
 					}
 				}
 			}
@@ -164,10 +174,98 @@ function SetupRouteDescription(
 		if (!isArrayProperty) {
 			let cellId = AddButtonToComponentLayout({ button, component: subcomponent });
 			AddComponentAutoStyles(subcomponent, routeDescription, cellId);
+		} else {
+			updateComponentProperty(button, NodeProperties.IsPropertyCentric, true);
+			updateComponentProperty(button, NodeProperties.PropertyCentricType, PropertyCentricTypes.Route);
+			if (routeDescription.source) {
+				let temp = routeDescription.source['model'];
+				if (temp && temp.model) {
+					switch (temp.type) {
+						case RouteSourceType.Model:
+							updateComponentProperty(button, NodeProperties.PropertyBeingUsed, temp.property);
+							let propertyComponents = GetPropertyComponentInLayout(
+								subcomponent,
+								temp.property ? temp.property : ''
+							);
+							[ propertyComponents ].forEach((pc: Node | null) => {
+								if (pc) {
+									let res: SetupApiResult = SetupApi(GetNodeById(subcomponent), 'routeinj', pc, true);
+									res.internal.forEach((internal: string) => {
+										updateComponentProperty(internal, NodeProperties.RouteInjection, true);
+									});
+									res.external.forEach((external: string) => {
+										updateComponentProperty(external, NodeProperties.RouteInjection, true);
+									});
+									let connectedComponentNodes = GetNodesLinkedTo(GetCurrentGraph(), {
+										id: pc.id,
+										componentType: NodeTypes.ComponentNode
+									});
+									connectedComponentNodes.forEach((ccn: Node) => {
+										let res = SetupApi(pc, 'routeinj', ccn);
+										res.internal.forEach((internal: string) => {
+											updateComponentProperty(internal, NodeProperties.RouteInjection, true);
+										});
+										res.external.forEach((external: string) => {
+											updateComponentProperty(external, NodeProperties.RouteInjection, true);
+										});
+										let { newCell, layout } = AddCellToComponentLayout(ccn.id);
+										layout.properties[newCell].injections = {
+											route: 'routeinj'
+										};
+										// let temp = GetNodesLinkedTo(GetCurrentGraph(), {
+										// 	id: ccn.id,
+										// 	componentType: NodeTypes.ComponentNode
+										// });
+										// temp.filter((v: Node) => v.id !== pc.id).forEach((ccnChild: Node) => {
+										// 	let res = SetupApi(ccn, 'routeinj', ccnChild);
+										// 	res.internal.forEach((internal: string) => {
+										// 		updateComponentProperty(internal, NodeProperties.RouteInjection, true);
+										// 	});
+										// 	res.external.forEach((external: string) => {
+										// 		updateComponentProperty(external, NodeProperties.RouteInjection, true);
+										// 	});
+										// });
+									});
+								}
+							});
+							break;
+					}
+				}
+			}
 		}
 	});
 }
 
+// Get a component in the layout of the parent that will be handling the model property.
+function GetPropertyComponentInLayout(parent: string, property: string): Node | null {
+	let layout: ComponentLayoutContainer = GetNodeProp(parent, NodeProperties.Layout);
+	let result: Node | null = null;
+	if (layout) {
+		let { properties } = layout;
+		if (properties) {
+			Object.entries(properties).find((item: any[]) => {
+				let [ key, value ] = item;
+				if (value) {
+					let { children } = value;
+					if (children && children[key]) {
+						let propertyNode = GetNodesLinkedTo(GetCurrentGraph(), {
+							id: children[key],
+							link: LinkType.DefaultViewType,
+							linkProperties: {
+								[LinkPropertyKeys.Sibling]: property
+							}
+						}).find((v: Node) => v.id === property);
+						if (propertyNode) {
+							result = GetNodeById(children[key]);
+							return true;
+						}
+					}
+				}
+			});
+		}
+	}
+	return result;
+}
 function NavigateTo(
 	routeDescription: RouteDescription,
 	screen: Node,

@@ -175,6 +175,21 @@ export function AddButtonToComponentLayout(args: { button: string; component: st
 	return lastCell;
 }
 
+export function AddCellToComponentLayout(component: string): { newCell: string; layout: ComponentLayoutContainer } {
+	let layout: ComponentLayoutContainer = GetNodeProp(component, NodeProperties.Layout);
+
+	let root = GetFirstCell(layout);
+	let rootChildren = GetChildren(layout, root);
+	let cellCount = rootChildren.length;
+	layout = SetCellsLayout(layout, cellCount + 1, root);
+	let lastCell = GetLastCell(layout, root ? root : null);
+	if (!lastCell) {
+		throw new Error('couldnt get the last cell: Setup Effect');
+	}
+	updateComponentProperty(component, NodeProperties.Layout, layout);
+	return { newCell: lastCell, layout };
+}
+
 export function SetupApi(parent: Node, paramName: string, child: Node, skipFirst?: boolean): SetupApiResult {
 	console.log(`setup api :${paramName}`);
 	let result: SetupApiResult = {
