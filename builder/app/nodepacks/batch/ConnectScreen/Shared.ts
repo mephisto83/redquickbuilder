@@ -175,9 +175,11 @@ export function AddButtonToComponentLayout(args: { button: string; component: st
 	return lastCell;
 }
 
-export function AddCellToComponentLayout(component: string): { newCell: string; layout: ComponentLayoutContainer } {
+export function AddCellToComponentLayout(component: string): { newCell: string; layout?: ComponentLayoutContainer } {
 	let layout: ComponentLayoutContainer = GetNodeProp(component, NodeProperties.Layout);
-
+	if (!layout) {
+		return { newCell: '' };
+	}
 	let root = GetFirstCell(layout);
 	let rootChildren = GetChildren(layout, root);
 	let cellCount = rootChildren.length;

@@ -26,7 +26,7 @@ import {
 	CreateNewNode,
 	GetModelCodeProperties
 } from '../../../actions/uiactions';
-import { GetNodesLinkedTo, GetNodeLinkedTo, GetCellProperties } from '../../../methods/graph_methods';
+import { GetNodesLinkedTo, GetNodeLinkedTo, GetCellProperties, SOURCE } from '../../../methods/graph_methods';
 import {
 	LinkType,
 	LinkProperties,
@@ -51,6 +51,7 @@ import CreateNavigateToScreenDC from '../../CreateNavigateToScreenDC';
 import { GetScreenOption } from '../../../service/screenservice';
 import { ViewTypes } from '../../../constants/viewtypes';
 import { LinkPropertyKeys } from '../../../constants/nodetypes';
+import { TARGET } from '../../../methods/graph_methods';
 
 export default function SetupRoute(
 	screen: Node,
@@ -198,34 +199,53 @@ function SetupRouteDescription(
 									});
 									let connectedComponentNodes = GetNodesLinkedTo(GetCurrentGraph(), {
 										id: pc.id,
-										componentType: NodeTypes.ComponentNode
+										componentType: NodeTypes.ComponentNode,
+										direction: SOURCE
 									});
-									connectedComponentNodes.forEach((ccn: Node) => {
-										let res = SetupApi(pc, 'routeinj', ccn);
-										res.internal.forEach((internal: string) => {
-											updateComponentProperty(internal, NodeProperties.RouteInjection, true);
+									connectedComponentNodes
+										.filter(
+											(v: Node) =>
+												GetNodeProp(v, NodeProperties.UIType) ===
+												GetNodeProp(screenOption, NodeProperties.UIType)
+										)
+										.forEach((ccn: Node) => {
+											let res = SetupApi(pc, 'routeinj', ccn);
+											res.internal.forEach((internal: string) => {
+												updateComponentProperty(internal, NodeProperties.RouteInjection, true);
+											});
+											res.external.forEach((external: string) => {
+												updateComponentProperty(external, NodeProperties.RouteInjection, true);
+											});
+
+											let temp = GetNodesLinkedTo(GetCurrentGraph(), {
+												id: ccn.id,
+												componentType: NodeTypes.ComponentNode
+											});
+											temp.filter((v: Node) => v.id !== pc.id).forEach((ccnChild: Node) => {
+												let res = SetupApi(ccn, 'routeinj', ccnChild);
+												res.internal.forEach((internal: string) => {
+													updateComponentProperty(
+														internal,
+														NodeProperties.RouteInjection,
+														true
+													);
+												});
+												res.external.forEach((external: string) => {
+													updateComponentProperty(
+														external,
+														NodeProperties.RouteInjection,
+														true
+													);
+												});
+												let { newCell, layout } = AddCellToComponentLayout(ccnChild.id);
+												if (layout && newCell) {
+													layout.properties[newCell].injections = {
+														route: 'routeinj'
+													};
+                          updateComponentProperty(ccnChild.id, NodeProperties.Layout, layout);
+												}
+											});
 										});
-										res.external.forEach((external: string) => {
-											updateComponentProperty(external, NodeProperties.RouteInjection, true);
-										});
-										let { newCell, layout } = AddCellToComponentLayout(ccn.id);
-										layout.properties[newCell].injections = {
-											route: 'routeinj'
-										};
-										// let temp = GetNodesLinkedTo(GetCurrentGraph(), {
-										// 	id: ccn.id,
-										// 	componentType: NodeTypes.ComponentNode
-										// });
-										// temp.filter((v: Node) => v.id !== pc.id).forEach((ccnChild: Node) => {
-										// 	let res = SetupApi(ccn, 'routeinj', ccnChild);
-										// 	res.internal.forEach((internal: string) => {
-										// 		updateComponentProperty(internal, NodeProperties.RouteInjection, true);
-										// 	});
-										// 	res.external.forEach((external: string) => {
-										// 		updateComponentProperty(external, NodeProperties.RouteInjection, true);
-										// 	});
-										// });
-									});
 								}
 							});
 							break;

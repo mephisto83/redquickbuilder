@@ -48,6 +48,7 @@ import ApplyExecutionChains from './ApplyExecutionChains';
 import ApplyValidationChains from './ApplyValidationChains';
 import SetupAuthenticationButtons from './SetupAuthenticationButtons';
 import { ConnectScreenListRoutes } from './ConnectScreens';
+import AttachTitleService from './AttachTitleService';
 
 interface BuildStep {
 	progress?: number;
@@ -201,6 +202,7 @@ export const CollectionConnectDataChainCollection = 'CollectionConnectDataChainC
 export const APPLY_PERMISSION_CHAINS = 'Apply Permission Chains';
 export const APPLY_VALIDATION_CHAINS = 'Apply Validation Chains';
 export const AUTHENTICATION_BUTTONS = 'Authentication Buttons';
+export const ATTACH_TITLE_SERVICE = 'Attach Title Service';
 export const GETALL_LIST_ROUTES = 'GETALL_LIST_ROUTES';
 export const APPLY_EXECUTION_CHAINS = 'Apply Execution Chains';
 
@@ -254,6 +256,7 @@ const buildAllProgress = [
 	{ name: APPLY_VALIDATION_CHAINS },
 	{ name: GETALL_LIST_ROUTES },
 	{ name: AUTHENTICATION_BUTTONS },
+	{ name: ATTACH_TITLE_SERVICE },
 	{ name: COMPLETED_BUILD }
 ];
 export const BuildAllInfo = {
@@ -371,7 +374,9 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		await run(buildAllProgress, AUTHENTICATION_BUTTONS, async (progressfunc) => {
 			await SetupAuthenticationButtons();
 		});
-
+		await run(buildAllProgress, ATTACH_TITLE_SERVICE, async (progressfunc) => {
+			await AttachTitleService();
+		});
 		await run(buildAllProgress, Add_Filters_To_Get_All, async (progresFunc: any) => {
 			await AddFiltersToGetAll(progresFunc);
 		});
