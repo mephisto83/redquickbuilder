@@ -64,6 +64,7 @@ import { SetPause } from '../methods/graph_methods';
 import SetupViewTypes from '../nodepacks/batch/SetupViewTypes';
 import { graphOperation, GetDispatchFunc, GetStateFunc } from '../actions/uiactions';
 import SetupAuthenticationButtons from '../nodepacks/batch/SetupAuthenticationButtons';
+import AttachTitleService from '../nodepacks/batch/AttachTitleService';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -321,6 +322,12 @@ class QuickMethods extends Component<any, any, any> {
 									title="Setup Authentication Buttons"
 									onClick={() => {
 										SetupAuthenticationButtons();
+									}}
+								/>
+								<TreeViewMenu
+									title="Attach Title Service"
+									onClick={() => {
+										AttachTitleService();
 									}}
 								/>
 								<TreeViewMenu
@@ -692,7 +699,9 @@ class QuickMethods extends Component<any, any, any> {
 									}}
 									icon="fa fa-tag"
 								>
-									{UIA.GetModelPropertyChildren(currentNode ? currentNode.id : null).map((child: { id: string | number | undefined; }) => (
+									{UIA.GetModelPropertyChildren(
+										currentNode ? currentNode.id : null
+									).map((child: { id: string | number | undefined }) => (
 										// Could use something besides a VISUAL for this.
 										<CheckBox
 											label={UIA.GetNodeTitle(child)}
@@ -708,13 +717,14 @@ class QuickMethods extends Component<any, any, any> {
 									<h4>Methods</h4>
 									<ButtonList
 										active
-										isSelected={(item: { value: React.ReactText; }) => this.state.selectedMethods[item.value]}
+										isSelected={(item: { value: React.ReactText }) =>
+											this.state.selectedMethods[item.value]}
 										items={Object.keys(ViewTypes).map((x) => ({
 											id: x,
 											value: x,
 											title: x
 										}))}
-										onClick={(item: { value: React.ReactText; }) => {
+										onClick={(item: { value: React.ReactText }) => {
 											this.setState({
 												selectedMethods: {
 													...this.state.selectedMethods || {},

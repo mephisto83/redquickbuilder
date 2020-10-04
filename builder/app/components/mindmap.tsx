@@ -132,7 +132,7 @@ export default class MindMap extends Component<any, any> {
 		const width = bb.width - 10; // 960;
 		const height = bb.height - 10; // 800;
 		const color = d3.scaleOrdinal(Object.values(NodeTypeColors) || d3.schemeCategory10);
-		me.avoidOverlaps = false;
+		me.avoidOverlaps = true;
 		const margin = 6;
 
 		const pad = 12;
@@ -288,16 +288,18 @@ export default class MindMap extends Component<any, any> {
 			console.log(e);
 			return;
 		}
-		const group = svg
-			.selectAll('.group')
-			.data(graph.groups)
-			.enter()
-			.append('rect')
-			.attr('rx', 8)
-			.attr('ry', 8)
-			.attr('class', 'group')
-			.style('fill', (d, i) => Object.values(NodeTypeColors)[i] || color(i))
-			.call(force.drag);
+		const group = !me.avoidOverlaps
+			? svg
+					.selectAll('.group')
+					.data(graph.groups)
+					.enter()
+					.append('rect')
+					.attr('rx', 8)
+					.attr('ry', 8)
+					.attr('class', 'group')
+					.style('fill', (d, i) => Object.values(NodeTypeColors)[i] || color(i))
+					.call(force.drag)
+			: null;
 
 		const node = svg.selectAll('.node');
 		this.$node = node;
@@ -572,42 +574,42 @@ export default class MindMap extends Component<any, any> {
 						return d.y - d.height / 2;
 					});
 			}
-			// if (me.avoidOverlapss)
-			group
-				.attr('x', (d) => {
-					if (!d.bounds) {
-						const min = d.leaves.minimum((x) => x.x - x.width / 2);
-						const max = d.leaves.maximum((x) => x.x + x.width / 2);
-						const width = max - min;
-						return d.leaves.summation((x) => x.x) / d.leaves.length - width / 2;
-					}
-					return d.bounds.x;
-				})
-				.attr('y', (d) => {
-					if (!d.bounds) {
-						const min = d.leaves.minimum((x) => x.y - x.height / 2);
-						const max = d.leaves.maximum((x) => x.y + x.height / 2);
-						const height = max - min;
-						return d.leaves.summation((x) => x.y) / d.leaves.length - height / 2;
-					}
-					return d.bounds.y;
-				})
-				.attr('width', (d) => {
-					if (!d.bounds) {
-						const min = d.leaves.minimum((x) => x.x - x.width / 2);
-						const max = d.leaves.maximum((x) => x.x + x.width / 2);
-						return max - min;
-					}
-					return d.bounds.width();
-				})
-				.attr('height', (d) => {
-					if (!d.bounds) {
-						const min = d.leaves.minimum((x) => x.y - x.height / 2);
-						const max = d.leaves.maximum((x) => x.y + x.height / 2);
-						return max - min;
-					}
-					return d.bounds.height();
-				});
+			if (!me.avoidOverlaps)
+				group
+					.attr('x', (d) => {
+						if (!d.bounds) {
+							const min = d.leaves.minimum((x) => x.x - x.width / 2);
+							const max = d.leaves.maximum((x) => x.x + x.width / 2);
+							const width = max - min;
+							return d.leaves.summation((x) => x.x) / d.leaves.length - width / 2;
+						}
+						return d.bounds.x;
+					})
+					.attr('y', (d) => {
+						if (!d.bounds) {
+							const min = d.leaves.minimum((x) => x.y - x.height / 2);
+							const max = d.leaves.maximum((x) => x.y + x.height / 2);
+							const height = max - min;
+							return d.leaves.summation((x) => x.y) / d.leaves.length - height / 2;
+						}
+						return d.bounds.y;
+					})
+					.attr('width', (d) => {
+						if (!d.bounds) {
+							const min = d.leaves.minimum((x) => x.x - x.width / 2);
+							const max = d.leaves.maximum((x) => x.x + x.width / 2);
+							return max - min;
+						}
+						return d.bounds.width();
+					})
+					.attr('height', (d) => {
+						if (!d.bounds) {
+							const min = d.leaves.minimum((x) => x.y - x.height / 2);
+							const max = d.leaves.maximum((x) => x.y + x.height / 2);
+							return max - min;
+						}
+						return d.bounds.height();
+					});
 
 			link.each((d) => {
 				// d.route = Cola.makeEdgeBetween(rotate(d.source), rotate(d.target, -Math.PI / 2), 5);

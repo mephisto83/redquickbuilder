@@ -167,7 +167,7 @@ function SetupRouteDescription(
 		AddApiToButton({ button, component: subcomponent });
 		// console.log(GetNodeProp(routeDescription.))
 		if (targetScreen) {
-			NavigateTo(routeDescription, targetScreen, information, { eventInstance, event, button });
+			NavigateTo(routeDescription, targetScreen, information, { isArrayProperty, eventInstance, event, button });
 		} else {
 			console.log(JSON.stringify(routeDescription, null, 4));
 			throw new Error('missing targetScreen');
@@ -242,7 +242,7 @@ function SetupRouteDescription(
 													layout.properties[newCell].injections = {
 														route: 'routeinj'
 													};
-                          updateComponentProperty(ccnChild.id, NodeProperties.Layout, layout);
+													updateComponentProperty(ccnChild.id, NodeProperties.Layout, layout);
 												}
 											});
 										});
@@ -290,7 +290,7 @@ function NavigateTo(
 	routeDescription: RouteDescription,
 	screen: Node,
 	information: SetupInformation,
-	buttonInformation: { eventInstance: string; event: string; button: string }
+	buttonInformation: { isArrayProperty?: boolean; eventInstance: string; event: string; button: string }
 ) {
 	console.log('navigate to ' + GetNodeTitle(screen));
 

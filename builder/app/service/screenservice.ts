@@ -1426,26 +1426,27 @@ function WriteDescribedApiProperties(
 		result.push('selected={((this.props.value||[]).indexOf(value) !== -1)}');
 	}
 
-	if (options && options.injections) {
+	if (options && options.injections && options.injections.length) {
 		let tempIndex = result.findIndex((v: string) => v.indexOf('routeinj=') !== -1);
-		result.splice(tempIndex, 1);
+		if (tempIndex !== -1) {
+			result.splice(tempIndex, 1);
 
-		let routes = options.injections.filter((v) => {
-			let property = GetNodeProp(v.node, NodeProperties.PropertyBeingUsed);
-			let type = GetNodeProp(v.node, NodeProperties.PropertyCentricType);
-			return (
-				GetNodesLinkedTo(GetCurrentGraph(), {
-					id: node ? node.id : null,
-					link: LinkType.DefaultViewType,
-					linkProperties: {
-						[LinkPropertyKeys.Sibling]: property
-					}
-				}).find((v: GraphMethods.Node) => v.id === property) && type === PropertyCentricTypes.Route
-			);
-		});
+			let routes = options.injections.filter((v) => {
+				let property = GetNodeProp(v.node, NodeProperties.PropertyBeingUsed);
+				let type = GetNodeProp(v.node, NodeProperties.PropertyCentricType);
+				return (
+					GetNodesLinkedTo(GetCurrentGraph(), {
+						id: node ? node.id : null,
+						link: LinkType.DefaultViewType,
+						linkProperties: {
+							[LinkPropertyKeys.Sibling]: property
+						}
+					}).find((v: GraphMethods.Node) => v.id === property) && type === PropertyCentricTypes.Route
+				);
+			});
 
-		if (routes && routes.length) {
-			let routeInjectionTemplate = `routeinj={(value: string) => {
+			if (routes && routes.length) {
+				let routeInjectionTemplate = `routeinj={(value: string) => {
         return [
           ${routes
 				.map((v) => v.code)
@@ -1460,7 +1461,8 @@ function WriteDescribedApiProperties(
         })
       }}`;
 
-			result.push(routeInjectionTemplate);
+				result.push(routeInjectionTemplate);
+			}
 		}
 	}
 
@@ -1971,7 +1973,15 @@ function createInternalApiArgumentsCode(
 						case RouteSourceType.Agent:
 						case RouteSourceType.Model:
 							methodParamNames.push(paramName);
+							if (GetNodeProp(routeSource.property, NodeProperties.NODEType) === NodeTypes.Model) {
+								return `${paramName}: (() => {
+                  /*route type: ${routeSource.type}*/
+                  let model = this.state.value;
+                  return model;
+                })()`;
+							}
 							return `${paramName}: (() => {
+                /*route type: ${routeSource.type}*/
                 let model = GetC(this.props.state, SITE, Models.${GetCodeName(routeSource.model)});
                 if(model) {
                   return model.${GetJSCodeName(routeSource.property)};
@@ -1981,11 +1991,9 @@ function createInternalApiArgumentsCode(
 						case RouteSourceType.Item:
 							methodParamNames.push(paramName);
 							return `${paramName}: (() => {
-                let model = GetItem(Models.${GetCodeName(routeSource.model)}, this.state.value);
-                if(model) {
-                  return model.${GetJSCodeName(routeSource.property)};
-                }
-                return null;
+                /*route type: ${routeSource.type}*/
+                let model = this.state.value;
+                return model;
               })()`;
 						case RouteSourceType.UrlParameter:
 							methodParamNames.push(paramName);
