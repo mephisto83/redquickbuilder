@@ -5,7 +5,14 @@ import {
 	GetLinkBetween,
 	updateLinkProperty
 } from '../methods/graph_methods';
-import { NodeTypes, LinkProperties, LinkPropertyKeys, NodeProperties, LinkType } from '../constants/nodetypes';
+import {
+	NodeTypes,
+	LinkProperties,
+	LinkPropertyKeys,
+	NodeProperties,
+	LinkType,
+	NEW_LINE
+} from '../constants/nodetypes';
 import {
 	REMOVE_NODE,
 	graphOperation,
@@ -605,18 +612,42 @@ function BuildMethodConcept(agentAccessContext: { entry: string }, effect: Effec
 						);
 					}
 				}
+				let permissionsSummary = (_effect.permissions || [])
+					.map((permission: PermissionConfig) => {
+						let res: any = {};
+						let result: string[] = [];
+						res.name = permission.summary || permission.name;
+						if (permission.dataChainOptions && permission.dataChainOptions.simpleValidations) {
+							permission.dataChainOptions.simpleValidations
+								.map((v) => v.name)
+								.filter((v) => v)
+								.forEach((v: any) => {
+									result.push(v);
+								});
+						}
+						res.parts = result;
+						return res;
+					})
 
-        let permissionsSummary = (_effect.permissions || []).map((permission: PermissionConfig) => {
-					return permission.summary || permission.name;
+				let validationSummary = (_effect.validations || []).map((validation: ValidationConfig) => {
+					let res: any = {};
+					let result: string[] = [];
+					res.name = validation.summary || validation.name;
+					if (validation.dataChainOptions && validation.dataChainOptions.simpleValidations) {
+						validation.dataChainOptions.simpleValidations
+							.map((v) => v.name)
+							.filter((v) => v)
+							.forEach((v: any) => {
+								result.push(v);
+							});
+					}
+          res.parts = result;
+					return res;
 				});
 
-        let validationSummary = (_effect.validations || []).map((validation: ValidationConfig) => {
-					return validation.summary || validation.name;
-				});
-
-        let executionSummary = (_effect.executions || []).map((execution: ExecutionConfig) => {
+				let executionSummary = (_effect.executions || []).map((execution: ExecutionConfig) => {
 					return execution.summary || execution.name;
-        });
+				});
 
 				let createNewNode = CreateNewNode(
 					{
@@ -670,6 +701,46 @@ function BuildMethodConceptMounting(
 						);
 					}
 				}
+
+				let permissionsSummary = (mountingDescription.permissions || [])
+					.map((permission: PermissionConfig) => {
+						let res: any = {};
+						let result: string[] = [];
+						res.name = permission.summary || permission.name;
+						if (permission.dataChainOptions && permission.dataChainOptions.simpleValidations) {
+							permission.dataChainOptions.simpleValidations
+								.map((v) => v.name)
+								.filter((v) => v)
+								.forEach((v: any) => {
+									result.push(v);
+								});
+						}
+            res.parts = result;
+						return res;
+					})
+					.flatten();
+
+				let validationSummary = (mountingDescription.validations || []).map((validation: ValidationConfig) => {
+          let res: any = {};
+          let result: string[] = [];
+          res.name = validation.summary || validation.name;
+
+					if (validation.dataChainOptions && validation.dataChainOptions.simpleValidations) {
+						validation.dataChainOptions.simpleValidations
+							.map((v) => v.name)
+							.filter((v) => v)
+							.forEach((v: any) => {
+								result.push(v);
+							});
+					}
+          res.parts = result;
+          return res;
+				});
+
+				let executionSummary = (mountingDescription.executions || []).map((execution: ExecutionConfig) => {
+					return execution.summary || execution.name;
+				});
+
 				let createNewNode = CreateNewNode(
 					{
 						[NodeProperties.NODEType]: NodeTypes.Concept,
@@ -677,7 +748,10 @@ function BuildMethodConceptMounting(
 						[NodeProperties.Description]: description,
 						[NodeProperties.FunctionType]: functionType,
 						[NodeProperties.ViewType]: viewType,
-						[NodeProperties.UIText]: `${mountingDescription.name}`
+						[NodeProperties.UIText]: `${mountingDescription.name}`,
+						[NodeProperties.PermissionSummary]: permissionsSummary,
+						[NodeProperties.ValidationSummary]: validationSummary,
+						[NodeProperties.ExecutionSummary]: executionSummary
 					},
 					(node: any) => {
 						newnode = node;

@@ -308,14 +308,14 @@ function GetNodeInformationForReport(node: any) {
 	let result: any = {};
 	switch (nodeType) {
 		case NodeTypes.AgentAccessDescription:
-			let linkedNode = GetNodeLinkedTo(GetCurrentGraph(), {
-				id: node.id,
-				link: LinkType.AgentAccess
-			});
-			let link = GetLinkBetween(linkedNode.id, node.id, GetCurrentGraph());
-			if (link) {
-				result.agentAccessLink = link;
-			}
+			// let linkedNode = GetNodeLinkedTo(GetCurrentGraph(), {
+			// 	id: node.id,
+			// 	link: LinkType.AgentAccess
+			// });
+			// let link = GetLinkBetween(linkedNode.id, node.id, GetCurrentGraph());
+			// if (link) {
+			// 	result.agentAccessLink = link;
+			// }
 			break;
 	}
 

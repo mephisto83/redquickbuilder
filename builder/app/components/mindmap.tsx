@@ -190,11 +190,11 @@ export default class MindMap extends Component<any, any> {
 				);
 				body.attr(
 					'data-transform',
-					`(${me.mapScale || 1})  (${me.mapTranslate.x + x}x, ${me.mapTranslate.y + y})y`
+					`Scale (${me.mapScale || 1})  (${me.mapTranslate.x + x}x, ${me.mapTranslate.y + y})y`
 				);
 				centerGuid.attr(
 					'style',
-					`position:absolute; top: 10px; left:330px; height: 20px; width:3px; background-color: red; transform:rotate(${Math.abs(
+					`position:absolute; display:none; top: 0px; left:0px; height: 20px; width:3px; background-color: red; transform:rotate(${Math.abs(
 						ang
 					)}deg)`
 				);

@@ -197,7 +197,7 @@ export default class GraphComponent extends Component<any, any> {
 				);
 				body.attr(
 					'data-transform',
-					`(${me.mapScale || 1})  (${me.mapTranslate.x + x}x, ${me.mapTranslate.y + y})y`
+					`Scale (${me.mapScale || 1}) | (${me.mapTranslate.x + x}x, ${me.mapTranslate.y + y})y`
 				);
 				// centerGuid.attr(
 				// 	'style',
