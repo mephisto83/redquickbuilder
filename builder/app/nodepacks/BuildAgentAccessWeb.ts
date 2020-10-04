@@ -31,7 +31,10 @@ import {
 	Routing,
 	RouteDescription,
 	RoutingProps,
-	EffectDescription
+	EffectDescription,
+	PermissionConfig,
+	ValidationConfig,
+	ExecutionConfig
 } from '../interface/methodprops';
 import { GraphLink, Graph, Node } from '../methods/graph_types';
 import { ViewTypes } from '../constants/viewtypes';
@@ -588,20 +591,33 @@ function BuildMethodConcept(agentAccessContext: { entry: string }, effect: Effec
 			if (!effect.effects) {
 				return [];
 			}
-			return effect.effects.map((efffect: EffectDescription) => {
+			return effect.effects.map((_effect: EffectDescription) => {
 				let description = '';
 				let functionType: string = '';
-				if (efffect.methodDescription) {
-					functionType = efffect.methodDescription.functionType;
+				if (_effect.methodDescription) {
+					functionType = _effect.methodDescription.functionType;
 					let descriptionTemplate =
-						MethodFunctions[efffect.methodDescription.functionType].descriptionTemplate;
-					if (descriptionTemplate && efffect.methodDescription.properties) {
+						MethodFunctions[_effect.methodDescription.functionType].descriptionTemplate;
+					if (descriptionTemplate && _effect.methodDescription.properties) {
 						description = descriptionTemplate(
-							GetNodeTitle(efffect.methodDescription.properties.model),
-							GetNodeTitle(efffect.methodDescription.properties.agent)
+							GetNodeTitle(_effect.methodDescription.properties.model),
+							GetNodeTitle(_effect.methodDescription.properties.agent)
 						);
 					}
 				}
+
+        let permissionsSummary = (_effect.permissions || []).map((permission: PermissionConfig) => {
+					return permission.summary || permission.name;
+				});
+
+        let validationSummary = (_effect.validations || []).map((validation: ValidationConfig) => {
+					return validation.summary || validation.name;
+				});
+
+        let executionSummary = (_effect.executions || []).map((execution: ExecutionConfig) => {
+					return execution.summary || execution.name;
+        });
+
 				let createNewNode = CreateNewNode(
 					{
 						[NodeProperties.NODEType]: NodeTypes.Concept,
@@ -609,7 +625,10 @@ function BuildMethodConcept(agentAccessContext: { entry: string }, effect: Effec
 						[NodeProperties.Description]: description,
 						[NodeProperties.FunctionType]: functionType,
 						[NodeProperties.ViewType]: viewType,
-						[NodeProperties.UIText]: `${efffect.name}`
+						[NodeProperties.UIText]: `${_effect.name}`,
+						[NodeProperties.PermissionSummary]: permissionsSummary,
+						[NodeProperties.ValidationSummary]: validationSummary,
+						[NodeProperties.ExecutionSummary]: executionSummary
 					},
 					(node: any) => {
 						newnode = node;
