@@ -9,7 +9,8 @@ import {
 	getNodeLinks,
 	SOURCE,
 	NodesByType,
-	GetLinkBetween
+	GetLinkBetween,
+	GetNodesLinkedTo, GetNodeLinkedTo
 } from '../methods/graph_methods';
 import {
 	SaveApplication,
@@ -34,7 +35,8 @@ import {
 	GetCssName,
 	GetState,
 	pinConnectedNodesByLinkType,
-	GetNodeById
+	GetNodeById,
+	GetNodeProp
 } from './uiactions';
 import { processRecording } from '../utils/utilservice';
 import prune from '../methods/prune';
@@ -45,7 +47,7 @@ import fs from 'fs';
 import JobService, { ensureDirectory, JobServiceConstants, ensureDirectorySync } from '../jobs/jobservice';
 import StoreGraph, { LoadGraph } from '../methods/storeGraph';
 import { Graph, GraphLink, Node, QuickAccess } from '../methods/graph_types';
-import { NodeProperties, LinkType, LinkPropertyKeys } from '../constants/nodetypes';
+import { NodeProperties, LinkType, LinkPropertyKeys, NodeTypes } from '../constants/nodetypes';
 import { Link } from 'react-router-dom';
 import { IfFalse } from '../components/titles';
 import { platform } from 'os';
@@ -99,8 +101,8 @@ export function openRedQuickBuilderGraph(unpruneGraph?: boolean, unpinned?: bool
 		const dialog = remote.dialog;
 		dialog
 			.showOpenDialog(remote.getCurrentWindow(), {
-				filters: [{ name: 'Red Quick Builder', extensions: [RED_QUICK_FILE_EXT$] }],
-				properties: ['openFile']
+				filters: [ { name: 'Red Quick Builder', extensions: [ RED_QUICK_FILE_EXT$ ] } ],
+				properties: [ 'openFile' ]
 			})
 			.then(async (opts) => {
 				let filePaths = opts.filePaths;
@@ -152,8 +154,8 @@ export function openRedQuickBuilderTheme() {
 		const dialog = remote.dialog;
 		dialog
 			.showOpenDialog(remote.getCurrentWindow(), {
-				filters: [{ name: 'Red Quick Builder', extensions: [RED_QUICK_FILE_THEME_EXT$] }],
-				properties: ['openFile']
+				filters: [ { name: 'Red Quick Builder', extensions: [ RED_QUICK_FILE_THEME_EXT$ ] } ],
+				properties: [ 'openFile' ]
 			})
 			.then((opts) => {
 				let fileName: any = opts.filePaths.find((x) => x);
@@ -219,7 +221,7 @@ export function saveGraphToFile(pruneGraph?: boolean) {
 			const dialog = remote.dialog;
 			dialog
 				.showSaveDialog(remote.getCurrentWindow(), {
-					filters: [{ name: 'Red Quick Builder', extensions: [RED_QUICK_FILE_EXT$] }]
+					filters: [ { name: 'Red Quick Builder', extensions: [ RED_QUICK_FILE_EXT$ ] } ]
 				})
 				.then(async (opts) => {
 					let fileName = opts.filePath;
@@ -282,12 +284,16 @@ export async function takeDashboardShot(folder: any, name?: string, getNodes?: a
 					projectJson = JSON.parse(fs.readFileSync(temppath, 'utf8'));
 				}
 				if (name) {
-					projectJson[name] = nodese.map((v: any) => ({
-						bounds: v.bounds,
-						properties: v.properties,
-						color: NodeTypeColors[v.properties.nodeType],
-						id: v.id
-					}));
+					projectJson[name] = nodese.map((v: any) => {
+						let info = GetNodeInformationForReport(v);
+						return {
+							bounds: v.bounds,
+							properties: v.properties,
+							color: NodeTypeColors[v.properties.nodeType],
+							id: v.id,
+							info
+						};
+					});
 					fs.writeFileSync(temppath, JSON.stringify(projectJson), 'utf8');
 				}
 			}
@@ -296,6 +302,24 @@ export async function takeDashboardShot(folder: any, name?: string, getNodes?: a
 			}
 		}
 	}
+}
+function GetNodeInformationForReport(node: any) {
+	let nodeType: string = GetNodeProp(node.id, NodeProperties.NODEType);
+	let result: any = {};
+	switch (nodeType) {
+		case NodeTypes.AgentAccessDescription:
+			let linkedNode = GetNodeLinkedTo(GetCurrentGraph(), {
+				id: node.id,
+				link: LinkType.AgentAccess
+			});
+			let link = GetLinkBetween(linkedNode.id, node.id, GetCurrentGraph());
+			if (link) {
+				result.agentAccessLink = link;
+			}
+			break;
+	}
+
+	return result;
 }
 export function getMindMapBounds() {
 	let svgs = document.querySelectorAll('.content-wrapper svg div[data-id]');
@@ -352,7 +376,7 @@ export async function startSequence(
 		setPinned(modelId, true);
 		await populate(modelId, ops);
 		let bounds = getMindMapBounds();
-		doesntfit = !doesItFit(bounds, ops.centerMindMap || (() => { }));
+		doesntfit = !doesItFit(bounds, ops.centerMindMap || (() => {}));
 		console.log(bounds);
 		maxattempts--;
 	} while (doesntfit && maxattempts);
@@ -395,7 +419,7 @@ export async function populate(
 	ops: { exclusiveLinkTypes: string[]; level1?: string; level2?: string[] }
 ) {
 	let links: GraphLink[] = getNodeLinks(GetCurrentGraph(), modelId);
-	let typesToSkip: string[] = ops && ops.exclusiveLinkTypes.length ? [] : [LinkType.PropertyLink];
+	let typesToSkip: string[] = ops && ops.exclusiveLinkTypes.length ? [] : [ LinkType.PropertyLink ];
 	let doesntfit = false;
 	let sorted = links
 		.unique((link: GraphLink) => GetLinkProperty(link, LinkPropertyKeys.TYPE))
@@ -433,7 +457,7 @@ export async function populate(
 				ops.level2 || LinkType.PropertyLink
 			);
 			let bounds = getMindMapBounds();
-			doesntfit = !doesItFit(bounds, () => { });
+			doesntfit = !doesItFit(bounds, () => {});
 			maxtimes--;
 			if (doesntfit) {
 				setPinned(pinned, false);
@@ -486,7 +510,7 @@ export function setJobFolder(key: string) {
 
 		dialog
 			.showOpenDialog(remote.getCurrentWindow(), {
-				properties: ['openDirectory']
+				properties: [ 'openDirectory' ]
 			})
 			.then((opts) => {
 				let fileName = opts.filePaths.find((x) => x);
@@ -544,7 +568,7 @@ export function remoteSelectNode(id: string) {
 			body: { id, command: 'select' }
 		})
 	);
-	return () => { };
+	return () => {};
 }
 export function sendNode(id: string) {
 	return (dispatch: Function, getState: Function) => {
@@ -554,10 +578,10 @@ export function sendNode(id: string) {
 		let links = !graph.nodeLinkIds[id]
 			? []
 			: Object.entries(graph.nodeLinkIds[id]).map((v) => {
-				let [key, value] = v;
-				othernodes.push(GetNodeById(key));
-				return graph.linkLib[value];
-			});
+					let [ key, value ] = v;
+					othernodes.push(GetNodeById(key));
+					return graph.linkLib[value];
+				});
 		let state = getState();
 		let selectedLink = Visual(state, SELECTED_LINK);
 
@@ -565,7 +589,7 @@ export function sendNode(id: string) {
 			? GetLinkBetween(selectedLink.source, selectedLink.target, GetCurrentGraph())
 			: null;
 
-		viewObject([node, ...othernodes], links, {
+		viewObject([ node, ...othernodes ], links, {
 			currentNode: id,
 			currentLink: currentLink,
 			nodeLinkIds: {
@@ -617,7 +641,7 @@ export function viewFlowCode(code: any) {
 			msg: HandlerEvents.flowCodeWindowCommand.message,
 			body: { code }
 		})
-	)
+	);
 }
 
 export function updateConfig(applicationConfiguration: any) {
@@ -641,7 +665,7 @@ export function saveRecording(recording: any) {
 				filters: [
 					{
 						name: 'Red Quick Builder Recording',
-						extensions: [RED_QUICK_FILE_RECORDING_EXT$]
+						extensions: [ RED_QUICK_FILE_RECORDING_EXT$ ]
 					}
 				]
 			})
@@ -680,7 +704,7 @@ export function saveTheme(theme: any) {
 				filters: [
 					{
 						name: 'Red Quick Builder Theme',
-						extensions: [RED_QUICK_FILE_THEME_EXT$]
+						extensions: [ RED_QUICK_FILE_THEME_EXT$ ]
 					}
 				]
 			})
@@ -724,7 +748,7 @@ export function saveGraph(graph: any) {
 						const files = fs.readdirSync(backupFolder);
 						let fileName = path.basename(currentGraph.graphFile);
 						let fileNumber = 0;
-						files.forEach(function (file: string) {
+						files.forEach(function(file: string) {
 							let parts = fileName.split('.');
 							fileName = parts.subset(0, parts.length - 1).join('.');
 							const split = file.split(`${fileName}.`);
@@ -773,7 +797,7 @@ export function setWorkingDirectory() {
 			const dialog = remote.dialog;
 			dialog
 				.showOpenDialog(remote.getCurrentWindow(), {
-					properties: ['openDirectory']
+					properties: [ 'openDirectory' ]
 				})
 				.then((opts) => {
 					let fileName = opts.filePaths.find((x) => x);
