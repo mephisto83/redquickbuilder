@@ -63,7 +63,7 @@ export default class DashboardContainer extends Component<any, any> {
 								/>
 							</SideBarMenu>
 						</MainSideBar>
-						<Content>{this.props.children}</Content>
+						<Content flex={this.props.flex}>{this.props.children}</Content>
 					</Header>
 				</div>
 			</div>

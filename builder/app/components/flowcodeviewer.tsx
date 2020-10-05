@@ -67,20 +67,20 @@ class FlowCodeViewer extends Component<any, any> {
 		let linkConnections: QuickAccess<string> = UIA.GetNodeLinksForView(state, currentViewNode);
 
 		return (
-			<DashboardContainer minified={UIA.GetC(state, UIA.VISUAL, UIA.DASHBOARD_MENU)}>
-				<ResponsiveGridLayout
+			<DashboardContainer flex minified={UIA.GetC(state, UIA.VISUAL, UIA.DASHBOARD_MENU)}>
+				{/* <ResponsiveGridLayout
 					className="layout"
 					draggableHandle={'.box-header'}
 					breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
 					layout={layout}
 					cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
 				>
-					<div key="a" data-grid={{x: 0, y: 0, w: 12, h: 3}}>
-						<Panel stretch title={node ? UIA.GetNodeTitle(node) : 'Current Node'}>
-							<FlowCode />
-						</Panel>
-					</div>
-				</ResponsiveGridLayout>
+					<div key="a" data-grid={{x: 0, y: 0, w: 12, h: 10}}> */}
+				<Panel stretch title={node ? UIA.GetNodeTitle(node) : 'Current Node'}>
+					<FlowCode />
+				</Panel>
+				{/* </div>
+				</ResponsiveGridLayout> */}
 			</DashboardContainer>
 		);
 	}

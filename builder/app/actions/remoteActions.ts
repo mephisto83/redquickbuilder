@@ -35,8 +35,8 @@ import {
 	GetCssName,
 	GetState,
 	pinConnectedNodesByLinkType,
-	GetNodeById,
-	GetNodeProp
+	GetNodeProp,
+	GetNodeById, GetModelCodeProperties
 } from './uiactions';
 import { processRecording } from '../utils/utilservice';
 import prune from '../methods/prune';
@@ -635,11 +635,18 @@ export function viewCode(code: string) {
 
 export function viewFlowCode(code: any) {
 	const { ipcRenderer } = require('electron');
+	let models = NodesByType(GetCurrentGraph(), NodeTypes.Model);
+	let enumerations = NodesByType(GetCurrentGraph(), NodeTypes.Enumeration);
+	let properties = models.map((model: Node) => {
+		return {
+			model, properties: GetModelCodeProperties(model.id).map((v: string) => GetNodeById(v, GetCurrentGraph()))
+		}
+	})
 	ipcRenderer.send(
 		'message',
 		JSON.stringify({
 			msg: HandlerEvents.flowCodeWindowCommand.message,
-			body: { code }
+			body: { code, models: properties, enumerations }
 		})
 	);
 }

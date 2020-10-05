@@ -65,6 +65,7 @@ import SetupViewTypes from '../nodepacks/batch/SetupViewTypes';
 import { graphOperation, GetDispatchFunc, GetStateFunc } from '../actions/uiactions';
 import SetupAuthenticationButtons from '../nodepacks/batch/SetupAuthenticationButtons';
 import AttachTitleService from '../nodepacks/batch/AttachTitleService';
+import { buildAst, buildFunctions, buildRules, FlowCodeStatements } from '../constants/flowcode_ast';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -400,6 +401,12 @@ class QuickMethods extends Component<any, any, any> {
 									}}
 									icon="fa fa-tag"
 								>
+									<TreeViewMenu title="FlowCode Test" onClick={()=>{
+										buildAst(FlowCodeStatements.ForEach)
+									}} />
+									<TreeViewMenu title="Build Rules Test" onClick={()=>{
+										buildFunctions();
+									}} />
 									<TreeViewMenu
 										title="Distribute Build All Jobs"
 										icon="fa fa-plus"

@@ -11,12 +11,12 @@ export default class Panel extends Component<any, any> {
 		let style: any = {};
 		let boxBodyStyle: any = {};
 		if (this.props.stretch) {
-			style.height = '100%';
 			style.display = 'flex';
 			style.flexDirection = 'column';
 			style.position = 'relative';
 			boxBodyStyle.height = '100%';
 			boxBodyStyle.overflow = 'auto';
+			boxBodyStyle.maxHeight = 'calc(100vh - 120px)';
 		}
 		return (
 			<div className="box box-default" style={style}>

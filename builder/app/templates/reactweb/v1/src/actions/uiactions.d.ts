@@ -28,7 +28,7 @@ export declare const UIKeys: {
     CREDENTIALS: string;
     USER_ID: string;
 };
-export declare function GetItems(modelType: any): unknown[];
+export declare function GetItems(modelType: any): any;
 export declare function GetScreenProperties(screen: any): any;
 export declare function UISP(screen: any, property: any, value: any): {
     type: string;
@@ -39,8 +39,10 @@ export declare function UISP(screen: any, property: any, value: any): {
 };
 export declare function GetItem(modelType: any, id: any): any;
 export declare function setGetState(): (dispatch: any, getState: any) => void;
-export declare function GetDispatch(): any;
-export declare function GetState(): any;
+export declare function GetDispatch(): (action: any) => void;
+export declare function GetState(): Function;
+export declare function Execute(func: Function): any;
+export declare function ExecuteDispatch(func: Function, dispatch: Function, getState: Function): any;
 export declare function setTestGetState(func: any): void;
 export declare function setDispatch(func: any): void;
 export declare function UIV(item: any, value: any): {
