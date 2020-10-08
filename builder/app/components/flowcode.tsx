@@ -25,6 +25,8 @@ const operations = {
     ADD_TYPE: '#74546A',
     ADD_ENUMERATION: '#7C7F65',
     ADD_SEQUENCE: '#59CD90',
+    FOREACH_CALLBACK: '#E39774',
+    MAP_CALLBACK: '#E39774',
     VARIABLE_GET: '#F34213',
     ADD_CONSTANT: '#D05353',
     ADD_IF: '#1B9AAA'
@@ -141,6 +143,9 @@ export default class FlowCode extends Component<any, any> {
                             <button onClick={() => {
                                 var str = JSON.stringify(activeModel.serialize());
                                 saveFlowModel({ name: this.state.functionName, model: str });
+                                setTimeout(() => {
+                                    refreshFlowModel();
+                                }, 1000);
                             }}><i className="fa fa-save" /></button>
                             <button onClick={() => {
                                 refreshFlowModel();
@@ -169,8 +174,14 @@ export default class FlowCode extends Component<any, any> {
                                 type: operations.ADD_CONSTANT, name: 'Constant', operation: true
                             }} name={'Constant'} color={operations.ADD_CONSTANT} />
                             <TrayItemWidget model={{
-                                type: operations.ADD_TYPE, name: 'Add Type', operation: true
+                                type: operations.ADD_TYPE, name: 'Type', operation: true
                             }} name={'Add Type'} color={operations.ADD_TYPE} />
+                            <TrayItemWidget model={{
+                                type: operations.FOREACH_CALLBACK, name: 'ForEach', operation: true
+                            }} name={'ForEach'} color={operations.FOREACH_CALLBACK} />
+                            <TrayItemWidget model={{
+                                type: operations.MAP_CALLBACK, name: 'Map', operation: true
+                            }} name={'Map'} color={operations.MAP_CALLBACK} />
                             <TrayItemWidget model={{
                                 type: operations.ADD_ENUMERATION, name: 'Add Enumeration', operation: true
                             }} name={'Add Enumeration'} color={operations.ADD_ENUMERATION} />
@@ -216,9 +227,25 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
     let description: IFlowCodeConfig = FlowCodeStatements[type];
     let node = new FlowCodeNodeModel(ops.name || type, !description ? ops.type : description.color);
 
-    if (![operations.START_FUNCTION, operations.ADD_CONSTANT, operations.ADD_TYPE, operations.VARIABLE_GET, operations.ADD_PARAMETER].some(v => v === type))
+    if (![
+        operations.START_FUNCTION,
+        operations.FOREACH_CALLBACK,
+        operations.MAP_CALLBACK,
+        operations.ADD_CONSTANT,
+        operations.ADD_TYPE,
+        operations.VARIABLE_GET,
+        operations.ADD_PARAMETER
+    ].some(v => v === type))
         node.addFlowIn();
-    if (![operations.ADD_TYPE, operations.ADD_CONSTANT, operations.ADD_PARAMETER, operations.VARIABLE_GET, operations.ADD_SEQUENCE].some(v => v === type))
+    if (![
+        operations.ADD_TYPE,
+        operations.FOREACH_CALLBACK,
+        operations.MAP_CALLBACK,
+        operations.ADD_CONSTANT,
+        operations.ADD_PARAMETER,
+        operations.VARIABLE_GET,
+        operations.ADD_SEQUENCE
+    ].some(v => v === type))
         node.addFlowOut();
     let selectTypes = () => {
         return Object.entries(ts.TypeFlags).map((v: any[]) => {
@@ -259,7 +286,7 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
         let newPort = node.addInPort('variable');
         newPort.prompt();
         let typePort = node.addInPort('type');
-        typePort.select(selectTypes);
+        // typePort.select(selectTypes);
         node.addOutPort('value');
         return node;
     }
@@ -274,7 +301,7 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
     }
     if (operations.VARIABLE_GET === type) {
         let typePort = node.addInPort('type');
-        typePort.select(selectTypes);
+        // typePort.select(selectTypes);
         let newPort = node.addOutPort('variable');
         newPort.prompt();
         return node;
@@ -288,8 +315,8 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
     }
 
     if (operations.ADD_TYPE === type) {
-        let typePort = node.addOutPort('type');
-        typePort.select(modelsSelect);
+        let typePort = node.addOutPort('modelType');
+        // typePort.select(modelsSelect);
         return node;
     }
     if (operations.START_FUNCTION === type) {
@@ -297,18 +324,39 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
     }
     if (operations.ADD_ENUMERATION === type) {
         let newPort = node.addInPort('enumeration');
-        newPort.select(enumerationSelect);
+        // newPort.select(enumerationSelect);
 
         let newPort2 = node.addInPort('enumerationValue');
-        newPort2.select(function () { return enumerationValueSelect(newPort) });
+        // newPort2.select(function () { return enumerationValueSelect(newPort) });
         node.addOutPort('value');
+        return node;
+    }
+    if (operations.FOREACH_CALLBACK === type) {
+        node.addInPort('in');
+        node.addOutPort('forEachFunc');
+        node.addOutPort('sequence');
+        node.addOutPort('value');
+        let typePort = node.addInPort('valueType');
+        // typePort.select(modelsSelect);
+        node.addOutPort('index');
+        return node;
+    }
+    if (operations.MAP_CALLBACK === type) {
+        node.addInPort('in');
+        node.addOutPort('mapFunc');
+        node.addOutPort('sequence');
+        node.addOutPort('value');
+        let typePort = node.addInPort('valueType');
+        // typePort.select(modelsSelect);
+        node.addInPort('outputType');
+        node.addOutPort('index');
         return node;
     }
     if (ops && ops.parameter) {
         let newPort = node.addInPort('variable');
         newPort.prompt();
         let typePort = node.addInPort('type');
-        typePort.select(selectTypes)
+        // typePort.select(selectTypes)
         return node;
     }
 

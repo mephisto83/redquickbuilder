@@ -1,9 +1,12 @@
 import * as React from 'react';
 import { DiagramEngine, PortWidget } from '@projectstorm/react-diagrams-core';
 import { FlowCodePortModel } from './FlowCodePortModel';
+import * as UIA from '../../actions/uiactions';
+import { Node } from '../../methods/graph_types';
 import styled from '@emotion/styled';
 import TextInput from '../textinput';
 import SelectInput from '../selectinput';
+import ts from 'typescript';
 export interface FlowCodePortLabelProps {
 	port: FlowCodePortModel;
 	engine: DiagramEngine;
@@ -30,6 +33,41 @@ export const SPort = styled.div`
 			background: rgb(192, 255, 0);
 		}
 	`;
+let selectTypes = () => {
+	return Object.entries(ts.TypeFlags).map((v: any[]) => {
+		return {
+			title: v[0],
+			value: v[0]
+		}
+	}).filter(v => isNaN(v.title));
+}
+let enumerationSelect = () => {
+	let enumerations = UIA.Visual(UIA.GetStateFunc()(), UIA.FLOW_CODE_ENUMERATION);
+	if (enumerations) {
+		return enumerations.toNodeSelect();
+	}
+	return [];
+}
+let modelsSelect = () => {
+	let modelProperties = UIA.Visual(UIA.GetStateFunc()(), UIA.FLOW_CODE_MODELS);
+	if (modelProperties) {
+		return modelProperties.map((a: any) => a.model).toNodeSelect();
+	}
+	return [];
+}
+let enumerationValueSelect = (port: FlowCodePortModel) => {
+	if (port) {
+		let options = port.getOptions();
+		if (options.value) {
+			let enumerations = UIA.Visual(UIA.GetStateFunc()(), UIA.FLOW_CODE_ENUMERATION);
+			if (enumerations) {
+				let _enum = enumerations.find((v: Node) => v.id === options.value)
+				return UIA.GetNodeProp(_enum, UIA.NodeProperties.Enumeration).map((v: any) => ({ value: v.id, title: v.value }));
+			}
+		}
+	}
+	return [];
+}
 export class FlowCodePortLabel extends React.Component<FlowCodePortLabelProps, any> {
 	constructor(props: any) {
 		super(props);
@@ -54,7 +92,23 @@ export class FlowCodePortLabel extends React.Component<FlowCodePortLabelProps, a
 	}
 	getSelect() {
 		let options = this.props.port.getOptions();
-		let selectOptions = options.selectFunc();
+		let selectOptions: any;
+		switch (options.label) {
+			case 'type':
+				selectOptions = selectTypes();
+				break;
+
+			case 'valueType':
+			case 'modelType':
+				selectOptions = modelsSelect();
+				break;
+			case 'enumeration':
+				selectOptions = enumerationSelect();
+				break;
+			case 'enumerationValue':
+				selectOptions = (function () { return enumerationValueSelect(null) })()
+				break;
+		}
 		return (<span style={{ position: 'relative' }}>
 			<div style={{ position: 'absolute', top: 0, left: 0, width: 250, height: 70 }}>
 				<SelectInput options={selectOptions} onBlur={() => {
@@ -77,10 +131,26 @@ export class FlowCodePortLabel extends React.Component<FlowCodePortLabelProps, a
 		);
 		const label = <SLabel><span title={options.valueTitle || options.value || ''} onClick={() => {
 			let options = this.props.port.getOptions();
-			if (options && options.prompt) {
+			let hasPrompting = false;
+			switch (options.label) {
+				case 'variable':
+					hasPrompting = true;
+					break;
+			}
+			let hasSelectPrompting = false;
+			switch (options.label) {
+				case 'type':
+				case 'valueType':
+				case 'modelType':
+				case 'enumeration':
+				case 'enumerationValue':
+					hasSelectPrompting = true;
+					break;
+			}
+			if (options && hasPrompting) {
 				this.setState({ showInput: true, value: options.value || options.label });
 			}
-			else if (options && options.selectFunc) {
+			else if (options && hasSelectPrompting) {
 				this.setState({ showSelect: true, value: options.value || options.label });
 			}
 		}}>{options.valueTitle || options.value || options.label}</span></SLabel>;
