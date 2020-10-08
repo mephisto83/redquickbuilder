@@ -2,7 +2,7 @@ import { Node, SourceFile } from "./CompilerApi";
 import { TreeMode } from "../types";
 import { assertNever } from "../utils";
 
-export function getChildrenFunction(mode: TreeMode, sourceFile: SourceFile) {
+export function getChildrenFunction(mode: TreeMode, sourceFile: SourceFile): any {
     switch (mode) {
         case TreeMode.getChildren:
             return getAllChildren;

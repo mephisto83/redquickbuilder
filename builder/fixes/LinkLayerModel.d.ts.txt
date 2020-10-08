@@ -1,0 +1,15 @@
+import { FactoryBankListener, LayerModel, LayerModelGenerics, FactoryBank, AbstractReactFactory } from '@projectstorm/react-canvas-core';
+import { LinkModel, LinkModelGenerics } from '../link/LinkModel';
+import { DiagramEngine } from '../../DiagramEngine';
+export interface LinkLayerModelGenerics extends LayerModelGenerics {
+    CHILDREN: LinkModel;
+    ENGINE: DiagramEngine;
+}
+export declare class LinkLayerModel<G extends LinkLayerModelGenerics = LinkLayerModelGenerics> extends LayerModel<G> {
+    constructor();
+    addModel(model: G['CHILDREN']): void;
+    getLinks(): {
+        [id: string]: G["CHILDREN"];
+    };
+    getChildModelFactoryBank(engine: G['ENGINE']): FactoryBank<AbstractReactFactory<LinkModel<LinkModelGenerics>, DiagramEngine>, FactoryBankListener<AbstractReactFactory<LinkModel<LinkModelGenerics>, DiagramEngine>>>;
+}

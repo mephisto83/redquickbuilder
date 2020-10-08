@@ -2,14 +2,13 @@
 import React, { Component } from 'react';
 import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
-import createEngine, { DiagramModel, DefaultNodeModel, DefaultLinkModel, DefaultDiagramState } from '@projectstorm/react-diagrams';
+import createEngine, { DiagramModel, DefaultNodeModel, DefaultLinkModel, DefaultDiagramState, LinkModel } from '@projectstorm/react-diagrams';
 import { CanvasWidget } from '@projectstorm/react-canvas-core';
 import DemoCanvasWidget from './canvaswidget';
 import * as SRD from '@projectstorm/react-diagrams';
 import styled from '@emotion/styled';
 import { TrayWidget } from './TrayWidget';
 import { TrayItemWidget } from './TrayItemWidget';
-import { FlowCodeTypes, ICodeNodeDescription } from '../constants/flowcode';
 import { buildAst, buildFunctions, FlowCodeStatements, IFlowCodeConfig } from '../constants/flowcode_ast';
 import ts from 'typescript';
 import { FlowCodePortFactory } from './flowcode/FlowCodePortFactory';
@@ -18,12 +17,17 @@ import { FlowCodeNodeModel } from './flowcode/FlowCodeNodeModel';
 import TextInput from './textinput';
 import { FlowCodePortModel } from './flowcode/FlowCodePortModel';
 import { Node } from '../methods/graph_types';
+import { refreshFlowModel, saveFlowModel } from '../actions/remoteActions';
 
 const operations = {
     ADD_PARAMETER: '#843B62',
     START_FUNCTION: '#FFB997',
     ADD_TYPE: '#74546A',
-    ADD_ENUMERATION: '#7C7F65'
+    ADD_ENUMERATION: '#7C7F65',
+    ADD_SEQUENCE: '#59CD90',
+    VARIABLE_GET: '#F34213',
+    ADD_CONSTANT: '#D05353',
+    ADD_IF: '#1B9AAA'
 };
 export const SBody = styled.div`
 flex-grow: 1;
@@ -53,15 +57,17 @@ position: relative;
 flex-grow: 1;
 `;
 
+
 export default class FlowCode extends Component<any, any> {
     constructor(props: any) {
         super(props);
-        let setup = this.newModel();
-        this.state = { ...setup };
+        let id = UIA.GUID();
+        let setup = this.newModel(id);
+        this.state = { ...setup, id };
     }
 
 
-    public newModel(): {
+    public newModel(id: string): {
         activeModel: SRD.DiagramModel,
         diagramEngine: SRD.DiagramEngine
     } {
@@ -76,24 +82,17 @@ export default class FlowCode extends Component<any, any> {
         let diagramEngine = engine;
         diagramEngine.setModel(activeModel);
 
-        // //3-A) create a default node
-        // var node1 = new SRD.DefaultNodeModel('Node 1', 'rgb(0,192,255)');
-        // let port = node1.addOutPort('Out');
-        // node1.setPosition(100, 100);
 
-        // //3-B) create another default node
-        // var node2 = new SRD.DefaultNodeModel('Node 2', 'rgb(192,255,0)');
-        // let port2 = node2.addInPort('In');
-        // node2.setPosition(400, 100);
-
-        // // link the ports
-        // let link1 = port.link(port2);
-
-        // this.activeModel.addAll(node1, node2, link1);
 
         return {
             activeModel,
             diagramEngine
+        }
+    }
+    componentDidUpdate(prevProps: any, prevState: any, snapshot: any) {
+        if (prevProps && prevProps.code !== this.props.code) {
+            this.state.activeModel.deserializeModel(JSON.parse(this.props.code), this.state.diagramEngine);
+            this.setState({ functionName: this.props.functionName })
         }
     }
 
@@ -118,17 +117,35 @@ export default class FlowCode extends Component<any, any> {
     render() {
 
         const { state } = this.props;
-        let { diagramEngine } = this.state;
+        let { diagramEngine, activeModel } = this.state;
         if (!diagramEngine) {
             return <div></div>
         }
         return (
-            <SBody>
+            <SBody onClick={() => {
+                // commonContext.active = this.state.id;
+            }}>
                 <SHeader>
                     <div className="title">Storm React Diagrams - DnD demo</div>
                 </SHeader>
                 <SContent>
                     <div style={{ display: 'flex', flexDirection: 'column', background: 'black' }}>
+                        <div style={{ padding: 5 }}>
+                            <TextInput label="Name" immediate value={this.state.functionName} onChange={(val: string) => {
+                                this.setState({
+                                    functionName: val
+                                });
+                            }} />
+                        </div>
+                        <div style={{ padding: 5, display: 'flex', flexDirection: 'row' }}>
+                            <button onClick={() => {
+                                var str = JSON.stringify(activeModel.serialize());
+                                saveFlowModel({ name: this.state.functionName, model: str });
+                            }}><i className="fa fa-save" /></button>
+                            <button onClick={() => {
+                                refreshFlowModel();
+                            }}><i className="fa fa-refresh" /></button>
+                        </div>
                         <div style={{ padding: 5 }}>
                             <TextInput label="Filter" immediate value={this.state.filterValue} onChange={(val: string) => {
                                 this.setState({
@@ -146,11 +163,23 @@ export default class FlowCode extends Component<any, any> {
                                 type: operations.ADD_PARAMETER, name: 'Parameter', operation: true
                             }} name={'Add Parameter'} color={operations.ADD_PARAMETER} />
                             <TrayItemWidget model={{
+                                type: operations.VARIABLE_GET, name: 'Variable', operation: true
+                            }} name={'Variable'} color={operations.VARIABLE_GET} />
+                            <TrayItemWidget model={{
+                                type: operations.ADD_CONSTANT, name: 'Constant', operation: true
+                            }} name={'Constant'} color={operations.ADD_CONSTANT} />
+                            <TrayItemWidget model={{
                                 type: operations.ADD_TYPE, name: 'Add Type', operation: true
                             }} name={'Add Type'} color={operations.ADD_TYPE} />
                             <TrayItemWidget model={{
                                 type: operations.ADD_ENUMERATION, name: 'Add Enumeration', operation: true
                             }} name={'Add Enumeration'} color={operations.ADD_ENUMERATION} />
+                            <TrayItemWidget model={{
+                                type: operations.ADD_SEQUENCE, name: 'Add Sequence', operation: true
+                            }} name={'Add Sequence'} color={operations.ADD_SEQUENCE} />
+                            <TrayItemWidget model={{
+                                type: operations.ADD_IF, name: 'Add If', operation: true
+                            }} name={'Add If'} color={operations.ADD_IF} />
                             {this.getItemWidgets()}
                         </TrayWidget>
                     </div>
@@ -187,9 +216,10 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
     let description: IFlowCodeConfig = FlowCodeStatements[type];
     let node = new FlowCodeNodeModel(ops.name || type, !description ? ops.type : description.color);
 
-    if (operations.START_FUNCTION !== type)
+    if (![operations.START_FUNCTION, operations.ADD_CONSTANT, operations.ADD_TYPE, operations.VARIABLE_GET, operations.ADD_PARAMETER].some(v => v === type))
         node.addFlowIn();
-    node.addFlowOut();
+    if (![operations.ADD_TYPE, operations.ADD_CONSTANT, operations.ADD_PARAMETER, operations.VARIABLE_GET, operations.ADD_SEQUENCE].some(v => v === type))
+        node.addFlowOut();
     let selectTypes = () => {
         return Object.entries(ts.TypeFlags).map((v: any[]) => {
             return {
@@ -202,6 +232,13 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
         let enumerations = UIA.Visual(UIA.GetStateFunc()(), UIA.FLOW_CODE_ENUMERATION);
         if (enumerations) {
             return enumerations.toNodeSelect();
+        }
+        return [];
+    }
+    let modelsSelect = () => {
+        let modelProperties = UIA.Visual(UIA.GetStateFunc()(), UIA.FLOW_CODE_MODELS);
+        if (modelProperties) {
+            return modelProperties.map((a: any) => a.model).toNodeSelect();
         }
         return [];
     }
@@ -223,6 +260,36 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
         newPort.prompt();
         let typePort = node.addInPort('type');
         typePort.select(selectTypes);
+        node.addOutPort('value');
+        return node;
+    }
+    if (operations.ADD_SEQUENCE === type) {
+        node.enableInPortAdd();
+        return node;
+    }
+    if (operations.ADD_CONSTANT === type) {
+        let newPort = node.addOutPort('constant');
+        newPort.prompt();
+        return node;
+    }
+    if (operations.VARIABLE_GET === type) {
+        let typePort = node.addInPort('type');
+        typePort.select(selectTypes);
+        let newPort = node.addOutPort('variable');
+        newPort.prompt();
+        return node;
+    }
+
+    if (operations.ADD_IF === type) {
+        node.addInPort('conditional');
+        node.addOutPort('then');
+        node.addOutPort('else');
+        return node;
+    }
+
+    if (operations.ADD_TYPE === type) {
+        let typePort = node.addOutPort('type');
+        typePort.select(modelsSelect);
         return node;
     }
     if (operations.START_FUNCTION === type) {
@@ -273,10 +340,27 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
                                     node.addOutPort(typeRef.typeName.escapedText, func.type.kind)
                                 }
                             }
+                            else {
+                                if (func.type.kind === ts.SyntaxKind.AnyKeyword) {
+                                    node.addOutPort('any', func.type.kind)
+                                }
+                                else if (func.type.kind === ts.SyntaxKind.BooleanKeyword) {
+                                    node.addOutPort('boolean', func.type.kind)
+                                }
+                                else if (func.type.kind === ts.SyntaxKind.StringKeyword) {
+                                    node.addOutPort('string', func.type.kind)
+                                }
+                                else if (func.type.kind === ts.SyntaxKind.NumberKeyword) {
+                                    node.addOutPort('number', func.type.kind)
+                                }
+                                else {
+                                    let temp: any = func.type;
+                                    node.addOutPort(temp.escapedText, func.type.kind)
+                                }
+                            }
                         }
-                        if (func.type.kind === ts.SyntaxKind.AnyKeyword) {
-                            node.addOutPort('any', func.type.kind)
-                        }
+
+
                     }
                     break;
                 case ts.SyntaxKind.VariableDeclaration:

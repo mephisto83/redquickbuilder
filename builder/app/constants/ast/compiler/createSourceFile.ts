@@ -1,7 +1,7 @@
 import { CompilerApi, TypeChecker, Program, SourceFile, CompilerOptions, ScriptTarget, ScriptKind, CompilerHost } from "./CompilerApi";
 import { assertNever } from "../utils";
 
-export function createSourceFile(api: CompilerApi, code: string, scriptTarget: ScriptTarget, scriptKind: ScriptKind) {
+export function createSourceFile(api: CompilerApi, code: string, scriptTarget: ScriptTarget, scriptKind: ScriptKind): any {
     const filePath = `/ts-ast-viewer${getExtension(api, scriptKind)}`;
     const sourceFile = api.createSourceFile(filePath, code, scriptTarget, false, scriptKind);
     let bindingResult: { typeChecker: TypeChecker; program: Program } | undefined;

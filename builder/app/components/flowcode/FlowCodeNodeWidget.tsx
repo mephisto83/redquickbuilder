@@ -60,10 +60,13 @@ export interface FlowCodeNodeProps {
  */
 export class FlowCodeNodeWidget extends React.Component<FlowCodeNodeProps> {
 	generatePort = (port: FlowCodePortModel) => {
-		return <FlowCodePortLabel engine={this.props.engine} port={port} key={port.getID()} />;
+		return <FlowCodePortLabel engine={this.props.engine} port={port} clearLinks={(portModel: FlowCodePortModel) => {
+			this.props.node.removePortLinks(portModel);
+		}} key={port.getID()} />;
 	};
 
 	render() {
+		let options = this.props.node.getOptions();
 		return (
 			<SNode
 				data-default-node-name={this.props.node.getOptions().name}
@@ -72,6 +75,12 @@ export class FlowCodeNodeWidget extends React.Component<FlowCodeNodeProps> {
 				<STitle>
 					<STitleName>{this.props.node.getOptions().name}</STitleName>
 				</STitle>
+				{ options && options.panel ? (<div style={{ paddingLeft: 5, paddingRight: 5, cursor: 'pointer' }} onClick={() => { }}>
+					{options.addInPort ? <i className="fa fa-plus" onClick={() => {
+						this.props.node.addOutPort(`sequence ${this.props.node.getOutPorts().length}`);
+						this.setState({ turn: Date.now() })
+					}} /> : null}
+				</div>) : null}
 				<SPorts>
 					<SPortsContainer>{_.map(this.props.node.getInPorts(), this.generatePort)}</SPortsContainer>
 					<SPortsContainer>{_.map(this.props.node.getOutPorts(), this.generatePort)}</SPortsContainer>

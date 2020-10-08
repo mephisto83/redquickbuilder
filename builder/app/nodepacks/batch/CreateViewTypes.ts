@@ -13,7 +13,7 @@ import { ViewTypes } from '../../constants/viewtypes';
 import { uuidv4 } from '../../utils/array';
 import { Node } from '../../methods/graph_types';
 
-export default async function CreateViewTypes(progress: any) {
+export default async function CreateViewTypes(progress?: any) {
 	const models = NodesByType(null, NodeTypes.Model);
 	const result: any = [];
 	const createViewTypes: any = {};

@@ -51,7 +51,7 @@ import {
 	handleCodeWindowMessage,
 	GetNodesByProperties, handleFlowCodeMessage
 } from './uiactions';
-import { GraphKeys, GetNodesLinkedTo } from '../methods/graph_methods';
+import { GraphKeys, GetNodesLinkedTo, SetFlowModel } from '../methods/graph_methods';
 import { HandlerEvents } from '../ipc/handler-events';
 import {
 	saveCurrentGraph,
@@ -62,7 +62,7 @@ import {
 	toggleVisualKey,
 	setAppConfigPath,
 	updateConfig,
-	showViewer
+	showViewer, viewFlowCode
 } from './remoteActions';
 import ThemeServiceGenerator from '../generators/themeservicegenerator';
 import ModelGenerator from '../generators/modelgenerators';
@@ -97,6 +97,15 @@ ipcRenderer.on(HandlerEvents.remoteCommand.message, (event, arg) => {
 					setPinned(body.id, true);
 					break;
 			}
+		}
+		else if (body && body.flowModel) {
+			let graph = GetCurrentGraph();
+			if (graph) {
+				SetFlowModel(graph, (body.flowModel));
+			}
+		}
+		else if (body && body.refreshModel) {
+			viewFlowCode({})
 		}
 	}
 });

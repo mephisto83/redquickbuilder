@@ -7,6 +7,7 @@ import SelectInput from '../selectinput';
 export interface FlowCodePortLabelProps {
 	port: FlowCodePortModel;
 	engine: DiagramEngine;
+	clearLinks: any
 }
 
 export const SPortLabel = styled.div`
@@ -29,11 +30,12 @@ export const SPort = styled.div`
 			background: rgb(192, 255, 0);
 		}
 	`;
-export class FlowCodePortLabel extends React.Component<FlowCodePortLabelProps> {
+export class FlowCodePortLabel extends React.Component<FlowCodePortLabelProps, any> {
 	constructor(props: any) {
 		super(props);
 		this.state = {
 			showInput: false,
+			showSelect: false,
 			value: ''
 		};
 	}
@@ -41,7 +43,9 @@ export class FlowCodePortLabel extends React.Component<FlowCodePortLabelProps> {
 		let options = this.props.port.getOptions();
 		return (<span style={{ position: 'relative' }}>
 			<div style={{ position: 'absolute', top: 0, left: 0, width: 250, height: 70 }}>
-				<TextInput value={this.state.value} onChange={(val: string) => {
+				<TextInput onBlur={() => {
+					this.setState({ showInput: false })
+				}} value={this.state.value} onChange={(val: string) => {
 					options.value = val;
 					this.setState({ showInput: false });
 				}} />
@@ -53,9 +57,11 @@ export class FlowCodePortLabel extends React.Component<FlowCodePortLabelProps> {
 		let selectOptions = options.selectFunc();
 		return (<span style={{ position: 'relative' }}>
 			<div style={{ position: 'absolute', top: 0, left: 0, width: 250, height: 70 }}>
-				<SelectInput options={selectOptions} value={options.value} onChange={(val: string) => {
+				<SelectInput options={selectOptions} onBlur={() => {
+					this.setState({ showSelect: false })
+				}} value={options.value} onChange={(val: string) => {
 					options.value = val;
-					options.valueTitle = selectOptions.find(v => v.value === val).title;
+					options.valueTitle = selectOptions.find((v: any) => v.value === val).title;
 
 					this.setState({ showSelect: false });
 				}} />
@@ -82,6 +88,17 @@ export class FlowCodePortLabel extends React.Component<FlowCodePortLabelProps> {
 		return (
 			<SPortLabel>
 				{options.in ? port : label}
+				<div style={{
+					cursor: 'pointer',
+					zIndex: 10000,
+					paddingLeft: 4,
+					paddingRight: 4
+				}}
+					onClick={() => {
+						if (this.props.clearLinks) {
+							this.props.clearLinks(this.props.port);
+						}
+					}}><i className="fa fa-times" /></div>
 				{options.in ? label : port}
 				{this.state.showInput ? this.getInput() : null}
 				{this.state.showSelect ? this.getSelect() : null}

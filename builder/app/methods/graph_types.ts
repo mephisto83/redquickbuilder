@@ -21,6 +21,7 @@ export interface Graph {
 	nodeLinks: QuickAccess<number>;
 	nodeConnections: QuickAccess<string>;
 	nodeLinkIds: QuickAccess<string>;
+	flowModels: { [str: string]: any };
 	linkLib: { [index: string]: GraphLink };
 	links: string[];
 	graphs: { [index: string]: Graph };

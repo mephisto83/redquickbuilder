@@ -42,7 +42,13 @@ import {
 } from './graph_types';
 
 const os = require('os');
-
+export function SetFlowModel(graph: Graph, flowModel: any) : Graph {
+	if (graph && flowModel && flowModel.name) {
+		graph.flowModels = graph.flowModels || {};
+		graph.flowModels[flowModel.name] = flowModel.model;
+	}
+	return graph;
+}
 export function createGraph(): Graph {
 	return {
 		id: uuidv4(),
@@ -69,6 +75,7 @@ export function createGraph(): Graph {
 		themeFonts: { fonts: [] },
 		spaceTheme: {},
 		themeVariables: { variables: [] },
+		flowModels: {},
 		// Groups
 		// Reference nodes
 		referenceNodes: {},
@@ -188,7 +195,7 @@ export function GetAllChildren(root: any) {
 	let result = Object.keys(root || {});
 	result.forEach((t) => {
 		const temp = GetAllChildren(root[t]);
-		result = [ ...result, ...temp ];
+		result = [...result, ...temp];
 	});
 	return result;
 }
@@ -457,7 +464,7 @@ export function addLeaf(graph: any, ops: any) {
 			leaves.push(leaf);
 		}
 	} else {
-		leaves = [ ...leaves, leaf ].unique((x: any) => x);
+		leaves = [...leaves, leaf].unique((x: any) => x);
 	}
 	// Groups => nodes
 	graph.groupsNodes[id] = graph.groupsNodes[id] || {};
@@ -530,7 +537,7 @@ export function addGroupToGroup(graph: any, ops: any) {
 			group.groups.push(groupId);
 		}
 	} else {
-		group.groups = [ ...groups, groupId ].unique((x: any) => x);
+		group.groups = [...groups, groupId].unique((x: any) => x);
 	}
 	graph.groupLib[id] = group;
 	if (!fast) {
@@ -595,7 +602,7 @@ export function clearGroup(graph: any, ops: any) {
 			}
 		}
 	}
-	graph.groups = [ ...graph.groups.filter((x: any) => x !== id) ];
+	graph.groups = [...graph.groups.filter((x: any) => x !== id)];
 	delete graph.groupLib[id];
 	delete graph.childGroups[id];
 	delete graph.groupsNodes[id];
@@ -778,7 +785,7 @@ export function MatchesProperties(properties: { [x: string]: any }, node: any) {
 }
 export function removeNode(graph: any, options: any = {}) {
 	const { id } = options;
-	const idsToDelete = [ id ];
+	const idsToDelete = [id];
 	const autoDelete = GetNodeProp(id, NodeProperties.AutoDelete, graph);
 	if (autoDelete) {
 		GetNodesLinkedTo(graph, { id })
@@ -878,7 +885,7 @@ function clearGroupDeep(graph: any, options: any) {
 			if (!graph.groupLib[id] || !graph.groupLib[id].groups || !graph.groupLib[id].groups.length) {
 				// if these conditions are met.
 				delete graph.groupLib[id];
-				graph.groups = [ ...graph.groups.filter((x: any) => x !== id) ];
+				graph.groups = [...graph.groups.filter((x: any) => x !== id)];
 				delete graph.childGroups[id];
 				if (graph.parentGroup[id]) {
 					for (var i in graph.parentGroup[id]) {
@@ -1195,7 +1202,7 @@ export function addGroup(
 			graph.groups.push(group.id);
 		}
 	} else {
-		graph.groups = [ ...graph.groups, group.id ].unique((x: any) => x);
+		graph.groups = [...graph.groups, group.id].unique((x: any) => x);
 	}
 	if (fast) {
 		return graph;
@@ -1339,7 +1346,7 @@ export function addNewNodeOfType(graph: any, options: any, nodeType: any, callba
 				target: node.id,
 				properties: linkProperties ? linkProperties.properties : null
 			},
-			() => {}
+			() => { }
 		);
 		if (graph.links.length !== Object.keys(graph.linkLib).length) {
 			throw new Error('invalid grid links');
@@ -1370,7 +1377,7 @@ export function addNewNodeOfType(graph: any, options: any, nodeType: any, callba
 							target: link.target,
 							properties: link.linkProperties ? link.linkProperties.properties : null
 						},
-						() => {}
+						() => { }
 					);
 				}
 			);
@@ -1621,7 +1628,7 @@ export function NodesByViewPackage(graph: any, viewPackage: any) {
 	const currentGraph = graph;
 	if (currentGraph) {
 		if (!Array.isArray(viewPackage)) {
-			viewPackage = [ viewPackage ];
+			viewPackage = [viewPackage];
 		}
 		if (AppCache && AppCache.Nodes) {
 			const temp: any = [];
@@ -1646,7 +1653,7 @@ export function LinksByType(graph: Graph, linkType: string | string[]): GraphLin
 	graph = graph || GetCurrentGraph();
 	let linkTypes: string[] = [];
 	if (!Array.isArray(linkType)) {
-		linkTypes = [ linkType ];
+		linkTypes = [linkType];
 	} else {
 		linkTypes = linkType;
 	}
@@ -1676,7 +1683,7 @@ export function NodesByType(graph: any, nodeType: any, options: any = {}) {
 	const currentGraph = graph;
 	if (currentGraph) {
 		if (!Array.isArray(nodeType)) {
-			nodeType = [ nodeType ];
+			nodeType = [nodeType];
 		}
 		if (!options || !removeNode)
 			if (AppCache && AppCache.Nodes) {
@@ -2068,7 +2075,7 @@ export const FunctionMeetsConstraint = {
 											if (
 												!relationshipLink ||
 												GetLinkProperty(relationshipLink, LinkPropertyKeys.TYPE) !==
-													LinkProperties.ParentLink.type
+												LinkProperties.ParentLink.type
 											) {
 												return false;
 											}
@@ -2108,7 +2115,7 @@ export const FunctionMeetsConstraint = {
 											if (
 												!relationshipLink ||
 												GetLinkProperty(relationshipLink, LinkPropertyKeys.TYPE) !==
-													LinkProperties.ParentLink.type
+												LinkProperties.ParentLink.type
 											) {
 												return false;
 											}
@@ -2249,7 +2256,7 @@ export function matchObject(obj1: { [x: string]: any }, obj2: { [x: string]: any
 }
 export function GetLinkByNodes(graph: any, options: any) {
 	const { source, target } = options;
-	return [ findLink(graph, { target, source }) ];
+	return [findLink(graph, { target, source })];
 	// return Object.values(graph.linkLib).find(t => t.source === source && t.target === target);
 }
 export function GetLinkChainItem(
@@ -2312,7 +2319,7 @@ export function GetDataChainEntryNodes(state: any, cs: any) {
 }
 export function GetConnectedNodeByType(state: any, id: any, type: any, direction: any, graph: any) {
 	if (!Array.isArray(type)) {
-		type = [ type ];
+		type = [type];
 	}
 	graph = graph || GetRootGraph(state);
 	return GetNodesLinkedTo(graph, {
@@ -2347,7 +2354,7 @@ export function GetLinkChain(state: any, options: any): any {
 }
 export function GetLinkChainFromGraph(graph: Graph, options: any, nodeType?: any): any {
 	const { id, links } = options;
-	let ids = [ id ];
+	let ids = [id];
 	let result: any = [];
 	links.forEach((op: any, il: any) => {
 		let newids: any = [];
@@ -2359,7 +2366,7 @@ export function GetLinkChainFromGraph(graph: Graph, options: any, nodeType?: any
 			if (il === links.length - 1) {
 				result = newnodes;
 			} else {
-				newids = [ ...newids, ...newnodes.map((t: any) => t.id) ];
+				newids = [...newids, ...newnodes.map((t: any) => t.id)];
 			}
 		});
 		newids = newids.unique((x: any) => x);
@@ -2592,7 +2599,7 @@ export function addLink(
 				graph.linkLib[link.id] = link;
 				if (!fast) {
 					graph.linkLib = { ...graph.linkLib };
-					graph.links = [ ...graph.links, link.id ];
+					graph.links = [...graph.links, link.id];
 				} else if (graph.links.indexOf(link.id) === -1) {
 					graph.links.push(link.id);
 				}
@@ -2767,9 +2774,9 @@ export function findLinkInstance(graph: any, options: any) {
 	const link =
 		graph && graph.links
 			? graph.links.find(
-					(x: string | number) =>
-						graph.linkLib[x] && graph.linkLib[x].source === source && graph.linkLib[x].target == target
-				)
+				(x: string | number) =>
+					graph.linkLib[x] && graph.linkLib[x].source === source && graph.linkLib[x].target == target
+			)
 			: null;
 	return link;
 }
@@ -3129,7 +3136,7 @@ export function GetScreenUrl(op: any, overrideText: any = null) {
 	return convertToURLRoute(route);
 }
 export function convertToURLRoute(x: string) {
-	return [ ...x.split(' ') ].filter((x) => x).join('/').toLowerCase();
+	return [...x.split(' ')].filter((x) => x).join('/').toLowerCase();
 }
 export const NodePropertiesDirtyChain = {
 	[NodeProperties.ServiceType]: [
@@ -3274,7 +3281,7 @@ export function updateNodeProperty(graph: any, options: any) {
 		if (prop === NodeProperties.Selected) {
 			graph.selected = graph.selected ? graph.selected + (value ? 1 : -1) : 0;
 			if (value) {
-				graph.markedSelectedNodeIds = [ ...(graph.markedSelectedNodeIds || []), id ].unique();
+				graph.markedSelectedNodeIds = [...(graph.markedSelectedNodeIds || []), id].unique();
 			} else {
 				graph.markedSelectedNodeIds = (graph.markedSelectedNodeIds || []).filter((x: any) => x !== id);
 			}
@@ -3435,7 +3442,7 @@ function GetNodesInsideGroup(
 				...seenGroups,
 				[i]: true
 			};
-			res = [ ...res, ...GetNodesInsideGroup(graph, i, seenGroups) ];
+			res = [...res, ...GetNodesInsideGroup(graph, i, seenGroups)];
 		}
 	}
 
@@ -3503,7 +3510,7 @@ export function FilterGraph(graph: any) {
 	filteredGraph.linkLib = { ...graph.linkLib };
 	filteredGraph.nodesGroups = { ...graph.nodesGroups };
 	filteredGraph.groupsNodes = { ...graph.groupsNodes };
-	filteredGraph.groups = [ ...graph.groups ];
+	filteredGraph.groups = [...graph.groups];
 	filteredGraph.groupLib = { ...graph.groupLib };
 	filteredGraph.childGroups = { ...graph.childGroups };
 	filteredGraph.parentGroup = { ...graph.parentGroup };
@@ -3542,7 +3549,7 @@ export function FilterGraph(graph: any) {
 				...filteredGraph.groupLib[group].groups.filter((x: string | number) => filteredGraph.groupLib[x])
 			];
 			if (!filteredGraph.groupLib[group].leaves.length && !filteredGraph.groupLib[group].groups.length) {
-				filteredGraph.groups = [ ...filteredGraph.groups.filter((x: string) => x !== group) ];
+				filteredGraph.groups = [...filteredGraph.groups.filter((x: string) => x !== group)];
 				delete filteredGraph.groupLib[group];
 			}
 		}
@@ -3772,7 +3779,7 @@ export function VisualProcess(graph: any, clearPinned: boolean = false) {
 		disappearingNodes = { ...disappearingNodes, ...dt };
 	});
 
-	vgraph.nodes = [ ...graph.nodes.filter((x: string | number) => !disappearingNodes[x]) ];
+	vgraph.nodes = [...graph.nodes.filter((x: string | number) => !disappearingNodes[x])];
 	vgraph.nodeLib = {};
 	vgraph.nodes.forEach((t: string | number) => {
 		vgraph.nodeLib[t] = graph.nodeLib[t];

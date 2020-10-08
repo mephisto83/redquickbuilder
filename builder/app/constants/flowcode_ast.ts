@@ -25,7 +25,7 @@ export const FlowCodeStatements: IFlowCodeStatements = {
         template: `export declare function GetItem(modelType: string, id: string): any;`
     },
     ForEach: {
-        color: '#684A52',
+        color: '#0B032D',
         declarations: [],
         template: `export declare function forEach(array: T[], callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;`
     },
@@ -34,13 +34,25 @@ export const FlowCodeStatements: IFlowCodeStatements = {
         declarations: [],
         template: `export declare function forEach(array: T[], callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;`
     },
-    IfThenElse: {
-        color: '#843B62',
-        template: `export declare function ifThenElse(condition: boolean, ifstatement: Function, elseStatement: Function): void`
+    IsEqual: {
+        color: '#3FA7D6',
+        template: `export declare function isEqual(a: any, b: any): boolean`
     },
-    If: {
-        color: '#F67E7D',
-        template: `export declare function ifThenElse(condition: boolean, ifstatement: Function): void`
+    IsGreaterThan: {
+        color: '#3FA7D6',
+        template: `export declare function isGreaterThan(a: any, b: any): boolean`
+    },
+    IsLessThan: {
+        color: '#3FA7D6',
+        template: `export declare function isLessThan(a: any, b: any): boolean`
+    },
+    isNull: {
+        color: '#3FA7D6',
+        template: `export declare function isNull(a: any): boolean`
+    },
+    not: {
+        color: '#3FA7D6',
+        template: `export declare function not(a: any): boolean`
     }
 }
 
@@ -77,11 +89,17 @@ function stripConvertParent(item: any): any {
             result[i] = item[i].map((v: any) => stripConvertParent(v));
         }
         else if (typeof item[i] === 'object') {
-            if (typeof item[i] !== 'function')
-                if (i !== 'parent')
+            if (typeof item[i] !== 'function') {
+                if (i !== 'parent') {
                     result[i] = stripConvertParent(item[i]);
+                }
+            }
         }
-        else if (typeof item[i] === 'function') { }
+        else if (typeof item[i] === 'function') {
+            if (i === 'getText' && item.getText) {
+                result.escapedText = result.escapedText || item.getText();
+            }
+        }
         else {
             result[i] = item[i];
         }

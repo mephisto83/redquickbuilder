@@ -61,6 +61,7 @@ export default class DashboardContainer extends Component<any, any> {
 										this.props.toggleVisual('MAIN_NAV');
 									}}
 								/>
+								{this.props.sideBar || null}
 							</SideBarMenu>
 						</MainSideBar>
 						<Content flex={this.props.flex}>{this.props.children}</Content>

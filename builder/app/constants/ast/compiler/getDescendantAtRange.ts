@@ -3,7 +3,7 @@ import { getChildrenFunction } from "./getChildrenFunction";
 import { getStartSafe } from "./getStartSafe";
 import { Node, SourceFile, CompilerApi } from "./CompilerApi";
 
-export function getDescendantAtRange(mode: TreeMode, sourceFile: SourceFile, range: [number, number], compilerApi: CompilerApi) {
+export function getDescendantAtRange(mode: TreeMode, sourceFile: SourceFile, range: [number, number], compilerApi: CompilerApi): any {
     const getChildren = getChildrenFunction(mode, sourceFile);
     const syntaxKinds = compilerApi.SyntaxKind;
 

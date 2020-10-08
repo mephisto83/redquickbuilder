@@ -25,6 +25,7 @@ export interface FlowCodePortModelGenerics extends PortModelGenerics {
 }
 
 export class FlowCodePortModel extends PortModel<FlowCodePortModelGenerics> {
+	onconnect: Function | undefined;
 	constructor(isIn: boolean, name?: string, label?: string);
 	constructor(options: FlowCodePortModelOptions);
 	constructor(options: FlowCodePortModelOptions | boolean, name?: string, label?: string) {
@@ -45,6 +46,9 @@ export class FlowCodePortModel extends PortModel<FlowCodePortModelGenerics> {
 	}
 	prompt() {
 		this.options.prompt = true;
+	}
+	onConnected(onconnect: Function): void {
+		this.onconnect = onconnect;
 	}
 	select(func: any) {
 		this.options.selectFunc = func;
@@ -67,6 +71,9 @@ export class FlowCodePortModel extends PortModel<FlowCodePortModelGenerics> {
 		let link = this.createLinkModel(factory);
 		link.setSourcePort(this);
 		link.setTargetPort(port);
+		if (this.onconnect) {
+			this.onconnect(link);
+		}
 		return link as T;
 	}
 

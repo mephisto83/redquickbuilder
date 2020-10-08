@@ -42,11 +42,16 @@ export default class SelectInput extends Component<any, any> {
 			<div className="form-group">
 				<label title={this.label()} {...extra}>{this.label()}</label>
 				<select
-          className="form-control"
-          {...selectExtra}
+					className="form-control"
+					{...selectExtra}
 					onSelect={(evt: any) => {
 						if (this.props.onChange) {
 							this.props.onChange(evt.target.value);
+						}
+					}}
+					onBlur={() => {
+						if (this.props.onBlur) {
+							this.props.onBlur();
 						}
 					}}
 					onChange={(evt) => {

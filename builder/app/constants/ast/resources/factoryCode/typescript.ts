@@ -54,11 +54,11 @@ export function generateFactoryCode(ts: typeof import("typescript"), initialNode
             case ts.SyntaxKind.NullKeyword:
                 createNull(node as import("typescript").NullLiteral);
                 return;
-            case ts.SyntaxKind.TrueKeyword:
-                createTrue(node as import("typescript").TrueLiteral);
-                return;
-            case ts.SyntaxKind.FalseKeyword:
-                createFalse(node as import("typescript").FalseLiteral);
+            // case ts.SyntaxKind.TrueKeyword:
+            //     createTrue(node as import("typescript").TrueLiteral);
+            //     return;
+            // case ts.SyntaxKind.FalseKeyword:
+            //     createFalse(node as import("typescript").FalseLiteral);
                 return;
             case ts.SyntaxKind.QualifiedName:
                 createQualifiedName(node as import("typescript").QualifiedName);
@@ -156,9 +156,9 @@ export function generateFactoryCode(ts: typeof import("typescript"), initialNode
             case ts.SyntaxKind.TupleType:
                 createTupleTypeNode(node as import("typescript").TupleTypeNode);
                 return;
-            case ts.SyntaxKind.NamedTupleMember:
-                createNamedTupleMember(node as import("typescript").NamedTupleMember);
-                return;
+            // case ts.SyntaxKind.NamedTupleMember:
+            //     createNamedTupleMember(node as import("typescript").NamedTupleMember);
+                // return;
             case ts.SyntaxKind.OptionalType:
                 createOptionalTypeNode(node as import("typescript").OptionalTypeNode);
                 return;
@@ -318,16 +318,16 @@ export function generateFactoryCode(ts: typeof import("typescript"), initialNode
             case ts.SyntaxKind.AsExpression:
                 createAsExpression(node as import("typescript").AsExpression);
                 return;
-            case ts.SyntaxKind.NonNullExpression:
-                if (ts.isNonNullChain(node)) {
-                    createNonNullChain(node as import("typescript").NonNullChain);
-                    return;
-                }
-                if (ts.isNonNullExpression(node)) {
-                    createNonNullExpression(node as import("typescript").NonNullExpression);
-                    return;
-                }
-                throw new Error("Unhandled node: " + node.getText());
+            // case ts.SyntaxKind.NonNullExpression:
+            //     if (ts.isNonNullChain(node)) {
+            //         createNonNullChain(node as import("typescript").NonNullChain);
+            //         return;
+            //     }
+            //     if (ts.isNonNullExpression(node)) {
+            //         createNonNullExpression(node as import("typescript").NonNullExpression);
+            //         return;
+            //     }
+            //     throw new Error("Unhandled node: " + node.getText());
             case ts.SyntaxKind.MetaProperty:
                 createMetaProperty(node as import("typescript").MetaProperty);
                 return;
@@ -586,15 +586,15 @@ export function generateFactoryCode(ts: typeof import("typescript"), initialNode
         writer.write(")");
     }
 
-    function createTrue(node: import("typescript").TrueLiteral) {
-        writer.write("factory.createTrue(");
-        writer.write(")");
-    }
+    // function createTrue(node: import("typescript").TrueLiteral) {
+    //     writer.write("factory.createTrue(");
+    //     writer.write(")");
+    // }
 
-    function createFalse(node: import("typescript").FalseLiteral) {
-        writer.write("factory.createFalse(");
-        writer.write(")");
-    }
+    // function createFalse(node: import("typescript").FalseLiteral) {
+    //     writer.write("factory.createFalse(");
+    //     writer.write(")");
+    // }
 
     function createQualifiedName(node: import("typescript").QualifiedName) {
         writer.write("factory.createQualifiedName(");
@@ -1580,48 +1580,48 @@ export function generateFactoryCode(ts: typeof import("typescript"), initialNode
     }
 
     function createTupleTypeNode(node: import("typescript").TupleTypeNode) {
-        writer.write("factory.createTupleTypeNode(");
-        writer.write("[");
-        if (node.elements.length === 1) {
-            const item = node.elements![0];
-            writeNodeText(item)
-        }
-        else if (node.elements.length > 1) {
-            writer.indent(() => {
-                for (let i = 0; i < node.elements!.length; i++) {
-                    const item = node.elements![i];
-                    if (i > 0)
-                        writer.write(",").newLine();
-                    writeNodeText(item)
-                }
-            });
-        }
-        writer.write("]");
-        writer.write(")");
+        // writer.write("factory.createTupleTypeNode(");
+        // writer.write("[");
+        // if (node.elements.length === 1) {
+        //     const item = node.elements![0];
+        //     writeNodeText(item)
+        // }
+        // else if (node.elements.length > 1) {
+        //     writer.indent(() => {
+        //         for (let i = 0; i < node.elements!.length; i++) {
+        //             const item = node.elements![i];
+        //             if (i > 0)
+        //                 writer.write(",").newLine();
+        //             writeNodeText(item)
+        //         }
+        //     });
+        // }
+        // writer.write("]");
+        // writer.write(")");
     }
 
-    function createNamedTupleMember(node: import("typescript").NamedTupleMember) {
-        writer.write("factory.createNamedTupleMember(");
-        writer.newLine();
-        writer.indent(() => {
-            if (node.dotDotDotToken == null)
-                writer.write("undefined");
-            else {
-                writeNodeText(node.dotDotDotToken)
-            }
-            writer.write(",").newLine();
-            writeNodeText(node.name)
-            writer.write(",").newLine();
-            if (node.questionToken == null)
-                writer.write("undefined");
-            else {
-                writeNodeText(node.questionToken)
-            }
-            writer.write(",").newLine();
-            writeNodeText(node.type)
-        });
-        writer.write(")");
-    }
+    // function createNamedTupleMember(node: import("typescript").NamedTupleMember) {
+    //     // writer.write("factory.createNamedTupleMember(");
+    //     // writer.newLine();
+    //     // writer.indent(() => {
+    //     //     if (node.dotDotDotToken == null)
+    //     //         writer.write("undefined");
+    //     //     else {
+    //     //         writeNodeText(node.dotDotDotToken)
+    //     //     }
+    //     //     writer.write(",").newLine();
+    //     //     writeNodeText(node.name)
+    //     //     writer.write(",").newLine();
+    //     //     if (node.questionToken == null)
+    //     //         writer.write("undefined");
+    //     //     else {
+    //     //         writeNodeText(node.questionToken)
+    //     //     }
+    //     //     writer.write(",").newLine();
+    //     //     writeNodeText(node.type)
+    //     // });
+    //     // writer.write(")");
+    // }
 
     function createOptionalTypeNode(node: import("typescript").OptionalTypeNode) {
         writer.write("factory.createOptionalTypeNode(");
@@ -2694,11 +2694,11 @@ export function generateFactoryCode(ts: typeof import("typescript"), initialNode
         writer.write(")");
     }
 
-    function createNonNullChain(node: import("typescript").NonNullChain) {
-        writer.write("factory.createNonNullChain(");
-        writeNodeText(node.expression)
-        writer.write(")");
-    }
+    // function createNonNullChain(node: import("typescript").NonNullChain) {
+    //     // writer.write("factory.createNonNullChain(");
+    //     // writeNodeText(node.expression)
+    //     // writer.write(")");
+    // }
 
     function createMetaProperty(node: import("typescript").MetaProperty) {
         writer.write("factory.createMetaProperty(");

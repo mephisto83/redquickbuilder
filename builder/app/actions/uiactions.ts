@@ -3700,22 +3700,31 @@ export function handleCodeWindowMessage(args: { code: string }) {
 export const FLOW_CODE_MODELS = 'FLOW_CODE_MODELS';
 export const FLOW_CODE_ENUMERATION = 'FLOW_CODE_ENUMERATION';
 export const FLOW_CODE = 'FLOW_CODE';
-export function handleFlowCodeMessage(args: { code: string, models: any, enumerations: any }) {
-	let { code, models, enumerations } = args;
+export const FLOW_CODE_FLOWS = 'FLOW_CODE_FLOWS';
+
+export function handleFlowCodeMessage(args: {
+	flowModels: any,
+	code: string,
+	models: any,
+	enumerations: any
+}) {
+	let { code, models, enumerations, flowModels } = args;
 	if (history) {
 		history.push(routes.FLOW_VIEWER);
 	}
 	let batchCommands: any[] = [];
 	batchCommands.push(UIC(VISUAL, FLOW_CODE, code));
-
+	if (flowModels) {
+		batchCommands.push(UIC(VISUAL, FLOW_CODE_FLOWS, flowModels));
+	}
 	if (models) {
 		batchCommands.push(UIC(VISUAL, FLOW_CODE_MODELS, models));
 	}
-	
+
 	if (enumerations) {
 		batchCommands.push(UIC(VISUAL, FLOW_CODE_ENUMERATION, enumerations));
 	}
-	
+
 	let dispatch = GetDispatchFunc();
 	if (dispatch) {
 		dispatch(Batch(batchCommands));

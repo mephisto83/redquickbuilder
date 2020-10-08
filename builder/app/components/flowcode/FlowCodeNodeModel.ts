@@ -7,6 +7,8 @@ import ts from 'typescript';
 export interface FlowCodeNodeModelOptions extends BasePositionModelOptions {
 	name?: string;
 	color?: string;
+	panel?: boolean;
+	addInPort?: boolean;
 }
 
 export interface FlowCodeNodeModelGenerics extends NodeModelGenerics {
@@ -50,7 +52,6 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 			this.portsOut.splice(this.portsOut.indexOf(port), 1);
 		}
 	}
-
 	addPort<T extends FlowCodePortModel>(port: T): T {
 		super.addPort(port);
 		if (port.getOptions().in) {
@@ -63,6 +64,18 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 			}
 		}
 		return port;
+	}
+
+	removePortLinks(port: FlowCodePortModel): void {
+		const links = port.getLinks();
+		for (const link in links) {
+			links[link].remove();
+		}
+		// this.removePort(port);
+	}
+	enableInPortAdd() {
+		this.options.addInPort = true;
+		this.options.panel = true;
 	}
 
 	addFlowIn(): FlowCodePortModel {

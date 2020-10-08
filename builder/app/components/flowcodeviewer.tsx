@@ -29,7 +29,7 @@ import { QuickAccess, GraphLink } from '../methods/graph_types';
 import NodeViewList from './nodeviewlist';
 import LinkViewList from './linkviewlist';
 const ResponsiveGridLayout = WidthProvider(Responsive);
-import FlowCode from './flowcode';
+import FlowCode, { SetFlowCodeModel } from './flowcode';
 
 class FlowCodeViewer extends Component<any, any> {
 	constructor(props: any) {
@@ -67,22 +67,42 @@ class FlowCodeViewer extends Component<any, any> {
 		let linkConnections: QuickAccess<string> = UIA.GetNodeLinksForView(state, currentViewNode);
 
 		return (
-			<DashboardContainer flex minified={UIA.GetC(state, UIA.VISUAL, UIA.DASHBOARD_MENU)}>
-				{/* <ResponsiveGridLayout
-					className="layout"
-					draggableHandle={'.box-header'}
-					breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-					layout={layout}
-					cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-				>
-					<div key="a" data-grid={{x: 0, y: 0, w: 12, h: 10}}> */}
+			<DashboardContainer flex minified={UIA.GetC(state, UIA.VISUAL, UIA.DASHBOARD_MENU)} sideBar={this.getSideBar()}>
 				<Panel stretch title={node ? UIA.GetNodeTitle(node) : 'Current Node'}>
-					<FlowCode />
+					<FlowCode code={this.state.code} functionName={this.state.functionName} />
 				</Panel>
-				{/* </div>
-				</ResponsiveGridLayout> */}
 			</DashboardContainer>
 		);
+	}
+	getSideBar() {
+		let flows = Visual(this.props.state, UIA.FLOW_CODE_FLOWS);
+		console.log(flows);
+		let typescriptFlows: any[] = [];
+		if (flows) {
+			Object.entries(flows).map((item: [string, any], index: number) => {
+				let [key, flow] = item;
+				typescriptFlows.push(<TreeViewMenu
+					active
+					title={key}
+					key={`${key}-${index}`}
+					icon="fa fa-map"
+					onClick={() => {
+						// SetFlowCodeModel(flow, key);
+						this.setState({ functionName: key, code: flow });
+					}}
+				/>)
+			})
+		}
+		return [<TreeViewMenu
+			key="typescriptflows"
+			title="Typescript"
+			active
+			open={this.state.typescriptFlowMenu}
+			onClick={() => {
+				this.setState({ typescriptFlowMenu: !this.state.typescriptFlowMenu })
+			}}>
+			{typescriptFlows}
+		</TreeViewMenu>];
 	}
 }
 
