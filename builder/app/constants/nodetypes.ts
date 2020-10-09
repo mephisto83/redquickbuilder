@@ -9,6 +9,7 @@ export const NodeTypes = {
 	StateKey: 'StateKey',
 	ModelFilter: 'model-filter',
 	Struct: 'struct',
+	UIMethod: 'UIMethod',
 	MethodApiParameters: 'method-api-parameters',
 	EventHandler: 'EventHandler',
 	ComponentApiConnector: 'component-api-connector',
@@ -405,10 +406,13 @@ export const PropertyCentricTypes = {
 	Route: 'Route',
 	Effect: 'Effect'
 };
-
+export const UIActionMethods = {
+	GetModelProperty: 'GetModelProperty'
+};
 export const NodeProperties = {
 	ViewPackage: 'view-package',
 	IsFetchOutput: 'IsFetchOutput',
+	UIActionMethod: 'UIActionMethod',
 	HideStyle: 'HideStyle',
 	IsPropertyCentric: 'IsPropertyCentric',
 	RouteInjection: 'RouteInjection',
@@ -809,6 +813,7 @@ export const LinkType = {
 	DataChainIsDisabled: 'DataChainIsDisabled',
 	Composition: 'Composition',
 	SwaggerClass: 'SwaggerClass',
+	UIMethod: 'UIMethod',
 	SwaggerMethodDescription: 'SwaggerMethodDescription',
 	SwaggerPaths: 'SwaggerPaths',
 	StateKey: 'StateKey',
@@ -1097,6 +1102,9 @@ export const LinkProperties = {
 	},
 	SwaggerClass: {
 		type: LinkType.SwaggerClass
+	},
+	UIMethod: {
+		type: LinkType.UIMethod
 	},
 	SwaggerPaths: {
 		type: LinkType.SwaggerPaths

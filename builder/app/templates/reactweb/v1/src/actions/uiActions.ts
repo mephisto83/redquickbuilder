@@ -722,3 +722,18 @@ export function updateModelInstanceFocus(model: any, instance: any, id: any) {
 		);
 	};
 }
+
+export function GetModelProperty($id: any, modelType: string, propertyName: string, fetchModel: Function) {
+	let x: any = $id ? $id.object : null;
+	let id: any = x;
+
+	let item = typeof id === 'object' ? id : GetItem(modelType, id);
+	if (!item && id && typeof id === 'string') {
+		fetchModel(modelType, id);
+	}
+	if (item && item.hasOwnProperty && item.hasOwnProperty('propertyName')) {
+		return item[propertyName];
+	}
+	return null;
+}
+

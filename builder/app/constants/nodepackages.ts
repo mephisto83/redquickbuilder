@@ -23,7 +23,8 @@ import {
 	LinkType,
 	LinkPropertyKeys,
 	SelectorPropertyKeys,
-	ApiNodeKeys
+	ApiNodeKeys,
+	UIActionMethods
 } from './nodetypes';
 import * as _ from '../methods/graph_types';
 import {
@@ -67,7 +68,9 @@ import {
 	addComponentTags,
 	SetSharedComponent,
 	ValidationPropName,
-	GetGraphNode
+	GetGraphNode,
+	CreateNewNode,
+	AddLinkBetweenNodes
 } from '../actions/uiactions';
 import {
 	CreateLayout,
@@ -5665,6 +5668,45 @@ function setupPropertyApi(args: any) {
 					default:
 						break;
 				}
+
+				return [
+					() => {
+						let uiMethodNode: _.Node = GetNodeByProperties({
+							[NodeProperties.UIActionMethod]: UIActionMethods.GetModelProperty,
+							[NodeProperties.NODEType]: NodeTypes.UIMethod
+						});
+						let res: any[] = [];
+						if (!uiMethodNode) {
+							res.push(() => {
+								return CreateNewNode(
+									{
+										[NodeProperties.UIActionMethod]: UIActionMethods.GetModelProperty,
+										[NodeProperties.UIText]: UIActionMethods.GetModelProperty,
+										[NodeProperties.NODEType]: NodeTypes.UIMethod
+									},
+									(node: _.Node) => {
+										uiMethodNode = node;
+									}
+								);
+							});
+						}
+						res.push(() => {
+							return AddLinkBetweenNodes(newItems[childComponents[propertyIndex]][apiProperty].componentExternalValue, uiMethodNode.id, {
+								...LinkProperties.UIMethod,
+								model: currentNode.id,
+								property: modelProperty.id,
+								parameters: [
+									'selector',
+									{ type: 'model', value: currentNode.id },
+									{ type: 'property', value: modelProperty.id }
+								]
+							});
+						});
+
+						return res;
+					}
+        ];
+        // Removed because it makes too many functions that are very repetitive.
 				return [
 					...CreateSelectorToDataChainSelectorDC({
 						model: currentNode.id,

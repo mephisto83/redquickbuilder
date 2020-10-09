@@ -583,10 +583,6 @@ export function bindComponent(node: any, componentBindingDefinition: any, langua
 			if (properties[key] && properties[key].style) {
 				const styles: string[] = [];
 				const nodeId = typeof node === 'string' ? node : node.id;
-				// const dataChainStyleLinks = GetNodesLinkedTo(graph, {
-				//   id: node.id,
-				//   link: LinkType.DataChainStyleLink
-				// });
 				const styleNodes = GetNodesLinkedTo(graph, {
 					id: nodeId,
 					link: LinkType.Style,

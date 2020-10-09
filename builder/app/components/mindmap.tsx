@@ -132,7 +132,7 @@ export default class MindMap extends Component<any, any> {
 		const width = bb.width - 10; // 960;
 		const height = bb.height - 10; // 800;
 		const color = d3.scaleOrdinal(Object.values(NodeTypeColors) || d3.schemeCategory10);
-		me.avoidOverlaps = true;
+		me.avoidOverlaps = false;
 		const margin = 6;
 
 		const pad = 12;
