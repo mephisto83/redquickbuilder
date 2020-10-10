@@ -20,6 +20,10 @@ export const HandlerEvents = {
 		message: 'code-window-command',
 		reply: 'code-window-command-reply'
 	},
+	graphWindowCommand: {
+		message: 'graph-window-command',
+		reply: 'graph-window-command-reply'
+	},
 	flowCodeWindowCommand: {
 		message: 'flow-code-window-command',
 		reply: 'flow-code-window-command-reply'

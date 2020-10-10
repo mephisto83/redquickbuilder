@@ -328,6 +328,16 @@ function handle(msg: any, windowCollections: { [str: string]: () => Promise<Brow
 				}
 			});
 			break;
+
+		case HandlerEvents.graphWindowCommand.message:
+			result = Promise.resolve().then(async () => {
+				let temp = await windowCollections.graphWindow();
+				if (temp) {
+					if (!temp.isVisible()) temp.show();
+					temp.webContents.send(HandlerEvents.graphWindowCommand.message, msg);
+				}
+			});
+			break;
 		case HandlerEvents.codeWindowCommand.message:
 			result = Promise.resolve().then(async () => {
 				let temp = await windowCollections.codeViewWindow();

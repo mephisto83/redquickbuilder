@@ -36,7 +36,7 @@ import {
 	GetState,
 	pinConnectedNodesByLinkType,
 	GetNodeProp,
-	GetNodeById, GetModelCodeProperties
+	GetNodeById, GetModelCodeProperties, getConnectedNodesByLinkType
 } from './uiactions';
 import { processRecording } from '../utils/utilservice';
 import prune from '../methods/prune';
@@ -276,7 +276,7 @@ export async function takeDashboardShot(folder: any, name?: string, getNodes?: a
 					fs.writeFileSync(path.join(folder, name || 'image.jpeg'), img.toPNG(), 'base64');
 				});
 			let nodese = getNodes ? getNodes() : null;
-			await wait(5000);
+			await wait(2000);
 			if (nodese) {
 				let projectJson: any = {};
 				let temppath = path.join(folder, 'project.json');
@@ -286,8 +286,10 @@ export async function takeDashboardShot(folder: any, name?: string, getNodes?: a
 				if (name) {
 					projectJson[name] = nodese.map((v: any) => {
 						let info = GetNodeInformationForReport(v);
+						let svgs: any = document.querySelector(`.content-wrapper svg div[data-id="${v.id}"]`);
+						let bounds = svgs ? svgs.getBoundingClientRect() : null;
 						return {
-							bounds: v.bounds,
+							bounds: v.bounds || (bounds ? { x: bounds.left, X: bounds.right, y: bounds.top, Y: bounds.bottom } : null),
 							properties: v.properties,
 							color: NodeTypeColors[v.properties.nodeType],
 							id: v.id,
@@ -371,7 +373,7 @@ export async function startSequence(
 	const maxi = 3;
 	let maxattempts = maxi;
 	do {
-		setVisual('LINK_DISTANCE', 125)(GetDispatchFunc(), GetStateFunc());
+		setVisual('LINK_DISTANCE', 300)(GetDispatchFunc(), GetStateFunc());
 		clearPinned();
 		setPinned(modelId, true);
 		await populate(modelId, ops);
@@ -404,9 +406,9 @@ export function doesItFit(bounds: { xmax: number; xmin: number; ymin: number; ym
 				} else {
 					let centerY = (bounds.ymax - bounds.ymin) / 2;
 					let centerX = (bounds.xmax - bounds.xmin) / 2;
-					if (false && centerMindMap) {
-						centerMindMap({ x: -centerX, y: -centerY });
-						return true;
+					let scale = Math.max((bounds.xmax - bounds.xmin) / (bbox.right - bbox.left), (bounds.ymax - bounds.ymin) / (bbox.bottom - bbox.top));
+					if (centerMindMap) {
+						centerMindMap({ x: -centerX, y: -centerY, scale });
 					}
 				}
 			}
@@ -414,6 +416,7 @@ export function doesItFit(bounds: { xmax: number; xmin: number; ymin: number; ym
 	}
 	return false;
 }
+
 export async function populate(
 	modelId: string,
 	ops: { exclusiveLinkTypes: string[]; level1?: string; level2?: string[] }
@@ -448,7 +451,7 @@ export async function populate(
 				GetStateFunc()
 			);
 			pinned.push(...added);
-			await wait(4500);
+			await wait(100);
 			added = await nextLevel(
 				link,
 				added,
@@ -482,11 +485,78 @@ export async function populate(
 							GetStateFunc()
 						);
 						pinned.push(...added);
-						if (added.length) await wait(4500);
+						if (added.length) await wait(1000);
 					}
 				});
 		}
 		return added;
+	}
+}
+
+
+export async function populateGraphPackage(
+	modelId: string,
+	ops: { exclusiveLinkTypes: string[]; level1?: string; level2?: string[] }
+) {
+	let links: GraphLink[] = getNodeLinks(GetCurrentGraph(), modelId);
+	let typesToSkip: string[] = ops && ops.exclusiveLinkTypes.length ? [] : [LinkType.PropertyLink];
+	let nodes: Node[] = [];
+	let sorted = links
+		.unique((link: GraphLink) => GetLinkProperty(link, LinkPropertyKeys.TYPE))
+		.filter((link: GraphLink) => typesToSkip.indexOf(GetLinkProperty(link, LinkPropertyKeys.TYPE)) === -1)
+		.filter(
+			(link: GraphLink) =>
+				ops && ops.exclusiveLinkTypes.length
+					? ops.exclusiveLinkTypes.indexOf(GetLinkProperty(link, LinkPropertyKeys.TYPE)) !== -1
+					: true
+		)
+		.sort((a: GraphLink, b: GraphLink) => {
+			if (GetLinkProperty(a, LinkPropertyKeys.TYPE) === LinkType.GeneralLink) {
+				return 1;
+			}
+			if (GetLinkProperty(b, LinkPropertyKeys.TYPE) === LinkType.GeneralLink) {
+				return -1;
+			}
+			return 0;
+		});
+
+	await sorted.forEachAsync(async (link: GraphLink) => {
+		let pinned: Node[] = [];
+		let added = getConnectedNodesByLinkType(modelId, GetLinkProperty(link, LinkPropertyKeys.TYPE));
+		pinned.push(...added);
+		added = await nextLevel(
+			link,
+			added,
+			pinned.map(v => v.id),
+			ops.level1 || LinkType.ModelTypeLink,
+			ops.level2 || LinkType.PropertyLink
+		);
+		nodes.push(...added);
+	});
+
+	async function nextLevel(
+		link: GraphLink,
+		added: string[],
+		pinned: string[],
+		level1: string,
+		level2: string | string[]
+	) {
+		if (GetLinkProperty(link, LinkPropertyKeys.TYPE) === level1) {
+			await getNodeLinks(GetCurrentGraph(), modelId)
+				.filter((v) => GetLinkProperty(v, LinkPropertyKeys.TYPE) === level1)
+				.forEachAsync(async (c: GraphLink) => {
+					if ((c.target === modelId || ops.level1) && ops && (!ops.exclusiveLinkTypes.length || ops.level1)) {
+						added = getConnectedNodesByLinkType(c.target === modelId ? c.source : c.target, level2);
+						pinned.push(...added);
+					}
+				});
+		}
+		return added;
+	}
+
+	return {
+		links: sorted,
+		nodes
 	}
 }
 
@@ -652,6 +722,18 @@ export function viewFlowCode(code: any) {
 				code,
 				models: properties,
 				enumerations
+			}
+		})
+	)
+}
+export function graphWindowCommand(graphWindowPackage: any) {
+	const { ipcRenderer } = require('electron');
+	ipcRenderer.send(
+		'message',
+		JSON.stringify({
+			msg: HandlerEvents.graphWindowCommand.message,
+			body: {
+				graphWindowPackage
 			}
 		})
 	)

@@ -163,7 +163,7 @@ import { Graph, Node } from '../methods/graph_types';
 import DashboardScreenNavigation from '../nodepacks/DashboardScreenNavigation';
 import CheckBoxProperty from './checkboxproperty';
 import AddShouldShowDataChain from '../nodepacks/screens/menus/AddShouldShowDataChain';
-import { startSequence, runSequence, viewFlowCode } from '../actions/remoteActions';
+import { startSequence, runSequence, viewFlowCode, populateGraphPackage, graphWindowCommand } from '../actions/remoteActions';
 
 const { clipboard } = require('electron');
 
@@ -2135,6 +2135,11 @@ class Dashboard extends Component<any, any> {
 											});
 										}}
 									/>
+									<TreeViewMenu hideArrow title={'Graph View'} icon="fa fa-outdent" onClick={() => {
+										graphWindowCommand(populateGraphPackage(currentNode.id, {
+											exclusiveLinkTypes: []
+										}))
+									}} />
 									<TreeViewMenu
 										hideArrow
 										title={'All Model Sequence'}

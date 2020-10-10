@@ -96,7 +96,7 @@ export default class MindMap extends Component<any, any> {
 		}
 	}
 
-	calculateNodeTextSize(text, pad, $width? = null) {
+	calculateNodeTextSize(text, pad, $width?= null) {
 		let div: any = document.querySelector('#secret-div-space');
 		if (true || !div || $width) {
 			div = div || document.createElement('div');
@@ -142,7 +142,7 @@ export default class MindMap extends Component<any, any> {
 			.avoidOverlaps(me.avoidOverlaps)
 			.convergenceThreshold(0.01)
 			.handleDisconnected(false)
-			.size([ width, height ]);
+			.size([width, height]);
 
 		const svg = makeSVG();
 		function makeSVG() {
@@ -205,8 +205,8 @@ export default class MindMap extends Component<any, any> {
 			stopFunc = () => me.$force.stop();
 			startFunc = () => force.start();
 			function center(args: any) {
-				const { x = 0, y = 0 } = args;
-				me.mapScale = 1;
+				const { x = 0, y = 0, scale = 0 } = args;
+				me.mapScale = scale || 1;
 				me.mapTranslate.x = 0;
 				me.mapTranslate.y = 0;
 				const ang = angle(1, 0, me.mapTranslate.x + x, me.mapTranslate.y + y);
@@ -290,15 +290,15 @@ export default class MindMap extends Component<any, any> {
 		}
 		const group = !me.avoidOverlaps
 			? svg
-					.selectAll('.group')
-					.data(graph.groups)
-					.enter()
-					.append('rect')
-					.attr('rx', 8)
-					.attr('ry', 8)
-					.attr('class', 'group')
-					.style('fill', (d, i) => Object.values(NodeTypeColors)[i] || color(i))
-					.call(force.drag)
+				.selectAll('.group')
+				.data(graph.groups)
+				.enter()
+				.append('rect')
+				.attr('rx', 8)
+				.attr('ry', 8)
+				.attr('class', 'group')
+				.style('fill', (d, i) => Object.values(NodeTypeColors)[i] || color(i))
+				.call(force.drag)
 			: null;
 
 		const node = svg.selectAll('.node');
@@ -632,7 +632,7 @@ export default class MindMap extends Component<any, any> {
 				return `translate(${x},${y})`;
 			});
 
-			label.attr('x', (d) => d.x - d.width / 2).attr('y', function(d) {
+			label.attr('x', (d) => d.x - d.width / 2).attr('y', function (d) {
 				const innerbit = this.querySelector('div');
 				const h = innerbit ? innerbit.getBoundingClientRect().height : 0;
 
@@ -701,10 +701,10 @@ export default class MindMap extends Component<any, any> {
 			const graphVersion = GraphMethods.GetAppCacheVersion();
 			if (graphVersion === version) {
 				if (mapSelectedNodes && props.selectedNodes.length === mapSelectedNodes.length) {
-					if ([ ...props.selectedNodes, ...mapSelectedNodes ].unique().length === mapSelectedNodes.length) {
+					if ([...props.selectedNodes, ...mapSelectedNodes].unique().length === mapSelectedNodes.length) {
 						if (mapSelectedLinks && props.selectedLinks.length === mapSelectedLinks.length) {
 							if (
-								[ ...props.selectedLinks, ...mapSelectedLinks ].unique().length ===
+								[...props.selectedLinks, ...mapSelectedLinks].unique().length ===
 								mapSelectedLinks.length
 							) {
 								return;
@@ -849,7 +849,7 @@ export default class MindMap extends Component<any, any> {
 	}
 
 	render() {
-		return <div id={this.state.id} className={`mindmap`} style={{ minHeight: 946 }} />;
+		return <div id={this.state.id} className={`mindmap`} style={{ minHeight: 946, height: `calc(100vh - 50px)` }} />;
 	}
 }
 
@@ -915,7 +915,7 @@ function duplicateGroup(nn) {
 }
 const throttle = (func, limit) => {
 	let inThrottle;
-	return function() {
+	return function () {
 		const args = arguments;
 		const context = this;
 		if (!inThrottle) {
@@ -938,64 +938,64 @@ function angle(cx, cy, ex, ey) {
 	return theta;
 }
 
-var Vector = (function() {
+var Vector = (function () {
 	function Vector(pX, pY, pZ) {
 		this.setX(pX);
 		this.setY(pY);
 		this.setZ(pZ);
 	}
-	Vector.prototype.getX = function() {
+	Vector.prototype.getX = function () {
 		return this.mX;
 	};
-	Vector.prototype.setX = function(pX) {
+	Vector.prototype.setX = function (pX) {
 		this.mX = pX;
 	};
-	Vector.prototype.getY = function() {
+	Vector.prototype.getY = function () {
 		return this.mY;
 	};
-	Vector.prototype.setY = function(pY) {
+	Vector.prototype.setY = function (pY) {
 		this.mY = pY;
 	};
-	Vector.prototype.getZ = function() {
+	Vector.prototype.getZ = function () {
 		return this.mZ;
 	};
-	Vector.prototype.setZ = function(pZ) {
+	Vector.prototype.setZ = function (pZ) {
 		this.mZ = pZ;
 	};
 
-	Vector.prototype.add = function(v) {
+	Vector.prototype.add = function (v) {
 		return new Vector(this.getX() + v.getX(), this.getY() + v.getY(), this.getZ() + v.getZ());
 	};
 
-	Vector.prototype.subtract = function(v) {
+	Vector.prototype.subtract = function (v) {
 		return new Vector(this.getX() - v.getX(), this.getY() - v.getY(), this.getZ() - v.getZ());
 	};
 
-	Vector.prototype.multiply = function(scalar) {
+	Vector.prototype.multiply = function (scalar) {
 		return new Vector(this.getX() * scalar, this.getY() * scalar, this.getZ() * scalar);
 	};
 
-	Vector.prototype.divide = function(scalar) {
+	Vector.prototype.divide = function (scalar) {
 		return new Vector(this.getX() / scalar, this.getY() / scalar, this.getZ() / scalar);
 	};
 
-	Vector.prototype.magnitude = function() {
+	Vector.prototype.magnitude = function () {
 		return Math.sqrt(this.getX() * this.getX() + this.getY() * this.getY() + this.getZ() * this.getZ());
 	};
 
 	// this is the vector I have tried for the normalisation
-	Vector.prototype.normalisedVector = function() {
+	Vector.prototype.normalisedVector = function () {
 		const vec = new Vector(this.getX(), this.getY(), this.getZ());
 		return vec.divide(this.magnitude());
 	};
 	return Vector;
 })();
 
-let startFunc: Function = () => {};
-let stopFunc: Function = () => {};
-let resetFunc: Function = () => {};
-let centerFunc: Function = () => {};
-let getNodesFunc: Function = () => {};
+let startFunc: Function = () => { };
+let stopFunc: Function = () => { };
+let resetFunc: Function = () => { };
+let centerFunc: Function = () => { };
+let getNodesFunc: Function = () => { };
 export function requestNodes() {
 	return getNodesFunc ? getNodesFunc() : null;
 }
