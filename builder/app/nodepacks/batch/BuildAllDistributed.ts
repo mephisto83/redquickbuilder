@@ -166,7 +166,6 @@ const Modify_Agent_Methods = 'Modify Agent Methods';
 const Add_Agent_Access_Methods = 'Add Agent Access Methods';
 export const Create_Component_All = 'Create Component All';
 export const Create_Component_Shared_All = 'Create Component Shared All';
-const Wait_For_Create_Component_All_Completion = 'Wait_For_Create_Component_All_Completion';
 const Select_All_On_Model_Filters = 'Select All On Model Filters';
 const Add_Filters_To_Get_All = 'Add Filters to Get All';
 const Create_Dashboard = 'Create Dashboard';

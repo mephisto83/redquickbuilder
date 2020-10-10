@@ -45,7 +45,9 @@ import {
 	StyleNodeProperties,
 	LinkProperties,
 	EventArgumentTypes,
-	PropertyCentricTypes
+	PropertyCentricTypes,
+	UIActionMethods,
+	UIActionMethodParameterTypes
 } from '../constants/nodetypes';
 import {
 	buildLayoutTree,
@@ -1329,6 +1331,11 @@ function WriteDescribedApiProperties(
 				link: LinkType.TitleServiceLink
 			}).find((x: any) => x);
 
+			const uiMethod = GetNodeLinkedTo(graph, {
+				id: componentExternalApi.id,
+				link: LinkType.UIMethod
+			});
+
 			const query = GetNodesLinkedTo(graph, {
 				id: componentExternalApi.id,
 				link: LinkType.QueryLink
@@ -1396,6 +1403,16 @@ function WriteDescribedApiProperties(
 				innerValue = `DC.${GetCodeName(dataChain, {
 					includeNameSpace: true
 				})}(${innerValue})`;
+			} else if (uiMethod) {
+				let link = GetLinkBetween(componentExternalApi.id, uiMethod.id, graph);
+				let parameters = GetLinkProperty(link, LinkPropertyKeys.Parameters);
+
+				let params = getUIMethodParameters(parameters);
+				let temp: any = UIActionMethods;
+				innerValue = `${temp[GetNodeProp(uiMethod, NodeProperties.UIActionMethod)]}(${innerValue}${params &&
+				params.length
+					? ', '
+					: ''}${params.join()})`;
 			}
 			if (innerValue) {
 				return `${GetJSCodeName(componentExternalApi)}={${innerValue}}`;
@@ -1744,7 +1761,10 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 		type: LinkType.DataChainLink,
 		direction: SOURCE
 	}).find((x) => x);
-
+	let uiMethod = GetNodeLinkedTo(graph, {
+		id: methodInstanceCall.id,
+		link: LinkType.UIMethod
+	});
 	const internalApiConnection = getNodesByLinkType(graph, {
 		id: methodInstanceCall.id,
 		type: LinkType.ComponentApi,
@@ -1881,6 +1901,17 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 				includeNameSpace: true
 			})}`;
 		}
+		if (uiMethod) {
+			let link = GetLinkBetween(methodInstanceCall.id, uiMethod.id, graph);
+			let parameters = GetLinkProperty(link, LinkPropertyKeys.Parameters);
+
+			let params = getUIMethodParameters(parameters);
+			let passingParameters = getUIMethodParameters(parameters, { passingParameters: true });
+			let temp: any = UIActionMethods;
+			dataChainInput = `${parts.length ? ',' : ''}dataChain: function(${passingParameters.join()}) {
+        return ${temp[GetNodeProp(uiMethod, NodeProperties.UIActionMethod)]}(${params.join()})
+      }`;
+		}
 		let preDataChainInput = '';
 		if (preDataChain) {
 			preDataChainInput = `${parts.length ? ',' : ''}preChain: DC.${GetCodeName(preDataChain, {
@@ -1938,6 +1969,41 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 			includeNameSpace: true
 		})}(value/*hi*/);`;
 	}
+}
+
+function getUIMethodParameters(parameters: any, options?: { passingParameters: boolean }) {
+	return parameters
+		.filter((v: any) => {
+			if (options && options.passingParameters) {
+				switch (v.type) {
+					case UIActionMethodParameterTypes.FunctionParameter:
+						return true;
+					default:
+						return false;
+				}
+			}
+			return true;
+		})
+		.map((v: any) => {
+			switch (v.type) {
+				case UIActionMethodParameterTypes.FunctionParameter:
+					if (options && options.passingParameters) {
+						return `${v.value}: any`;
+					}
+					return v.value;
+				case UIActionMethodParameterTypes.ModelKey:
+				case UIActionMethodParameterTypes.Model:
+					return `Models.${GetCodeName(v.value)}`;
+				case UIActionMethodParameterTypes.Property:
+					return `\`${GetJSCodeName(v.value)}\``;
+				case UIActionMethodParameterTypes.FetchModel:
+					return 'fetchModel';
+				case UIActionMethodParameterTypes.RetrieveParameters:
+					return 'retrieveParameters';
+				case UIActionMethodParameterTypes.ViewModelKey:
+					return `ViewModelKeys.${GetCodeName(v.value)}`;
+			}
+		});
 }
 
 function GetComponentContextScript(component: GraphMethods.Node) {
@@ -2135,6 +2201,7 @@ export function GetComponentDidMount(screenOption: any, options: any = {}) {
         this.captureValues({});
         ${options.skipOutOfBand ? '' : outOfBandCall}
         ${invocations}
+        //Chain invocations
         ${chainInvocations}
 {{handles}}
 }

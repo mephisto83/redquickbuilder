@@ -407,7 +407,18 @@ export const PropertyCentricTypes = {
 	Effect: 'Effect'
 };
 export const UIActionMethods = {
-	GetModelProperty: 'GetModelProperty'
+	GetModelProperty: 'GetModelProperty',
+	LoadModel: 'LoadModel',
+	StoreInLake: 'StoreInLake'
+};
+export const UIActionMethodParameterTypes = {
+	Model: 'model',
+	ModelKey: 'modelKey',
+	Property: 'property',
+	FunctionParameter: 'FunctionParameter',
+	FetchModel: 'fetchModel',
+	ViewModelKey: 'viewModelKey',
+	RetrieveParameters: 'RetrieveParameters'
 };
 export const NodeProperties = {
 	ViewPackage: 'view-package',
@@ -1073,6 +1084,10 @@ export const LinkPropertyKeys = {
 	InstanceUpdate: 'InstanceUpdate',
 	ComponentTag: 'ComponentTag',
 	Sibling: 'sibling',
+	Parameters: 'parameters',
+	Model: 'model',
+	ViewModelKey: 'viewModelKey',
+	ModelKey: 'modelKey',
 	ComponentStyle: 'ComponentStyle',
 	MethodProps: 'methodProps',
 	MountingProps: 'mountingProps',

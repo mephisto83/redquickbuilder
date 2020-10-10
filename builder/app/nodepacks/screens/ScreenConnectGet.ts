@@ -18,9 +18,21 @@ import {
 	UPDATE_NODE_PROPERTY,
 	ScreenOptionFilter,
 	GetLambdaVariableTitle,
-	graphOperation
+	graphOperation,
+	GetNodeByProperties,
+	CreateNewNode,
+	AddLinkBetweenNodes
 } from '../../actions/uiactions';
-import { LinkType, NodeProperties, LinkProperties, Methods } from '../../constants/nodetypes';
+import {
+	LinkType,
+	NodeProperties,
+	LinkProperties,
+	Methods,
+	UIActionMethods,
+	NodeTypes,
+	LinkPropertyKeys,
+	UIActionMethodParameterTypes
+} from '../../constants/nodetypes';
 import { ComponentLifeCycleEvents, ComponentEvents } from '../../constants/componenttypes';
 import AddLifeCylcleMethodInstance from '../AddLifeCylcleMethodInstance';
 import CreateNavigateToScreenDC from '../CreateNavigateToScreenDC';
@@ -29,7 +41,7 @@ import { uuidv4 } from '../../utils/array';
 import AppendValidations from './AppendValidations';
 import { TEMPLATE_PARAMETERS } from '../../constants/functiontypes';
 import StoreModelInLake from '../datachain/StoreModelInLake';
-import { Graph } from '../../methods/graph_types';
+import { Graph, Node } from '../../methods/graph_types';
 
 export default function ScreenConnectGet(args: any = {}) {
 	let { node: screen, method } = args;
@@ -306,32 +318,75 @@ export default function ScreenConnectGet(args: any = {}) {
 						}
 						return [];
 					},
-					(graph: Graph) => {
-						let model = GetNodeProp(screen, NodeProperties.Model, graph);
-						return StoreModelInLake({
-							modelId: model,
-							modelInsertName: GetLambdaVariableTitle(model, false, true),
-							model: GetNodeTitle(model),
-							viewPackages,
-							callback: (dcontext: { entry: string }) => {
-								datachain = dcontext.entry;
-							}
-						});
-					},
 					() => {
 						return [
-							{
-								operation: ADD_LINK_BETWEEN_NODES,
-								options() {
-									return {
-										properties: { ...LinkProperties.DataChainLink },
-										target: datachain,
-										source: cycleInstance ? cycleInstance.id : null
-									};
+							() => {
+								let uiMethodNode: Node = GetNodeByProperties({
+									[NodeProperties.UIActionMethod]: UIActionMethods.StoreInLake,
+									[NodeProperties.NODEType]: NodeTypes.UIMethod
+								});
+								let res: any[] = [];
+								if (!uiMethodNode) {
+									res.push(() => {
+										return CreateNewNode(
+											{
+												[NodeProperties.UIActionMethod]: UIActionMethods.StoreInLake,
+												[NodeProperties.UIText]: UIActionMethods.StoreInLake,
+												[NodeProperties.NODEType]: NodeTypes.UIMethod
+											},
+											(node: Node) => {
+												uiMethodNode = node;
+											}
+										);
+									});
 								}
+								res.push(() => {
+									return AddLinkBetweenNodes(cycleInstance ? cycleInstance.id : '', uiMethodNode.id, {
+										...LinkProperties.UIMethod,
+										[LinkPropertyKeys.ModelKey]: GetNodeProp(screen, NodeProperties.Model),
+										parameters: [
+											{
+												type: UIActionMethodParameterTypes.FunctionParameter,
+												value: 'a'
+											},
+											{
+												type: UIActionMethodParameterTypes.ModelKey,
+												value: GetNodeProp(screen, NodeProperties.Model)
+											}
+										]
+									});
+								});
+
+								return res;
 							}
 						];
 					},
+					// (graph: Graph) => {
+					// 	let model = GetNodeProp(screen, NodeProperties.Model, graph);
+					// 	return StoreModelInLake({
+					// 		modelId: model,
+					// 		modelInsertName: GetLambdaVariableTitle(model, false, true),
+					// 		model: GetNodeTitle(model),
+					// 		viewPackages,
+					// 		callback: (dcontext: { entry: string }) => {
+					// 			datachain = dcontext.entry;
+					// 		}
+					// 	});
+					// },
+					// () => {
+					// 	return [
+					// 		{
+					// 			operation: ADD_LINK_BETWEEN_NODES,
+					// 			options() {
+					// 				return {
+					// 					properties: { ...LinkProperties.DataChainLink },
+					// 					target: datachain,
+					// 					source: cycleInstance ? cycleInstance.id : null
+					// 				};
+					// 			}
+					// 		}
+					// 	];
+					// },
 					() => {
 						if (apiEndpoints) {
 							return Object.keys(apiEndpoints).map((key) => {

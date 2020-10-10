@@ -24,7 +24,8 @@ import {
 	LinkPropertyKeys,
 	SelectorPropertyKeys,
 	ApiNodeKeys,
-	UIActionMethods
+	UIActionMethods,
+	UIActionMethodParameterTypes
 } from './nodetypes';
 import * as _ from '../methods/graph_types';
 import {
@@ -1978,17 +1979,6 @@ export const CreateDefaultView = {
 									});
 								}
 							: null,
-						// Adding load data chain
-						...(needsLoadToScreenState && false
-							? LoadModel({
-									model_view_name: `${viewName} Load ${GetNodeTitle(currentNode)}`,
-									model_item: `Models.${GetCodeName(currentNode)}`,
-									callback: (context: { entry: any }) => {
-										newItems.dataChainForLoading = context.entry;
-									}
-								})
-							: []),
-
 						{
 							operation: ADD_NEW_NODE,
 							options(graph: any) {
@@ -2204,19 +2194,6 @@ export const CreateDefaultView = {
 											};
 										}
 									};
-								})
-							: []),
-						...(needsLoadToScreenState && false
-							? ConnectLifecycleMethodToDataChain({
-									lifeCycleMethod: (graph: any) => {
-										const sce = screenComponentEvents.find(
-											(x) =>
-												GetNodeProp(x, NodeProperties.EventType, graph) ===
-												ComponentLifeCycleEvents.ComponentDidMount
-										);
-										return sce;
-									},
-									dataChain: () => newItems.dataChainForLoading
 								})
 							: []),
 						!isSharedComponent && isList
@@ -5691,22 +5668,26 @@ function setupPropertyApi(args: any) {
 							});
 						}
 						res.push(() => {
-							return AddLinkBetweenNodes(newItems[childComponents[propertyIndex]][apiProperty].componentExternalValue, uiMethodNode.id, {
-								...LinkProperties.UIMethod,
-								model: currentNode.id,
-								property: modelProperty.id,
-								parameters: [
-									'selector',
-									{ type: 'model', value: currentNode.id },
-									{ type: 'property', value: modelProperty.id }
-								]
-							});
+							return AddLinkBetweenNodes(
+								newItems[childComponents[propertyIndex]][apiProperty].componentExternalValue,
+								uiMethodNode.id,
+								{
+									...LinkProperties.UIMethod,
+									model: currentNode.id,
+									property: modelProperty.id,
+									parameters: [
+										{ type: UIActionMethodParameterTypes.Model, value: currentNode.id },
+										{ type: UIActionMethodParameterTypes.Property, value: modelProperty.id },
+										{ type: UIActionMethodParameterTypes.FetchModel }
+									]
+								}
+							);
 						});
 
 						return res;
 					}
-        ];
-        // Removed because it makes too many functions that are very repetitive.
+				];
+				// Removed because it makes too many functions that are very repetitive.
 				return [
 					...CreateSelectorToDataChainSelectorDC({
 						model: currentNode.id,
