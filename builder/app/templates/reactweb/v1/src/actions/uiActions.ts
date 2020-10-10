@@ -736,4 +736,24 @@ export function GetModelProperty($id: any, modelType: string, propertyName: stri
 	}
 	return null;
 }
+// TODO: Copy to other uiactions later. 10/10/2020
+export function LoadModel(viewModelDefault: string, modelKey: string, retrieveParameters: Function) {
+	let params = retrieveParameters();
+	let { model, value, viewModel = viewModelDefault } = params;
+	let dispatch = GetDispatch();
+	let currentItem = GetItem(modelKey, model || value);
+	if (currentItem) {
+		dispatch(clearScreenInstance(viewModel, currentItem ? currentItem.id : null, currentItem));
+		dispatch(updateScreenInstanceObject(viewModel, currentItem ? currentItem.id : null, { ...currentItem }));
+	}
 
+	return params;
+}
+// TODO: Copy to other uiactions later. 10/10/2020
+export function StoreInLake(a: any, modelKey: string) {
+	let dispatch = GetDispatch();
+
+	dispatch(Batch(UIModels(modelKey, a)));
+
+	return a;
+}

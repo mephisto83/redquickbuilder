@@ -16,7 +16,9 @@ import {
 	ADD_LINK_BETWEEN_NODES,
 	ComponentEventTo,
 	GetComponentExternalApiNode,
-	ScreenOptionFilter
+	ScreenOptionFilter,
+	CreateNewNode,
+	AddLinkBetweenNodes
 } from '../../actions/uiactions';
 import {
 	LinkType,
@@ -25,7 +27,9 @@ import {
 	LinkProperties,
 	UITypes,
 	NodeTypes,
-	Methods
+	Methods,
+	UIActionMethods,
+	UIActionMethodParameterTypes
 } from '../../constants/nodetypes';
 import { ComponentLifeCycleEvents, ComponentEvents } from '../../constants/componenttypes';
 import AddLifeCylcleMethodInstance from '../AddLifeCylcleMethodInstance';
@@ -37,7 +41,7 @@ import AppendPostMethod from './AppendPostMethod';
 import GetModelObjectFromSelector from '../GetModelObjectFromSelector';
 import LoadModel from '../LoadModel';
 import ClearScreenInstance from '../datachain/ClearScreenInstance';
-import { Graph } from '../../methods/graph_types';
+import { Graph, Node } from '../../methods/graph_types';
 
 export default function ScreenConnectUpdate(args: any = {}) {
 	let { node, method } = args;
@@ -170,27 +174,69 @@ export default function ScreenConnectUpdate(args: any = {}) {
 							}
 							return [];
 						},
-						...LoadModel({
-							screen: node,
-							viewPackages,
-							model_view_name: `Load ${GetCodeName(GetNodeProp(node, NodeProperties.Model))} into state`,
-							model_item: `Models.${GetCodeName(GetNodeProp(node, NodeProperties.Model))}`,
-							callback: (context: { entry: any }) => {
-								dataChainForLoading = context.entry;
-							}
-						}),
-						{
-							operation: ADD_LINK_BETWEEN_NODES,
-							options() {
-								return {
-									target: dataChainForLoading,
-									source: cycleInstance.id,
-									properties: {
-										...LinkProperties.DataChainLink
+						() => {
+							return [
+								() => {
+									let uiMethodNode: Node = GetNodeByProperties({
+										[NodeProperties.UIActionMethod]: UIActionMethods.LoadModel,
+										[NodeProperties.NODEType]: NodeTypes.UIMethod
+									});
+									let res: any[] = [];
+									if (!uiMethodNode) {
+										res.push(() => {
+											return CreateNewNode(
+												{
+													[NodeProperties.UIActionMethod]: UIActionMethods.LoadModel,
+													[NodeProperties.UIText]: UIActionMethods.LoadModel,
+													[NodeProperties.NODEType]: NodeTypes.UIMethod
+												},
+												(node: Node) => {
+													uiMethodNode = node;
+												}
+											);
+										});
 									}
-								};
-							}
-						}
+									res.push(() => {
+										return AddLinkBetweenNodes(cycleInstance.id, uiMethodNode.id, {
+											...LinkProperties.UIMethod,
+											[LinkPropertyKeys.ModelKey]: GetNodeProp(node, NodeProperties.Model),
+											[LinkPropertyKeys.ViewModelKey]: node,
+											parameters: [
+												{ type: UIActionMethodParameterTypes.ViewModelKey, value: node },
+												{
+													type: UIActionMethodParameterTypes.ModelKey,
+													value: GetNodeProp(node, NodeProperties.Model)
+												},
+												{ type: UIActionMethodParameterTypes.RetrieveParameters }
+											]
+										});
+									});
+
+									return res;
+								}
+							];
+						}//,
+						// ...LoadModel({
+						// 	screen: node,
+						// 	viewPackages,
+						// 	model_view_name: `Load ${GetCodeName(GetNodeProp(node, NodeProperties.Model))} into state`,
+						// 	model_item: `Models.${GetCodeName(GetNodeProp(node, NodeProperties.Model))}`,
+						// 	callback: (context: { entry: any }) => {
+						// 		dataChainForLoading = context.entry;
+						// 	}
+						// }),
+						// {
+						// 	operation: ADD_LINK_BETWEEN_NODES,
+						// 	options() {
+						// 		return {
+						// 			target: dataChainForLoading,
+						// 			source: cycleInstance.id,
+						// 			properties: {
+						// 				...LinkProperties.DataChainLink
+						// 			}
+						// 		};
+						// 	}
+						// }
 					);
 				});
 			});
@@ -399,8 +445,8 @@ export default function ScreenConnectUpdate(args: any = {}) {
 							};
 						}
 					}
-        },
-        // - clear screen -
+				},
+				// - clear screen -
 				() => ({
 					operation: ADD_LINK_BETWEEN_NODES,
 					options() {

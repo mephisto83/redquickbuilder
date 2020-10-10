@@ -8,15 +8,25 @@ import {
 	graphOperation,
 	GetStateFunc,
 	GetDispatchFunc,
-	NodeTypes
+	NodeTypes,
+	GetNodeByProperties,
+	CreateNewNode,
+	AddLinkBetweenNodes
 } from '../../actions/uiactions';
 import { GetNodesLinkedTo, GetNodeProp } from '../../methods/graph_methods';
-import { LinkType, NodeProperties, LinkProperties } from '../../constants/nodetypes';
+import {
+	LinkType,
+	NodeProperties,
+	LinkProperties,
+	UIActionMethods,
+	LinkPropertyKeys,
+	UIActionMethodParameterTypes
+} from '../../constants/nodetypes';
 import { ComponentLifeCycleEvents } from '../../constants/componenttypes';
 import AddLifeCylcleMethodInstance from '../AddLifeCylcleMethodInstance';
 import { uuidv4 } from '../../utils/array';
 import ConnectLifecycleMethod from '../../components/ConnectLifecycleMethod';
-import { Graph } from '../../methods/graph_types';
+import { Graph, Node } from '../../methods/graph_types';
 import StoreModelInLake from '../datachain/StoreModelInLake';
 import { MethodFunctions } from '../../constants/functiontypes';
 import LoadModel from '../LoadModel';
@@ -74,7 +84,7 @@ export default function ConnectComponentDidMount(args: {
 			.filter((x: any) => GetNodeProp(x, NodeProperties.UIText) === ComponentLifeCycleEvents.ComponentDidMount)
 			.map((lifeCylcleMethod: { id: any }) => {
 				const apiEndpoints: any = {};
-				let cycleInstance: { id: any } | null = null;
+				let cycleInstance: Node | null = null;
 				let datachain: string;
 				let functionType: string = GetNodeProp(method, NodeProperties.FunctionType);
 				let functionTypeParameters = GetMethodTemplateParameters(functionType);
@@ -142,29 +152,81 @@ export default function ConnectComponentDidMount(args: {
 					//Returns a MODEL and an instanceType[IS edit]
 					...(!returnsAList && instanceType
 						? [
-								LoadModel({
-									screen: screen,
-									viewPackages,
-									model_view_name: `Load ${GetCodeName(
-										GetNodeProp(screen, NodeProperties.Model)
-									)} into state`,
-									model_item: `Models.${GetCodeName(GetNodeProp(screen, NodeProperties.Model))}`,
-									callback: (context: { entry: any }) => {
-										dataChainForLoading = context.entry;
-									}
-								}),
-								{
-									operation: ADD_LINK_BETWEEN_NODES,
-									options() {
-										return {
-											target: dataChainForLoading,
-											source: cycleInstance ? cycleInstance.id : null,
-											properties: {
-												...LinkProperties.DataChainLink
+								() => {
+									return [
+										() => {
+											let uiMethodNode: Node = GetNodeByProperties({
+												[NodeProperties.UIActionMethod]: UIActionMethods.LoadModel,
+												[NodeProperties.NODEType]: NodeTypes.UIMethod
+											});
+											let res: any[] = [];
+											if (!uiMethodNode) {
+												res.push(() => {
+													return CreateNewNode(
+														{
+															[NodeProperties.UIActionMethod]: UIActionMethods.LoadModel,
+															[NodeProperties.UIText]: UIActionMethods.LoadModel,
+															[NodeProperties.NODEType]: NodeTypes.UIMethod
+														},
+														(node: Node) => {
+															uiMethodNode = node;
+														}
+													);
+												});
 											}
-										};
-									}
+											res.push(() => {
+												return AddLinkBetweenNodes(
+													cycleInstance ? cycleInstance.id : '',
+													uiMethodNode.id,
+													{
+														...LinkProperties.UIMethod,
+														[LinkPropertyKeys.ModelKey]: GetNodeProp(
+															screen,
+															NodeProperties.Model
+														),
+														[LinkPropertyKeys.ViewModelKey]: screen,
+														parameters: [
+															{
+																type: UIActionMethodParameterTypes.ViewModelKey,
+																value: screen
+															},
+															{
+																type: UIActionMethodParameterTypes.ModelKey,
+																value: GetNodeProp(screen, NodeProperties.Model)
+															},
+															{ type: UIActionMethodParameterTypes.RetrieveParameters }
+														]
+													}
+												);
+											});
+
+											return res;
+										}
+									];
 								}
+								// LoadModel({
+								// 	screen: screen,
+								// 	viewPackages,
+								// 	model_view_name: `Load ${GetCodeName(
+								// 		GetNodeProp(screen, NodeProperties.Model)
+								// 	)} into state`,
+								// 	model_item: `Models.${GetCodeName(GetNodeProp(screen, NodeProperties.Model))}`,
+								// 	callback: (context: { entry: any }) => {
+								// 		dataChainForLoading = context.entry;
+								// 	}
+								// }),
+								// {
+								// 	operation: ADD_LINK_BETWEEN_NODES,
+								// 	options() {
+								// 		return {
+								// 			target: dataChainForLoading,
+								// 			source: cycleInstance ? cycleInstance.id : null,
+								// 			properties: {
+								// 				...LinkProperties.DataChainLink
+								// 			}
+								// 		};
+								// 	}
+								// }
 							]
 						: []),
 					//Returns a LIST and is an instanceType[IS edit]
@@ -211,38 +273,89 @@ export default function ConnectComponentDidMount(args: {
 					//Returns a model and not an instanceType[not edit]
 					...(!returnsAList && !instanceType
 						? [
-								(graph: Graph) => {
-									let model = GetNodeProp(screen, NodeProperties.Model, graph);
-									if (model) {
-										return StoreModelInLake({
-											modelId: model,
-											modelInsertName: GetLambdaVariableTitle(model, false, true),
-											model: GetNodeTitle(model),
-											viewPackages,
-											callback: (dcontext: { entry: string }) => {
-												datachain = dcontext.entry;
-											}
-										});
-									}
-									return [];
-								},
+
 								() => {
-									if (datachain) {
-										return [
-											{
-												operation: ADD_LINK_BETWEEN_NODES,
-												options() {
-													return {
-														properties: { ...LinkProperties.DataChainLink },
-														target: datachain,
-														source: cycleInstance ? cycleInstance.id : null
-													};
-												}
+									return [
+										() => {
+											let uiMethodNode: Node = GetNodeByProperties({
+												[NodeProperties.UIActionMethod]: UIActionMethods.StoreInLake,
+												[NodeProperties.NODEType]: NodeTypes.UIMethod
+											});
+											let res: any[] = [];
+											if (!uiMethodNode) {
+												res.push(() => {
+													return CreateNewNode(
+														{
+															[NodeProperties.UIActionMethod]: UIActionMethods.StoreInLake,
+															[NodeProperties.UIText]: UIActionMethods.StoreInLake,
+															[NodeProperties.NODEType]: NodeTypes.UIMethod
+														},
+														(node: Node) => {
+															uiMethodNode = node;
+														}
+													);
+												});
 											}
-										];
-									}
-									return [];
+											res.push(() => {
+												return AddLinkBetweenNodes(
+													cycleInstance ? cycleInstance.id : '',
+													uiMethodNode.id,
+													{
+														...LinkProperties.UIMethod,
+														[LinkPropertyKeys.ModelKey]: GetNodeProp(
+															screen,
+															NodeProperties.Model
+														),
+														parameters: [
+															{
+																type: UIActionMethodParameterTypes.FunctionParameter,
+																value: 'a'
+															},
+															{
+																type: UIActionMethodParameterTypes.ModelKey,
+																value: GetNodeProp(screen, NodeProperties.Model)
+															}
+														]
+													}
+												);
+											});
+
+											return res;
+										}
+									];
 								}
+								// (graph: Graph) => {
+								// 	let model = GetNodeProp(screen, NodeProperties.Model, graph);
+								// 	if (model) {
+								// 		return StoreModelInLake({
+								// 			modelId: model,
+								// 			modelInsertName: GetLambdaVariableTitle(model, false, true),
+								// 			model: GetNodeTitle(model),
+								// 			viewPackages,
+								// 			callback: (dcontext: { entry: string }) => {
+								// 				datachain = dcontext.entry;
+								// 			}
+								// 		});
+								// 	}
+								// 	return [];
+								// },
+								// () => {
+								// 	if (datachain) {
+								// 		return [
+								// 			{
+								// 				operation: ADD_LINK_BETWEEN_NODES,
+								// 				options() {
+								// 					return {
+								// 						properties: { ...LinkProperties.DataChainLink },
+								// 						target: datachain,
+								// 						source: cycleInstance ? cycleInstance.id : null
+								// 					};
+								// 				}
+								// 			}
+								// 		];
+								// 	}
+								// 	return [];
+								// }
 							]
 						: []),
 					//Returns a LIST and not an instanceType[not edit]
