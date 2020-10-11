@@ -77,47 +77,91 @@ export default function AddMenuComponent(args: any = {}) {
 				}
 			}),
 		() => {
-			const dataChain = GetNodeByProperties({
-				[NodeProperties.DataChainTypeName]: DataChainTypeNames.NavigateToRoute,
-				[NodeProperties.UIType]: args.uiType
-			});
-			if (dataChain) {
-				return [
-					{
-						operation: 'ADD_LINK_BETWEEN_NODES',
-						options: {
-							source: context.eventTypeInstanceNode,
-							target: dataChain.id,
-							properties: { ...LinkProperties.DataChainLink }
-						}
+			return [
+				() => {
+					let uiMethodNode: Node = GetNodeByProperties({
+						[NodeProperties.UIActionMethod]: UIActionMethods.NavigateToRoute,
+						[NodeProperties.NODEType]: NodeTypes.UIMethod
+					});
+					let res: any[] = [];
+					if (!uiMethodNode) {
+						res.push(() => {
+							return CreateNewNode(
+								{
+									[NodeProperties.UIActionMethod]: UIActionMethods.NavigateToRoute,
+									[NodeProperties.UIText]: UIActionMethods.NavigateToRoute,
+									[NodeProperties.NODEType]: NodeTypes.UIMethod
+								},
+								(node: Node) => {
+									uiMethodNode = node;
+								}
+							);
+						});
 					}
-				];
-			}
-			return NavigateToRoute({
-				menunavigate: `Navigate To Route`,
-				viewPackages,
-				uiType: args.uiType,
-				callback: (navigcontext: { entry: any }) => {
-					context.navigateDataChain = navigcontext.entry;
-				}
-			});
-		},
-		() => {
-			if (context.navigateDataChain) {
-				return [
-					{
-						operation: 'ADD_LINK_BETWEEN_NODES',
-						options: {
-							source: context.eventTypeInstanceNode,
-							target: context.navigateDataChain,
-							properties: { ...LinkProperties.DataChainLink }
-						}
-					}
-				];
-			}
+					res.push(() => {
+						return AddLinkBetweenNodes(context.eventTypeInstanceNode, uiMethodNode.id, {
+							...LinkProperties.UIMethod,
+							parameters: [
+								{
+									type: UIActionMethodParameterTypes.FunctionParameter,
+									value: 'a'
+								},
+								{
+									type: UIActionMethodParameterTypes.Navigate
+								},
+								{
+									type: UIActionMethodParameterTypes.Routes
+								}
+							]
+						});
+					});
 
-			return [];
+					return res;
+				}
+			];
 		},
+		// () => {
+		// 	const dataChain = GetNodeByProperties({
+		// 		[NodeProperties.DataChainTypeName]: DataChainTypeNames.NavigateToRoute,
+		// 		[NodeProperties.UIType]: args.uiType
+		// 	});
+		// 	if (dataChain) {
+		// 		return [
+		// 			{
+		// 				operation: 'ADD_LINK_BETWEEN_NODES',
+		// 				options: {
+		// 					source: context.eventTypeInstanceNode,
+		// 					target: dataChain.id,
+		// 					properties: { ...LinkProperties.DataChainLink }
+		// 				}
+		// 			}
+		// 		];
+		// 	}
+		// 	return NavigateToRoute({
+		// 		menunavigate: `Navigate To Route`,
+		// 		viewPackages,
+		// 		uiType: args.uiType,
+		// 		callback: (navigcontext: { entry: any }) => {
+		// 			context.navigateDataChain = navigcontext.entry;
+		// 		}
+		// 	});
+		// },
+		// () => {
+		// 	if (context.navigateDataChain) {
+		// 		return [
+		// 			{
+		// 				operation: 'ADD_LINK_BETWEEN_NODES',
+		// 				options: {
+		// 					source: context.eventTypeInstanceNode,
+		// 					target: context.navigateDataChain,
+		// 					properties: { ...LinkProperties.DataChainLink }
+		// 				}
+		// 			}
+		// 		];
+		// 	}
+
+		// 	return [];
+		// },
 		// (graph: any) => {
 		// 	const buildMethodDataChain = GetNodeByProperties(
 		// 		{

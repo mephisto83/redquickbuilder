@@ -758,6 +758,7 @@ export function StoreInLake(a: any, modelKey: string) {
 	return a;
 }
 
+// TODO: Copy to other uiactions later. 10/10/2020
 export function StoreModelArray(a: any[], modelType: string, stateKey: string) {
 	let dispatch = GetDispatch();
 
@@ -769,6 +770,7 @@ export function StoreModelArray(a: any[], modelType: string, stateKey: string) {
 
 	return ids;
 }
+// TODO: Copy to other uiactions later. 10/10/2020
 export function GetMenuDataSource(GetMenuSource: any, RedGraph: any) {
 	let array = GetMenuSource({ getState: GetState(), dispatch: GetDispatch() });
 
@@ -786,9 +788,15 @@ export function GetMenuDataSource(GetMenuSource: any, RedGraph: any) {
 	return graph;
 }
 
+// TODO: Copy to other uiactions later. 10/10/2020
 export function StoreResultInReducer(x: any, modelType: string, navigate: any) {
 	x = x !== undefined || x !== null ? [ x ] : [];
 	let dispatch = GetDispatch();
 	dispatch(UIModels(modelType, x));
 	navigate.GoBack()(dispatch, GetState());
+}
+
+// TODO: Copy to other uiactions later. 10/11/2020
+export function NavigateToRoute(id: string, navigate: any, routes: any) {
+	navigate.Go({ route: routes[id] })(GetDispatch(), GetState());
 }

@@ -411,6 +411,7 @@ export const UIActionMethods = {
 	LoadModel: 'LoadModel',
 	StoreResultInReducer: 'StoreResultInReducer',
 	StoreInLake: 'StoreInLake',
+	NavigateToRoute: 'NavigateToRoute',
 	GetMenuDataSource: 'GetMenuDataSource',
 	StoreModelArray: 'StoreModelArray'
 };
@@ -420,6 +421,7 @@ export const UIActionMethodParameterTypes = {
 	Property: 'property',
 	Navigate: 'Navigate',
 	StateKey: 'stateKey',
+	Routes: 'Routes',
 	FunctionParameter: 'FunctionParameter',
 	GetMenuSource: 'GetMenuSource',
 	FetchModel: 'fetchModel',
