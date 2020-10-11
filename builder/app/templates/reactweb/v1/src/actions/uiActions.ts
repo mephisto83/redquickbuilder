@@ -757,3 +757,38 @@ export function StoreInLake(a: any, modelKey: string) {
 
 	return a;
 }
+
+export function StoreModelArray(a: any[], modelType: string, stateKey: string) {
+	let dispatch = GetDispatch();
+
+	dispatch(UIModels(modelType, a));
+
+	let ids = (a || []).map((x: any) => (x ? x.id : null));
+
+	dispatch(UIC('Data', stateKey, ids));
+
+	return ids;
+}
+export function GetMenuDataSource(GetMenuSource: any, RedGraph: any) {
+	let array = GetMenuSource({ getState: GetState(), dispatch: GetDispatch() });
+
+	let graph = RedGraph.create();
+
+	array
+		.map((item: any) => {
+			RedGraph.addNode(graph, item, null);
+		})
+		.forEach((item: any) => {
+			if (item && item.parent) {
+				RedGraph.addLink(graph, item.parent, item.id);
+			}
+		});
+	return graph;
+}
+
+export function StoreResultInReducer(x: any, modelType: string, navigate: any) {
+	x = x !== undefined || x !== null ? [ x ] : [];
+	let dispatch = GetDispatch();
+	dispatch(UIModels(modelType, x));
+	navigate.GoBack()(dispatch, GetState());
+}

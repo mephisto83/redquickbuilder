@@ -3,10 +3,16 @@ import { Platform, StyleSheet, TouchableOpacity } from "react-native";
 import { redConnect, titleService } from '../actions/util';
 import * as DC from '../actions/data-chain';
 import * as S from '../actions/selector';
-import { GetItems, navigate, GetScreenParam, setNavigate, GetItem, SITE, GetC, StoreInLake, GetModelProperty, LoadModel  } from '../actions/uiactions';
+import { GetItems, navigate, GetScreenParam, setNavigate, GetItem, SITE, GetC, StoreInLake,GetMenuDataSource, GetModelProperty, LoadModel, StoreModelArray  } from '../actions/uiactions';
 import getTheme from '../../native-base-theme/components';
 import Models from '../model_keys';
+import StateKeys from '../state_keys';
+import RedGraph from '../actions/redgraph';
+import {
+  GetMenuSource
+} from '../actions/menuSource';
 import * as ScreenInstance from '../actions/screenInstances';
+import * as navigate from '../actions/navigationActions';
 import material from '../../native-base-theme/variables/variables';
 import { fetchModel, retrieveParameters } from '../actions/redutils';
 import { DrawerActions } from 'react-navigation-drawer';

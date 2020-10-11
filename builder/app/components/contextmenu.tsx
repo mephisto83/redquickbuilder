@@ -2393,7 +2393,7 @@ class ContextMenu extends Component<any, any> {
 							this.props.toggleVisual('OPERATIONS');
 						}}
 					>
-						<TreeViewMenu
+						{/* <TreeViewMenu
 							title="Add Store Model Array Standard Handler"
 							onClick={() => {
 								const methodCall = UIA.GetNodeMethodCall(currentNode.id);
@@ -2407,7 +2407,7 @@ class ContextMenu extends Component<any, any> {
 											model[FunctionTemplateKeys.Model];
 										if (model) {
 											this.props.graphOperation(
-												StoreModelArrayStandard({
+											//	StoreModelArrayStandard({
 													model,
 													state_key: `${UIA.GetNodeTitle(model)} State`
 												})
@@ -2416,7 +2416,7 @@ class ContextMenu extends Component<any, any> {
 									}
 								}
 							}}
-						/>
+						/> */}
 					</TreeViewMenu>
 				];
 			case NodeTypes.ComponentExternalApi:

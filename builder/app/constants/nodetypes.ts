@@ -409,15 +409,22 @@ export const PropertyCentricTypes = {
 export const UIActionMethods = {
 	GetModelProperty: 'GetModelProperty',
 	LoadModel: 'LoadModel',
-	StoreInLake: 'StoreInLake'
+	StoreResultInReducer: 'StoreResultInReducer',
+	StoreInLake: 'StoreInLake',
+	GetMenuDataSource: 'GetMenuDataSource',
+	StoreModelArray: 'StoreModelArray'
 };
 export const UIActionMethodParameterTypes = {
 	Model: 'model',
 	ModelKey: 'modelKey',
 	Property: 'property',
+	Navigate: 'Navigate',
+	StateKey: 'stateKey',
 	FunctionParameter: 'FunctionParameter',
+	GetMenuSource: 'GetMenuSource',
 	FetchModel: 'fetchModel',
 	ViewModelKey: 'viewModelKey',
+	RedGraph: 'RedGraph',
 	RetrieveParameters: 'RetrieveParameters'
 };
 export const NodeProperties = {

@@ -8,14 +8,22 @@ import {
 	$addComponentApiNodes,
 	ComponentApiKeys,
 	GetNodeProp,
-	GetComponentExternalApiNode
+	GetComponentExternalApiNode,
+	AddLinkBetweenNodes,
+	CreateNewNode
 } from '../../actions/uiactions';
 import { DataChainTypeNames } from '../../constants/datachain';
 import NavigateToRoute from '../datachain/NavigateToRoute';
 import { uuidv4 } from '../../utils/array';
 import MenuDataSource from '../datachain/MenuDataSource';
-import { UITypes } from '../../constants/nodetypes';
-
+import {
+	LinkPropertyKeys,
+	NodeTypes,
+	UIActionMethodParameterTypes,
+	UIActionMethods,
+	UITypes
+} from '../../constants/nodetypes';
+import { Node } from '../../methods/graph_types';
 export default function AddMenuComponent(args: any = {}) {
 	// node0,node1
 
@@ -52,7 +60,7 @@ export default function AddMenuComponent(args: any = {}) {
 			uiType: args.uiType,
 			componentName: args.componentName,
 			componentType: ComponentTypeKeys.Menu,
-			callback: (menuContext: { entry: any; }) => {
+			callback: (menuContext: { entry: any }) => {
 				context.menu = menuContext.entry;
 			}
 		}),
@@ -64,7 +72,7 @@ export default function AddMenuComponent(args: any = {}) {
 				reverse: true,
 				viewPackages,
 				skipProperty: false,
-				callback: (eventContext: { eventTypeInstanceNode: any; }) => {
+				callback: (eventContext: { eventTypeInstanceNode: any }) => {
 					context.eventTypeInstanceNode = eventContext.eventTypeInstanceNode;
 				}
 			}),
@@ -89,7 +97,7 @@ export default function AddMenuComponent(args: any = {}) {
 				menunavigate: `Navigate To Route`,
 				viewPackages,
 				uiType: args.uiType,
-				callback: (navigcontext: { entry: any; }) => {
+				callback: (navigcontext: { entry: any }) => {
 					context.navigateDataChain = navigcontext.entry;
 				}
 			});
@@ -110,50 +118,96 @@ export default function AddMenuComponent(args: any = {}) {
 
 			return [];
 		},
-		(graph: any) => {
-			const buildMethodDataChain = GetNodeByProperties(
-				{
-					[NodeProperties.DataChainTypeName]: context.buildMethod,
-					[NodeProperties.UIType]: args.uiType
-				},
-				graph
-			);
-			if (!buildMethodDataChain) {
-				return MenuDataSource({
-					uiType: args.uiType,
-					buildMethod: context.buildMethod,
-					menu_name: `${context.buildMethod} ${args.uiType}`,
-					menuGeneration: context.menuGeneration,
-					navigate_function: context.navigate_function,
-					component: context.component,
-					callback: (menuDataSourceContext: { entry: any; }) => {
-						context.menuDataSourceContext = menuDataSourceContext.entry;
-					}
-				});
-			}
-			context.menuDataSourceContext = buildMethodDataChain.id;
-			return [];
-		},
+		// (graph: any) => {
+		// 	const buildMethodDataChain = GetNodeByProperties(
+		// 		{
+		// 			[NodeProperties.DataChainTypeName]: context.buildMethod,
+		// 			[NodeProperties.UIType]: args.uiType
+		// 		},
+		// 		graph
+		// 	);
+		// 	if (!buildMethodDataChain) {
+		// 		return MenuDataSource({
+		// 			uiType: args.uiType,
+		// 			buildMethod: context.buildMethod,
+		// 			menu_name: `${context.buildMethod} ${args.uiType}`,
+		// 			menuGeneration: context.menuGeneration,
+		// 			navigate_function: context.navigate_function,
+		// 			component: context.component,
+		// 			callback: (menuDataSourceContext: { entry: any; }) => {
+		// 				context.menuDataSourceContext = menuDataSourceContext.entry;
+		// 			}
+		// 		});
+		// 	}
+		// 	context.menuDataSourceContext = buildMethodDataChain.id;
+		// 	return [];
+		// },
 		(gg: any) => {
 			const valueApi = GetComponentExternalApiNode(ComponentApiKeys.Value, context.menu, gg);
 			if (valueApi) {
 				context.externalApi = valueApi.id;
 				return [];
 			}
-			return $addComponentApiNodes(context.menu, ComponentApiKeys.Value, null, viewPackages, (apiNodeContext: { externalApi: any; }) => {
-				context.externalApi = apiNodeContext.externalApi;
-			});
-		},
-		() => [
-			{
-				operation: 'ADD_LINK_BETWEEN_NODES',
-				options: {
-					source: context.externalApi,
-					target: context.menuDataSourceContext,
-					properties: { ...LinkProperties.DataChainLink }
+			return $addComponentApiNodes(
+				context.menu,
+				ComponentApiKeys.Value,
+				null,
+				viewPackages,
+				(apiNodeContext: { externalApi: any }) => {
+					context.externalApi = apiNodeContext.externalApi;
 				}
-			}
-		],
+			);
+		},
+		() => {
+			return [
+				() => {
+					let uiMethodNode: Node = GetNodeByProperties({
+						[NodeProperties.UIActionMethod]: UIActionMethods.GetMenuDataSource,
+						[NodeProperties.NODEType]: NodeTypes.UIMethod
+					});
+					let res: any[] = [];
+					if (!uiMethodNode) {
+						res.push(() => {
+							return CreateNewNode(
+								{
+									[NodeProperties.UIActionMethod]: UIActionMethods.GetMenuDataSource,
+									[NodeProperties.UIText]: UIActionMethods.GetMenuDataSource,
+									[NodeProperties.NODEType]: NodeTypes.UIMethod
+								},
+								(node: Node) => {
+									uiMethodNode = node;
+								}
+							);
+						});
+					}
+					res.push(() => {
+						return AddLinkBetweenNodes(context.externalApi, uiMethodNode.id, {
+							...LinkProperties.UIMethod,
+							parameters: [
+								{
+									type: UIActionMethodParameterTypes.GetMenuSource
+								},
+								{
+									type: UIActionMethodParameterTypes.RedGraph
+								}
+							]
+						});
+					});
+
+					return res;
+				}
+			];
+		},
+		// () => [
+		// 	{
+		// 		operation: 'ADD_LINK_BETWEEN_NODES',
+		// 		options: {
+		// 			source: context.externalApi,
+		// 			target: context.menuDataSourceContext,
+		// 			properties: { ...LinkProperties.DataChainLink }
+		// 		}
+		// 	}
+		// ],
 		() => {
 			if (args.callback) {
 				context.entry = context.menu;

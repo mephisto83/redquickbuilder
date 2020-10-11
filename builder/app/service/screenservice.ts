@@ -1409,10 +1409,9 @@ function WriteDescribedApiProperties(
 
 				let params = getUIMethodParameters(parameters);
 				let temp: any = UIActionMethods;
-				innerValue = `${temp[GetNodeProp(uiMethod, NodeProperties.UIActionMethod)]}(${innerValue}${params &&
-				params.length
-					? ', '
-					: ''}${params.join()})`;
+				innerValue = `${temp[
+					GetNodeProp(uiMethod, NodeProperties.UIActionMethod)
+				]}(${innerValue}${innerValue.trim() && params && params.length ? ', ' : ''}${params.join()})`;
 			}
 			if (innerValue) {
 				return `${GetJSCodeName(componentExternalApi)}={${innerValue}}`;
@@ -1991,11 +1990,20 @@ function getUIMethodParameters(parameters: any, options?: { passingParameters: b
 						return `${v.value}: any`;
 					}
 					return v.value;
+				case UIActionMethodParameterTypes.GetMenuSource:
+					return 'GetMenuSource';
+				case UIActionMethodParameterTypes.RedGraph:
+					return 'RedGraph';
+				case UIActionMethodParameterTypes.Navigate:
+					return 'navigate';
 				case UIActionMethodParameterTypes.ModelKey:
 				case UIActionMethodParameterTypes.Model:
 					return `Models.${GetCodeName(v.value)}`;
 				case UIActionMethodParameterTypes.Property:
 					return `\`${GetJSCodeName(v.value)}\``;
+				case UIActionMethodParameterTypes.StateKey:
+					let stateId = GetNodeById(v.value);
+					return `StateKeys.${GetCodeName(GetNodeProp(stateId, NodeProperties.StateKey))}State`;
 				case UIActionMethodParameterTypes.FetchModel:
 					return 'fetchModel';
 				case UIActionMethodParameterTypes.RetrieveParameters:
