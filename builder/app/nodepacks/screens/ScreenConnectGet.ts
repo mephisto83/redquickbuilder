@@ -210,15 +210,65 @@ export default function ScreenConnectGet(args: any = {}) {
 								}
 							],
 							...(navigateTo
-								? // this can be updated to include different types of parameters,
-									// checkout the lambda property for the arguments, setting it to the appropriate
+								? [
+										() => {
+											return [
+												() => {
+													let uiMethodNode: Node = GetNodeByProperties({
+														[NodeProperties.UIActionMethod]: UIActionMethods.NavigateToScreen,
+														[NodeProperties.NODEType]: NodeTypes.UIMethod
+													});
+													let res: any[] = [];
+													if (!uiMethodNode) {
+														res.push(() => {
+															return CreateNewNode(
+																{
+																	[NodeProperties.UIActionMethod]:
+																		UIActionMethods.NavigateToScreen,
+																	[NodeProperties.UIText]:
+																		UIActionMethods.NavigateToScreen,
+																	[NodeProperties.NODEType]: NodeTypes.UIMethod
+																},
+																(node: Node) => {
+																	uiMethodNode = node;
+																}
+															);
+														});
+													}
+													res.push(() => {
+														return AddLinkBetweenNodes(_instanceNode.id, uiMethodNode.id, {
+															...LinkProperties.UIMethod,
+															parameters: [
+																{
+																	type: UIActionMethodParameterTypes.NullParameter
+																},
+																{
+																	type: UIActionMethodParameterTypes.NullParameter
+																},
+																{
+																	type: UIActionMethodParameterTypes.ScreenRoute,
+																	value: navigateTo
+																},
+																{
+																	type: UIActionMethodParameterTypes.Navigate
+																}
+															]
+														});
+													});
+
+													return res;
+												}
+											];
+										}
+									] // this can be updated to include different types of parameters,
+								: // checkout the lambda property for the arguments, setting it to the appropriate
 									// lambda string will get use the parameters in the url that we desire.
-									CreateNavigateToScreenDC({
-										screen: navigateTo,
-										node: () => _instanceNode.id,
-										viewPackages
-									})
-								: []),
+									// CreateNavigateToScreenDC({
+									// 	screen: navigateTo,
+									// 	node: () => _instanceNode.id,
+									// 	viewPackages
+									// })
+									[]),
 							(currentGraph: any) => {
 								const valueComponentApiNode = GetComponentApiNode(
 									ComponentApiKeys.Value,

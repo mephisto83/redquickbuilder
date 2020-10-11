@@ -800,3 +800,37 @@ export function StoreResultInReducer(x: any, modelType: string, navigate: any) {
 export function NavigateToRoute(id: string, navigate: any, routes: any) {
 	navigate.Go({ route: routes[id] })(GetDispatch(), GetState());
 }
+
+// TODO: Copy to other uiactions later. 10/11/2020
+export function NavigateToScreen(
+	$id?: any,
+	$internalComponentState?: {
+		[str: string]: any;
+		label: string | number | null;
+		viewModel: string | number | null;
+		value: string | number | null;
+		model: string | number | null;
+	} | null,
+	route?: string,
+	navigate?: any
+) {
+	if (route) {
+		let a = { value: $id };
+
+		if (a && typeof a === 'object' && a.hasOwnProperty('success')) {
+			return a;
+		}
+		if ($internalComponentState) {
+			Object.keys($internalComponentState).forEach((v: any) => {
+				let regex = new RegExp(`\:${v}`, 'gm');
+				if (route) route = route.replace(regex, $internalComponentState[v]);
+			});
+		}
+
+		let regex = new RegExp(`\:value`, 'gm');
+    if (route) route = route.replace(regex, a.value);
+
+		navigate.Go({ route })(GetDispatch(), GetState());
+		return a;
+	}
+}

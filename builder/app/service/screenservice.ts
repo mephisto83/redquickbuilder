@@ -1967,6 +1967,16 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 		return `DC.${GetCodeName(dataChain, {
 			includeNameSpace: true
 		})}(value/*hi*/);`;
+	} else if (!method && uiMethod) {
+		let link = GetLinkBetween(methodInstanceCall.id, uiMethod.id, graph);
+		let parameters = GetLinkProperty(link, LinkPropertyKeys.Parameters);
+
+		let params = getUIMethodParameters(parameters);
+		let passingParameters = getUIMethodParameters(parameters, { passingParameters: true });
+		let temp: any = UIActionMethods;
+		return `(function(${passingParameters.join()}) {
+        return ${temp[GetNodeProp(uiMethod, NodeProperties.UIActionMethod)]}(${params.join()})
+      })(value/*hi*/)`;
 	}
 }
 
@@ -1996,6 +2006,8 @@ function getUIMethodParameters(parameters: any, options?: { passingParameters: b
 					return 'RedGraph';
 				case UIActionMethodParameterTypes.Navigate:
 					return 'navigate';
+				case UIActionMethodParameterTypes.Routes:
+					return 'routes';
 				case UIActionMethodParameterTypes.ModelKey:
 				case UIActionMethodParameterTypes.Model:
 					return `Models.${GetCodeName(v.value)}`;

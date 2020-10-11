@@ -168,17 +168,67 @@ export default function ScreenConnectGetAll(args: any = {}) {
 								}
 							],
 							...(navigateTo
-								? // See nots in the ScreenConnectGet
-									CreateNavigateToScreenDC({
-										screen: navigateTo,
-										node: () => _instanceNode.id,
-										lambda: lambdaFunc,
-										viewPackages,
-										callback: (navigateContext: any) => {
-											_navigateContext = navigateContext;
+								? [
+										() => {
+											return [
+												() => {
+													let uiMethodNode: Node = GetNodeByProperties({
+														[NodeProperties.UIActionMethod]: UIActionMethods.NavigateToScreen,
+														[NodeProperties.NODEType]: NodeTypes.UIMethod
+													});
+													let res: any[] = [];
+													if (!uiMethodNode) {
+														res.push(() => {
+															return CreateNewNode(
+																{
+																	[NodeProperties.UIActionMethod]:
+																		UIActionMethods.NavigateToScreen,
+																	[NodeProperties.UIText]:
+																		UIActionMethods.NavigateToScreen,
+																	[NodeProperties.NODEType]: NodeTypes.UIMethod
+																},
+																(node: Node) => {
+																	uiMethodNode = node;
+																}
+															);
+														});
+													}
+													res.push(() => {
+														return AddLinkBetweenNodes(_instanceNode.id, uiMethodNode.id, {
+															...LinkProperties.UIMethod,
+															parameters: [
+																{
+																	type: UIActionMethodParameterTypes.NullParameter
+																},
+																{
+																	type: UIActionMethodParameterTypes.NullParameter
+																},
+																{
+																	type: UIActionMethodParameterTypes.ScreenRoute,
+																	value: navigateTo
+																},
+																{
+																	type: UIActionMethodParameterTypes.Navigate
+																}
+															]
+														});
+													});
+
+													return res;
+												}
+											];
 										}
-									})
-								: []),
+									] // See nots in the ScreenConnectGet
+								: // CreateNavigateToScreenDC({
+									// 	screen: navigateTo,
+									// 	node: () => _instanceNode.id,
+									// 	lambda: lambdaFunc,
+									// 	viewPackages,
+									// 	callback: (navigateContext: any) => {
+									// 		_navigateContext = navigateContext;
+									// 	}
+									// })
+									[]),
 							{
 								operation: ADD_LINK_BETWEEN_NODES,
 								options() {
