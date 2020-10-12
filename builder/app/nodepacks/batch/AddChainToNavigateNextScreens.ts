@@ -27,7 +27,7 @@ export default async function AddChainToNavigateNextScreens(progresFunc: any) {
 	if (!screen) {
 		throw new Error('no screen found');
 	}
-	if (!dataChains || !dataChains.length) {
+	if (!dataChains) {
 		throw new Error('No Target Screen Data chains found');
 	}
 	await dataChains.forEachAsync(async (dataChain: any, index: any, length: any) => {

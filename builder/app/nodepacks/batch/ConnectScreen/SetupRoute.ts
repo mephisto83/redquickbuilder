@@ -318,54 +318,57 @@ function NavigateTo(
 	// 		GetStateFunc()
 	// 	);
 	// }
-	graphOperation(() => {
-		return [
-			() => {
-				let uiMethodNode: Node = GetNodeByProperties({
-					[NodeProperties.UIActionMethod]: UIActionMethods.NavigateToScreen,
-					[NodeProperties.NODEType]: NodeTypes.UIMethod
-				});
-				let res: any[] = [];
-				if (!uiMethodNode) {
+	graphOperation([
+		() => {
+			return [
+				() => {
+					let uiMethodNode: Node = GetNodeByProperties({
+						[NodeProperties.UIActionMethod]: UIActionMethods.NavigateToScreen,
+						[NodeProperties.NODEType]: NodeTypes.UIMethod
+					});
+					let res: any[] = [];
+					if (!uiMethodNode) {
+						res.push(() => {
+							return CreateNewNode(
+								{
+									[NodeProperties.UIActionMethod]: UIActionMethods.NavigateToScreen,
+									[NodeProperties.UIText]: UIActionMethods.NavigateToScreen,
+									[NodeProperties.NODEType]: NodeTypes.UIMethod
+								},
+								(node: Node) => {
+									uiMethodNode = node;
+								}
+							);
+						});
+					}
 					res.push(() => {
-						return CreateNewNode(
-							{
-								[NodeProperties.UIActionMethod]: UIActionMethods.NavigateToScreen,
-								[NodeProperties.UIText]: UIActionMethods.NavigateToScreen,
-								[NodeProperties.NODEType]: NodeTypes.UIMethod
-							},
-							(node: Node) => {
-								uiMethodNode = node;
-							}
-						);
+						return AddLinkBetweenNodes(eventInstance, uiMethodNode.id, {
+							...LinkProperties.UIMethod,
+							parameters: [
+								{
+									type: UIActionMethodParameterTypes.FunctionParameter,
+									value: 'value?: any'
+								},
+								{
+									type: UIActionMethodParameterTypes.RouteDescription,
+									value: routeDescription
+								},
+								{
+									type: UIActionMethodParameterTypes.ScreenRoute,
+									value: screen.id
+								},
+								{
+									type: UIActionMethodParameterTypes.Navigate
+								}
+							]
+						});
 					});
-				}
-				res.push(() => {
-					return AddLinkBetweenNodes(eventInstance, uiMethodNode.id, {
-						...LinkProperties.UIMethod,
-						parameters: [
-							{
-								type: UIActionMethodParameterTypes.NullParameter
-							},
-							{
-								type: UIActionMethodParameterTypes.RouteDescription,
-								value: routeDescription
-							},
-							{
-								type: UIActionMethodParameterTypes.ScreenRoute,
-								value: screen.id
-							},
-							{
-								type: UIActionMethodParameterTypes.Navigate
-							}
-						]
-					});
-				});
 
-				return res;
-			}
-		];
-	})(GetDispatchFunc(), GetStateFunc());
+					return res;
+				}
+			];
+		}
+	])(GetDispatchFunc(), GetStateFunc());
 	// if (routeDescription && routeDescription.source) {
 	// 	Object.keys(routeDescription.source).forEach((sourceKey: string) => {
 	// 		if (routeDescription.source) {

@@ -5,7 +5,7 @@ import StateKeys from '../state_keys';
 import * as S from '../actions/selector';
 import { setParameters } from '../actions/redutils';
 import Models from '../model_keys';
-import { GetItems, GetScreenParam, setNavigate, GetItem, GetC,GetMenuDataSource, GetModelProperty, StoreInLake, LoadModel, StoreModelArray } from '../actions/uiactions';
+import { GetItems, GetScreenParam, setNavigate, GetItem, GetC,GetMenuDataSource, GetModelProperty, NavigateToScreen, StoreInLake, LoadModel, StoreModelArray } from '../actions/uiactions';
 import * as ScreenInstance from '../actions/screenInstances';
 import { fetchModel, retrieveParameters } from '../actions/redutils';
 import StateKeys from '../state_keys';

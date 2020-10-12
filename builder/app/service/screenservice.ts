@@ -2002,10 +2002,16 @@ function getUIMethodParameters(parameters: any, options?: { passingParameters: b
 					return v.value;
 				case UIActionMethodParameterTypes.GetMenuSource:
 					return 'GetMenuSource';
+				case UIActionMethodParameterTypes.NullParameter:
+          return 'null';
+        case UIActionMethodParameterTypes.RouteDescription:
+          return 'null/**/';
 				case UIActionMethodParameterTypes.RedGraph:
 					return 'RedGraph';
 				case UIActionMethodParameterTypes.Navigate:
-					return 'navigate';
+          return 'navigate';
+        case UIActionMethodParameterTypes.ScreenRoute:
+          return `routes.${GetCodeName(v.value)}`;
 				case UIActionMethodParameterTypes.Routes:
 					return 'routes';
 				case UIActionMethodParameterTypes.ModelKey:

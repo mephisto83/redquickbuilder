@@ -198,7 +198,8 @@ export default function ScreenConnectGetAll(args: any = {}) {
 															...LinkProperties.UIMethod,
 															parameters: [
 																{
-																	type: UIActionMethodParameterTypes.NullParameter
+																	type: UIActionMethodParameterTypes.FunctionParameter,
+																	value: 'value?: any'
 																},
 																{
 																	type: UIActionMethodParameterTypes.NullParameter
