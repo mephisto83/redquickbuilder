@@ -170,8 +170,8 @@ const _nlp = nlp.extend((Doc: any, world: any) => {
 		Model: 'Model',
 		matches: 'Matches',
 		intersects: 'Intersects',
-		'first name': [ 'Property', 'Noun' ],
-		name: [ 'Name' ],
+		'first name': ['Property', 'Noun'],
+		name: ['Name'],
 		enumeration: 'Enumeration'
 	});
 	setNLPWorld(world);
@@ -182,18 +182,18 @@ function setNLPWorld(_world: any) {
 
 export function updateWorld() {
 	let webDictionary: { [str: string]: string[] } = {};
-	webDictionary['agent'] = [ AGENT ];
-	webDictionary['agents'] = [ AGENT, POSSESIVE ];
-	webDictionary['model'] = [ MODEL, SCREEN_PARAMETER ];
-	webDictionary['output'] = [ 'ModelOutput', MODEL ];
-	webDictionary['outputs'] = [ MODEL, 'ModelOutput', POSSESIVE ];
-	webDictionary['parent'] = [ 'Parent', MODEL, SCREEN_PARAMETER ];
-	webDictionary['target'] = [ MODEL, 'Target' ];
-	webDictionary['parents'] = [ MODEL, 'Parent', POSSESIVE ];
-	webDictionary['models'] = [ MODEL, POSSESIVE ];
-	webDictionary['is a valid'] = [ IS_A ];
-	webDictionary['must be a valid'] = [ IS_A ];
-	webDictionary['equaling'] = [ 'Comparison' ];
+	webDictionary['agent'] = [AGENT];
+	webDictionary['agents'] = [AGENT, POSSESIVE];
+	webDictionary['model'] = [MODEL, SCREEN_PARAMETER];
+	webDictionary['output'] = ['ModelOutput', MODEL];
+	webDictionary['outputs'] = [MODEL, 'ModelOutput', POSSESIVE];
+	webDictionary['parent'] = ['Parent', MODEL, SCREEN_PARAMETER];
+	webDictionary['target'] = [MODEL, 'Target'];
+	webDictionary['parents'] = [MODEL, 'Parent', POSSESIVE];
+	webDictionary['models'] = [MODEL, POSSESIVE];
+	webDictionary['is a valid'] = [IS_A];
+	webDictionary['must be a valid'] = [IS_A];
+	webDictionary['equaling'] = ['Comparison'];
 	actionStuff.forEach((action: string) => {
 		webDictionary[action] = webDictionary[action] || [];
 		webDictionary[action].push(SET_PROPERTY_ACTION);
@@ -208,7 +208,7 @@ export function updateWorld() {
 		webDictionary[v] = webDictionary[v].unique();
 	});
 	Object.entries(NodeAttributePropertyTypes).forEach((d: any) => {
-		let [ key, value ] = d;
+		let [key, value] = d;
 		webDictionary[key] = webDictionary[key] || [];
 		webDictionary[key].push(key, 'NodeAttributePropertyTypes');
 		webDictionary[key] = webDictionary[key].unique();
@@ -218,7 +218,7 @@ export function updateWorld() {
 	});
 
 	Object.entries(NLValidationClauses).forEach((d: any) => {
-		let [ key, value ] = d;
+		let [key, value] = d;
 		if (value && value.$def) {
 			value.$def.forEach((v: string) => {
 				webDictionary[v] = webDictionary[v] || [];
@@ -235,7 +235,7 @@ export function updateWorld() {
 	]);
 	nodes.forEach((node: Node) => {
 		let type = GetNodeProp(node, NodeProperties.NODEType);
-		[ GetNodeTitle(node), GetCodeName(node) ].filter((v) => v).forEach((v) => {
+		[GetNodeTitle(node), GetCodeName(node)].filter((v) => v).forEach((v) => {
 			webDictionary[v] = webDictionary[v] || [];
 			// webDictionary[v].push(type);
 			if (GetNodeProp(node, NodeProperties.IsAgent)) {
@@ -294,6 +294,7 @@ export interface QueryResultNL {
 	targetClause: Clause;
 }
 export interface NLMeaning {
+	quickType?: QuickType;
 	setProperty?: SetPropertyClause;
 	findAnExisting?: QueryResultNL;
 	checkForExisting?: QueryResultNL;
@@ -314,16 +315,16 @@ export interface RoutingArgs {
 	useArgument?: string;
 	subClause?: Clause;
 }
-let booleanStuff = [ 'is true', 'is false' ];
-let equals = [ 'must match', 'matches', 'is equal to' ];
-let isA = [ 'must be a', 'must be an', 'is a', 'is an', ...booleanStuff ];
-let contains = [ 'contains a', 'contains an' ];
-let intersects = [ 'intersects', 'intersects with' ];
-let inAEnumeration = [ 'is in an enumeration', 'is an enumeration', 'is in a set' ];
-let executionStuff = [ 'copies to', 'increments by', 'concatenates with', 'concatenates list with' ];
-let referenceStuff = [ 'must connect to a real' ];
-let validationStuff = [ 'must conform to a' ];
-let actionStuff = [ 'Append the', 'Increment the', 'Decrement the', 'Set the' ];
+let booleanStuff = ['is true', 'is false'];
+let equals = ['must match', 'matches', 'is equal to'];
+let isA = ['must be a', 'must be an', 'is a', 'is an', ...booleanStuff];
+let contains = ['contains a', 'contains an'];
+let intersects = ['intersects', 'intersects with'];
+let inAEnumeration = ['is in an enumeration', 'is an enumeration', 'is in a set'];
+let executionStuff = ['copies to', 'increments by', 'concatenates with', 'concatenates list with'];
+let referenceStuff = ['must connect to a real'];
+let validationStuff = ['must conform to a'];
+let actionStuff = ['Append the', 'Increment the', 'Decrement the', 'Set the'];
 let afterEffectStuff = [
 	...actionStuff,
 	'Execute the function',
@@ -332,8 +333,11 @@ let afterEffectStuff = [
 	'Create a new',
 	'Find an existing'
 ];
-let navigationStuff = [ 'navigates to' ];
+let deletedThing = ['has not been deleted'];
+let quickOnes = [...deletedThing];
+let navigationStuff = ['navigates to'];
 let all = [
+	...quickOnes,
 	...afterEffectStuff,
 	...navigationStuff,
 	...validationStuff,
@@ -475,7 +479,7 @@ export function getTextEditorSuggestions(text: string, editorContext: string, co
 				});
 			});
 		} else if (temp.has('argtype')) {
-			[ 'model', 'property' ].forEach((argtype: string) => {
+			['model', 'property'].forEach((argtype: string) => {
 				suggestions.push({
 					label: `argtype: ${argtype}`,
 					kind: monaco.languages.CompletionItemKind.Text,
@@ -565,10 +569,14 @@ export default function getLanguageMeaning(
 			result.methodType = NLMethodType.IsA;
 			let isAClause = understandableClause; //temp.lookAhead(understandableClause).text();
 			Object.entries(NLValidationClauses).forEach((item: any) => {
-				let [ key, value ] = item;
+				let [key, value] = item;
 				result.validation[`${key}`] = _nlp(isAClause).has(`#${key}`);
 			});
-		} else if (contains.find((item: string) => temp.has(item))) {
+		} else if (deletedThing) {
+			result.methodType = NLMethodType.QuickMethod;
+			result.quickType = QuickType.IsNotDeleted;
+		}
+		else if (contains.find((item: string) => temp.has(item))) {
 			result.methodType = NLMethodType.Contains;
 		} else if (booleanStuff.find((item: string) => temp.has(item))) {
 			result.methodType = NLMethodType.IsTrue;
@@ -614,7 +622,7 @@ export default function getLanguageMeaning(
 				result.options = {};
 			} else if (temp.has('concatenates with')) {
 				result.methodType = NLMethodType.ConcatenateString;
-				result.parameterClauses = captureParameters('concatenates with', temp.text(), [ 'with spaces' ]);
+				result.parameterClauses = captureParameters('concatenates with', temp.text(), ['with spaces']);
 				result.options = {
 					withSpaces: temp.text().split('concatenates with').subset(1).join().indexOf('with spaces') !== -1
 				};
@@ -787,7 +795,7 @@ export default function getLanguageMeaning(
 
 		if (_nlp(secondClause).has(`#NodeAttributePropertyTypes`)) {
 			Object.entries(NodeAttributePropertyTypes).forEach((d: any) => {
-				let [ key, value ] = d;
+				let [key, value] = d;
 
 				if (_nlp(secondClause).has(`#${key}`)) {
 					{
@@ -879,6 +887,7 @@ export enum NLMethodType {
 	AreEqual = 'AreEqual',
 	IsA = 'IsA',
 	Contains = 'Contains',
+	QuickMethod = 'QuickMethod',
 	IsTrue = 'IsTrue',
 	Intersects = 'Intersects',
 	IsFalse = 'IsFalse',
@@ -897,11 +906,13 @@ export enum NLMethodType {
 	SetProperty = 'SetProperty',
 	Navigate = 'Navigate'
 }
-
+export enum QuickType {
+	IsNotDeleted = "IsNotDeleted"
+}
 export const NLValidationClauses = {
 	Name: {
 		isA: 'Validation',
-		$def: [ 'is a name' ],
+		$def: ['is a name'],
 		$property: {
 			isNotNull: () => {
 				return CreateBoolean();
@@ -922,7 +933,7 @@ export const NLValidationClauses = {
 	},
 	Intersects: {
 		isA: 'Validation',
-		$def: [ 'intersects', 'intersects with' ]
+		$def: ['intersects', 'intersects with']
 	},
 	MinLength: {
 		isA: 'Validation',
@@ -949,7 +960,7 @@ export const NLValidationClauses = {
 	},
 	IsAlphaOnlyWithSpaces: {
 		isA: 'Validation',
-		$def: [ 'is alpha only', 'are alpha only' ],
+		$def: ['is alpha only', 'are alpha only'],
 		$property: {
 			alphaOnlyWithSpaces: () => {
 				return CreateBoolean();
@@ -958,7 +969,7 @@ export const NLValidationClauses = {
 	},
 	IsNull: {
 		isA: 'Validation',
-		$def: [ 'is null', 'are null' ],
+		$def: ['is null', 'are null'],
 		$property: {
 			isNull: () => {
 				return CreateBoolean();
@@ -970,7 +981,7 @@ export const NLValidationClauses = {
 	},
 	IsZipEmpty: {
 		isA: 'Validation',
-		$def: [ 'is an empty zip code' ],
+		$def: ['is an empty zip code'],
 		$property: {
 			zipEmpty: () => {
 				return CreateBoolean();
@@ -979,7 +990,7 @@ export const NLValidationClauses = {
 	},
 	IsZip: {
 		isA: 'Validation',
-		$def: [ 'is a zip code' ],
+		$def: ['is a zip code'],
 		$property: {
 			zip: () => {
 				return CreateBoolean();
@@ -988,7 +999,7 @@ export const NLValidationClauses = {
 	},
 	IsUrlEmpty: {
 		isA: 'Validation',
-		$def: [ 'is an empty url' ],
+		$def: ['is an empty url'],
 		$property: {
 			urlEmpty: () => {
 				return CreateBoolean();
@@ -997,7 +1008,7 @@ export const NLValidationClauses = {
 	},
 	IsUrl: {
 		isA: 'Validation',
-		$def: [ 'is a url' ],
+		$def: ['is a url'],
 		$property: {
 			url: () => {
 				return CreateBoolean();
@@ -1006,7 +1017,7 @@ export const NLValidationClauses = {
 	},
 	IsSocialSecurity: {
 		isA: 'Validation',
-		$def: [ 'is a social security', 'is a social security number' ],
+		$def: ['is a social security', 'is a social security number'],
 		$property: {
 			socialSecurity: () => {
 				return CreateBoolean();
@@ -1039,7 +1050,7 @@ export const NLValidationClauses = {
 	},
 	IsNumericInteger: {
 		isA: 'Validation',
-		$def: [ 'is an integer' ],
+		$def: ['is an integer'],
 		$property: {
 			numericInt: () => {
 				return CreateBoolean();
@@ -1048,7 +1059,7 @@ export const NLValidationClauses = {
 	},
 	IsEmailEmpty: {
 		isA: 'Validation',
-		$def: [ 'is an empty email' ],
+		$def: ['is an empty email'],
 		$property: {
 			emailEmpty: () => {
 				return CreateBoolean();
@@ -1057,7 +1068,7 @@ export const NLValidationClauses = {
 	},
 	IsEmail: {
 		isA: 'Validation',
-		$def: [ 'is an email' ],
+		$def: ['is an email'],
 		$property: {
 			email: () => {
 				return CreateBoolean();
@@ -1066,7 +1077,7 @@ export const NLValidationClauses = {
 	},
 	IsCreditCard: {
 		isA: 'Validation',
-		$def: [ 'is a credit card' ],
+		$def: ['is a credit card'],
 		$property: {
 			creditCard: () => {
 				return CreateBoolean();
@@ -1075,7 +1086,7 @@ export const NLValidationClauses = {
 	},
 	IsAlphaOnly: {
 		isA: 'Validation',
-		$def: [ 'is alpha only' ],
+		$def: ['is alpha only'],
 		$property: {
 			alphaOnly: () => {
 				return CreateBoolean();
@@ -1084,7 +1095,7 @@ export const NLValidationClauses = {
 	},
 	IsAlphaNumeric: {
 		isA: 'Validation',
-		$def: [ 'is alpha numeric' ],
+		$def: ['is alpha numeric'],
 		$property: {
 			alphaNumeric: () => {
 				return CreateBoolean();
@@ -1093,7 +1104,7 @@ export const NLValidationClauses = {
 	},
 	IsFalse: {
 		isA: 'Validation',
-		$def: [ 'is false' ],
+		$def: ['is false'],
 		$property: {
 			isFalse: () => {
 				return CreateBoolean();

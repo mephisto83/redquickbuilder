@@ -849,7 +849,7 @@ export default class MindMap extends Component<any, any> {
 	}
 
 	render() {
-		return <div id={this.state.id} className={`mindmap`} style={{ minHeight: 946, height: `calc(100vh - 50px)` }} />;
+		return <div id={this.state.id} className={`mindmap`} style={{ minHeight: `calc(100vh - 50px)` }} />;
 	}
 }
 

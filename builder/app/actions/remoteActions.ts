@@ -36,7 +36,7 @@ import {
 	GetState,
 	pinConnectedNodesByLinkType,
 	GetNodeProp,
-	GetNodeById, GetModelCodeProperties, getConnectedNodesByLinkType
+	GetNodeById, GetModelCodeProperties, getConnectedNodesByLinkType, GetCodeName, GetNodeTitle
 } from './uiactions';
 import { processRecording } from '../utils/utilservice';
 import prune from '../methods/prune';
@@ -47,7 +47,7 @@ import fs from 'fs';
 import JobService, { ensureDirectory, JobServiceConstants, ensureDirectorySync } from '../jobs/jobservice';
 import StoreGraph, { LoadGraph } from '../methods/storeGraph';
 import { Graph, GraphLink, Node, QuickAccess } from '../methods/graph_types';
-import { NodeProperties, LinkType, LinkPropertyKeys, NodeTypes } from '../constants/nodetypes';
+import { NodeProperties, LinkType, LinkPropertyKeys, NodeTypes, NEW_LINE } from '../constants/nodetypes';
 import { Link } from 'react-router-dom';
 import { IfFalse } from '../components/titles';
 import { platform } from 'os';
@@ -492,71 +492,100 @@ export async function populate(
 		return added;
 	}
 }
+export async function BuildReport() {
+	let graph = GetCurrentGraph();
+	let root = graph;
+	const workspace = root.workspaces ? root.workspaces[platform()] || root.workspace : root.workspace;
+	let folder = path.join(workspace, graph.title, 'mindmaps');
 
+	if (root.reportDirectory && fs.existsSync(root.reportDirectory)) {
+		folder = root.reportDirectory;
+	}
+	let nodes = NodesByType(graph, [NodeTypes.Enumeration, NodeTypes.Model, NodeTypes.AgentAccessDescription]);
+	let fileNameList: any[] = [];
+	await nodes.forEachAsync(async (currentNode: Node) => {
+		let nodeType = GetNodeProp(currentNode, NodeProperties.NODEType);
+		let setup: any = null;
+		switch (nodeType) {
+			case NodeTypes.Model:
+				setup = {
+					level1: LinkType.PropertyLink,
+					level2: [LinkType.AttributeLink, LinkType.Enumeration],
+				};
+				break;
+			case NodeTypes.Enumeration:
+				setup = {
+					level1: [LinkType.Enumeration, LinkType.GeneralLink],
+					level2: [LinkType.PropertyLink, LinkType.ModelTypeLink],
+				};
+				break;
+			case NodeTypes.AgentAccessDescription:
+				setup = {
+					level1: [LinkType.ModelAccess, LinkType.AgentAccess, LinkType.GeneralLink],
+					level2: [LinkType.PropertyLink, LinkType.ModelTypeLink],
+				};
+				break;
+
+		}
+
+		if (setup) {
+			let reportPackage = await populateGraphPackage(currentNode.id, setup);
+			await ensureDirectory(path.join(folder, 'public', 'img'));
+			let temppath = path.join(folder, 'public', 'img', `${nodeType}--${GetCodeName(currentNode)}.json`);
+			fileNameList.push({ nodeType, name: GetNodeTitle(currentNode), url: `${nodeType}--${GetCodeName(currentNode)}.json` });
+			fs.writeFileSync(temppath, `${JSON.stringify(reportPackage)}`, 'utf8');
+		}
+	})
+	await ensureDirectory(path.join(folder, 'src'));
+	let temppath = path.join(folder, 'src', 'project.ts');
+	fs.writeFileSync(temppath, `export default ${JSON.stringify(fileNameList)}; `, 'utf8');
+}
 
 export async function populateGraphPackage(
 	modelId: string,
-	ops: { exclusiveLinkTypes: string[]; level1?: string; level2?: string[] }
+	ops: { level1?: string; level2?: string[] }
 ) {
-	let links: GraphLink[] = getNodeLinks(GetCurrentGraph(), modelId);
-	let typesToSkip: string[] = ops && ops.exclusiveLinkTypes.length ? [] : [LinkType.PropertyLink];
-	let nodes: Node[] = [];
-	let sorted = links
-		.unique((link: GraphLink) => GetLinkProperty(link, LinkPropertyKeys.TYPE))
-		.filter((link: GraphLink) => typesToSkip.indexOf(GetLinkProperty(link, LinkPropertyKeys.TYPE)) === -1)
-		.filter(
-			(link: GraphLink) =>
-				ops && ops.exclusiveLinkTypes.length
-					? ops.exclusiveLinkTypes.indexOf(GetLinkProperty(link, LinkPropertyKeys.TYPE)) !== -1
-					: true
-		)
-		.sort((a: GraphLink, b: GraphLink) => {
-			if (GetLinkProperty(a, LinkPropertyKeys.TYPE) === LinkType.GeneralLink) {
-				return 1;
-			}
-			if (GetLinkProperty(b, LinkPropertyKeys.TYPE) === LinkType.GeneralLink) {
-				return -1;
-			}
-			return 0;
+	let links: GraphLink[] = [];
+	let graph = GetCurrentGraph();
+	let nodes: Node[] = [GetNodeById(modelId)];
+	let level1 = Array.isArray(ops.level1) ? ops.level1 : [ops.level1 || ''];
+	let level2 = Array.isArray(ops.level2) ? ops.level2 : [ops.level2 || ''];
+	nodes.map(v => v).forEach((node: Node) => {
+		let forLevelTwo: Node[] = [];
+		level1.filter(v => v).forEach((lvl) => {
+			let temp = GetNodesLinkedTo(graph, {
+				id: node.id,
+				link: lvl
+			})
+			temp.forEach((tnode: Node) => {
+				let tlink = GetLinkBetween(node.id, tnode.id, graph) || GetLinkBetween(tnode.id, node.id, graph);
+				if (tlink) {
+					links.push(tlink);
+				}
+			})
+			forLevelTwo.push(...temp);
 		});
-
-	await sorted.forEachAsync(async (link: GraphLink) => {
-		let pinned: Node[] = [];
-		let added = getConnectedNodesByLinkType(modelId, GetLinkProperty(link, LinkPropertyKeys.TYPE));
-		pinned.push(...added);
-		added = await nextLevel(
-			link,
-			added,
-			pinned.map(v => v.id),
-			ops.level1 || LinkType.ModelTypeLink,
-			ops.level2 || LinkType.PropertyLink
-		);
-		nodes.push(...added);
-	});
-
-	async function nextLevel(
-		link: GraphLink,
-		added: string[],
-		pinned: string[],
-		level1: string,
-		level2: string | string[]
-	) {
-		if (GetLinkProperty(link, LinkPropertyKeys.TYPE) === level1) {
-			await getNodeLinks(GetCurrentGraph(), modelId)
-				.filter((v) => GetLinkProperty(v, LinkPropertyKeys.TYPE) === level1)
-				.forEachAsync(async (c: GraphLink) => {
-					if ((c.target === modelId || ops.level1) && ops && (!ops.exclusiveLinkTypes.length || ops.level1)) {
-						added = getConnectedNodesByLinkType(c.target === modelId ? c.source : c.target, level2);
-						pinned.push(...added);
+		forLevelTwo.forEach((node: Node) => {
+			level2.filter((v: string) => v).forEach((lvl: string) => {
+				let temp = GetNodesLinkedTo(graph, {
+					id: node.id,
+					link: lvl
+				})
+				temp.forEach((tnode: Node) => {
+					let tlink = GetLinkBetween(node.id, tnode.id, graph) || GetLinkBetween(tnode.id, node.id, graph);
+					if (tlink) {
+						links.push(tlink);
 					}
-				});
-		}
-		return added;
-	}
+				})
+				nodes.push(...temp);
+			})
+		});
+		nodes.push(...forLevelTwo)
+	})
 
 	return {
-		links: sorted,
-		nodes
+		links: links.unique((v: GraphLink) => v.id),
+		nodes: nodes.unique((v: Node) => v.id)
 	}
 }
 
@@ -898,7 +927,31 @@ export function saveCurrentGraph() {
 	const state = _getState();
 	saveGraph(GetRootGraph(state))(_dispatch, _getState);
 }
+export function setReportDirectory() {
+	return (dispatch: Function, getState: () => any) => {
+		let currentGraph = GetRootGraph(getState());
+		// You can obviously give a direct path without use the dialog (C:/Program Files/path/myfileexample.txt)
+		if (currentGraph) {
+			const remote = require('electron').remote;
+			const dialog = remote.dialog;
+			dialog
+				.showOpenDialog(remote.getCurrentWindow(), {
+					properties: ['openDirectory']
+				})
+				.then((opts) => {
+					let fileName = opts.filePaths.find((x) => x);
+					if (fileName === undefined) {
+						console.log("You didn't save the file");
+						return;
+					}
 
+					console.log(fileName);
+					currentGraph.reportDirectory = fileName;
+					SaveGraph(currentGraph, dispatch);
+				});
+		}
+	};
+}
 export function setWorkingDirectory() {
 	return (dispatch: Function, getState: () => any) => {
 		let currentGraph = GetRootGraph(getState());

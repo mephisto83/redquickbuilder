@@ -546,6 +546,7 @@ export const Validator = 'Validator';
 export const PublishFiles = 'Publish Files';
 export const Scaffold = 'Scaffold';
 export const SetWorkingDirectory = 'Set Working Directory';
+export const SetReportDirectory = 'Set Report Directory';
 export const CommonProperties = 'Common Properties';
 export const ModelActivityMenu = 'Model Activity Menu';
 export const MindMap = 'Mind Map';

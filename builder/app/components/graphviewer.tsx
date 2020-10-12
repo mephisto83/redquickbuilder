@@ -1,35 +1,13 @@
 // @flow
 import React, { Component } from 'react';
 import * as UIA from '../actions/uiactions';
-import * as Titles from './titles';
-import CheckBox from './checkbox';
-import TreeViewMenu from './treeviewmenu';
 import { EnumerationConfig } from '../interface/methodprops';
-import TreeViewItemContainer from './treeviewitemcontainer';
-import SelectInput from './selectinput';
-import DashboardLogo from './dashboardlogo';
-import DashboardNavBar from './dashboardnavbar';
-import { NodesByType, GetNodeProp } from '../methods/graph_methods';
-import MainSideBar from './mainsidebar';
-import SidebarToggle from './sidebartoggle';
-import SideBarMenu from './sidebarmenu';
-import SideBarHeader from './sidebarheader';
-import { NodeTypes, NodeProperties } from '../constants/nodetypes';
-import Header from './header';
-import Content from './content';
+import { GetNodeProp } from '../methods/graph_methods';
+import { NodeProperties } from '../constants/nodetypes';
 import { UIConnect } from '../utils/utils';
-import NavBarMenu from './navbarmenu';
 import DashboardContainer from './dashboardcontainer';
-import Panel from './panel';
-import GridLayout from 'react-grid-layout';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import NodeViewer from './nodeview';
 import { Visual } from '../actions/uiactions';
-import { QuickAccess, GraphLink } from '../methods/graph_types';
-import NodeViewList from './nodeviewlist';
-import LinkViewList from './linkviewlist';
-const ResponsiveGridLayout = WidthProvider(Responsive);
-import FlowCode, { SetFlowCodeModel } from './flowcode';
 import GraphView from './graphview';
 
 class GraphViewer extends Component<any, any> {
@@ -54,14 +32,6 @@ class GraphViewer extends Component<any, any> {
         const Deflayout = [
             { i: 'a', x: 0, y: 0, w: 6, h: 6 }
         ];
-        const layout = {
-            lg: Deflayout,
-            md: Deflayout,
-            sm: Deflayout,
-            xs: Deflayout,
-            xxs: Deflayout
-        };
-        let currentViewNode: string | null = Visual(state, UIA.CURRENT_VIEW_NODE); 
         let graphViewPackage = Visual(state, UIA.GRAPH_WINDOW_PACKAGE);
 
         return (

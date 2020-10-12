@@ -23,7 +23,7 @@ import {
 	CreateReferences,
 	EighthRelation,
 	MethodPropsProperties,
-	CreateNameSpaceConfig
+	CreateNameSpaceConfig, AfterEffectRelations
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import {
@@ -45,7 +45,7 @@ import { GetNodeProp, GetNodeLinkedTo } from '../methods/graph_methods';
 import Typeahead from './typeahead';
 import CheckBox from './checkbox';
 import { MethodFunctions } from '../constants/functiontypes';
-import getLanguageMeaning, { NLMeaning, NLMethodType, Clause, NLValidationClauses } from '../service/naturallang';
+import getLanguageMeaning, { NLMeaning, NLMethodType, Clause, NLValidationClauses, QuickType } from '../service/naturallang';
 import { GetCurrentGraph, GetCodeName } from '../actions/uiactions';
 import { viewCode } from '../actions/remoteActions';
 
@@ -147,7 +147,7 @@ export default class ValidationComponentItem extends Component<any, any> {
 								if (this.state.sentences.indexOf(AGENT_IS_NOT_DELETED) === -1) {
 									this.setState(
 										{
-											sentences: [ this.state.sentences, AGENT_IS_NOT_DELETED ]
+											sentences: [this.state.sentences, AGENT_IS_NOT_DELETED]
 												.filter((x) => x)
 												.join(NEW_LINE)
 										},
@@ -166,7 +166,7 @@ export default class ValidationComponentItem extends Component<any, any> {
 								if (this.state.sentences.indexOf(MODEL_IS_NOT_DELETED) === -1) {
 									this.setState(
 										{
-											sentences: [ this.state.sentences, MODEL_IS_NOT_DELETED ]
+											sentences: [this.state.sentences, MODEL_IS_NOT_DELETED]
 												.filter((x) => x)
 												.join(NEW_LINE)
 										},
@@ -185,7 +185,7 @@ export default class ValidationComponentItem extends Component<any, any> {
 								if (this.state.sentences.indexOf(MODEL_IS_NOT_DELETED) === -1) {
 									this.setState(
 										{
-											sentences: [ this.state.sentences, MODEL_IS_NOT_DELETED ]
+											sentences: [this.state.sentences, MODEL_IS_NOT_DELETED]
 												.filter((x) => x)
 												.join(NEW_LINE)
 										},
@@ -204,7 +204,7 @@ export default class ValidationComponentItem extends Component<any, any> {
 								if (this.state.sentences.indexOf(AGENT_OWN_THE_MODEL) === -1) {
 									this.setState(
 										{
-											sentences: [ this.state.sentences, AGENT_OWN_THE_MODEL ]
+											sentences: [this.state.sentences, AGENT_OWN_THE_MODEL]
 												.filter((x) => x)
 												.join(NEW_LINE)
 										},
@@ -570,24 +570,24 @@ export default class ValidationComponentItem extends Component<any, any> {
 					</TreeViewItemContainer>
 				</TreeViewButtonGroup>
 				{originalConfig && originalConfig !== validationConfig.id ? null : validationConfig &&
-				validationConfig.dataChain ? (
-					<DataChainOptions
-						methods={this.props.methods}
-						onContext={this.props.onContext}
-						name={validationConfig.name}
-						methodDescription={this.props.methodDescription}
-						currentDescription={mountingItem}
-						onChange={(val: boolean) => {
-							this.setState({ turn: Date.now() });
-							if (this.props.onChange) {
-								this.props.onChange();
-							}
-						}}
-						dataChainType={this.props.dataChainType || DataChainType.Validation}
-						previousEffect={this.props.previousEffect}
-						dataChainOptions={validationConfig.dataChainOptions}
-					/>
-				) : null}
+					validationConfig.dataChain ? (
+						<DataChainOptions
+							methods={this.props.methods}
+							onContext={this.props.onContext}
+							name={validationConfig.name}
+							methodDescription={this.props.methodDescription}
+							currentDescription={mountingItem}
+							onChange={(val: boolean) => {
+								this.setState({ turn: Date.now() });
+								if (this.props.onChange) {
+									this.props.onChange();
+								}
+							}}
+							dataChainType={this.props.dataChainType || DataChainType.Validation}
+							previousEffect={this.props.previousEffect}
+							dataChainOptions={validationConfig.dataChainOptions}
+						/>
+					) : null}
 			</TreeViewMenu>
 		);
 	}
@@ -825,6 +825,25 @@ export function updateValidationMethod({
 						simpleValidation.oneOf = oneOf;
 					}
 					break;
+				case NLMethodType.QuickMethod:
+					switch (meaning.quickType) {
+						case QuickType.IsNotDeleted:
+							if (meaning.actorClause.relationType) {
+								simpleValidation.relationType = meaning.actorClause.relationType;
+							}
+							if (meaning.actorClause.agent) {
+								let deletedNodeProperty = UIA.GetModelCodeProperties(meaning.actorClause.agent).find((v: Node) => GetCodeName(v) === 'Deleted');
+								if (deletedNodeProperty) {
+									meaning.actorClause.property = deletedNodeProperty.id;
+								}
+							}
+
+							setupAreEqual(simpleValidation, meaning.actorClause);
+							simpleValidation.isFalse = CreateBoolean();
+							simpleValidation.isFalse.enabled = true;
+							break;
+					}
+					break;
 				case NLMethodType.Intersects:
 					let intersecting = CreateAreEqual();
 					if (meaning.targetClause.relationType) {
@@ -839,12 +858,12 @@ export function updateValidationMethod({
 				case NLMethodType.IsA:
 					if (meaning.validation) {
 						Object.entries(meaning.validation).forEach((temp: any) => {
-							let [ key, value ] = temp;
+							let [key, value] = temp;
 							if (!value) return;
 							let nlvc: any = NLValidationClauses;
 							if (nlvc[key] && nlvc[key].$property) {
 								Object.entries(nlvc[key].$property).forEach((entry: any) => {
-									let [ key, value ] = entry;
+									let [key, value] = entry;
 									let proxy: any = simpleValidation;
 									proxy[key] = value();
 									proxy[key].enabled = true;
@@ -1049,7 +1068,7 @@ export function setupRelation(halfRelation: HalfRelation, clause: Clause) {
 			break;
 	}
 }
-function setupAreEqual(areEqual: AreEqualConfig, clause: Clause) {
+function setupAreEqual(areEqual: AfterEffectRelations, clause: Clause) {
 	switch (areEqual.relationType) {
 		case RelationType.Agent:
 			if (clause.agent) {

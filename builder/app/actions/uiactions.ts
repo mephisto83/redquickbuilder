@@ -3745,6 +3745,10 @@ export function handleGraphMessage(args: any) {
 	if (args && args.graphWindowPackage) {
 		batchCommands.push(UIC(VISUAL, GRAPH_WINDOW_PACKAGE, args.graphWindowPackage));
 	}
+	let dispatch = GetDispatchFunc();
+	if (dispatch) {
+		dispatch(Batch(batchCommands));
+	}
 }
 
 export function handleViewWindowMessage(args: {

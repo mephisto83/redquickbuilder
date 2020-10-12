@@ -1,23 +1,17 @@
 // @flow
 import React, { Component } from 'react';
-import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
-import CheckBox from './checkbox';
-import TreeViewMenu from './treeviewmenu';
 import { EnumerationConfig } from '../interface/methodprops';
-import TreeViewItemContainer from './treeviewitemcontainer';
-import SelectInput from './selectinput';
 import DashboardLogo from './dashboardlogo';
 import DashboardNavBar from './dashboardnavbar';
-import { NodesByType, GetNodeProp } from '../methods/graph_methods';
+import { GetNodeProp } from '../methods/graph_methods';
 import MainSideBar from './mainsidebar';
 import SidebarToggle from './sidebartoggle';
 import SideBarMenu from './sidebarmenu';
 import SideBarHeader from './sidebarheader';
-import { NodeTypes, NodeProperties } from '../constants/nodetypes';
+import { NodeProperties } from '../constants/nodetypes';
 import Header from './header';
 import Content from './content';
-import { UIConnect } from '../utils/utils';
 import NavBarMenu from './navbarmenu';
 
 export default class DashboardContainer extends Component<any, any> {
@@ -27,7 +21,6 @@ export default class DashboardContainer extends Component<any, any> {
 	}
 
 	minified() {
-		const { state } = this.props;
 		return this.props.minified ? 'sidebar-collapse' : '';
 	}
 

@@ -2,6 +2,7 @@ export interface Graph {
 	id: string;
 	version: Version;
 	workspace: string;
+	reportDirectory?: string;
 	title: string;
 	namespace: string;
 	graphFile?: string;

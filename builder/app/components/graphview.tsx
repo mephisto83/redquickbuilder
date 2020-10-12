@@ -18,6 +18,8 @@ import TextInput from './textinput';
 import { FlowCodePortModel } from './flowcode/FlowCodePortModel';
 import { GraphLink, Node } from '../methods/graph_types';
 import { refreshFlowModel, saveFlowModel } from '../actions/remoteActions';
+import { LinkPropertyKeys } from '../constants/nodetypes';
+import { GetLinkProperty } from '../actions/uiactions';
 
 const operations = {
     ADD_PARAMETER: '#843B62',
@@ -69,8 +71,8 @@ export default class GraphView extends Component<any, any> {
             graph: {
                 rankdir: 'RL',
                 ranker: 'longest-path',
-                marginx: 25,
-                marginy: 25
+                marginx: 50,
+                marginy: 50
             },
             includeLinks: true
         });
@@ -99,7 +101,7 @@ export default class GraphView extends Component<any, any> {
         }
     }
     autoDistribute = () => {
-        this.engine.redistribute(this.props.model);
+        this.engine.redistribute(this.state.activeModel);
 
         // only happens if pathfing is enabled (check line 25)
         this.reroute();
@@ -136,6 +138,9 @@ export default class GraphView extends Component<any, any> {
             activeModel.getNodes().forEach((node: any) => {
                 activeModel.removeNode(node);
             });
+            activeModel.getLinks().forEach((link: any) => {
+                activeModel.removeLink(link);
+            })
 
             nodes.forEach((node: Node, index: number) => {
                 dnodes[node.id].setPosition(index * 70, index * 70);
@@ -143,20 +148,25 @@ export default class GraphView extends Component<any, any> {
             });
             if (links) {
                 links.forEach((link: GraphLink) => {
-                    let newLink = this.connectNodes(dnodes[link.source], dnodes[link.target], engine);
-                    activeModel.addLink(newLink );
+                    let newLink = this.connectNodes(dnodes[link.source], dnodes[link.target], link, engine);
+                    if (newLink)
+                        activeModel.addLink(newLink);
                 });
             }
+            setTimeout(() => {
+                this.autoDistribute();
+            }, 1500);
         }
     }
-    connectNodes(nodeFrom: any, nodeTo: any, engine: DiagramEngine) {
+    connectNodes(nodeFrom: any, nodeTo: any, link: GraphLink, engine: DiagramEngine) {
+        if (!nodeFrom || !nodeTo) { return false; }
         //just to get id-like structure
-        const portOut = nodeFrom.addPort(new DefaultPortModel(true, `${nodeFrom.name}-out-${UIA.GUID()}`, 'Out'));
-        const portTo = nodeTo.addPort(new DefaultPortModel(false, `${nodeFrom.name}-to-${UIA.GUID()}`, 'IN'));
-        // return portOut.link(portTo);
+        const portOut = nodeFrom.addPort(new DefaultPortModel(true, `${nodeFrom.name}-out-${UIA.GUID()}`, GetLinkProperty(link, LinkPropertyKeys.TYPE) || 'Out'));
+        const portTo = nodeTo.addPort(new DefaultPortModel(false, `${nodeTo.name}-to-${UIA.GUID()}`, GetLinkProperty(link, LinkPropertyKeys.TYPE) || 'IN'));
+        return portOut.link(portTo);
 
         // ################# UNCOMMENT THIS LINE FOR PATH FINDING #############################
-        return portOut.link(portTo, engine.getLinkFactories().getFactory(PathFindingLinkFactory.NAME));
+        // return portOut.link(portTo, engine.getLinkFactories().getFactory(PathFindingLinkFactory.NAME));
         // #####################################################################################
     }
 
