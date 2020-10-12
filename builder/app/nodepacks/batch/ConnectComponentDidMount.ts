@@ -235,37 +235,127 @@ export default function ConnectComponentDidMount(args: {
 						? [
 								!(methodProperties && (methodProperties.model || methodProperties.model_output))
 									? []
-									: StoreModelArrayStandard({
-											viewPackages,
-											model: methodProperties.model_output || methodProperties.model,
-											modelText: GetNodeTitle(
-												methodProperties.model_output || methodProperties.model
-											),
-											state_key: `${GetNodeTitle(
-												GetNodeProp(screen, NodeProperties.Model)
-											)} ${GetNodeTitle(
-												methodProperties.model_output || methodProperties.model
-											)} State`,
-											callback: (context: { entry: any }) => {
-												storeModelDataChain = context.entry;
-											}
-										}),
+									: () => {
+											return [
+												() => {
+													let uiMethodNode: Node = GetNodeByProperties({
+														[NodeProperties.UIActionMethod]: UIActionMethods.StoreModelArray,
+														[NodeProperties.NODEType]: NodeTypes.UIMethod
+													});
+													let stateKey: Node = GetNodeByProperties({
+														[NodeProperties.NODEType]: NodeTypes.StateKey,
+														[NodeProperties.StateKey]: GetNodeProp(screen, NodeProperties.Model)
+													});
+													let res: any[] = [];
+													if (!stateKey) {
+														res.push(() => {
+															return CreateNewNode(
+																{
+																	[NodeProperties.StateKey]: GetNodeProp(
+																		screen,
+																		NodeProperties.Model
+																	),
+																	[NodeProperties.UIText]: `${GetNodeTitle(
+																		GetNodeProp(screen, NodeProperties.Model)
+																	)} State`,
+																	[NodeProperties.NODEType]: NodeTypes.StateKey
+																},
+																(node: Node) => {
+																	stateKey = node;
+																}
+															);
+														});
+													}
+
+													if (!uiMethodNode) {
+														res.push(() => {
+															return CreateNewNode(
+																{
+																	[NodeProperties.UIActionMethod]:
+																		UIActionMethods.StoreModelArray,
+																	[NodeProperties.UIText]:
+																		UIActionMethods.StoreModelArray,
+																	[NodeProperties.NODEType]: NodeTypes.UIMethod
+																},
+																(node: Node) => {
+																	uiMethodNode = node;
+																}
+															);
+														});
+													}
+													res.push(() => {
+														return AddLinkBetweenNodes(
+															cycleInstance ? cycleInstance.id : '',
+															uiMethodNode.id,
+															{
+																...LinkProperties.UIMethod,
+																[LinkPropertyKeys.ModelKey]: GetNodeProp(
+																	screen,
+																	NodeProperties.Model
+																),
+																parameters: [
+																	{
+																		type:
+																			UIActionMethodParameterTypes.FunctionParameter,
+																		value: 'a'
+																	},
+																	{
+																		type: UIActionMethodParameterTypes.ModelKey,
+																		value: GetNodeProp(screen, NodeProperties.Model)
+																	},
+																	{
+																		type: UIActionMethodParameterTypes.StateKey,
+																		value: stateKey.id
+																	}
+																]
+															}
+														);
+													});
+													res.push(() => {
+														return AddLinkBetweenNodes(
+															cycleInstance ? cycleInstance.id : '',
+															uiMethodNode.id,
+															{
+																...LinkProperties.StateKey,
+																stateKey: stateKey.id
+															}
+														);
+													});
+													return res;
+												}
+											];
+										},
+								// StoreModelArrayStandard({
+								// 		viewPackages,
+								// 		model: methodProperties.model_output || methodProperties.model,
+								// 		modelText: GetNodeTitle(
+								// 			methodProperties.model_output || methodProperties.model
+								// 		),
+								// 		state_key: `${GetNodeTitle(
+								// 			GetNodeProp(screen, NodeProperties.Model)
+								// 		)} ${GetNodeTitle(
+								// 			methodProperties.model_output || methodProperties.model
+								// 		)} State`,
+								// 		callback: (context: { entry: any }) => {
+								// 			storeModelDataChain = context.entry;
+								// 		}
+								//   })
 								() => {
 									return [
-										{
-											operation: ADD_LINK_BETWEEN_NODES,
-											options() {
-												return {
-													target: storeModelDataChain,
-													source: cycleInstance ? cycleInstance.id : null,
-													properties: {
-														...LinkProperties.DataChainLink,
-														singleLink: true,
-														nodeTypes: [ NodeTypes.DataChain ]
-													}
-												};
-											}
-										}
+										// {
+										// 	operation: ADD_LINK_BETWEEN_NODES,
+										// 	options() {
+										// 		return {
+										// 			target: storeModelDataChain,
+										// 			source: cycleInstance ? cycleInstance.id : null,
+										// 			properties: {
+										// 				...LinkProperties.DataChainLink,
+										// 				singleLink: true,
+										// 				nodeTypes: [ NodeTypes.DataChain ]
+										// 			}
+										// 		};
+										// 	}
+										// }
 									];
 								}
 							]
@@ -273,7 +363,6 @@ export default function ConnectComponentDidMount(args: {
 					//Returns a model and not an instanceType[not edit]
 					...(!returnsAList && !instanceType
 						? [
-
 								() => {
 									return [
 										() => {
@@ -363,15 +452,105 @@ export default function ConnectComponentDidMount(args: {
 						? [
 								!GetNodeProp(screen, NodeProperties.Model)
 									? []
-									: StoreModelArrayStandard({
-											viewPackages,
-											model: GetNodeProp(screen, NodeProperties.Model),
-											modelText: GetNodeTitle(screen),
-											state_key: `${GetNodeTitle(GetNodeProp(screen, NodeProperties.Model))} State`,
-											callback: (context: { entry: any }) => {
-												storeModelDataChain = context.entry;
-											}
-										}),
+									: () => {
+											return [
+												() => {
+													let uiMethodNode: Node = GetNodeByProperties({
+														[NodeProperties.UIActionMethod]: UIActionMethods.StoreModelArray,
+														[NodeProperties.NODEType]: NodeTypes.UIMethod
+													});
+													let stateKey: Node = GetNodeByProperties({
+														[NodeProperties.NODEType]: NodeTypes.StateKey,
+														[NodeProperties.StateKey]: GetNodeProp(screen, NodeProperties.Model)
+													});
+													let res: any[] = [];
+													if (!stateKey) {
+														res.push(() => {
+															return CreateNewNode(
+																{
+																	[NodeProperties.StateKey]: GetNodeProp(
+																		screen,
+																		NodeProperties.Model
+																	),
+																	[NodeProperties.UIText]: `${GetNodeTitle(
+																		GetNodeProp(screen, NodeProperties.Model)
+																	)} State`,
+																	[NodeProperties.NODEType]: NodeTypes.StateKey
+																},
+																(node: Node) => {
+																	stateKey = node;
+																}
+															);
+														});
+													}
+
+													if (!uiMethodNode) {
+														res.push(() => {
+															return CreateNewNode(
+																{
+																	[NodeProperties.UIActionMethod]:
+																		UIActionMethods.StoreModelArray,
+																	[NodeProperties.UIText]:
+																		UIActionMethods.StoreModelArray,
+																	[NodeProperties.NODEType]: NodeTypes.UIMethod
+																},
+																(node: Node) => {
+																	uiMethodNode = node;
+																}
+															);
+														});
+													}
+													res.push(() => {
+														return AddLinkBetweenNodes(
+															cycleInstance ? cycleInstance.id : '',
+															uiMethodNode.id,
+															{
+																...LinkProperties.UIMethod,
+																[LinkPropertyKeys.ModelKey]: GetNodeProp(
+																	screen,
+																	NodeProperties.Model
+																),
+																parameters: [
+																	{
+																		type:
+																			UIActionMethodParameterTypes.FunctionParameter,
+																		value: 'a'
+																	},
+																	{
+																		type: UIActionMethodParameterTypes.ModelKey,
+																		value: GetNodeProp(screen, NodeProperties.Model)
+																	},
+																	{
+																		type: UIActionMethodParameterTypes.StateKey,
+																		value: stateKey.id
+																	}
+																]
+															}
+														);
+													});
+													res.push(() => {
+														return AddLinkBetweenNodes(
+															cycleInstance ? cycleInstance.id : '',
+															uiMethodNode.id,
+															{
+																...LinkProperties.StateKey,
+																stateKey: stateKey.id
+															}
+														);
+													});
+													return res;
+												}
+											];
+										},
+								//  StoreModelArrayStandard({
+								// 		viewPackages,
+								// 		model: GetNodeProp(screen, NodeProperties.Model),
+								// 		modelText: GetNodeTitle(screen),
+								// 		state_key: `${GetNodeTitle(GetNodeProp(screen, NodeProperties.Model))} State`,
+								// 		callback: (context: { entry: any }) => {
+								// 			storeModelDataChain = context.entry;
+								// 		}
+								//   })
 								() => {
 									return [
 										{

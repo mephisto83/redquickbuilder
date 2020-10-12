@@ -10,9 +10,21 @@ import {
 	GetNodeTitle,
 	UPDATE_NODE_PROPERTY,
 	ComponentApiKeys,
-	ScreenOptionFilter
+	ScreenOptionFilter,
+	GetNodeByProperties,
+	AddLinkBetweenNodes,
+	CreateNewNode
 } from '../../actions/uiactions';
-import { LinkType, NodeProperties, LinkProperties, NodeTypes, Methods } from '../../constants/nodetypes';
+import {
+	LinkType,
+	NodeProperties,
+	LinkProperties,
+	NodeTypes,
+	Methods,
+	UIActionMethods,
+	UIActionMethodParameterTypes,
+	LinkPropertyKeys
+} from '../../constants/nodetypes';
 import { ComponentLifeCycleEvents, ComponentEvents, ComponentTypeKeys } from '../../constants/componenttypes';
 import AddLifeCylcleMethodInstance from '../AddLifeCylcleMethodInstance';
 import CreateNavigateToScreenDC from '../CreateNavigateToScreenDC';
@@ -20,7 +32,7 @@ import ConnectLifecycleMethod from '../../components/ConnectLifecycleMethod';
 import { uuidv4 } from '../../utils/array';
 import StoreModelArrayStandard from '../StoreModelArrayStandard';
 import AppendValidations from './AppendValidations';
-
+import { Node } from '../../methods/graph_types';
 export default function ScreenConnectGetAll(args: any = {}) {
 	let { node, method } = args;
 	const { navigateTo } = args;
@@ -155,18 +167,68 @@ export default function ScreenConnectGetAll(args: any = {}) {
 									)
 								}
 							],
-              ...(navigateTo
-                // See nots in the ScreenConnectGet
-								? CreateNavigateToScreenDC({
-										screen: navigateTo,
-										node: () => _instanceNode.id,
-										lambda: lambdaFunc,
-										viewPackages,
-										callback: (navigateContext: any) => {
-											_navigateContext = navigateContext;
+							...(navigateTo
+								? [
+										() => {
+											return [
+												() => {
+													let uiMethodNode: Node = GetNodeByProperties({
+														[NodeProperties.UIActionMethod]: UIActionMethods.NavigateToScreen,
+														[NodeProperties.NODEType]: NodeTypes.UIMethod
+													});
+													let res: any[] = [];
+													if (!uiMethodNode) {
+														res.push(() => {
+															return CreateNewNode(
+																{
+																	[NodeProperties.UIActionMethod]:
+																		UIActionMethods.NavigateToScreen,
+																	[NodeProperties.UIText]:
+																		UIActionMethods.NavigateToScreen,
+																	[NodeProperties.NODEType]: NodeTypes.UIMethod
+																},
+																(node: Node) => {
+																	uiMethodNode = node;
+																}
+															);
+														});
+													}
+													res.push(() => {
+														return AddLinkBetweenNodes(_instanceNode.id, uiMethodNode.id, {
+															...LinkProperties.UIMethod,
+															parameters: [
+																{
+																	type: UIActionMethodParameterTypes.NullParameter
+																},
+																{
+																	type: UIActionMethodParameterTypes.NullParameter
+																},
+																{
+																	type: UIActionMethodParameterTypes.ScreenRoute,
+																	value: navigateTo
+																},
+																{
+																	type: UIActionMethodParameterTypes.Navigate
+																}
+															]
+														});
+													});
+
+													return res;
+												}
+											];
 										}
-									})
-								: []),
+									] // See nots in the ScreenConnectGet
+								: // CreateNavigateToScreenDC({
+									// 	screen: navigateTo,
+									// 	node: () => _instanceNode.id,
+									// 	lambda: lambdaFunc,
+									// 	viewPackages,
+									// 	callback: (navigateContext: any) => {
+									// 		_navigateContext = navigateContext;
+									// 	}
+									// })
+									[]),
 							{
 								operation: ADD_LINK_BETWEEN_NODES,
 								options() {
@@ -261,15 +323,86 @@ export default function ScreenConnectGetAll(args: any = {}) {
 						}
 						return [];
 					},
-					...StoreModelArrayStandard({
-						viewPackages,
-						model: GetNodeProp(node, NodeProperties.Model),
-						modelText: GetNodeTitle(node),
-						state_key: `${GetNodeTitle(GetNodeProp(node, NodeProperties.Model))} State`,
-						callback: (context: { entry: any }) => {
-							storeModelDataChain = context.entry;
-						}
-					}),
+					// ...StoreModelArrayStandard({
+					// 	viewPackages,
+					// 	model: GetNodeProp(node, NodeProperties.Model),
+					// 	modelText: GetNodeTitle(node),
+					// 	state_key: `${GetNodeTitle(GetNodeProp(node, NodeProperties.Model))} State`,
+					// 	callback: (context: { entry: any }) => {
+					// 		storeModelDataChain = context.entry;
+					// 	}
+					// }),
+					() => {
+						return [
+							() => {
+								let uiMethodNode: Node = GetNodeByProperties({
+									[NodeProperties.UIActionMethod]: UIActionMethods.StoreModelArray,
+									[NodeProperties.NODEType]: NodeTypes.UIMethod
+								});
+								let stateKey: Node = GetNodeByProperties({
+									[NodeProperties.NODEType]: NodeTypes.StateKey,
+									[NodeProperties.StateKey]: GetNodeProp(node, NodeProperties.Model)
+								});
+								let res: any[] = [];
+								if (!stateKey) {
+									res.push(() => {
+										return CreateNewNode(
+											{
+												[NodeProperties.StateKey]: GetNodeProp(node, NodeProperties.Model),
+												[NodeProperties.UIText]: `${GetNodeTitle(
+													GetNodeProp(node, NodeProperties.Model)
+												)} State`,
+												[NodeProperties.NODEType]: NodeTypes.StateKey
+											},
+											(node: Node) => {
+												stateKey = node;
+											}
+										);
+									});
+								}
+								if (!uiMethodNode) {
+									res.push(() => {
+										return CreateNewNode(
+											{
+												[NodeProperties.UIActionMethod]: UIActionMethods.StoreModelArray,
+												[NodeProperties.UIText]: UIActionMethods.StoreModelArray,
+												[NodeProperties.NODEType]: NodeTypes.UIMethod
+											},
+											(node: Node) => {
+												uiMethodNode = node;
+											}
+										);
+									});
+								}
+								res.push(() => {
+									return AddLinkBetweenNodes(cycleInstance.id, uiMethodNode.id, {
+										...LinkProperties.UIMethod,
+										parameters: [
+											{
+												type: UIActionMethodParameterTypes.FunctionParameter,
+												value: 'a'
+											},
+											{
+												type: UIActionMethodParameterTypes.ModelKey,
+												value: GetNodeProp(node, NodeProperties.Model)
+											},
+											{
+												type: UIActionMethodParameterTypes.StateKey,
+												value: stateKey.id
+											}
+										]
+									});
+								});
+								res.push(() => {
+									return AddLinkBetweenNodes(cycleInstance.id, uiMethodNode.id, {
+										...LinkProperties.StateKey,
+										stateKey: stateKey.id
+									});
+								});
+								return res;
+							}
+						];
+					},
 					(graph: any) => {
 						return [
 							{

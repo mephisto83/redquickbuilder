@@ -33,7 +33,9 @@ import {
 	NodeProperties,
 	NodeTypes,
 	EventArgumentTypes,
-	PropertyCentricTypes
+	PropertyCentricTypes,
+	UIActionMethodParameterTypes,
+	UIActionMethods
 } from '../../../constants/nodetypes';
 import { Node, ComponentLayoutContainer } from '../../../methods/graph_types';
 import {
@@ -301,40 +303,87 @@ function NavigateTo(
 	console.log('create navigate to screen DC ');
 
 	let entryNode: string | null = null;
-	graphOperation(
-		CreateNavigateToScreenDC({
-			screen: screen.id,
-			node: () => eventInstance,
-			callback: (dataChainContext: { entry: string }) => {
-				entryNode = dataChainContext.entry;
-			}
-		})
-	)(GetDispatchFunc(), GetStateFunc());
-	if (entryNode !== null) {
-		graphOperation(AddLinkBetweenNodes(entryNode, button, LinkProperties.MethodArgumentSoure))(
-			GetDispatchFunc(),
-			GetStateFunc()
-		);
-	}
-
-	if (routeDescription && routeDescription.source) {
-		Object.keys(routeDescription.source).forEach((sourceKey: string) => {
-			if (routeDescription.source) {
-				let temp = routeDescription.source[sourceKey];
-				if (temp) {
-					switch (temp.type) {
-						case RouteSourceType.Model:
-						case RouteSourceType.Agent:
-						case RouteSourceType.UrlParameter:
-						case RouteSourceType.Item:
-						case RouteSourceType.Body:
-							AttachEventArguments(button, sourceKey, temp, screen);
-							break;
-					}
+	// graphOperation(
+	// 	CreateNavigateToScreenDC({
+	// 		screen: screen.id,
+	// 		node: () => eventInstance,
+	// 		callback: (dataChainContext: { entry: string }) => {
+	// 			entryNode = dataChainContext.entry;
+	// 		}
+	// 	})
+	// )(GetDispatchFunc(), GetStateFunc());
+	// if (entryNode !== null) {
+	// 	graphOperation(AddLinkBetweenNodes(entryNode, button, LinkProperties.MethodArgumentSoure))(
+	// 		GetDispatchFunc(),
+	// 		GetStateFunc()
+	// 	);
+	// }
+	graphOperation(() => {
+		return [
+			() => {
+				let uiMethodNode: Node = GetNodeByProperties({
+					[NodeProperties.UIActionMethod]: UIActionMethods.NavigateToScreen,
+					[NodeProperties.NODEType]: NodeTypes.UIMethod
+				});
+				let res: any[] = [];
+				if (!uiMethodNode) {
+					res.push(() => {
+						return CreateNewNode(
+							{
+								[NodeProperties.UIActionMethod]: UIActionMethods.NavigateToScreen,
+								[NodeProperties.UIText]: UIActionMethods.NavigateToScreen,
+								[NodeProperties.NODEType]: NodeTypes.UIMethod
+							},
+							(node: Node) => {
+								uiMethodNode = node;
+							}
+						);
+					});
 				}
+				res.push(() => {
+					return AddLinkBetweenNodes(eventInstance, uiMethodNode.id, {
+						...LinkProperties.UIMethod,
+						parameters: [
+							{
+								type: UIActionMethodParameterTypes.NullParameter
+							},
+							{
+								type: UIActionMethodParameterTypes.RouteDescription,
+								value: routeDescription
+							},
+							{
+								type: UIActionMethodParameterTypes.ScreenRoute,
+								value: screen.id
+							},
+							{
+								type: UIActionMethodParameterTypes.Navigate
+							}
+						]
+					});
+				});
+
+				return res;
 			}
-		});
-	}
+		];
+	})(GetDispatchFunc(), GetStateFunc());
+	// if (routeDescription && routeDescription.source) {
+	// 	Object.keys(routeDescription.source).forEach((sourceKey: string) => {
+	// 		if (routeDescription.source) {
+	// 			let temp = routeDescription.source[sourceKey];
+	// 			if (temp) {
+	// 				switch (temp.type) {
+	// 					case RouteSourceType.Model:
+	// 					case RouteSourceType.Agent:
+	// 					case RouteSourceType.UrlParameter:
+	// 					case RouteSourceType.Item:
+	// 					case RouteSourceType.Body:
+	// 						AttachEventArguments(button, sourceKey, temp, screen);
+	// 						break;
+	// 				}
+	// 			}
+	// 		}
+	// 	});
+	// }
 
 	console.log('adding connections to api nodes');
 	graphOperation((currentGraph: any) => {

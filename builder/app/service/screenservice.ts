@@ -1409,10 +1409,9 @@ function WriteDescribedApiProperties(
 
 				let params = getUIMethodParameters(parameters);
 				let temp: any = UIActionMethods;
-				innerValue = `${temp[GetNodeProp(uiMethod, NodeProperties.UIActionMethod)]}(${innerValue}${params &&
-				params.length
-					? ', '
-					: ''}${params.join()})`;
+				innerValue = `${temp[
+					GetNodeProp(uiMethod, NodeProperties.UIActionMethod)
+				]}(${innerValue}${innerValue.trim() && params && params.length ? ', ' : ''}${params.join()})`;
 			}
 			if (innerValue) {
 				return `${GetJSCodeName(componentExternalApi)}={${innerValue}}`;
@@ -1968,6 +1967,16 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 		return `DC.${GetCodeName(dataChain, {
 			includeNameSpace: true
 		})}(value/*hi*/);`;
+	} else if (!method && uiMethod) {
+		let link = GetLinkBetween(methodInstanceCall.id, uiMethod.id, graph);
+		let parameters = GetLinkProperty(link, LinkPropertyKeys.Parameters);
+
+		let params = getUIMethodParameters(parameters);
+		let passingParameters = getUIMethodParameters(parameters, { passingParameters: true });
+		let temp: any = UIActionMethods;
+		return `(function(${passingParameters.join()}) {
+        return ${temp[GetNodeProp(uiMethod, NodeProperties.UIActionMethod)]}(${params.join()})
+      })(value/*hi*/)`;
 	}
 }
 
@@ -1991,11 +2000,22 @@ function getUIMethodParameters(parameters: any, options?: { passingParameters: b
 						return `${v.value}: any`;
 					}
 					return v.value;
+				case UIActionMethodParameterTypes.GetMenuSource:
+					return 'GetMenuSource';
+				case UIActionMethodParameterTypes.RedGraph:
+					return 'RedGraph';
+				case UIActionMethodParameterTypes.Navigate:
+					return 'navigate';
+				case UIActionMethodParameterTypes.Routes:
+					return 'routes';
 				case UIActionMethodParameterTypes.ModelKey:
 				case UIActionMethodParameterTypes.Model:
 					return `Models.${GetCodeName(v.value)}`;
 				case UIActionMethodParameterTypes.Property:
 					return `\`${GetJSCodeName(v.value)}\``;
+				case UIActionMethodParameterTypes.StateKey:
+					let stateId = GetNodeById(v.value);
+					return `StateKeys.${GetCodeName(GetNodeProp(stateId, NodeProperties.StateKey))}State`;
 				case UIActionMethodParameterTypes.FetchModel:
 					return 'fetchModel';
 				case UIActionMethodParameterTypes.RetrieveParameters:

@@ -757,3 +757,80 @@ export function StoreInLake(a: any, modelKey: string) {
 
 	return a;
 }
+
+// TODO: Copy to other uiactions later. 10/10/2020
+export function StoreModelArray(a: any[], modelType: string, stateKey: string) {
+	let dispatch = GetDispatch();
+
+	dispatch(UIModels(modelType, a));
+
+	let ids = (a || []).map((x: any) => (x ? x.id : null));
+
+	dispatch(UIC('Data', stateKey, ids));
+
+	return ids;
+}
+// TODO: Copy to other uiactions later. 10/10/2020
+export function GetMenuDataSource(GetMenuSource: any, RedGraph: any) {
+	let array = GetMenuSource({ getState: GetState(), dispatch: GetDispatch() });
+
+	let graph = RedGraph.create();
+
+	array
+		.map((item: any) => {
+			RedGraph.addNode(graph, item, null);
+		})
+		.forEach((item: any) => {
+			if (item && item.parent) {
+				RedGraph.addLink(graph, item.parent, item.id);
+			}
+		});
+	return graph;
+}
+
+// TODO: Copy to other uiactions later. 10/10/2020
+export function StoreResultInReducer(x: any, modelType: string, navigate: any) {
+	x = x !== undefined || x !== null ? [ x ] : [];
+	let dispatch = GetDispatch();
+	dispatch(UIModels(modelType, x));
+	navigate.GoBack()(dispatch, GetState());
+}
+
+// TODO: Copy to other uiactions later. 10/11/2020
+export function NavigateToRoute(id: string, navigate: any, routes: any) {
+	navigate.Go({ route: routes[id] })(GetDispatch(), GetState());
+}
+
+// TODO: Copy to other uiactions later. 10/11/2020
+export function NavigateToScreen(
+	$id?: any,
+	$internalComponentState?: {
+		[str: string]: any;
+		label: string | number | null;
+		viewModel: string | number | null;
+		value: string | number | null;
+		model: string | number | null;
+	} | null,
+	route?: string,
+	navigate?: any
+) {
+	if (route) {
+		let a = { value: $id };
+
+		if (a && typeof a === 'object' && a.hasOwnProperty('success')) {
+			return a;
+		}
+		if ($internalComponentState) {
+			Object.keys($internalComponentState).forEach((v: any) => {
+				let regex = new RegExp(`\:${v}`, 'gm');
+				if (route) route = route.replace(regex, $internalComponentState[v]);
+			});
+		}
+
+		let regex = new RegExp(`\:value`, 'gm');
+    if (route) route = route.replace(regex, a.value);
+
+		navigate.Go({ route })(GetDispatch(), GetState());
+		return a;
+	}
+}

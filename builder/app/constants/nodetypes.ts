@@ -409,15 +409,28 @@ export const PropertyCentricTypes = {
 export const UIActionMethods = {
 	GetModelProperty: 'GetModelProperty',
 	LoadModel: 'LoadModel',
-	StoreInLake: 'StoreInLake'
+	StoreResultInReducer: 'StoreResultInReducer',
+	NavigateToScreen: 'NavigateToScreen',
+	StoreInLake: 'StoreInLake',
+	NavigateToRoute: 'NavigateToRoute',
+	GetMenuDataSource: 'GetMenuDataSource',
+	StoreModelArray: 'StoreModelArray'
 };
 export const UIActionMethodParameterTypes = {
 	Model: 'model',
 	ModelKey: 'modelKey',
 	Property: 'property',
+	Navigate: 'Navigate',
+	StateKey: 'stateKey',
+	Routes: 'Routes',
+	RouteDescription: 'RouteDescription',
+	ScreenRoute: 'ScreenRoute',
 	FunctionParameter: 'FunctionParameter',
+	NullParameter: 'NullParameter',
+	GetMenuSource: 'GetMenuSource',
 	FetchModel: 'fetchModel',
 	ViewModelKey: 'viewModelKey',
+	RedGraph: 'RedGraph',
 	RetrieveParameters: 'RetrieveParameters'
 };
 export const NodeProperties = {
