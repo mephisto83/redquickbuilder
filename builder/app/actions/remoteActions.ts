@@ -952,6 +952,22 @@ export function setReportDirectory() {
 		}
 	};
 }
+export async function getGenericDirectory(): Promise<string | undefined> {
+	const remote = require('electron').remote;
+	const dialog = remote.dialog;
+	return dialog
+		.showOpenDialog(remote.getCurrentWindow(), {
+			properties: ['openDirectory']
+		})
+		.then((opts) => {
+			let fileName = opts.filePaths.find((x) => x);
+			if (fileName === undefined) {
+				console.log("You didn't save the file");
+				return;
+			}
+			return fileName;
+		});
+}
 export function setWorkingDirectory() {
 	return (dispatch: Function, getState: () => any) => {
 		let currentGraph = GetRootGraph(getState());

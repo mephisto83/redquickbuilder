@@ -1,5 +1,7 @@
 import fs from 'fs';
 import * as ts from 'typescript';
+import path from 'path';
+import { getGenericDirectory } from '../actions/remoteActions';
 import { fs_readFileSync } from '../generators/modelgenerators';
 import MemoryCompilerHost from './ast/compiler/MemoryCompilerHost';
 import { NEW_LINE } from './nodetypes';
@@ -14,6 +16,12 @@ export interface IFlowCodeConfig {
 }
 export interface IFlowCodeStatements {
     [str: string]: IFlowCodeConfig
+}
+export interface IFlowCodeFile {
+    [file: string]: IFlowCodeStatements
+}
+export const FlowCodeNameSpaces: IFlowCodeFile = {
+
 }
 export const FlowCodeStatements: IFlowCodeStatements = {
     Assignment: {
@@ -107,11 +115,30 @@ function stripConvertParent(item: any): any {
     return result;
 }
 export function buildFunctions() {
-    let fileContents = fs_readFileSync('./app/templates/reactweb/v1/src/actions/uiactions.d.ts', 'utf8') as string;
+    // let fileContents = fs_readFileSync('./app/templates/reactweb/v1/src/actions/uiactions.d.ts', 'utf8') as string;
 
-    let res = ts.createSourceFile('x.ts', fileContents, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+    // buildFunctionsFromString(fileContents);
+}
+export async function LoadFileSource(): Promise<IFlowCodeFile> {
+    let fileSpace: IFlowCodeFile = {}
+    return getGenericDirectory().then((folder: string | undefined) => {
+        if (folder) {
+            console.log(folder);
+            let files = fs.readdirSync(folder)
+            files.forEach((file: string) => {
+                if (file.endsWith('.d.ts')) {
+                    let fileContent = fs.readFileSync(path.join(folder, file), 'utf8');
+                    fileSpace[file] = buildFunctionsFromString(fileContent, file);
+                }
+            })
+        }
+        return fileSpace;
+    })
+}
+export function buildFunctionsFromString(fileContents: string, fileName: string = 'x.ts'): IFlowCodeStatements {
+    let res = ts.createSourceFile(fileName, fileContents, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
 
-
+    let flowCodeFile: IFlowCodeStatements = {};
     res.statements.forEach((statement: ts.Statement) => {
         let text = statement.getFullText();
         let fcConfig: IFlowCodeConfig = {
@@ -121,9 +148,11 @@ export function buildFunctions() {
 
         let ast: any = captureContents(fcConfig);
         fcConfig.ast = ast;
-        FlowCodeStatements[ast && ast.name && ast.name.escapedText ? ast.name.escapedText : text] = fcConfig;
-    })
+        flowCodeFile[ast && ast.name && ast.name.escapedText ? ast.name.escapedText : text] = fcConfig;
+    });
+    return flowCodeFile
 }
+
 export function buildRules() {
     let fileContents = fs.readFileSync('D:\\dev\\redquickbuilder\\builder\\node_modules\\typescript\\lib\\typescript.d.ts', 'utf-8');
 
@@ -156,6 +185,15 @@ export function buildRules() {
                             let unionType = typeAliasDec.type as unknown as ts.UnionType;
                             if (unionType) {
                                 aliasTypeMembers[typeAliasDec.name.escapedText.toString()] = unionType.types;
+                            }
+                        }
+                    }
+                    else if (statement.kind === ts.SyntaxKind.ClassDeclaration) {
+                        let typeAliasDec = statement as ts.ClassDeclaration;
+                        if (typeAliasDec.kind === ts.SyntaxKind.ClassDeclaration) {
+                            let unionType = typeAliasDec as unknown as ts.ClassDeclaration;
+                            if (unionType) {
+                                // aliasTypeMembers[typeAliasDec.name.escapedText.toString()] = unionType.types;
                             }
                         }
                     }
@@ -199,6 +237,8 @@ function captureContents(config: IFlowCodeConfig): ts.Node | null | undefined {
                         let func = node as ts.FunctionDeclaration;
                         result = stripConvertParent(func);
                         return;
+                    case ts.SyntaxKind.ClassDeclaration:
+                    case ts.SyntaxKind.InterfaceDeclaration:
                     case ts.SyntaxKind.VariableDeclaration:
                         let vdl = node as ts.VariableDeclaration;
                         result = stripConvertParent(vdl);

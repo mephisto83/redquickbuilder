@@ -26,6 +26,8 @@ export interface FlowCodePortModelGenerics extends PortModelGenerics {
 
 export class FlowCodePortModel extends PortModel<FlowCodePortModelGenerics> {
 	onconnect: Function | undefined;
+	portType?: string;
+	member?: ts.Node;
 	constructor(isIn: boolean, name?: string, label?: string);
 	constructor(options: FlowCodePortModelOptions);
 	constructor(options: FlowCodePortModelOptions | boolean, name?: string, label?: string) {

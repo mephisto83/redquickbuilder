@@ -9,7 +9,7 @@ import * as SRD from '@projectstorm/react-diagrams';
 import styled from '@emotion/styled';
 import { TrayWidget } from './TrayWidget';
 import { TrayItemWidget } from './TrayItemWidget';
-import { buildAst, buildFunctions, FlowCodeStatements, IFlowCodeConfig } from '../constants/flowcode_ast';
+import { buildAst, buildFunctions, FlowCodeStatements, IFlowCodeConfig, LoadFileSource } from '../constants/flowcode_ast';
 import ts from 'typescript';
 import { FlowCodePortFactory } from './flowcode/FlowCodePortFactory';
 import { FlowCodeNodeFactory } from './flowcode/FlowCodeNodeFactory';
@@ -201,7 +201,7 @@ export default class FlowCode extends Component<any, any> {
 
                             var node: FlowCodeNodeModel | null = null;
                             if (data.type) {
-                                node = ConstructNodeModel(data.type, data)
+                                node = ConstructNodeModel(data.type, data, this.props.fileSource)
                             }
                             if (node) {
                                 var point = diagramEngine.getRelativeMousePoint(event);
@@ -223,8 +223,11 @@ export default class FlowCode extends Component<any, any> {
     }
 }
 
-function ConstructNodeModel(type: string, ops: { name: string, parameter: boolean, type: string }): FlowCodeNodeModel {
+function ConstructNodeModel(type: string, ops: { name: string, parameter: boolean, type: string, file: string }, fileSource: any): FlowCodeNodeModel {
     let description: IFlowCodeConfig = FlowCodeStatements[type];
+    if (ops && ops.file && fileSource) {
+        description = fileSource[ops.file][ops.type]
+    }
     let node = new FlowCodeNodeModel(ops.name || type, !description ? ops.type : description.color);
 
     if (![
@@ -254,33 +257,6 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
                 value: v[0]
             }
         }).filter(v => isNaN(v.title));
-    }
-    let enumerationSelect = () => {
-        let enumerations = UIA.Visual(UIA.GetStateFunc()(), UIA.FLOW_CODE_ENUMERATION);
-        if (enumerations) {
-            return enumerations.toNodeSelect();
-        }
-        return [];
-    }
-    let modelsSelect = () => {
-        let modelProperties = UIA.Visual(UIA.GetStateFunc()(), UIA.FLOW_CODE_MODELS);
-        if (modelProperties) {
-            return modelProperties.map((a: any) => a.model).toNodeSelect();
-        }
-        return [];
-    }
-    let enumerationValueSelect = (port: FlowCodePortModel) => {
-        if (port) {
-            let options = port.getOptions();
-            if (options.value) {
-                let enumerations = UIA.Visual(UIA.GetStateFunc()(), UIA.FLOW_CODE_ENUMERATION);
-                if (enumerations) {
-                    let _enum = enumerations.find((v: Node) => v.id === options.value)
-                    return UIA.GetNodeProp(_enum, UIA.NodeProperties.Enumeration).map((v: any) => ({ value: v.id, title: v.value }));
-                }
-            }
-        }
-        return [];
     }
     if (operations.ADD_PARAMETER === type) {
         let newPort = node.addInPort('variable');
@@ -375,8 +351,12 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
                     let func = ast as ts.FunctionDeclaration;
                     func.parameters.forEach((param: ts.ParameterDeclaration) => {
                         let temp: any = param.name;
+                        let paramAny: any = param;
                         if (temp.text || temp.escapedText) {
-                            node.addInPort(temp.text || temp.escapedText, param.kind);
+                            let port = node.addInPort(temp.text || temp.escapedText, param.kind);
+                            if (paramAny.type) {
+                                port.portType = paramAny.type.escapedText;
+                            }
                         }
                     })
                     if (func.type) {
@@ -389,27 +369,50 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
                                 }
                             }
                             else {
+                                let port: any = null;
                                 if (func.type.kind === ts.SyntaxKind.AnyKeyword) {
-                                    node.addOutPort('any', func.type.kind)
+                                    port = node.addOutPort('any', func.type.kind)
                                 }
                                 else if (func.type.kind === ts.SyntaxKind.BooleanKeyword) {
-                                    node.addOutPort('boolean', func.type.kind)
+                                    port = node.addOutPort('boolean', func.type.kind)
                                 }
                                 else if (func.type.kind === ts.SyntaxKind.StringKeyword) {
-                                    node.addOutPort('string', func.type.kind)
+                                    port = node.addOutPort('string', func.type.kind)
                                 }
                                 else if (func.type.kind === ts.SyntaxKind.NumberKeyword) {
-                                    node.addOutPort('number', func.type.kind)
+                                    port = node.addOutPort('number', func.type.kind)
                                 }
                                 else {
                                     let temp: any = func.type;
-                                    node.addOutPort(temp.escapedText, func.type.kind)
+                                    port = node.addOutPort(temp.escapedText, func.type.kind)
+                                }
+                                if (func.type && port) {
+                                    port.portType = (func.type as any).escapedText;
                                 }
                             }
                         }
 
 
                     }
+                    break;
+                case ts.SyntaxKind.InterfaceDeclaration:
+                case ts.SyntaxKind.ClassDeclaration:
+                    let classDec = ast as ts.ClassDeclaration;
+                    classDec.members.forEach((member: ts.ClassElement) => {
+                        let temp: any = member;
+                        let newPort: any = null;
+                        switch (member.kind) {
+                            case ts.SyntaxKind.PropertyDeclaration:
+                            case ts.SyntaxKind.Constructor:
+                            case ts.SyntaxKind.MethodDeclaration:
+                                if (temp.name && temp.type) {
+                                    newPort = node.addOutPort(temp.name.escapedText, member.kind);
+                                    newPort.portType = temp.type.escapedText;
+                                    newPort.member = member;
+                                }
+                                break;
+                        }
+                    });
                     break;
                 case ts.SyntaxKind.VariableDeclaration:
                     let newPort = node.addInPort('variable');

@@ -30,6 +30,7 @@ import NodeViewList from './nodeviewlist';
 import LinkViewList from './linkviewlist';
 const ResponsiveGridLayout = WidthProvider(Responsive);
 import FlowCode, { SetFlowCodeModel } from './flowcode';
+import { IFlowCodeConfig, IFlowCodeStatements, LoadFileSource } from '../constants/flowcode_ast';
 
 class FlowCodeViewer extends Component<any, any> {
 	constructor(props: any) {
@@ -69,7 +70,7 @@ class FlowCodeViewer extends Component<any, any> {
 		return (
 			<DashboardContainer flex minified={UIA.GetC(state, UIA.VISUAL, UIA.DASHBOARD_MENU)} sideBar={this.getSideBar()}>
 				<Panel stretch title={node ? UIA.GetNodeTitle(node) : 'Current Node'}>
-					<FlowCode code={this.state.code} functionName={this.state.functionName} />
+					<FlowCode fileSource={this.state.fileSource} code={this.state.code} functionName={this.state.functionName} />
 				</Panel>
 			</DashboardContainer>
 		);
@@ -101,8 +102,43 @@ class FlowCodeViewer extends Component<any, any> {
 			onClick={() => {
 				this.setState({ typescriptFlowMenu: !this.state.typescriptFlowMenu })
 			}}>
+			<TreeViewMenu title="load" onClick={() => {
+				LoadFileSource().then((res) => {
+					this.setState({ fileSource: res })
+				})
+			}} />
 			{typescriptFlows}
+			{this.getTypescriptAsts()}
 		</TreeViewMenu>];
+	}
+	getTypescriptAsts() {
+		let result: any[] = [];
+
+		if (this.state.fileSource) {
+			Object.entries(this.state.fileSource).map((item: any[]) => {
+				let [key, obj] = item;
+				let statements: IFlowCodeStatements = obj;
+				result.push(<TreeViewMenu active key={key} open={this.state[`${key}`]} title={key} onClick={() => {
+					this.setState({ [`${key}`]: !this.state[`${key}`] });
+				}}>
+					{this.getTypescriptASTFunctions(statements, key)}
+				</TreeViewMenu>)
+			})
+		}
+
+		return result;
+	}
+	getTypescriptASTFunctions(statements: IFlowCodeStatements, file: string): any {
+		let result: any[] = [];
+
+		Object.entries(statements).map((value: [string, IFlowCodeConfig]) => {
+			let [key, config] = value;
+			result.push(<TreeViewMenu active title={key} key={key} color={config.color} onDragStart={(event: any) => {
+				event.dataTransfer.setData('storm-diagram-node', JSON.stringify({ type: key, file: file }));
+			}} />)
+		})
+
+		return result;
 	}
 }
 
