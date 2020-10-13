@@ -8,7 +8,7 @@ import getTheme from '../../native-base-theme/components';
 import Models from '../model_keys';
 import StateKeys from '../state_keys';
 import RedGraph from '../actions/redgraph';
-import routes from '{{relative_depth}}constants/routes';
+import routes from '../constants/routes';
 import {
   GetMenuSource
 } from '../actions/menuSource';

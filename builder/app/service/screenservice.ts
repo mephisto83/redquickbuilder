@@ -1907,9 +1907,9 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 			let params = getUIMethodParameters(parameters);
 			let passingParameters = getUIMethodParameters(parameters, { passingParameters: true });
 			let temp: any = UIActionMethods;
-			dataChainInput = `${parts.length ? ',' : ''}dataChain: function(${passingParameters.join()}) {
+			dataChainInput = `${parts.length ? ',' : ''}dataChain: ((${passingParameters.join()}) => {
         return ${temp[GetNodeProp(uiMethod, NodeProperties.UIActionMethod)]}(${params.join()})
-      }`;
+      })`;
 		}
 		let preDataChainInput = '';
 		if (preDataChain) {
@@ -1974,7 +1974,7 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 		let params = getUIMethodParameters(parameters);
 		let passingParameters = getUIMethodParameters(parameters, { passingParameters: true });
 		let temp: any = UIActionMethods;
-		return `(function(${passingParameters.join()}) {
+		return `((${passingParameters.join()}) => {
         return ${temp[GetNodeProp(uiMethod, NodeProperties.UIActionMethod)]}(${params.join()})
       })(value/*hi*/)`;
 	}
@@ -2003,15 +2003,24 @@ function getUIMethodParameters(parameters: any, options?: { passingParameters: b
 				case UIActionMethodParameterTypes.GetMenuSource:
 					return 'GetMenuSource';
 				case UIActionMethodParameterTypes.NullParameter:
-          return 'null';
-        case UIActionMethodParameterTypes.RouteDescription:
-          return 'null/**/';
+					return 'null';
+				case UIActionMethodParameterTypes.StateViewModel:
+					return 'this.state.viewModel';
+				case UIActionMethodParameterTypes.RouteDescription:
+					debugger;
+					if (v && v.routeArgNodes && v.componentApiNodes) {
+						return createInternalApiArgumentsCode(
+							v.componentApiNodes.map((v: string) => GetNodeById(v)),
+							v.routeArgNodes.map((v: string) => GetNodeById(v))
+						);
+					}
+					return 'null/**/';
 				case UIActionMethodParameterTypes.RedGraph:
 					return 'RedGraph';
 				case UIActionMethodParameterTypes.Navigate:
-          return 'navigate';
-        case UIActionMethodParameterTypes.ScreenRoute:
-          return `routes.${GetCodeName(v.value)}`;
+					return 'navigate';
+				case UIActionMethodParameterTypes.ScreenRoute:
+					return `routes.${GetCodeName(v.value)}`;
 				case UIActionMethodParameterTypes.Routes:
 					return 'routes';
 				case UIActionMethodParameterTypes.ModelKey:

@@ -318,6 +318,27 @@ function NavigateTo(
 	// 		GetStateFunc()
 	// 	);
 	// }
+	let routeArgumentNodes: Node[] = [];
+	if (routeDescription && routeDescription.source) {
+		Object.keys(routeDescription.source).forEach((sourceKey: string) => {
+			if (routeDescription.source) {
+				let temp = routeDescription.source[sourceKey];
+				if (temp) {
+					switch (temp.type) {
+						case RouteSourceType.Model:
+						case RouteSourceType.Agent:
+						case RouteSourceType.UrlParameter:
+						case RouteSourceType.Item:
+						case RouteSourceType.Body:
+							let tempNode: Node = AttachEventArguments(button, sourceKey, temp, screen);
+							routeArgumentNodes.push(tempNode);
+							break;
+					}
+				}
+			}
+		});
+	}
+	let componentApiNodes = GetComponentApiNodes(button, GetCurrentGraph());
 	graphOperation([
 		() => {
 			return [
@@ -347,11 +368,12 @@ function NavigateTo(
 							parameters: [
 								{
 									type: UIActionMethodParameterTypes.FunctionParameter,
-									value: 'value?: any'
+									value: 'value'
 								},
 								{
 									type: UIActionMethodParameterTypes.RouteDescription,
-									value: routeDescription
+									routeArgNodes: routeArgumentNodes.map((v: Node) => v.id),
+									componentApiNodes: componentApiNodes.map((v: Node) => v.id)
 								},
 								{
 									type: UIActionMethodParameterTypes.ScreenRoute,
@@ -369,24 +391,6 @@ function NavigateTo(
 			];
 		}
 	])(GetDispatchFunc(), GetStateFunc());
-	// if (routeDescription && routeDescription.source) {
-	// 	Object.keys(routeDescription.source).forEach((sourceKey: string) => {
-	// 		if (routeDescription.source) {
-	// 			let temp = routeDescription.source[sourceKey];
-	// 			if (temp) {
-	// 				switch (temp.type) {
-	// 					case RouteSourceType.Model:
-	// 					case RouteSourceType.Agent:
-	// 					case RouteSourceType.UrlParameter:
-	// 					case RouteSourceType.Item:
-	// 					case RouteSourceType.Body:
-	// 						AttachEventArguments(button, sourceKey, temp, screen);
-	// 						break;
-	// 				}
-	// 			}
-	// 		}
-	// 	});
-	// }
 
 	console.log('adding connections to api nodes');
 	graphOperation((currentGraph: any) => {

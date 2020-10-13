@@ -199,7 +199,7 @@ export default function ScreenConnectGetAll(args: any = {}) {
 															parameters: [
 																{
 																	type: UIActionMethodParameterTypes.FunctionParameter,
-																	value: 'value?: any'
+																	value: 'value'
 																},
 																{
 																	type: UIActionMethodParameterTypes.NullParameter
