@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { FlatList, Image } from '{{relative_depth}}html-components';
 import { redConnect, titleService} from '{{relative_depth}}actions/util';
-import { GetItems, GetScreenParam, GetItem, SITE, GetC, StoreInLake, GetModelProperty, GetMenuDataSource, LoadModel, StoreResultInReducer, NavigateToRoute, StoreModelArray } from '{{relative_depth}}actions/uiactions';
+import { GetItems, GetScreenParam, GetItem, SITE, GetC, StoreInLake, NavigateToScreen, GetModelProperty, GetMenuDataSource, LoadModel, StoreResultInReducer, NavigateToRoute, StoreModelArray } from '{{relative_depth}}actions/uiactions';
 import Models from '{{relative_depth}}model_keys';
 import routes from '{{relative_depth}}constants/routes';
 import StateKeys from '{{relative_depth}}state_keys';

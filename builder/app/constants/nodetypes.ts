@@ -422,6 +422,7 @@ export const UIActionMethodParameterTypes = {
 	Property: 'property',
 	Navigate: 'Navigate',
 	StateKey: 'stateKey',
+	StateViewModel: 'StateViewModel',
 	Routes: 'Routes',
 	RouteDescription: 'RouteDescription',
 	ScreenRoute: 'ScreenRoute',

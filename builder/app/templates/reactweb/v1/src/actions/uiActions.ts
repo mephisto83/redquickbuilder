@@ -731,7 +731,7 @@ export function GetModelProperty($id: any, modelType: string, propertyName: stri
 	if (!item && id && typeof id === 'string') {
 		fetchModel(modelType, id);
 	}
-	if (item && item.hasOwnProperty && item.hasOwnProperty('propertyName')) {
+	if (item && item.hasOwnProperty && item.hasOwnProperty(propertyName)) {
 		return item[propertyName];
 	}
 	return null;
@@ -806,10 +806,10 @@ export function NavigateToScreen(
 	$id?: any,
 	$internalComponentState?: {
 		[str: string]: any;
-		label: string | number | null;
-		viewModel: string | number | null;
-		value: string | number | null;
-		model: string | number | null;
+		label?: string | number | null;
+		viewModel?: string | number | null;
+		value?: string | number | null;
+		model?: string | number | null;
 	} | null,
 	route?: string,
 	navigate?: any
@@ -828,9 +828,10 @@ export function NavigateToScreen(
 		}
 
 		let regex = new RegExp(`\:value`, 'gm');
-    if (route) route = route.replace(regex, a.value);
+		if (route) route = route.replace(regex, a.value);
 
 		navigate.Go({ route })(GetDispatch(), GetState());
 		return a;
 	}
+	return null;
 }

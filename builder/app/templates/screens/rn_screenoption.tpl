@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Platform, StyleSheet, TouchableOpacity, FlatList,Image } from "react-native";
 import { redConnect, titleService} from '{{relative_depth}}actions/util';
-import { GetItems, GetScreenParam, fetchModelInstanceChildren, GetItem, GetItems, SITE, GetC, StoreInLake,  GetMenuDataSource, StoreResultInReducer, NavigateToRoute,  GetModelProperty, LoadModel, StoreModelArray } from '{{relative_depth}}actions/uiactions';
+import { GetItems, GetScreenParam, fetchModelInstanceChildren, GetItem, GetItems, SITE, GetC, StoreInLake, NavigateToScreen,  GetMenuDataSource, StoreResultInReducer, NavigateToRoute,  GetModelProperty, LoadModel, StoreModelArray } from '{{relative_depth}}actions/uiactions';
 import Models from '{{relative_depth}}model_keys';
 import StateKeys from '{{relative_depth}}state_keys';
 import RedGraph from '{{relative_depth}}actions/redgraph';

@@ -5676,7 +5676,7 @@ function setupPropertyApi(args: any) {
 									model: currentNode.id,
 									property: modelProperty.id,
 									parameters: [
-										{ type: UIActionMethodParameterTypes.Model, value: currentNode.id },
+										{ type: UIActionMethodParameterTypes.StateViewModel },
 										{ type: UIActionMethodParameterTypes.Property, value: modelProperty.id },
 										{ type: UIActionMethodParameterTypes.FetchModel }
 									]

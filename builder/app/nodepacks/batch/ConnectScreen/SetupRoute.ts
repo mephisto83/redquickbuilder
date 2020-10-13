@@ -318,72 +318,79 @@ function NavigateTo(
 	// 		GetStateFunc()
 	// 	);
 	// }
-	graphOperation(() => {
-		return [
-			() => {
-				let uiMethodNode: Node = GetNodeByProperties({
-					[NodeProperties.UIActionMethod]: UIActionMethods.NavigateToScreen,
-					[NodeProperties.NODEType]: NodeTypes.UIMethod
-				});
-				let res: any[] = [];
-				if (!uiMethodNode) {
-					res.push(() => {
-						return CreateNewNode(
-							{
-								[NodeProperties.UIActionMethod]: UIActionMethods.NavigateToScreen,
-								[NodeProperties.UIText]: UIActionMethods.NavigateToScreen,
-								[NodeProperties.NODEType]: NodeTypes.UIMethod
-							},
-							(node: Node) => {
-								uiMethodNode = node;
-							}
-						);
-					});
+	let routeArgumentNodes: Node[] = [];
+	if (routeDescription && routeDescription.source) {
+		Object.keys(routeDescription.source).forEach((sourceKey: string) => {
+			if (routeDescription.source) {
+				let temp = routeDescription.source[sourceKey];
+				if (temp) {
+					switch (temp.type) {
+						case RouteSourceType.Model:
+						case RouteSourceType.Agent:
+						case RouteSourceType.UrlParameter:
+						case RouteSourceType.Item:
+						case RouteSourceType.Body:
+							let tempNode: Node = AttachEventArguments(button, sourceKey, temp, screen);
+							routeArgumentNodes.push(tempNode);
+							break;
+					}
 				}
-				res.push(() => {
-					return AddLinkBetweenNodes(eventInstance, uiMethodNode.id, {
-						...LinkProperties.UIMethod,
-						parameters: [
-							{
-								type: UIActionMethodParameterTypes.NullParameter
-							},
-							{
-								type: UIActionMethodParameterTypes.RouteDescription,
-								value: routeDescription
-							},
-							{
-								type: UIActionMethodParameterTypes.ScreenRoute,
-								value: screen.id
-							},
-							{
-								type: UIActionMethodParameterTypes.Navigate
-							}
-						]
-					});
-				});
-
-				return res;
 			}
-		];
-	})(GetDispatchFunc(), GetStateFunc());
-	// if (routeDescription && routeDescription.source) {
-	// 	Object.keys(routeDescription.source).forEach((sourceKey: string) => {
-	// 		if (routeDescription.source) {
-	// 			let temp = routeDescription.source[sourceKey];
-	// 			if (temp) {
-	// 				switch (temp.type) {
-	// 					case RouteSourceType.Model:
-	// 					case RouteSourceType.Agent:
-	// 					case RouteSourceType.UrlParameter:
-	// 					case RouteSourceType.Item:
-	// 					case RouteSourceType.Body:
-	// 						AttachEventArguments(button, sourceKey, temp, screen);
-	// 						break;
-	// 				}
-	// 			}
-	// 		}
-	// 	});
-	// }
+		});
+	}
+	let componentApiNodes = GetComponentApiNodes(button, GetCurrentGraph());
+	graphOperation([
+		() => {
+			return [
+				() => {
+					let uiMethodNode: Node = GetNodeByProperties({
+						[NodeProperties.UIActionMethod]: UIActionMethods.NavigateToScreen,
+						[NodeProperties.NODEType]: NodeTypes.UIMethod
+					});
+					let res: any[] = [];
+					if (!uiMethodNode) {
+						res.push(() => {
+							return CreateNewNode(
+								{
+									[NodeProperties.UIActionMethod]: UIActionMethods.NavigateToScreen,
+									[NodeProperties.UIText]: UIActionMethods.NavigateToScreen,
+									[NodeProperties.NODEType]: NodeTypes.UIMethod
+								},
+								(node: Node) => {
+									uiMethodNode = node;
+								}
+							);
+						});
+					}
+					res.push(() => {
+						return AddLinkBetweenNodes(eventInstance, uiMethodNode.id, {
+							...LinkProperties.UIMethod,
+							parameters: [
+								{
+									type: UIActionMethodParameterTypes.FunctionParameter,
+									value: 'value'
+								},
+								{
+									type: UIActionMethodParameterTypes.RouteDescription,
+									routeArgNodes: routeArgumentNodes.map((v: Node) => v.id),
+									componentApiNodes: componentApiNodes.map((v: Node) => v.id)
+								},
+								{
+									type: UIActionMethodParameterTypes.ScreenRoute,
+									value: screen.id
+								},
+								{
+									type: UIActionMethodParameterTypes.Navigate
+								}
+							]
+						});
+					});
+
+					return res;
+				}
+			];
+		}
+	])(GetDispatchFunc(), GetStateFunc());
 
 	console.log('adding connections to api nodes');
 	graphOperation((currentGraph: any) => {
