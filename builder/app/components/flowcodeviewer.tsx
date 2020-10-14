@@ -30,7 +30,7 @@ import NodeViewList from './nodeviewlist';
 import LinkViewList from './linkviewlist';
 const ResponsiveGridLayout = WidthProvider(Responsive);
 import FlowCode, { SetFlowCodeModel } from './flowcode';
-import { IFlowCodeConfig, IFlowCodeStatements, LoadFileSource } from '../constants/flowcode_ast';
+import { DeclartionColors, IFlowCodeConfig, IFlowCodeStatements, LoadFileSource } from '../constants/flowcode_ast';
 
 class FlowCodeViewer extends Component<any, any> {
 	constructor(props: any) {
@@ -133,8 +133,9 @@ class FlowCodeViewer extends Component<any, any> {
 
 		Object.entries(statements).map((value: [string, IFlowCodeConfig]) => {
 			let [key, config] = value;
-			result.push(<TreeViewMenu active title={key} key={key} color={config.color} onDragStart={(event: any) => {
-				event.dataTransfer.setData('storm-diagram-node', JSON.stringify({ type: key, file: file }));
+			let colorKey: any = config.ast ? config.ast.kind : '';
+			result.push(<TreeViewMenu active title={key} key={key} color={DeclartionColors[colorKey] || config.color} onDragStart={(event: any) => {
+				event.dataTransfer.setData('storm-diagram-node', JSON.stringify({ type: key, file: file, color: DeclartionColors[colorKey] || config.color }));
 			}} />)
 		})
 

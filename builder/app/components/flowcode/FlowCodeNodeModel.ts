@@ -14,11 +14,12 @@ export interface FlowCodeNodeModelOptions extends BasePositionModelOptions {
 export interface FlowCodeNodeModelGenerics extends NodeModelGenerics {
 	OPTIONS: FlowCodeNodeModelOptions;
 }
+export interface FlowCodeSourceOptions { file: string, type: string }
 
 export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 	protected portsIn: FlowCodePortModel[];
 	protected portsOut: FlowCodePortModel[];
-
+	protected sourceOptions?: FlowCodeSourceOptions;
 	constructor(name: string, color: string);
 	constructor(options?: FlowCodeNodeModelOptions);
 	constructor(options: any = {}, color?: string) {
@@ -37,7 +38,12 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 		this.portsOut = [];
 		this.portsIn = [];
 	}
-
+	setSourceOptions(sourceOptions: any) {
+		this.sourceOptions = sourceOptions;
+	}
+	getSourceOptions(): FlowCodeSourceOptions | undefined {
+		return this.sourceOptions;
+	}
 	doClone(lookupTable: {}, clone: any): void {
 		clone.portsIn = [];
 		clone.portsOut = [];
@@ -82,6 +88,7 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 		const p = new FlowCodePortModel({
 			in: true,
 			name: 'In',
+			isStatic: true,
 			label: 'In',
 			alignment: PortModelAlignment.LEFT,
 			isFlow: true
@@ -95,6 +102,7 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 			in: false,
 			name: 'Out',
 			label: 'Out',
+			isStatic: true,
 			alignment: PortModelAlignment.RIGHT,
 			isFlow: true
 		});
@@ -116,7 +124,6 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 		return this.addPort(p);
 	}
 
-
 	addOutPort(label: string, kind?: ts.SyntaxKind, after = true): FlowCodePortModel {
 		const p = new FlowCodePortModel({
 			in: false,
@@ -135,6 +142,8 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 		super.deserialize(event);
 		this.options.name = event.data.name;
 		this.options.color = event.data.color;
+
+		this.sourceOptions = event.data.sourceOptions;
 		this.portsIn = _.map(event.data.portsInOrder, (id) => {
 			return this.getPortFromID(id);
 		}) as FlowCodePortModel[];
@@ -148,6 +157,7 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 			...super.serialize(),
 			name: this.options.name,
 			color: this.options.color,
+			sourceOptions: this.sourceOptions,
 			portsInOrder: _.map(this.portsIn, (port) => {
 				return port.getID();
 			}),

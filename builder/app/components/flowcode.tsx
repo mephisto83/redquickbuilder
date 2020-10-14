@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
 import createEngine, { DiagramModel, DefaultNodeModel, DefaultLinkModel, DefaultDiagramState, LinkModel } from '@projectstorm/react-diagrams';
-import { CanvasWidget } from '@projectstorm/react-canvas-core';
+import { BaseEvent, CanvasWidget } from '@projectstorm/react-canvas-core';
 import DemoCanvasWidget from './canvaswidget';
 import * as SRD from '@projectstorm/react-diagrams';
 import styled from '@emotion/styled';
@@ -15,14 +15,16 @@ import { FlowCodePortFactory } from './flowcode/FlowCodePortFactory';
 import { FlowCodeNodeFactory } from './flowcode/FlowCodeNodeFactory';
 import { FlowCodeNodeModel } from './flowcode/FlowCodeNodeModel';
 import TextInput from './textinput';
-import { FlowCodePortModel } from './flowcode/FlowCodePortModel';
+import { FlowCodeLinkHandlers, FlowCodePortModel } from './flowcode/FlowCodePortModel';
 import { Node } from '../methods/graph_types';
 import { refreshFlowModel, saveFlowModel } from '../actions/remoteActions';
+import { PortHandler, PortHandlerType } from './flowcode/PortHandler';
 
-const operations = {
+export const operations = {
     ADD_PARAMETER: '#843B62',
     START_FUNCTION: '#FFB997',
     ADD_TYPE: '#74546A',
+    ADD_CONSTRUCTOR: '#FFD046',
     ADD_ENUMERATION: '#7C7F65',
     ADD_SEQUENCE: '#59CD90',
     FOREACH_CALLBACK: '#E39774',
@@ -84,6 +86,22 @@ export default class FlowCode extends Component<any, any> {
         let diagramEngine = engine;
         diagramEngine.setModel(activeModel);
 
+
+        activeModel.registerListener({
+            eventDidFire: (event: BaseEvent) => {
+                console.log(event);
+                let temp: any = event;
+
+                if (event && event.firing && temp.isCreated) {
+                    let defaultLinkModel: DefaultLinkModel = temp.link;
+                    registerLinkListeners(defaultLinkModel);
+                }
+                return true;
+            },
+            eventWillFire: (event: BaseEvent) => {
+
+            }
+        });
 
 
         return {
@@ -165,6 +183,9 @@ export default class FlowCode extends Component<any, any> {
                                 operation: true
                             }} name={'Function Entry'} color={operations.START_FUNCTION} />
                             <TrayItemWidget model={{
+                                type: operations.ADD_CONSTRUCTOR, name: 'Add Constructor', operation: true
+                            }} name={'Add Constructor'} color={operations.ADD_CONSTRUCTOR} />
+                            <TrayItemWidget model={{
                                 type: operations.ADD_PARAMETER, name: 'Parameter', operation: true
                             }} name={'Add Parameter'} color={operations.ADD_PARAMETER} />
                             <TrayItemWidget model={{
@@ -223,10 +244,44 @@ export default class FlowCode extends Component<any, any> {
     }
 }
 
-function ConstructNodeModel(type: string, ops: { name: string, parameter: boolean, type: string, file: string }, fileSource: any): FlowCodeNodeModel {
+function registerLinkListeners(defaultLinkModel: DefaultLinkModel) {
+    if (defaultLinkModel && defaultLinkModel.registerListener)
+        defaultLinkModel.registerListener({
+            sourcePortChanged: (portEvent: BaseEvent) => {
+                let sourcePort: FlowCodePortModel = defaultLinkModel.getSourcePort() as FlowCodePortModel;
+
+                if (sourcePort) {
+                    let linkHandlers = sourcePort.getLinkHandlers();
+                    handleLinkHandlers(linkHandlers, defaultLinkModel, sourcePort);
+                }
+            },
+            targetPortChanged: (portEvent: BaseEvent) => {
+                let targetPort: FlowCodePortModel = defaultLinkModel.getTargetPort() as FlowCodePortModel;
+
+                if (targetPort) {
+                    let linkHandlers = targetPort.getLinkHandlers();
+                    handleLinkHandlers(linkHandlers, defaultLinkModel, targetPort);
+                }
+            },
+        });
+}
+
+function handleLinkHandlers(linkHandlers: FlowCodeLinkHandlers[], defaultLinkModel: DefaultLinkModel, port: FlowCodePortModel) {
+    linkHandlers.forEach((linkHandle: FlowCodeLinkHandlers) => {
+        PortHandler.Handle({
+            link: defaultLinkModel,
+            port: port,
+            node: port.getNode() as FlowCodeNodeModel,
+            type: linkHandle.type
+        });
+    });
+}
+
+function ConstructNodeModel(type: string, ops: { color?: string, name: string, parameter: boolean, type: string, file: string }, fileSource: any): FlowCodeNodeModel {
     let description: IFlowCodeConfig = FlowCodeStatements[type];
     if (ops && ops.file && fileSource) {
         description = fileSource[ops.file][ops.type]
+        description.color = ops.color || '' || description.color;
     }
     let node = new FlowCodeNodeModel(ops.name || type, !description ? ops.type : description.color);
 
@@ -237,7 +292,8 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
         operations.ADD_CONSTANT,
         operations.ADD_TYPE,
         operations.VARIABLE_GET,
-        operations.ADD_PARAMETER
+        operations.ADD_PARAMETER,
+        operations.ADD_CONSTRUCTOR
     ].some(v => v === type))
         node.addFlowIn();
     if (![
@@ -260,10 +316,19 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
     }
     if (operations.ADD_PARAMETER === type) {
         let newPort = node.addInPort('variable');
+        newPort.setPortName('variable');
         newPort.prompt();
         let typePort = node.addInPort('type');
+        typePort.addLinkHandler(PortHandlerType.FunctionParameterType, node.getID())
         // typePort.select(selectTypes);
         node.addOutPort('value');
+        return node;
+    }
+    if (operations.ADD_CONSTRUCTOR === type) {
+        let newPort = node.addInPort('type');
+        newPort.addLinkHandler(PortHandlerType.Constructor, node.getID())
+        newPort.setStatic();
+
         return node;
     }
     if (operations.ADD_SEQUENCE === type) {
@@ -345,6 +410,7 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
 
     if (description.ast) {
         let { ast } = description;
+        node.setSourceOptions({ file: ops.file, type: ops.type })
         if (ast) {
             switch (ast.kind) {
                 case ts.SyntaxKind.FunctionDeclaration:
@@ -398,6 +464,7 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
                 case ts.SyntaxKind.InterfaceDeclaration:
                 case ts.SyntaxKind.ClassDeclaration:
                     let classDec = ast as ts.ClassDeclaration;
+                    let classTemp: any = classDec;
                     classDec.members.forEach((member: ts.ClassElement) => {
                         let temp: any = member;
                         let newPort: any = null;
@@ -405,14 +472,18 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
                             case ts.SyntaxKind.PropertyDeclaration:
                             case ts.SyntaxKind.Constructor:
                             case ts.SyntaxKind.MethodDeclaration:
-                                if (temp.name && temp.type) {
-                                    newPort = node.addOutPort(temp.name.escapedText, member.kind);
-                                    newPort.portType = temp.type.escapedText;
-                                    newPort.member = member;
-                                }
+                            case ts.SyntaxKind.PropertySignature:
+                                // Don't should any thing yet.
+                                // if (temp.name && temp.type) {
+                                //     newPort = node.addOutPort(temp.name.escapedText, member.kind);
+                                //     newPort.portType = temp.type.escapedText;
+                                //     newPort.member = member;
+                                // }
                                 break;
                         }
                     });
+
+                    node.addOutPort(classTemp.name ? classTemp.name.escapedText : '', ast.kind);
                     break;
                 case ts.SyntaxKind.VariableDeclaration:
                     let newPort = node.addInPort('variable');

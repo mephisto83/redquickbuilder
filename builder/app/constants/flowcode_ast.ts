@@ -5,6 +5,7 @@ import { getGenericDirectory } from '../actions/remoteActions';
 import { fs_readFileSync } from '../generators/modelgenerators';
 import MemoryCompilerHost from './ast/compiler/MemoryCompilerHost';
 import { NEW_LINE } from './nodetypes';
+import { PortHandler } from '../components/flowcode/PortHandler';
 
 
 export interface IFlowCodeConfig {
@@ -12,6 +13,7 @@ export interface IFlowCodeConfig {
     color: string;
     template: string;
     ast?: ts.Node | null;
+    filePath?: string;
     isParameter?: boolean;
 }
 export interface IFlowCodeStatements {
@@ -21,8 +23,12 @@ export interface IFlowCodeFile {
     [file: string]: IFlowCodeStatements
 }
 export const FlowCodeNameSpaces: IFlowCodeFile = {
-
 }
+export const DeclartionColors = {
+    [ts.SyntaxKind.ClassDeclaration]: '#241e4e',
+    [ts.SyntaxKind.InterfaceDeclaration]: '#eadaa2'
+}
+
 export const FlowCodeStatements: IFlowCodeStatements = {
     Assignment: {
         color: '#DD4B39',
@@ -127,26 +133,35 @@ export async function LoadFileSource(): Promise<IFlowCodeFile> {
             let files = fs.readdirSync(folder)
             files.forEach((file: string) => {
                 if (file.endsWith('.d.ts')) {
+                    PortHandler.storeFlowLibrary(file, path.join(folder, file));
                     let fileContent = fs.readFileSync(path.join(folder, file), 'utf8');
-                    fileSpace[file] = buildFunctionsFromString(fileContent, file);
+                    fileSpace[path.join(folder, file)] = buildFunctionsFromString(fileContent, path.join(folder, file));
                 }
             })
         }
         return fileSpace;
     })
 }
-export function buildFunctionsFromString(fileContents: string, fileName: string = 'x.ts'): IFlowCodeStatements {
-    let res = ts.createSourceFile(fileName, fileContents, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+export function buildFunctionsFromString(fileContents: string, filePath: string = 'x.ts', noCapture?: boolean): IFlowCodeStatements {
+    let res = ts.createSourceFile('x.ts', fileContents, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
 
     let flowCodeFile: IFlowCodeStatements = {};
-    res.statements.forEach((statement: ts.Statement) => {
+    res.statements.filter((statement: ts.Statement) => {
+        switch (statement.kind) {
+            case ts.SyntaxKind.ImportDeclaration:
+                return false;
+            default:
+                return true;
+        }
+    }).forEach((statement: ts.Statement) => {
         let text = statement.getFullText();
         let fcConfig: IFlowCodeConfig = {
             template: text,
             color: '#f1038f'
         };
 
-        let ast: any = captureContents(fcConfig);
+        let ast: any = captureContents(fcConfig, noCapture);
+        fcConfig.filePath = filePath;
         fcConfig.ast = ast;
         flowCodeFile[ast && ast.name && ast.name.escapedText ? ast.name.escapedText : text] = fcConfig;
     });
@@ -221,7 +236,7 @@ function captureModules(node: ts.Node): ts.Node[] {
 
     return result;
 }
-function captureContents(config: IFlowCodeConfig): ts.Node | null | undefined {
+function captureContents(config: IFlowCodeConfig, noCapture?: boolean): ts.Node | null | undefined {
     let result: ts.Node | null = null;
 
 
@@ -234,14 +249,15 @@ function captureContents(config: IFlowCodeConfig): ts.Node | null | undefined {
             function visit(node: ts.Node): ts.Node | undefined {
                 switch (node.kind) {
                     case ts.SyntaxKind.FunctionDeclaration:
-                        let func = node as ts.FunctionDeclaration;
-                        result = stripConvertParent(func);
-                        return;
                     case ts.SyntaxKind.ClassDeclaration:
                     case ts.SyntaxKind.InterfaceDeclaration:
                     case ts.SyntaxKind.VariableDeclaration:
-                        let vdl = node as ts.VariableDeclaration;
-                        result = stripConvertParent(vdl);
+                        if (noCapture) {
+                            result = node;
+                        }
+                        else {
+                            result = stripConvertParent(node);
+                        }
                         return;
                 }
 
