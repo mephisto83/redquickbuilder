@@ -19,20 +19,8 @@ import { FlowCodeLinkHandlers, FlowCodePortModel } from './flowcode/FlowCodePort
 import { Node } from '../methods/graph_types';
 import { refreshFlowModel, saveFlowModel } from '../actions/remoteActions';
 import { PortHandler, PortHandlerType } from './flowcode/PortHandler';
+import { Operations, PortStructures } from './flowcode/flowutils';
 
-export const operations = {
-    ADD_PARAMETER: '#843B62',
-    START_FUNCTION: '#FFB997',
-    ADD_TYPE: '#74546A',
-    ADD_CONSTRUCTOR: '#FFD046',
-    ADD_ENUMERATION: '#7C7F65',
-    ADD_SEQUENCE: '#59CD90',
-    FOREACH_CALLBACK: '#E39774',
-    MAP_CALLBACK: '#E39774',
-    VARIABLE_GET: '#F34213',
-    ADD_CONSTANT: '#D05353',
-    ADD_IF: '#1B9AAA'
-};
 export const SBody = styled.div`
 flex-grow: 1;
 display: flex;
@@ -95,6 +83,8 @@ export default class FlowCode extends Component<any, any> {
                 if (event && event.firing && temp.isCreated) {
                     let defaultLinkModel: DefaultLinkModel = temp.link;
                     registerLinkListeners(defaultLinkModel);
+                    registerNodeListeners(temp.node);
+                    this.forceUpdate();
                 }
                 return true;
             },
@@ -178,40 +168,40 @@ export default class FlowCode extends Component<any, any> {
                         </div>
                         <TrayWidget>
                             <TrayItemWidget model={{
-                                type: operations.START_FUNCTION,
+                                type: Operations.START_FUNCTION,
                                 name: 'Function Entry',
                                 operation: true
-                            }} name={'Function Entry'} color={operations.START_FUNCTION} />
+                            }} name={'Function Entry'} color={Operations.START_FUNCTION} />
                             <TrayItemWidget model={{
-                                type: operations.ADD_CONSTRUCTOR, name: 'Add Constructor', operation: true
-                            }} name={'Add Constructor'} color={operations.ADD_CONSTRUCTOR} />
+                                type: Operations.ADD_CONSTRUCTOR, name: 'Add Constructor', operation: true
+                            }} name={'Add Constructor'} color={Operations.ADD_CONSTRUCTOR} />
                             <TrayItemWidget model={{
-                                type: operations.ADD_PARAMETER, name: 'Parameter', operation: true
-                            }} name={'Add Parameter'} color={operations.ADD_PARAMETER} />
+                                type: Operations.ADD_PARAMETER, name: 'Parameter', operation: true
+                            }} name={'Add Parameter'} color={Operations.ADD_PARAMETER} />
                             <TrayItemWidget model={{
-                                type: operations.VARIABLE_GET, name: 'Variable', operation: true
-                            }} name={'Variable'} color={operations.VARIABLE_GET} />
+                                type: Operations.VARIABLE_GET, name: 'Variable', operation: true
+                            }} name={'Variable'} color={Operations.VARIABLE_GET} />
                             <TrayItemWidget model={{
-                                type: operations.ADD_CONSTANT, name: 'Constant', operation: true
-                            }} name={'Constant'} color={operations.ADD_CONSTANT} />
+                                type: Operations.ADD_CONSTANT, name: 'Constant', operation: true
+                            }} name={'Constant'} color={Operations.ADD_CONSTANT} />
                             <TrayItemWidget model={{
-                                type: operations.ADD_TYPE, name: 'Type', operation: true
-                            }} name={'Add Type'} color={operations.ADD_TYPE} />
+                                type: Operations.ADD_TYPE, name: 'Type', operation: true
+                            }} name={'Add Type'} color={Operations.ADD_TYPE} />
                             <TrayItemWidget model={{
-                                type: operations.FOREACH_CALLBACK, name: 'ForEach', operation: true
-                            }} name={'ForEach'} color={operations.FOREACH_CALLBACK} />
+                                type: Operations.FOREACH_CALLBACK, name: 'ForEach', operation: true
+                            }} name={'ForEach'} color={Operations.FOREACH_CALLBACK} />
                             <TrayItemWidget model={{
-                                type: operations.MAP_CALLBACK, name: 'Map', operation: true
-                            }} name={'Map'} color={operations.MAP_CALLBACK} />
+                                type: Operations.MAP_CALLBACK, name: 'Map', operation: true
+                            }} name={'Map'} color={Operations.MAP_CALLBACK} />
                             <TrayItemWidget model={{
-                                type: operations.ADD_ENUMERATION, name: 'Add Enumeration', operation: true
-                            }} name={'Add Enumeration'} color={operations.ADD_ENUMERATION} />
+                                type: Operations.ADD_ENUMERATION, name: 'Add Enumeration', operation: true
+                            }} name={'Add Enumeration'} color={Operations.ADD_ENUMERATION} />
                             <TrayItemWidget model={{
-                                type: operations.ADD_SEQUENCE, name: 'Add Sequence', operation: true
-                            }} name={'Add Sequence'} color={operations.ADD_SEQUENCE} />
+                                type: Operations.ADD_SEQUENCE, name: 'Add Sequence', operation: true
+                            }} name={'Add Sequence'} color={Operations.ADD_SEQUENCE} />
                             <TrayItemWidget model={{
-                                type: operations.ADD_IF, name: 'Add If', operation: true
-                            }} name={'Add If'} color={operations.ADD_IF} />
+                                type: Operations.ADD_IF, name: 'Add If', operation: true
+                            }} name={'Add If'} color={Operations.ADD_IF} />
                             {this.getItemWidgets()}
                         </TrayWidget>
                     </div>
@@ -243,7 +233,23 @@ export default class FlowCode extends Component<any, any> {
         );
     }
 }
-
+function registerNodeListeners(node: FlowCodeNodeModel) {
+    if (node && node.registerListener) {
+        node.registerListener({
+            removing: (evt: BaseEvent) => {
+                console.log(evt);
+                let { targetPort, sourcePort } = evt as any;
+                if (targetPort) {
+                    let linkHandlers = sourcePort.getLinkHandlers();
+                    handleLinkHandlers(linkHandlers, null, sourcePort, targetPort, 'source');
+                    linkHandlers = targetPort.getLinkHandlers();
+                    handleLinkHandlers(linkHandlers, null, sourcePort, targetPort, 'target');
+                }
+                return true;
+            }
+        });
+    }
+}
 function registerLinkListeners(defaultLinkModel: DefaultLinkModel) {
     if (defaultLinkModel && defaultLinkModel.registerListener)
         defaultLinkModel.registerListener({
@@ -252,7 +258,7 @@ function registerLinkListeners(defaultLinkModel: DefaultLinkModel) {
 
                 if (sourcePort) {
                     let linkHandlers = sourcePort.getLinkHandlers();
-                    handleLinkHandlers(linkHandlers, defaultLinkModel, sourcePort);
+                    handleLinkHandlers(linkHandlers, defaultLinkModel, sourcePort, defaultLinkModel.getTargetPort() as FlowCodePortModel, 'source');
                 }
             },
             targetPortChanged: (portEvent: BaseEvent) => {
@@ -260,135 +266,127 @@ function registerLinkListeners(defaultLinkModel: DefaultLinkModel) {
 
                 if (targetPort) {
                     let linkHandlers = targetPort.getLinkHandlers();
-                    handleLinkHandlers(linkHandlers, defaultLinkModel, targetPort);
+                    handleLinkHandlers(linkHandlers, defaultLinkModel, defaultLinkModel.getSourcePort() as FlowCodePortModel, targetPort, 'target');
                 }
             },
         });
 }
 
-function handleLinkHandlers(linkHandlers: FlowCodeLinkHandlers[], defaultLinkModel: DefaultLinkModel, port: FlowCodePortModel) {
+function handleLinkHandlers(linkHandlers: FlowCodeLinkHandlers[], defaultLinkModel: DefaultLinkModel | null, sourcePort: FlowCodePortModel, targetPort: FlowCodePortModel, interestPort: 'source' | 'target') {
     linkHandlers.forEach((linkHandle: FlowCodeLinkHandlers) => {
         PortHandler.Handle({
             link: defaultLinkModel,
-            port: port,
-            node: port.getNode() as FlowCodeNodeModel,
+            sourcePort,
+            targetPort,
+            interestPort: interestPort,
+            node: sourcePort.getNode() as FlowCodeNodeModel,
             type: linkHandle.type
         });
     });
 }
 
-function ConstructNodeModel(type: string, ops: { color?: string, name: string, parameter: boolean, type: string, file: string }, fileSource: any): FlowCodeNodeModel {
+function ConstructNodeModel(type: string, ops: { operation?: boolean, color?: string, name: string, parameter: boolean, type: string, file: string }, fileSource: any): FlowCodeNodeModel {
     let description: IFlowCodeConfig = FlowCodeStatements[type];
     if (ops && ops.file && fileSource) {
         description = fileSource[ops.file][ops.type]
         description.color = ops.color || '' || description.color;
     }
     let node = new FlowCodeNodeModel(ops.name || type, !description ? ops.type : description.color);
-
-    if (![
-        operations.START_FUNCTION,
-        operations.FOREACH_CALLBACK,
-        operations.MAP_CALLBACK,
-        operations.ADD_CONSTANT,
-        operations.ADD_TYPE,
-        operations.VARIABLE_GET,
-        operations.ADD_PARAMETER,
-        operations.ADD_CONSTRUCTOR
-    ].some(v => v === type))
-        node.addFlowIn();
-    if (![
-        operations.ADD_TYPE,
-        operations.FOREACH_CALLBACK,
-        operations.MAP_CALLBACK,
-        operations.ADD_CONSTANT,
-        operations.ADD_PARAMETER,
-        operations.VARIABLE_GET,
-        operations.ADD_SEQUENCE
-    ].some(v => v === type))
-        node.addFlowOut();
-    let selectTypes = () => {
-        return Object.entries(ts.TypeFlags).map((v: any[]) => {
-            return {
-                title: v[0],
-                value: v[0]
-            }
-        }).filter(v => isNaN(v.title));
+    if (ops.operation || FlowCodeStatements[type]) {
+        node.isOperation(ops.operation || !!FlowCodeStatements[type]);
     }
-    if (operations.ADD_PARAMETER === type) {
+    if (![
+        Operations.START_FUNCTION,
+        Operations.FOREACH_CALLBACK,
+        Operations.MAP_CALLBACK,
+        Operations.ADD_CONSTANT,
+        Operations.ADD_TYPE,
+        Operations.VARIABLE_GET,
+        Operations.ADD_PARAMETER,
+        Operations.ADD_CONSTRUCTOR
+    ].some(v => v === type)) {
+        node.addFlowIn();
+    }
+    if (![
+        Operations.ADD_TYPE,
+        Operations.FOREACH_CALLBACK,
+        Operations.MAP_CALLBACK,
+        Operations.ADD_CONSTANT,
+        Operations.ADD_PARAMETER,
+        Operations.VARIABLE_GET,
+        Operations.ADD_SEQUENCE
+    ].some(v => v === type)) {
+        node.addFlowOut();
+    }
+
+    if (Operations.ADD_PARAMETER === type) {
         let newPort = node.addInPort('variable');
         newPort.setPortName('variable');
         newPort.prompt();
         let typePort = node.addInPort('type');
-        typePort.addLinkHandler(PortHandlerType.FunctionParameterType, node.getID())
-        // typePort.select(selectTypes);
+        typePort.addLinkHandler(PortHandlerType.FunctionParameterType, node.getID());
         node.addOutPort('value');
         return node;
     }
-    if (operations.ADD_CONSTRUCTOR === type) {
+    if (Operations.ADD_CONSTRUCTOR === type) {
         let newPort = node.addInPort('type');
+        newPort.setPortName(PortStructures.Generic.Type);
         newPort.addLinkHandler(PortHandlerType.Constructor, node.getID())
         newPort.setStatic();
 
         return node;
     }
-    if (operations.ADD_SEQUENCE === type) {
+    if (Operations.ADD_SEQUENCE === type) {
         node.enableInPortAdd();
         return node;
     }
-    if (operations.ADD_CONSTANT === type) {
+    if (Operations.ADD_CONSTANT === type) {
         let newPort = node.addOutPort('constant');
         newPort.prompt();
         return node;
     }
-    if (operations.VARIABLE_GET === type) {
-        let typePort = node.addInPort('type');
-        // typePort.select(selectTypes);
+    if (Operations.VARIABLE_GET === type) {
+        node.addInPort('type');
         let newPort = node.addOutPort('variable');
         newPort.prompt();
         return node;
     }
 
-    if (operations.ADD_IF === type) {
+    if (Operations.ADD_IF === type) {
         node.addInPort('conditional');
         node.addOutPort('then');
         node.addOutPort('else');
         return node;
     }
 
-    if (operations.ADD_TYPE === type) {
-        let typePort = node.addOutPort('modelType');
-        // typePort.select(modelsSelect);
+    if (Operations.ADD_TYPE === type) {
+        node.addOutPort('modelType');
         return node;
     }
-    if (operations.START_FUNCTION === type) {
+    if (Operations.START_FUNCTION === type) {
         return node;
     }
-    if (operations.ADD_ENUMERATION === type) {
-        let newPort = node.addInPort('enumeration');
-        // newPort.select(enumerationSelect);
-
-        let newPort2 = node.addInPort('enumerationValue');
-        // newPort2.select(function () { return enumerationValueSelect(newPort) });
+    if (Operations.ADD_ENUMERATION === type) {
+        node.addInPort('enumeration');
+        node.addInPort('enumerationValue');
         node.addOutPort('value');
         return node;
     }
-    if (operations.FOREACH_CALLBACK === type) {
+    if (Operations.FOREACH_CALLBACK === type) {
         node.addInPort('in');
         node.addOutPort('forEachFunc');
         node.addOutPort('sequence');
         node.addOutPort('value');
-        let typePort = node.addInPort('valueType');
-        // typePort.select(modelsSelect);
+        node.addInPort('valueType');
         node.addOutPort('index');
         return node;
     }
-    if (operations.MAP_CALLBACK === type) {
+    if (Operations.MAP_CALLBACK === type) {
         node.addInPort('in');
         node.addOutPort('mapFunc');
         node.addOutPort('sequence');
         node.addOutPort('value');
-        let typePort = node.addInPort('valueType');
-        // typePort.select(modelsSelect);
+        node.addInPort('valueType');
         node.addInPort('outputType');
         node.addOutPort('index');
         return node;
@@ -397,7 +395,8 @@ function ConstructNodeModel(type: string, ops: { color?: string, name: string, p
         let newPort = node.addInPort('variable');
         newPort.prompt();
         let typePort = node.addInPort('type');
-        // typePort.select(selectTypes)
+        typePort.addLinkHandler(PortHandlerType.FunctionParameterType, node.getID());
+        typePort.setPortName(PortStructures.Generic.Type);
         return node;
     }
 
@@ -489,8 +488,11 @@ function ConstructNodeModel(type: string, ops: { color?: string, name: string, p
                     let newPort = node.addInPort('variable');
                     newPort.prompt();
                     let typePort = node.addInPort('type');
-                    typePort.select(selectTypes)
-                    node.addInPort('expression');
+                    typePort.setPortName(PortStructures.Generic.Type);
+                    typePort.addLinkHandler(PortHandlerType.FunctionParameterType, node.getID());
+                    let expressionPort = node.addInPort('expression');
+                    expressionPort.setPortName(PortStructures.Generic.Expression);
+                    expressionPort.addLinkHandler(PortHandlerType.FunctionParameterExpressionType, node.getID());
                     break;
 
             }

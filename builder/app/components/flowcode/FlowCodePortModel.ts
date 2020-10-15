@@ -114,7 +114,7 @@ export class FlowCodePortModel extends PortModel<FlowCodePortModelGenerics> {
 		// }
 		let node = this.getNode() as FlowCodeNodeModel;
 		this.linkHandlers.forEach((handler: FlowCodeLinkHandlers) => {
-			PortHandler.Handle({ type: handler.type, link, port: port as FlowCodePortModel, node });
+			PortHandler.Handle({ type: handler.type, link, targetPort: port as FlowCodePortModel, sourcePort: this, node });
 		})
 		return link as T;
 	}
