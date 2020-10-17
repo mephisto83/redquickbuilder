@@ -163,7 +163,7 @@ import { Graph, Node } from '../methods/graph_types';
 import DashboardScreenNavigation from '../nodepacks/DashboardScreenNavigation';
 import CheckBoxProperty from './checkboxproperty';
 import AddShouldShowDataChain from '../nodepacks/screens/menus/AddShouldShowDataChain';
-import { startSequence, runSequence, viewFlowCode } from '../actions/remoteActions';
+import { startSequence, runSequence, viewFlowCode, populateGraphPackage, graphWindowCommand, BuildReport } from '../actions/remoteActions';
 
 const { clipboard } = require('electron');
 
@@ -2135,6 +2135,15 @@ class Dashboard extends Component<any, any> {
 											});
 										}}
 									/>
+									<TreeViewMenu hideArrow title={'Graph View'} icon="fa fa-outdent" onClick={() => {
+										populateGraphPackage(currentNode.id, {
+											level1: LinkType.PropertyLink,
+											level2: [LinkType.AttributeLink, LinkType.Enumeration],
+										}).then(graphWindowCommand);
+									}} />
+									<TreeViewMenu hideArrow title={'Build Report'} icon="fa fa-outdent" onClick={() => {
+										BuildReport()
+									}} />
 									<TreeViewMenu
 										hideArrow
 										title={'All Model Sequence'}
@@ -2286,10 +2295,20 @@ class Dashboard extends Component<any, any> {
 									{rootGraph ? (
 										<TreeViewMenu
 											hideArrow
-											title={Titles.SetWorkingDirectory}
+											title={workspace || Titles.SetWorkingDirectory}
 											icon="fa fa-folder-open"
 											onClick={() => {
 												this.props.setWorkingDirectory();
+											}}
+										/>
+									) : null}
+									{rootGraph ? (
+										<TreeViewMenu
+											hideArrow
+											title={rootGraph.reportDirectory || Titles.SetReportDirectory}
+											icon="fa fa-folder-open"
+											onClick={() => {
+												this.props.setReportDirectory();
 											}}
 										/>
 									) : null}

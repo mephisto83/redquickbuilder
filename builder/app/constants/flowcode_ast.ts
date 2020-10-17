@@ -1,8 +1,11 @@
 import fs from 'fs';
 import * as ts from 'typescript';
+import path from 'path';
+import { getGenericDirectory } from '../actions/remoteActions';
 import { fs_readFileSync } from '../generators/modelgenerators';
 import MemoryCompilerHost from './ast/compiler/MemoryCompilerHost';
 import { NEW_LINE } from './nodetypes';
+import { PortHandler } from '../components/flowcode/PortHandler';
 
 
 export interface IFlowCodeConfig {
@@ -10,11 +13,22 @@ export interface IFlowCodeConfig {
     color: string;
     template: string;
     ast?: ts.Node | null;
+    filePath?: string;
     isParameter?: boolean;
 }
 export interface IFlowCodeStatements {
     [str: string]: IFlowCodeConfig
 }
+export interface IFlowCodeFile {
+    [file: string]: IFlowCodeStatements
+}
+export const FlowCodeNameSpaces: IFlowCodeFile = {
+}
+export const DeclartionColors = {
+    [ts.SyntaxKind.ClassDeclaration]: '#241e4e',
+    [ts.SyntaxKind.InterfaceDeclaration]: '#eadaa2'
+}
+
 export const FlowCodeStatements: IFlowCodeStatements = {
     Assignment: {
         color: '#DD4B39',
@@ -107,23 +121,53 @@ function stripConvertParent(item: any): any {
     return result;
 }
 export function buildFunctions() {
-    let fileContents = fs_readFileSync('./app/templates/reactweb/v1/src/actions/uiactions.d.ts', 'utf8') as string;
+    // let fileContents = fs_readFileSync('./app/templates/reactweb/v1/src/actions/uiactions.d.ts', 'utf8') as string;
 
+    // buildFunctionsFromString(fileContents);
+}
+export async function LoadFileSource(): Promise<IFlowCodeFile> {
+    let fileSpace: IFlowCodeFile = {}
+    return getGenericDirectory().then((folder: string | undefined) => {
+        if (folder) {
+            console.log(folder);
+            let files = fs.readdirSync(folder)
+            files.forEach((file: string) => {
+                if (file.endsWith('.d.ts')) {
+                    PortHandler.storeFlowLibrary(file, path.join(folder, file));
+                    let fileContent = fs.readFileSync(path.join(folder, file), 'utf8');
+                    fileSpace[path.join(folder, file)] = buildFunctionsFromString(fileContent, path.join(folder, file));
+                }
+            })
+        }
+        return fileSpace;
+    })
+}
+export function buildFunctionsFromString(fileContents: string, filePath: string = 'x.ts', noCapture?: boolean): IFlowCodeStatements {
     let res = ts.createSourceFile('x.ts', fileContents, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
 
-
-    res.statements.forEach((statement: ts.Statement) => {
+    let flowCodeFile: IFlowCodeStatements = {};
+    res.statements.filter((statement: ts.Statement) => {
+        switch (statement.kind) {
+            case ts.SyntaxKind.ImportDeclaration:
+                return false;
+            default:
+                return true;
+        }
+    }).forEach((statement: ts.Statement) => {
         let text = statement.getFullText();
         let fcConfig: IFlowCodeConfig = {
             template: text,
             color: '#f1038f'
         };
 
-        let ast: any = captureContents(fcConfig);
+        let ast: any = captureContents(fcConfig, noCapture);
+        fcConfig.filePath = filePath;
         fcConfig.ast = ast;
-        FlowCodeStatements[ast && ast.name && ast.name.escapedText ? ast.name.escapedText : text] = fcConfig;
-    })
+        flowCodeFile[ast && ast.name && ast.name.escapedText ? ast.name.escapedText : text] = fcConfig;
+    });
+    return flowCodeFile
 }
+
 export function buildRules() {
     let fileContents = fs.readFileSync('D:\\dev\\redquickbuilder\\builder\\node_modules\\typescript\\lib\\typescript.d.ts', 'utf-8');
 
@@ -159,6 +203,15 @@ export function buildRules() {
                             }
                         }
                     }
+                    else if (statement.kind === ts.SyntaxKind.ClassDeclaration) {
+                        let typeAliasDec = statement as ts.ClassDeclaration;
+                        if (typeAliasDec.kind === ts.SyntaxKind.ClassDeclaration) {
+                            let unionType = typeAliasDec as unknown as ts.ClassDeclaration;
+                            if (unionType) {
+                                // aliasTypeMembers[typeAliasDec.name.escapedText.toString()] = unionType.types;
+                            }
+                        }
+                    }
                 })
             }
         }
@@ -183,7 +236,7 @@ function captureModules(node: ts.Node): ts.Node[] {
 
     return result;
 }
-function captureContents(config: IFlowCodeConfig): ts.Node | null | undefined {
+function captureContents(config: IFlowCodeConfig, noCapture?: boolean): ts.Node | null | undefined {
     let result: ts.Node | null = null;
 
 
@@ -196,12 +249,15 @@ function captureContents(config: IFlowCodeConfig): ts.Node | null | undefined {
             function visit(node: ts.Node): ts.Node | undefined {
                 switch (node.kind) {
                     case ts.SyntaxKind.FunctionDeclaration:
-                        let func = node as ts.FunctionDeclaration;
-                        result = stripConvertParent(func);
-                        return;
+                    case ts.SyntaxKind.ClassDeclaration:
+                    case ts.SyntaxKind.InterfaceDeclaration:
                     case ts.SyntaxKind.VariableDeclaration:
-                        let vdl = node as ts.VariableDeclaration;
-                        result = stripConvertParent(vdl);
+                        if (noCapture) {
+                            result = node;
+                        }
+                        else {
+                            result = stripConvertParent(node);
+                        }
                         return;
                 }
 

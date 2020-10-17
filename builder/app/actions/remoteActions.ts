@@ -36,7 +36,7 @@ import {
 	GetState,
 	pinConnectedNodesByLinkType,
 	GetNodeProp,
-	GetNodeById, GetModelCodeProperties
+	GetNodeById, GetModelCodeProperties, getConnectedNodesByLinkType, GetCodeName, GetNodeTitle
 } from './uiactions';
 import { processRecording } from '../utils/utilservice';
 import prune from '../methods/prune';
@@ -47,7 +47,7 @@ import fs from 'fs';
 import JobService, { ensureDirectory, JobServiceConstants, ensureDirectorySync } from '../jobs/jobservice';
 import StoreGraph, { LoadGraph } from '../methods/storeGraph';
 import { Graph, GraphLink, Node, QuickAccess } from '../methods/graph_types';
-import { NodeProperties, LinkType, LinkPropertyKeys, NodeTypes } from '../constants/nodetypes';
+import { NodeProperties, LinkType, LinkPropertyKeys, NodeTypes, NEW_LINE } from '../constants/nodetypes';
 import { Link } from 'react-router-dom';
 import { IfFalse } from '../components/titles';
 import { platform } from 'os';
@@ -276,7 +276,7 @@ export async function takeDashboardShot(folder: any, name?: string, getNodes?: a
 					fs.writeFileSync(path.join(folder, name || 'image.jpeg'), img.toPNG(), 'base64');
 				});
 			let nodese = getNodes ? getNodes() : null;
-			await wait(5000);
+			await wait(2000);
 			if (nodese) {
 				let projectJson: any = {};
 				let temppath = path.join(folder, 'project.json');
@@ -286,8 +286,10 @@ export async function takeDashboardShot(folder: any, name?: string, getNodes?: a
 				if (name) {
 					projectJson[name] = nodese.map((v: any) => {
 						let info = GetNodeInformationForReport(v);
+						let svgs: any = document.querySelector(`.content-wrapper svg div[data-id="${v.id}"]`);
+						let bounds = svgs ? svgs.getBoundingClientRect() : null;
 						return {
-							bounds: v.bounds,
+							bounds: v.bounds || (bounds ? { x: bounds.left, X: bounds.right, y: bounds.top, Y: bounds.bottom } : null),
 							properties: v.properties,
 							color: NodeTypeColors[v.properties.nodeType],
 							id: v.id,
@@ -371,7 +373,7 @@ export async function startSequence(
 	const maxi = 3;
 	let maxattempts = maxi;
 	do {
-		setVisual('LINK_DISTANCE', 125)(GetDispatchFunc(), GetStateFunc());
+		setVisual('LINK_DISTANCE', 300)(GetDispatchFunc(), GetStateFunc());
 		clearPinned();
 		setPinned(modelId, true);
 		await populate(modelId, ops);
@@ -404,9 +406,9 @@ export function doesItFit(bounds: { xmax: number; xmin: number; ymin: number; ym
 				} else {
 					let centerY = (bounds.ymax - bounds.ymin) / 2;
 					let centerX = (bounds.xmax - bounds.xmin) / 2;
-					if (false && centerMindMap) {
-						centerMindMap({ x: -centerX, y: -centerY });
-						return true;
+					let scale = Math.max((bounds.xmax - bounds.xmin) / (bbox.right - bbox.left), (bounds.ymax - bounds.ymin) / (bbox.bottom - bbox.top));
+					if (centerMindMap) {
+						centerMindMap({ x: -centerX, y: -centerY, scale });
 					}
 				}
 			}
@@ -414,6 +416,7 @@ export function doesItFit(bounds: { xmax: number; xmin: number; ymin: number; ym
 	}
 	return false;
 }
+
 export async function populate(
 	modelId: string,
 	ops: { exclusiveLinkTypes: string[]; level1?: string; level2?: string[] }
@@ -448,7 +451,7 @@ export async function populate(
 				GetStateFunc()
 			);
 			pinned.push(...added);
-			await wait(4500);
+			await wait(100);
 			added = await nextLevel(
 				link,
 				added,
@@ -482,11 +485,107 @@ export async function populate(
 							GetStateFunc()
 						);
 						pinned.push(...added);
-						if (added.length) await wait(4500);
+						if (added.length) await wait(1000);
 					}
 				});
 		}
 		return added;
+	}
+}
+export async function BuildReport() {
+	let graph = GetCurrentGraph();
+	let root = graph;
+	const workspace = root.workspaces ? root.workspaces[platform()] || root.workspace : root.workspace;
+	let folder = path.join(workspace, graph.title, 'mindmaps');
+
+	if (root.reportDirectory && fs.existsSync(root.reportDirectory)) {
+		folder = root.reportDirectory;
+	}
+	let nodes = NodesByType(graph, [NodeTypes.Enumeration, NodeTypes.Model, NodeTypes.AgentAccessDescription]);
+	let fileNameList: any[] = [];
+	await nodes.forEachAsync(async (currentNode: Node) => {
+		let nodeType = GetNodeProp(currentNode, NodeProperties.NODEType);
+		let setup: any = null;
+		switch (nodeType) {
+			case NodeTypes.Model:
+				setup = {
+					level1: LinkType.PropertyLink,
+					level2: [LinkType.AttributeLink, LinkType.Enumeration],
+				};
+				break;
+			case NodeTypes.Enumeration:
+				setup = {
+					level1: [LinkType.Enumeration, LinkType.GeneralLink],
+					level2: [LinkType.PropertyLink, LinkType.ModelTypeLink],
+				};
+				break;
+			case NodeTypes.AgentAccessDescription:
+				setup = {
+					level1: [LinkType.ModelAccess, LinkType.AgentAccess, LinkType.GeneralLink],
+					level2: [LinkType.PropertyLink, LinkType.ModelTypeLink],
+				};
+				break;
+
+		}
+
+		if (setup) {
+			let reportPackage = await populateGraphPackage(currentNode.id, setup);
+			await ensureDirectory(path.join(folder, 'public', 'img'));
+			let temppath = path.join(folder, 'public', 'img', `${nodeType}--${GetCodeName(currentNode)}.json`);
+			fileNameList.push({ nodeType, name: GetNodeTitle(currentNode), url: `${nodeType}--${GetCodeName(currentNode)}.json` });
+			fs.writeFileSync(temppath, `${JSON.stringify(reportPackage)}`, 'utf8');
+		}
+	})
+	await ensureDirectory(path.join(folder, 'src'));
+	let temppath = path.join(folder, 'src', 'project.ts');
+	fs.writeFileSync(temppath, `export default ${JSON.stringify(fileNameList)}; `, 'utf8');
+}
+
+export async function populateGraphPackage(
+	modelId: string,
+	ops: { level1?: string; level2?: string[] }
+) {
+	let links: GraphLink[] = [];
+	let graph = GetCurrentGraph();
+	let nodes: Node[] = [GetNodeById(modelId)];
+	let level1 = Array.isArray(ops.level1) ? ops.level1 : [ops.level1 || ''];
+	let level2 = Array.isArray(ops.level2) ? ops.level2 : [ops.level2 || ''];
+	nodes.map(v => v).forEach((node: Node) => {
+		let forLevelTwo: Node[] = [];
+		level1.filter(v => v).forEach((lvl) => {
+			let temp = GetNodesLinkedTo(graph, {
+				id: node.id,
+				link: lvl
+			})
+			temp.forEach((tnode: Node) => {
+				let tlink = GetLinkBetween(node.id, tnode.id, graph) || GetLinkBetween(tnode.id, node.id, graph);
+				if (tlink) {
+					links.push(tlink);
+				}
+			})
+			forLevelTwo.push(...temp);
+		});
+		forLevelTwo.forEach((node: Node) => {
+			level2.filter((v: string) => v).forEach((lvl: string) => {
+				let temp = GetNodesLinkedTo(graph, {
+					id: node.id,
+					link: lvl
+				})
+				temp.forEach((tnode: Node) => {
+					let tlink = GetLinkBetween(node.id, tnode.id, graph) || GetLinkBetween(tnode.id, node.id, graph);
+					if (tlink) {
+						links.push(tlink);
+					}
+				})
+				nodes.push(...temp);
+			})
+		});
+		nodes.push(...forLevelTwo)
+	})
+
+	return {
+		links: links.unique((v: GraphLink) => v.id),
+		nodes: nodes.unique((v: Node) => v.id)
 	}
 }
 
@@ -656,6 +755,18 @@ export function viewFlowCode(code: any) {
 		})
 	)
 }
+export function graphWindowCommand(graphWindowPackage: any) {
+	const { ipcRenderer } = require('electron');
+	ipcRenderer.send(
+		'message',
+		JSON.stringify({
+			msg: HandlerEvents.graphWindowCommand.message,
+			body: {
+				graphWindowPackage
+			}
+		})
+	)
+}
 
 export function saveFlowModel(flowModel: any) {
 	const { ipcRenderer } = require('electron');
@@ -816,7 +927,47 @@ export function saveCurrentGraph() {
 	const state = _getState();
 	saveGraph(GetRootGraph(state))(_dispatch, _getState);
 }
+export function setReportDirectory() {
+	return (dispatch: Function, getState: () => any) => {
+		let currentGraph = GetRootGraph(getState());
+		// You can obviously give a direct path without use the dialog (C:/Program Files/path/myfileexample.txt)
+		if (currentGraph) {
+			const remote = require('electron').remote;
+			const dialog = remote.dialog;
+			dialog
+				.showOpenDialog(remote.getCurrentWindow(), {
+					properties: ['openDirectory']
+				})
+				.then((opts) => {
+					let fileName = opts.filePaths.find((x) => x);
+					if (fileName === undefined) {
+						console.log("You didn't save the file");
+						return;
+					}
 
+					console.log(fileName);
+					currentGraph.reportDirectory = fileName;
+					SaveGraph(currentGraph, dispatch);
+				});
+		}
+	};
+}
+export async function getGenericDirectory(): Promise<string | undefined> {
+	const remote = require('electron').remote;
+	const dialog = remote.dialog;
+	return dialog
+		.showOpenDialog(remote.getCurrentWindow(), {
+			properties: ['openDirectory']
+		})
+		.then((opts) => {
+			let fileName = opts.filePaths.find((x) => x);
+			if (fileName === undefined) {
+				console.log("You didn't save the file");
+				return;
+			}
+			return fileName;
+		});
+}
 export function setWorkingDirectory() {
 	return (dispatch: Function, getState: () => any) => {
 		let currentGraph = GetRootGraph(getState());

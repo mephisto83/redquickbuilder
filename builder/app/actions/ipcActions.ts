@@ -49,7 +49,7 @@ import {
 	UIC,
 	setPinned,
 	handleCodeWindowMessage,
-	GetNodesByProperties, handleFlowCodeMessage
+	GetNodesByProperties, handleFlowCodeMessage, handleGraphMessage
 } from './uiactions';
 import { GraphKeys, GetNodesLinkedTo, SetFlowModel } from '../methods/graph_methods';
 import { HandlerEvents } from '../ipc/handler-events';
@@ -83,6 +83,11 @@ ipcRenderer.on(HandlerEvents.codeWindowCommand.message, (event, arg) => {
 ipcRenderer.on(HandlerEvents.flowCodeWindowCommand.message, (event, arg) => {
 	console.log(arg);
 	if (arg && arg.body) handleFlowCodeMessage(arg.body);
+})
+
+ipcRenderer.on(HandlerEvents.graphWindowCommand.message, (event, arg) => {
+	console.log(arg);
+	if (arg && arg.body) handleGraphMessage(arg.body);
 })
 
 ipcRenderer.on(HandlerEvents.remoteCommand.message, (event, arg) => {

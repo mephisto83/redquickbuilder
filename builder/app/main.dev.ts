@@ -26,6 +26,7 @@ let mainWindow: BrowserWindow | null = null;
 let objectViewerWindow: BrowserWindow | null = null;
 let codeViewWindow: BrowserWindow | null = null;
 let flowCodeWindow: BrowserWindow | null = null;
+let graphWindow: BrowserWindow | null = null;
 
 if (process.env.NODE_ENV === 'production' || true) {
 	const sourceMapSupport = require('source-map-support');
@@ -109,7 +110,14 @@ const createWindow = async () => {
 				});
 				return objectViewerWindow;
 			},
-
+			graphWindow: async function () {
+				if (graphWindow)
+					return graphWindow;
+				graphWindow = await createObjectViewerWindow(() => {
+					graphWindow = null;
+				});
+				return graphWindow;
+			},
 			flowCodeWindow: async function () {
 				if (flowCodeWindow)
 					return flowCodeWindow;
@@ -145,6 +153,9 @@ const createWindow = async () => {
 		}
 		if (flowCodeWindow) {
 			flowCodeWindow.close();
+		}
+		if (graphWindow) {
+			graphWindow?.close();
 		}
 		mainWindow = null;
 	});

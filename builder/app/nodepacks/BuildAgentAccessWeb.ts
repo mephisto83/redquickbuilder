@@ -274,21 +274,21 @@ export default function BuildAgentAccessWeb(args: any) {
 												}
 											),
 											contextualParameters,
-											function() {
+											function () {
 												return AddLinkBetweenNodes(
 													contextualNode.id,
 													effects[key].dataChain,
 													LinkProperties.ContextualParameters
 												);
 											},
-											function() {
+											function () {
 												return AddLinkBetweenNodes(
 													newnode.id,
 													agentAccessContext.entry,
 													LinkProperties.ScreenEffectApi
 												);
 											},
-											function() {
+											function () {
 												return AddLinkBetweenNodes(
 													newnode.id,
 													_ef.dataChain,
@@ -311,7 +311,28 @@ export default function BuildAgentAccessWeb(args: any) {
 			}
 		});
 	});
-
+	NodesByType(graph, NodeTypes.Enumeration).forEach((node: Node) => {
+		let enumerations = GetNodeProp(node, NodeProperties.Enumeration);
+		enumerations.forEach((enumeration: any) => {
+			let newNode: Node | null = null;
+			let createNewNode = CreateNewNode(
+				{
+					[NodeProperties.NODEType]: NodeTypes.Concept,
+					[NodeProperties.GeneratedConcept]: true,
+					[NodeProperties.Description]: `${enumeration.value}`,
+					[NodeProperties.UIText]: `${enumeration.value}`
+				},
+				(node: any) => {
+					newNode = node;
+				}
+			);
+			result.push(createNewNode, () => {
+				if (newNode)
+					return AddLinkBetweenNodes(newNode.id, node.id, { ...LinkProperties.GeneralLink });
+				return null;
+			});
+		})
+	})
 	graphOperation(result)(GetDispatchFunc(), GetStateFunc());
 }
 
@@ -484,17 +505,17 @@ function screenEffectGen(
 				return [
 					createNewNode,
 					contextualParameters,
-					function() {
+					function () {
 						return AddLinkBetweenNodes(
 							contextualNode.id,
 							effect.dataChain,
 							LinkProperties.ContextualParameters
 						);
 					},
-					function() {
+					function () {
 						return AddLinkBetweenNodes(newnode.id, effect.dataChain, LinkProperties.ScreenEffectApi);
 					},
-					function() {
+					function () {
 						return AddLinkBetweenNodes(
 							newnode.id,
 							agentAccessContext.entry,
@@ -530,7 +551,7 @@ function screenEffectViewMountGen(
 				);
 				return [
 					contextualParameters,
-					function() {
+					function () {
 						return AddLinkBetweenNodes(
 							contextualNode.id,
 							effect.dataChain,
@@ -641,7 +662,7 @@ function BuildMethodConcept(agentAccessContext: { entry: string }, effect: Effec
 								result.push(v);
 							});
 					}
-          res.parts = result;
+					res.parts = result;
 					return res;
 				});
 
@@ -715,15 +736,15 @@ function BuildMethodConceptMounting(
 									result.push(v);
 								});
 						}
-            res.parts = result;
+						res.parts = result;
 						return res;
 					})
 					.flatten();
 
 				let validationSummary = (mountingDescription.validations || []).map((validation: ValidationConfig) => {
-          let res: any = {};
-          let result: string[] = [];
-          res.name = validation.summary || validation.name;
+					let res: any = {};
+					let result: string[] = [];
+					res.name = validation.summary || validation.name;
 
 					if (validation.dataChainOptions && validation.dataChainOptions.simpleValidations) {
 						validation.dataChainOptions.simpleValidations
@@ -733,8 +754,8 @@ function BuildMethodConceptMounting(
 								result.push(v);
 							});
 					}
-          res.parts = result;
-          return res;
+					res.parts = result;
+					return res;
 				});
 
 				let executionSummary = (mountingDescription.executions || []).map((execution: ExecutionConfig) => {

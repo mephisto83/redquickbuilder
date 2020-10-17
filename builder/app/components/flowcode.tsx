@@ -3,34 +3,24 @@ import React, { Component } from 'react';
 import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
 import createEngine, { DiagramModel, DefaultNodeModel, DefaultLinkModel, DefaultDiagramState, LinkModel } from '@projectstorm/react-diagrams';
-import { CanvasWidget } from '@projectstorm/react-canvas-core';
+import { BaseEvent, CanvasWidget } from '@projectstorm/react-canvas-core';
 import DemoCanvasWidget from './canvaswidget';
 import * as SRD from '@projectstorm/react-diagrams';
 import styled from '@emotion/styled';
 import { TrayWidget } from './TrayWidget';
 import { TrayItemWidget } from './TrayItemWidget';
-import { buildAst, buildFunctions, FlowCodeStatements, IFlowCodeConfig } from '../constants/flowcode_ast';
+import { buildAst, buildFunctions, FlowCodeStatements, IFlowCodeConfig, LoadFileSource } from '../constants/flowcode_ast';
 import ts from 'typescript';
 import { FlowCodePortFactory } from './flowcode/FlowCodePortFactory';
 import { FlowCodeNodeFactory } from './flowcode/FlowCodeNodeFactory';
 import { FlowCodeNodeModel } from './flowcode/FlowCodeNodeModel';
 import TextInput from './textinput';
-import { FlowCodePortModel } from './flowcode/FlowCodePortModel';
+import { FlowCodeLinkHandlers, FlowCodePortModel } from './flowcode/FlowCodePortModel';
 import { Node } from '../methods/graph_types';
 import { refreshFlowModel, saveFlowModel } from '../actions/remoteActions';
+import { PortHandler, PortHandlerType } from './flowcode/PortHandler';
+import { Operations, PortStructures } from './flowcode/flowutils';
 
-const operations = {
-    ADD_PARAMETER: '#843B62',
-    START_FUNCTION: '#FFB997',
-    ADD_TYPE: '#74546A',
-    ADD_ENUMERATION: '#7C7F65',
-    ADD_SEQUENCE: '#59CD90',
-    FOREACH_CALLBACK: '#E39774',
-    MAP_CALLBACK: '#E39774',
-    VARIABLE_GET: '#F34213',
-    ADD_CONSTANT: '#D05353',
-    ADD_IF: '#1B9AAA'
-};
 export const SBody = styled.div`
 flex-grow: 1;
 display: flex;
@@ -84,6 +74,24 @@ export default class FlowCode extends Component<any, any> {
         let diagramEngine = engine;
         diagramEngine.setModel(activeModel);
 
+
+        activeModel.registerListener({
+            eventDidFire: (event: BaseEvent) => {
+                console.log(event);
+                let temp: any = event;
+
+                if (event && event.firing && temp.isCreated) {
+                    let defaultLinkModel: DefaultLinkModel = temp.link;
+                    registerLinkListeners(defaultLinkModel);
+                    registerNodeListeners(temp.node);
+                    this.forceUpdate();
+                }
+                return true;
+            },
+            eventWillFire: (event: BaseEvent) => {
+
+            }
+        });
 
 
         return {
@@ -160,37 +168,40 @@ export default class FlowCode extends Component<any, any> {
                         </div>
                         <TrayWidget>
                             <TrayItemWidget model={{
-                                type: operations.START_FUNCTION,
+                                type: Operations.START_FUNCTION,
                                 name: 'Function Entry',
                                 operation: true
-                            }} name={'Function Entry'} color={operations.START_FUNCTION} />
+                            }} name={'Function Entry'} color={Operations.START_FUNCTION} />
                             <TrayItemWidget model={{
-                                type: operations.ADD_PARAMETER, name: 'Parameter', operation: true
-                            }} name={'Add Parameter'} color={operations.ADD_PARAMETER} />
+                                type: Operations.ADD_CONSTRUCTOR, name: 'Add Constructor', operation: true
+                            }} name={'Add Constructor'} color={Operations.ADD_CONSTRUCTOR} />
                             <TrayItemWidget model={{
-                                type: operations.VARIABLE_GET, name: 'Variable', operation: true
-                            }} name={'Variable'} color={operations.VARIABLE_GET} />
+                                type: Operations.ADD_PARAMETER, name: 'Parameter', operation: true
+                            }} name={'Add Parameter'} color={Operations.ADD_PARAMETER} />
                             <TrayItemWidget model={{
-                                type: operations.ADD_CONSTANT, name: 'Constant', operation: true
-                            }} name={'Constant'} color={operations.ADD_CONSTANT} />
+                                type: Operations.VARIABLE_GET, name: 'Variable', operation: true
+                            }} name={'Variable'} color={Operations.VARIABLE_GET} />
                             <TrayItemWidget model={{
-                                type: operations.ADD_TYPE, name: 'Type', operation: true
-                            }} name={'Add Type'} color={operations.ADD_TYPE} />
+                                type: Operations.ADD_CONSTANT, name: 'Constant', operation: true
+                            }} name={'Constant'} color={Operations.ADD_CONSTANT} />
                             <TrayItemWidget model={{
-                                type: operations.FOREACH_CALLBACK, name: 'ForEach', operation: true
-                            }} name={'ForEach'} color={operations.FOREACH_CALLBACK} />
+                                type: Operations.ADD_TYPE, name: 'Type', operation: true
+                            }} name={'Add Type'} color={Operations.ADD_TYPE} />
                             <TrayItemWidget model={{
-                                type: operations.MAP_CALLBACK, name: 'Map', operation: true
-                            }} name={'Map'} color={operations.MAP_CALLBACK} />
+                                type: Operations.FOREACH_CALLBACK, name: 'ForEach', operation: true
+                            }} name={'ForEach'} color={Operations.FOREACH_CALLBACK} />
                             <TrayItemWidget model={{
-                                type: operations.ADD_ENUMERATION, name: 'Add Enumeration', operation: true
-                            }} name={'Add Enumeration'} color={operations.ADD_ENUMERATION} />
+                                type: Operations.MAP_CALLBACK, name: 'Map', operation: true
+                            }} name={'Map'} color={Operations.MAP_CALLBACK} />
                             <TrayItemWidget model={{
-                                type: operations.ADD_SEQUENCE, name: 'Add Sequence', operation: true
-                            }} name={'Add Sequence'} color={operations.ADD_SEQUENCE} />
+                                type: Operations.ADD_ENUMERATION, name: 'Add Enumeration', operation: true
+                            }} name={'Add Enumeration'} color={Operations.ADD_ENUMERATION} />
                             <TrayItemWidget model={{
-                                type: operations.ADD_IF, name: 'Add If', operation: true
-                            }} name={'Add If'} color={operations.ADD_IF} />
+                                type: Operations.ADD_SEQUENCE, name: 'Add Sequence', operation: true
+                            }} name={'Add Sequence'} color={Operations.ADD_SEQUENCE} />
+                            <TrayItemWidget model={{
+                                type: Operations.ADD_IF, name: 'Add If', operation: true
+                            }} name={'Add If'} color={Operations.ADD_IF} />
                             {this.getItemWidgets()}
                         </TrayWidget>
                     </div>
@@ -201,7 +212,7 @@ export default class FlowCode extends Component<any, any> {
 
                             var node: FlowCodeNodeModel | null = null;
                             if (data.type) {
-                                node = ConstructNodeModel(data.type, data)
+                                node = ConstructNodeModel(data.type, data, this.props.fileSource)
                             }
                             if (node) {
                                 var point = diagramEngine.getRelativeMousePoint(event);
@@ -222,132 +233,160 @@ export default class FlowCode extends Component<any, any> {
         );
     }
 }
-
-function ConstructNodeModel(type: string, ops: { name: string, parameter: boolean, type: string }): FlowCodeNodeModel {
-    let description: IFlowCodeConfig = FlowCodeStatements[type];
-    let node = new FlowCodeNodeModel(ops.name || type, !description ? ops.type : description.color);
-
-    if (![
-        operations.START_FUNCTION,
-        operations.FOREACH_CALLBACK,
-        operations.MAP_CALLBACK,
-        operations.ADD_CONSTANT,
-        operations.ADD_TYPE,
-        operations.VARIABLE_GET,
-        operations.ADD_PARAMETER
-    ].some(v => v === type))
-        node.addFlowIn();
-    if (![
-        operations.ADD_TYPE,
-        operations.FOREACH_CALLBACK,
-        operations.MAP_CALLBACK,
-        operations.ADD_CONSTANT,
-        operations.ADD_PARAMETER,
-        operations.VARIABLE_GET,
-        operations.ADD_SEQUENCE
-    ].some(v => v === type))
-        node.addFlowOut();
-    let selectTypes = () => {
-        return Object.entries(ts.TypeFlags).map((v: any[]) => {
-            return {
-                title: v[0],
-                value: v[0]
-            }
-        }).filter(v => isNaN(v.title));
-    }
-    let enumerationSelect = () => {
-        let enumerations = UIA.Visual(UIA.GetStateFunc()(), UIA.FLOW_CODE_ENUMERATION);
-        if (enumerations) {
-            return enumerations.toNodeSelect();
-        }
-        return [];
-    }
-    let modelsSelect = () => {
-        let modelProperties = UIA.Visual(UIA.GetStateFunc()(), UIA.FLOW_CODE_MODELS);
-        if (modelProperties) {
-            return modelProperties.map((a: any) => a.model).toNodeSelect();
-        }
-        return [];
-    }
-    let enumerationValueSelect = (port: FlowCodePortModel) => {
-        if (port) {
-            let options = port.getOptions();
-            if (options.value) {
-                let enumerations = UIA.Visual(UIA.GetStateFunc()(), UIA.FLOW_CODE_ENUMERATION);
-                if (enumerations) {
-                    let _enum = enumerations.find((v: Node) => v.id === options.value)
-                    return UIA.GetNodeProp(_enum, UIA.NodeProperties.Enumeration).map((v: any) => ({ value: v.id, title: v.value }));
+function registerNodeListeners(node: FlowCodeNodeModel) {
+    if (node && node.registerListener) {
+        node.registerListener({
+            removing: (evt: BaseEvent) => {
+                console.log(evt);
+                let { targetPort, sourcePort } = evt as any;
+                if (targetPort) {
+                    let linkHandlers = sourcePort.getLinkHandlers();
+                    handleLinkHandlers(linkHandlers, null, sourcePort, targetPort, 'source');
+                    linkHandlers = targetPort.getLinkHandlers();
+                    handleLinkHandlers(linkHandlers, null, sourcePort, targetPort, 'target');
                 }
+                return true;
             }
-        }
-        return [];
+        });
     }
-    if (operations.ADD_PARAMETER === type) {
+}
+function registerLinkListeners(defaultLinkModel: DefaultLinkModel) {
+    if (defaultLinkModel && defaultLinkModel.registerListener)
+        defaultLinkModel.registerListener({
+            sourcePortChanged: (portEvent: BaseEvent) => {
+                let sourcePort: FlowCodePortModel = defaultLinkModel.getSourcePort() as FlowCodePortModel;
+
+                if (sourcePort) {
+                    let linkHandlers = sourcePort.getLinkHandlers();
+                    handleLinkHandlers(linkHandlers, defaultLinkModel, sourcePort, defaultLinkModel.getTargetPort() as FlowCodePortModel, 'source');
+                }
+            },
+            targetPortChanged: (portEvent: BaseEvent) => {
+                let targetPort: FlowCodePortModel = defaultLinkModel.getTargetPort() as FlowCodePortModel;
+
+                if (targetPort) {
+                    let linkHandlers = targetPort.getLinkHandlers();
+                    handleLinkHandlers(linkHandlers, defaultLinkModel, defaultLinkModel.getSourcePort() as FlowCodePortModel, targetPort, 'target');
+                }
+            },
+        });
+}
+
+function handleLinkHandlers(linkHandlers: FlowCodeLinkHandlers[], defaultLinkModel: DefaultLinkModel | null, sourcePort: FlowCodePortModel, targetPort: FlowCodePortModel, interestPort: 'source' | 'target') {
+    linkHandlers.forEach((linkHandle: FlowCodeLinkHandlers) => {
+        PortHandler.Handle({
+            link: defaultLinkModel,
+            sourcePort,
+            targetPort,
+            interestPort: interestPort,
+            node: sourcePort.getNode() as FlowCodeNodeModel,
+            type: linkHandle.type
+        });
+    });
+}
+
+function ConstructNodeModel(type: string, ops: { operation?: boolean, color?: string, name: string, parameter: boolean, type: string, file: string }, fileSource: any): FlowCodeNodeModel {
+    let description: IFlowCodeConfig = FlowCodeStatements[type];
+    if (ops && ops.file && fileSource) {
+        description = fileSource[ops.file][ops.type]
+        description.color = ops.color || '' || description.color;
+    }
+    let node = new FlowCodeNodeModel(ops.name || type, !description ? ops.type : description.color);
+    if (ops.operation || FlowCodeStatements[type]) {
+        node.isOperation(ops.operation || !!FlowCodeStatements[type]);
+    }
+    if (![
+        Operations.START_FUNCTION,
+        Operations.FOREACH_CALLBACK,
+        Operations.MAP_CALLBACK,
+        Operations.ADD_CONSTANT,
+        Operations.ADD_TYPE,
+        Operations.VARIABLE_GET,
+        Operations.ADD_PARAMETER,
+        Operations.ADD_CONSTRUCTOR
+    ].some(v => v === type)) {
+        node.addFlowIn();
+    }
+    if (![
+        Operations.ADD_TYPE,
+        Operations.FOREACH_CALLBACK,
+        Operations.MAP_CALLBACK,
+        Operations.ADD_CONSTANT,
+        Operations.ADD_PARAMETER,
+        Operations.VARIABLE_GET,
+        Operations.ADD_SEQUENCE
+    ].some(v => v === type)) {
+        node.addFlowOut();
+    }
+
+    if (Operations.ADD_PARAMETER === type) {
         let newPort = node.addInPort('variable');
+        newPort.setPortName('variable');
         newPort.prompt();
         let typePort = node.addInPort('type');
-        // typePort.select(selectTypes);
+        typePort.addLinkHandler(PortHandlerType.FunctionParameterType, node.getID());
         node.addOutPort('value');
         return node;
     }
-    if (operations.ADD_SEQUENCE === type) {
+    if (Operations.ADD_CONSTRUCTOR === type) {
+        let newPort = node.addInPort('type');
+        newPort.setPortName(PortStructures.Generic.Type);
+        newPort.addLinkHandler(PortHandlerType.Constructor, node.getID())
+        newPort.setStatic();
+
+        return node;
+    }
+    if (Operations.ADD_SEQUENCE === type) {
         node.enableInPortAdd();
         return node;
     }
-    if (operations.ADD_CONSTANT === type) {
+    if (Operations.ADD_CONSTANT === type) {
         let newPort = node.addOutPort('constant');
         newPort.prompt();
         return node;
     }
-    if (operations.VARIABLE_GET === type) {
-        let typePort = node.addInPort('type');
-        // typePort.select(selectTypes);
+    if (Operations.VARIABLE_GET === type) {
+        node.addInPort('type');
         let newPort = node.addOutPort('variable');
         newPort.prompt();
         return node;
     }
 
-    if (operations.ADD_IF === type) {
+    if (Operations.ADD_IF === type) {
         node.addInPort('conditional');
         node.addOutPort('then');
         node.addOutPort('else');
         return node;
     }
 
-    if (operations.ADD_TYPE === type) {
-        let typePort = node.addOutPort('modelType');
-        // typePort.select(modelsSelect);
+    if (Operations.ADD_TYPE === type) {
+        node.addOutPort('modelType');
         return node;
     }
-    if (operations.START_FUNCTION === type) {
+    if (Operations.START_FUNCTION === type) {
         return node;
     }
-    if (operations.ADD_ENUMERATION === type) {
-        let newPort = node.addInPort('enumeration');
-        // newPort.select(enumerationSelect);
-
-        let newPort2 = node.addInPort('enumerationValue');
-        // newPort2.select(function () { return enumerationValueSelect(newPort) });
+    if (Operations.ADD_ENUMERATION === type) {
+        node.addInPort('enumeration');
+        node.addInPort('enumerationValue');
         node.addOutPort('value');
         return node;
     }
-    if (operations.FOREACH_CALLBACK === type) {
+    if (Operations.FOREACH_CALLBACK === type) {
         node.addInPort('in');
         node.addOutPort('forEachFunc');
         node.addOutPort('sequence');
         node.addOutPort('value');
-        let typePort = node.addInPort('valueType');
-        // typePort.select(modelsSelect);
+        node.addInPort('valueType');
         node.addOutPort('index');
         return node;
     }
-    if (operations.MAP_CALLBACK === type) {
+    if (Operations.MAP_CALLBACK === type) {
         node.addInPort('in');
         node.addOutPort('mapFunc');
         node.addOutPort('sequence');
         node.addOutPort('value');
-        let typePort = node.addInPort('valueType');
-        // typePort.select(modelsSelect);
+        node.addInPort('valueType');
         node.addInPort('outputType');
         node.addOutPort('index');
         return node;
@@ -356,7 +395,8 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
         let newPort = node.addInPort('variable');
         newPort.prompt();
         let typePort = node.addInPort('type');
-        // typePort.select(selectTypes)
+        typePort.addLinkHandler(PortHandlerType.FunctionParameterType, node.getID());
+        typePort.setPortName(PortStructures.Generic.Type);
         return node;
     }
 
@@ -369,14 +409,19 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
 
     if (description.ast) {
         let { ast } = description;
+        node.setSourceOptions({ file: ops.file, type: ops.type })
         if (ast) {
             switch (ast.kind) {
                 case ts.SyntaxKind.FunctionDeclaration:
                     let func = ast as ts.FunctionDeclaration;
                     func.parameters.forEach((param: ts.ParameterDeclaration) => {
                         let temp: any = param.name;
+                        let paramAny: any = param;
                         if (temp.text || temp.escapedText) {
-                            node.addInPort(temp.text || temp.escapedText, param.kind);
+                            let port = node.addInPort(temp.text || temp.escapedText, param.kind);
+                            if (paramAny.type) {
+                                port.portType = paramAny.type.escapedText;
+                            }
                         }
                     })
                     if (func.type) {
@@ -389,21 +434,25 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
                                 }
                             }
                             else {
+                                let port: any = null;
                                 if (func.type.kind === ts.SyntaxKind.AnyKeyword) {
-                                    node.addOutPort('any', func.type.kind)
+                                    port = node.addOutPort('any', func.type.kind)
                                 }
                                 else if (func.type.kind === ts.SyntaxKind.BooleanKeyword) {
-                                    node.addOutPort('boolean', func.type.kind)
+                                    port = node.addOutPort('boolean', func.type.kind)
                                 }
                                 else if (func.type.kind === ts.SyntaxKind.StringKeyword) {
-                                    node.addOutPort('string', func.type.kind)
+                                    port = node.addOutPort('string', func.type.kind)
                                 }
                                 else if (func.type.kind === ts.SyntaxKind.NumberKeyword) {
-                                    node.addOutPort('number', func.type.kind)
+                                    port = node.addOutPort('number', func.type.kind)
                                 }
                                 else {
                                     let temp: any = func.type;
-                                    node.addOutPort(temp.escapedText, func.type.kind)
+                                    port = node.addOutPort(temp.escapedText, func.type.kind)
+                                }
+                                if (func.type && port) {
+                                    port.portType = (func.type as any).escapedText;
                                 }
                             }
                         }
@@ -411,12 +460,39 @@ function ConstructNodeModel(type: string, ops: { name: string, parameter: boolea
 
                     }
                     break;
+                case ts.SyntaxKind.InterfaceDeclaration:
+                case ts.SyntaxKind.ClassDeclaration:
+                    let classDec = ast as ts.ClassDeclaration;
+                    let classTemp: any = classDec;
+                    classDec.members.forEach((member: ts.ClassElement) => {
+                        let temp: any = member;
+                        let newPort: any = null;
+                        switch (member.kind) {
+                            case ts.SyntaxKind.PropertyDeclaration:
+                            case ts.SyntaxKind.Constructor:
+                            case ts.SyntaxKind.MethodDeclaration:
+                            case ts.SyntaxKind.PropertySignature:
+                                // Don't should any thing yet.
+                                // if (temp.name && temp.type) {
+                                //     newPort = node.addOutPort(temp.name.escapedText, member.kind);
+                                //     newPort.portType = temp.type.escapedText;
+                                //     newPort.member = member;
+                                // }
+                                break;
+                        }
+                    });
+
+                    node.addOutPort(classTemp.name ? classTemp.name.escapedText : '', ast.kind);
+                    break;
                 case ts.SyntaxKind.VariableDeclaration:
                     let newPort = node.addInPort('variable');
                     newPort.prompt();
                     let typePort = node.addInPort('type');
-                    typePort.select(selectTypes)
-                    node.addInPort('expression');
+                    typePort.setPortName(PortStructures.Generic.Type);
+                    typePort.addLinkHandler(PortHandlerType.FunctionParameterType, node.getID());
+                    let expressionPort = node.addInPort('expression');
+                    expressionPort.setPortName(PortStructures.Generic.Expression);
+                    expressionPort.addLinkHandler(PortHandlerType.FunctionParameterExpressionType, node.getID());
                     break;
 
             }

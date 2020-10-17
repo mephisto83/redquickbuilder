@@ -9,6 +9,9 @@ var files = [{
 }, {
   fix: 'node_modules/@projectstorm/react-diagrams-core/dist/@types/entities/link-layer/LinkLayerModel.d.ts',
   target: './fixes/LinkLayerModel.d.ts.txt'
+}, {
+  fix: 'node_modules/terser/dist/bundle.min.js',
+  target: './fixes/bundle.min.js.txt'
 }]
 
 files.forEach((part) => {

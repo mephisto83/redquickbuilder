@@ -8,23 +8,28 @@ export interface FlowCodeNodeModelOptions extends BasePositionModelOptions {
 	name?: string;
 	color?: string;
 	panel?: boolean;
+	operation?: boolean;
 	addInPort?: boolean;
+	nodeType?: string;
 }
 
 export interface FlowCodeNodeModelGenerics extends NodeModelGenerics {
 	OPTIONS: FlowCodeNodeModelOptions;
 }
-
+export interface FlowCodeSourceOptions { file: string, type: string }
+export const BuiltIn = '$BuiltIn$';
 export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 	protected portsIn: FlowCodePortModel[];
 	protected portsOut: FlowCodePortModel[];
-
+	protected sourceOptions?: FlowCodeSourceOptions;
 	constructor(name: string, color: string);
 	constructor(options?: FlowCodeNodeModelOptions);
 	constructor(options: any = {}, color?: string) {
 		if (typeof options === 'string') {
 			options = {
 				name: options,
+				nodeType: color,
+				operation: false,
 				color: color
 			};
 		}
@@ -37,7 +42,20 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 		this.portsOut = [];
 		this.portsIn = [];
 	}
-
+	getNodeType(): string | undefined {
+		return this.options.nodeType;
+	}
+	isOperation(bool?: boolean) {
+		if (bool !== undefined)
+			this.options.operation = bool
+		return this.options.operation;
+	}
+	setSourceOptions(sourceOptions: any) {
+		this.sourceOptions = sourceOptions;
+	}
+	getSourceOptions(): FlowCodeSourceOptions | undefined {
+		return this.sourceOptions;
+	}
 	doClone(lookupTable: {}, clone: any): void {
 		clone.portsIn = [];
 		clone.portsOut = [];
@@ -69,7 +87,10 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 	removePortLinks(port: FlowCodePortModel): void {
 		const links = port.getLinks();
 		for (const link in links) {
+			let targetPort = links[link].getTargetPort();
+			let sourcePort = links[link].getSourcePort();
 			links[link].remove();
+			this.fireEvent({ firing: true, targetPort, sourcePort }, 'removing');
 		}
 		// this.removePort(port);
 	}
@@ -82,12 +103,14 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 		const p = new FlowCodePortModel({
 			in: true,
 			name: 'In',
+			isStatic: true,
 			label: 'In',
 			alignment: PortModelAlignment.LEFT,
 			isFlow: true
 		});
 
 		return this.addPort(p);
+
 	}
 
 	addFlowOut(): FlowCodePortModel {
@@ -95,6 +118,7 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 			in: false,
 			name: 'Out',
 			label: 'Out',
+			isStatic: true,
 			alignment: PortModelAlignment.RIGHT,
 			isFlow: true
 		});
@@ -116,7 +140,6 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 		return this.addPort(p);
 	}
 
-
 	addOutPort(label: string, kind?: ts.SyntaxKind, after = true): FlowCodePortModel {
 		const p = new FlowCodePortModel({
 			in: false,
@@ -135,6 +158,9 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 		super.deserialize(event);
 		this.options.name = event.data.name;
 		this.options.color = event.data.color;
+		this.options.nodeType = event.data.nodeType;
+		this.options.operation = event.data.operation;
+		this.sourceOptions = event.data.sourceOptions;
 		this.portsIn = _.map(event.data.portsInOrder, (id) => {
 			return this.getPortFromID(id);
 		}) as FlowCodePortModel[];
@@ -148,6 +174,9 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 			...super.serialize(),
 			name: this.options.name,
 			color: this.options.color,
+			sourceOptions: this.sourceOptions,
+			operation: this.options.operation,
+			nodeType: this.options.nodeType,
 			portsInOrder: _.map(this.portsIn, (port) => {
 				return port.getID();
 			}),

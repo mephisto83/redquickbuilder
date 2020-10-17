@@ -2635,6 +2635,9 @@ export function getDataChainNameSpace(dataChain: any, asFilePath?: boolean) {
 					.map((v) => {
 						let temp = GetCodeName(v);
 						if (temp !== Titles.Unknown && temp) {
+							if (GetNodeById(v)) {
+								return `${temp}NS`
+							}
 							return temp;
 						}
 						return v;
@@ -2646,6 +2649,9 @@ export function getDataChainNameSpace(dataChain: any, asFilePath?: boolean) {
 			.map((v) => {
 				let temp = GetCodeName(v);
 				if (temp !== Titles.Unknown && temp) {
+					if (GetNodeById(v)) {
+						return `${temp}NS`
+					}
 					return temp;
 				}
 				return v;
@@ -3726,6 +3732,20 @@ export function handleFlowCodeMessage(args: { flowModels: any; code: string; mod
 		dispatch(Batch(batchCommands));
 	}
 }
+export const GRAPH_WINDOW_PACKAGE = 'GRAPH_WINDOW_PACKAGE';
+export function handleGraphMessage(args: any) {
+	let batchCommands: any[] = [];
+	if (history) {
+		history.push(routes.GRAPH_VIEWER);
+	}
+	if (args && args.graphWindowPackage) {
+		batchCommands.push(UIC(VISUAL, GRAPH_WINDOW_PACKAGE, args.graphWindowPackage));
+	}
+	let dispatch = GetDispatchFunc();
+	if (dispatch) {
+		dispatch(Batch(batchCommands));
+	}
+}
 
 export function handleViewWindowMessage(args: {
 	nodes: _.Node[];
@@ -4322,6 +4342,33 @@ export function pinConnectedNodesByLinkType(model: any, linkType: any) {
 		)(dispatch, getState);
 		return pinned;
 	};
+}
+export function getConnectedNodesByLinkType(model: any, linkType: any) {
+	let getState = GetStateFunc();
+	const state = getState();
+	const graph = GetRootGraph(state);
+	const nodes: any[] = [];
+	if (Array.isArray(linkType)) {
+		linkType.forEach((_linkType: string) => {
+			nodes.push(
+				...GraphMethods.GetNodesLinkedTo(graph, {
+					id: model,
+					link: _linkType
+				})
+			);
+		});
+	} else {
+		nodes.push(
+			...GraphMethods.GetNodesLinkedTo(graph, {
+				id: model,
+				link: linkType
+			})
+		);
+	}
+	const pinned: any[] = [];
+	pinned.push(...nodes.map((v: { id: any }) => v));
+
+	return pinned;
 }
 export function setPinned(id: string | string[], pinned: boolean = false) {
 	if (!Array.isArray(id)) {
