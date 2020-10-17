@@ -106,7 +106,9 @@ function createReactWeb() {
 					'react-hot-loader',
 					'redux',
 					'react-router',
-					'redux-logger'
+					'redux-logger',
+					'tslint',
+					'tslint-etc'
 				].map((dependency) => {
 					promise = promise.then(() =>
 						executeSpawnCmd('yarn', [ 'add', dependency ], {
@@ -126,6 +128,10 @@ function createReactWeb() {
 					shell: true,
 					cwd: path.join(localDir, appName)
 				});
+			})
+			.then(() => {
+				let contents = fs.readFileSync('./tslint-imports.json', 'utf8');
+				fs.writeFileSync(path.join(`./${appName}`, 'tslint-imports.json'), contents, 'utf8');
 			})
 			.catch((e) => {
 				console.log(e);

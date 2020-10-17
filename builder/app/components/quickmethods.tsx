@@ -37,7 +37,8 @@ import UpdateScreenUrls from '../nodepacks/screens/UpdateScreenUrls';
 import JobService from '../jobs/jobservice';
 import {
 	CollectionScreenWithoutDatachainDistributed,
-	CollectionConnectDataChainCollection
+	CollectionConnectDataChainCollection,
+  CollectionPruneDataChain
 } from '../nodepacks/CollectionDataChainsIntoCollections';
 import ApplyTemplates from '../nodepacks/permission/ApplyTemplates';
 import ApplyValidationFromProperties from '../nodepacks/permission/ApplyValidationFromProperties';
@@ -332,6 +333,12 @@ class QuickMethods extends Component<any, any, any> {
 									}}
 								/>
 								<TreeViewMenu
+									title="Collection Prune DataChain"
+									onClick={() => {
+										CollectionPruneDataChain();
+									}}
+								/>
+								<TreeViewMenu
 									title={StartJob.title}
 									icon="fa fa-play"
 									onClick={() => {
@@ -401,12 +408,18 @@ class QuickMethods extends Component<any, any, any> {
 									}}
 									icon="fa fa-tag"
 								>
-									<TreeViewMenu title="FlowCode Test" onClick={()=>{
-										buildAst(FlowCodeStatements.ForEach)
-									}} />
-									<TreeViewMenu title="Build Rules Test" onClick={()=>{
-										buildFunctions();
-									}} />
+									<TreeViewMenu
+										title="FlowCode Test"
+										onClick={() => {
+											buildAst(FlowCodeStatements.ForEach);
+										}}
+									/>
+									<TreeViewMenu
+										title="Build Rules Test"
+										onClick={() => {
+											buildFunctions();
+										}}
+									/>
 									<TreeViewMenu
 										title="Distribute Build All Jobs"
 										icon="fa fa-plus"

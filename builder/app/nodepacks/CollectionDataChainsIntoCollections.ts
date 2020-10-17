@@ -11,7 +11,9 @@ import {
 	executeGraphOperations,
 	GetDispatchFunc,
 	GetStateFunc,
-	graphOperation
+	graphOperation,
+	updateComponentProperty,
+	removeNodeById
 } from '../actions/uiactions';
 import { GetNodesLinkedTo, GetNodeLinkedTo, TARGET, SOURCE } from '../methods/graph_methods';
 import { NodeType } from '../components/titles';
@@ -632,6 +634,42 @@ export function CollectionScreenWithoutDatachainDistributed(filter: any) {
 
 	return result;
 }
+
+export async function CollectionPruneDataChain() {
+  let done = true;
+  debugger;
+	do {
+		done = true;
+		let graph = GetCurrentGraph();
+
+		let dataChainCollections = NodesByType(null, NodeTypes.DataChainCollection);
+		let leafNodes = dataChainCollections.filter((a: Node, b: Node) => {
+			let aChildCount = getChildCount(graph, a);
+			return aChildCount === 0;
+		});
+		if (leafNodes.length) {
+			done = false;
+			leafNodes.forEach((leaf: Node) => {
+				removeNodeById(leaf.id);
+			});
+		}
+	} while (!done);
+}
+
+function getChildCount(graph: any, a: Node) {
+	let dataChains = GetNodesLinkedTo(graph, {
+		id: a.id,
+		componentType: NodeTypes.DataChain
+	});
+
+	let children = GetNodesLinkedTo(graph, {
+		id: a.id,
+		link: LinkType.DataChainCollection,
+		direction: 'TARGET'
+	});
+	return children.length + dataChains.length;
+}
+
 //this can be first
 export function CollectionSharedReference() {
 	const result: any = [];
