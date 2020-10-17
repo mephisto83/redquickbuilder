@@ -6,6 +6,8 @@ import { FlowCodePortLabel } from './FlowCodePortLabelWidget';
 import styled from '@emotion/styled';
 import { css } from '@emotion/core';
 import { FlowCodePortModel } from './FlowCodePortModel';
+import { ProcessFlowCodeCommand } from './PortHandler';
+import { FlowCodeNodeCommands } from './flowutils';
 
 export const SNode = styled.div<{ background: string; selected: boolean }>`
 		background-color: ${(p) => p.background};
@@ -34,7 +36,19 @@ export const SPorts = styled.div`
 		display: flex;
 		background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2));
 	`;
-
+export const SButton = styled.div`
+	padding: 4px;
+	margin: 2px;
+	border-radius: 2px;
+    align-items: center;
+    justify-content: center;
+	background-color: rgba(0,0,0,.3);
+	display: inline-flex;
+    height: 22px;
+    width: 22px;
+    justify-content: center;
+    align-items: center;
+`;
 export const SPortsContainer = styled.div`
 		flex-grow: 1;
 		display: flex;
@@ -80,12 +94,21 @@ export class FlowCodeNodeWidget extends React.Component<FlowCodeNodeProps> {
 						this.props.node.addOutPort(`sequence ${this.props.node.getOutPorts().length}`);
 						this.setState({ turn: Date.now() })
 					}} /> : null}
-				</div>) : null}
+					{options.commands ? options.commands.map((command: FlowCodeNodeCommands) => {
+						return <SButton title={command.title} onClick={() => {
+							let res = ProcessFlowCodeCommand(this.props.node, command);
+							if (res) {
+								this.forceUpdate();
+							}
+						}} ><i className={command.clsName}/></SButton>
+					}) : null}
+				</div>) : null
+	}
 				<SPorts>
-					<SPortsContainer>{_.map(this.props.node.getInPorts(), this.generatePort)}</SPortsContainer>
-					<SPortsContainer>{_.map(this.props.node.getOutPorts(), this.generatePort)}</SPortsContainer>
-				</SPorts>
-			</SNode>
+	<SPortsContainer>{_.map(this.props.node.getInPorts(), this.generatePort)}</SPortsContainer>
+	<SPortsContainer>{_.map(this.props.node.getOutPorts(), this.generatePort)}</SPortsContainer>
+</SPorts>
+			</SNode >
 		);
 	}
 }

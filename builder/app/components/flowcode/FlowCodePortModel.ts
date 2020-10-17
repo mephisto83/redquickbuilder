@@ -20,6 +20,7 @@ export interface FlowCodePortModelOptions extends PortModelOptions {
 	portType?: PortType;
 	kind?: ts.SyntaxKind
 	isStatic?: boolean;
+	bindingPort?: string;
 	prompt?: boolean;
 	selectFunc?: any;
 	value?: any;
@@ -68,6 +69,10 @@ export class FlowCodePortModel extends PortModel<FlowCodePortModelGenerics> {
 	setName(name: string) {
 		this.options.valueTitle = name;
 	}
+	bindPort(port: FlowCodePortModel) {
+		this.options.bindingPort = port.getID();
+		port.options.bindingPort = this.getID()
+	}
 	getValueTitle() {
 		return this.options.valueTitle;
 	}
@@ -100,6 +105,7 @@ export class FlowCodePortModel extends PortModel<FlowCodePortModelGenerics> {
 		this.options.in = event.data.in;
 		this.options.label = event.data.label;
 		this.options.portType = event.data.portType;
+		this.options.bindingPort = event.data.bindingPort;
 		this.options.isStatic = event.data.isStatic;
 		this.options.name = event.data.name;
 		this.options.valueTitle = event.data.valueTitle;
@@ -114,6 +120,7 @@ export class FlowCodePortModel extends PortModel<FlowCodePortModelGenerics> {
 			portName: this.options.portName,
 			isStatic: this.options.isStatic,
 			portType: this.options.portType,
+			bindingPort: this.options.bindingPort,
 			valueTitle: this.options.valueTitle,
 			kind: this.options.kind,
 			label: this.options.label,

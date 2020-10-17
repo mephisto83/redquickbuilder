@@ -3,11 +3,13 @@ import { NodeModel, NodeModelGenerics, PortModelAlignment } from '@projectstorm/
 import { BasePositionModelOptions, DeserializeEvent } from '@projectstorm/react-canvas-core';
 import { FlowCodePortModel } from './FlowCodePortModel';
 import ts from 'typescript';
+import { FlowCodeNodeCommands } from './flowutils';
 
 export interface FlowCodeNodeModelOptions extends BasePositionModelOptions {
 	name?: string;
 	color?: string;
 	nodeHandlers?: string[];
+	commands?: FlowCodeNodeCommands[];
 	panel?: boolean;
 	operation?: boolean;
 	addInPort?: boolean;
@@ -99,7 +101,9 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 		this.options.addInPort = true;
 		this.options.panel = true;
 	}
-
+	panel() {
+		this.options.panel = true;
+	}
 	addFlowIn(): FlowCodePortModel {
 		const p = new FlowCodePortModel({
 			in: true,
@@ -160,11 +164,17 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 		return this.addPort(p);
 	}
 
+	addCommands(command: FlowCodeNodeCommands) {
+		this.options.commands = this.options.commands || [];
+		this.options.commands.push(command);
+	}
+
 	deserialize(event: DeserializeEvent<this>) {
 		super.deserialize(event);
 		this.options.name = event.data.name;
 		this.options.color = event.data.color;
 		this.options.nodeType = event.data.nodeType;
+		this.options.commands = event.data.commands;
 		this.options.operation = event.data.operation;
 		this.options.nodeHandlers = event.data.nodeHandlers;
 		this.sourceOptions = event.data.sourceOptions;
@@ -182,6 +192,7 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 			name: this.options.name,
 			color: this.options.color,
 			sourceOptions: this.sourceOptions,
+			commands: this.options.commands,
 			operation: this.options.operation,
 			nodeHandlers: this.options.nodeHandlers,
 			nodeType: this.options.nodeType,

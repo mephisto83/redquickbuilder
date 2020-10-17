@@ -17,6 +17,9 @@ export default class TreeViewMenu extends Component<any, any> {
 	icon() {
 		return this.props.icon || (this.props.children ? 'fa fa-folder' : null) || 'fa fa-wrench';
 	}
+	iconcolor() {
+		return this.props.iconcolor || 'white'
+	}
 	color() {
 		return this.props.color ? { color: this.props.color } : {};
 	}
@@ -63,7 +66,7 @@ export default class TreeViewMenu extends Component<any, any> {
 								}
 							}}
 						>
-							<i className="fa fa-angle-left pull-right" />
+							<i className="fa fa-angle-left pull-right" style={{ color: this.color() }} />
 							{this.props.right ? this.props.right : null}
 						</span>
 					)}

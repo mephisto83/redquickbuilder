@@ -19,7 +19,7 @@ import { FlowCodeLinkHandlers, FlowCodePortModel } from './flowcode/FlowCodePort
 import { Node } from '../methods/graph_types';
 import { refreshFlowModel, saveFlowModel } from '../actions/remoteActions';
 import { FlowNodeEventType, PortHandler, PortHandlerType } from './flowcode/PortHandler';
-import { Operations, PortStructures } from './flowcode/flowutils';
+import { FlowCodeCommand, Operations, PortStructures } from './flowcode/flowutils';
 
 export const SBody = styled.div`
 flex-grow: 1;
@@ -339,27 +339,27 @@ function processLinks(linkModel: DefaultLinkModel, eventType: FlowNodeEventType)
     }
 }
 function processNodes(node: FlowCodeNodeModel, eventType: FlowNodeEventType) {
- 
-        let portNames = node.getNodeHandlers();
-        let ports = node.getPorts();
-        portNames.forEach((portName: string) => {
 
-            if (ports && ports[portName]) {
-                let flowPortModel = ports[portName] as FlowCodePortModel;
-                let handlers = flowPortModel.getLinkHandlers();
-                handlers.forEach((handle) => {
-                    PortHandler.Handle({
-                        link: null,
-                        sourcePort: flowPortModel.getOptions().in ? flowPortModel : null,
-                        targetPort: !flowPortModel.getOptions().in ? flowPortModel : null,
-                        interestPort: !flowPortModel.getOptions().in ? 'target' : 'source',
-                        node: flowPortModel.getNode() as FlowCodeNodeModel,
-                        eventType: eventType,
-                        type: handle.type
-                    });
-                })
-            }
-        }) 
+    let portNames = node.getNodeHandlers();
+    let ports = node.getPorts();
+    portNames.forEach((portName: string) => {
+
+        if (ports && ports[portName]) {
+            let flowPortModel = ports[portName] as FlowCodePortModel;
+            let handlers = flowPortModel.getLinkHandlers();
+            handlers.forEach((handle) => {
+                PortHandler.Handle({
+                    link: null,
+                    sourcePort: flowPortModel.getOptions().in ? flowPortModel : null,
+                    targetPort: !flowPortModel.getOptions().in ? flowPortModel : null,
+                    interestPort: !flowPortModel.getOptions().in ? 'target' : 'source',
+                    node: flowPortModel.getNode() as FlowCodeNodeModel,
+                    eventType: eventType,
+                    type: handle.type
+                });
+            })
+        }
+    })
 }
 function registerLinkListeners(defaultLinkModel: DefaultLinkModel) {
     if (defaultLinkModel && defaultLinkModel.registerListener)
@@ -432,6 +432,11 @@ function ConstructNodeModel(type: string, ops: { operation?: boolean, color?: st
         Operations.ADD_CONSTRUCTOR
     ].some(v => v === type)) {
         node.addFlowOut();
+    }
+
+    if (Operations.ANONYMOUS_FUNCTION === type) {
+        node.addOutPort('function');
+        return node;
     }
 
     if (Operations.ADD_PARAMETER === type) {

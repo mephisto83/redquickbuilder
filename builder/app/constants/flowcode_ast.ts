@@ -130,14 +130,20 @@ export async function LoadFileSource(): Promise<IFlowCodeFile> {
     return getGenericDirectory().then((folder: string | undefined) => {
         if (folder) {
             console.log(folder);
-            let files = fs.readdirSync(folder)
-            files.forEach((file: string) => {
-                if (file.endsWith('.d.ts')) {
-                    PortHandler.storeFlowLibrary(file, path.join(folder, file));
-                    let fileContent = fs.readFileSync(path.join(folder, file), 'utf8');
-                    fileSpace[path.join(folder, file)] = buildFunctionsFromString(fileContent, path.join(folder, file));
-                }
-            })
+            function innerProcess(folder: string) {
+                let files = fs.readdirSync(folder)
+                files.forEach((file: string) => {
+                    let file_dir_path = path.join(folder, file);
+                    if (file.endsWith('.d.ts')) {
+                        PortHandler.storeFlowLibrary(file, file_dir_path);
+                        let fileContent = fs.readFileSync(file_dir_path, 'utf8');
+                        fileSpace[file_dir_path] = buildFunctionsFromString(fileContent, file_dir_path);
+                    } else if (fs.existsSync(file_dir_path) && fs.lstatSync(file_dir_path).isDirectory()) {
+                        innerProcess(file_dir_path);
+                    }
+                })
+            }
+            innerProcess(folder);
         }
         return fileSpace;
     })
