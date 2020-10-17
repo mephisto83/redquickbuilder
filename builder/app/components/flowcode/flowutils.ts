@@ -13,24 +13,33 @@ export const PortStructures = {
     Constructor: {
         Type: 'type',
         OutputPort: 'outputPort'
+    },
+    CallableExpression: {
+        Method: 'method'
     }
 }
 
 export const Operations = {
     ADD_PARAMETER: '#843B62',
+    GET_PROPERTY: '#F7B267',
+    SET_PROPERTY: '#F4845F',
+    CALL_METHOD: '#F27059',
     START_FUNCTION: '#FFB997',
     ADD_TYPE: '#74546A',
     ADD_CONSTRUCTOR: '#FFD046',
     ADD_ENUMERATION: '#7C7F65',
     ADD_SEQUENCE: '#59CD90',
+    ANONYMOUS_FUNCTION: '#218380',
     FOREACH_CALLBACK: '#E39774',
-    MAP_CALLBACK: '#E39774',
+    MAP_CALLBACK: '#E39773',
     VARIABLE_GET: '#F34213',
     ADD_CONSTANT: '#D05353',
     ADD_IF: '#1B9AAA'
 };
 
-
+export enum PortType {
+    MethodParameters = "method-parameters"
+}
 export function GetPortASTTypeName(port: FlowCodePortModel) {
     return GetNodeASTPortTypeName(port, port.getNode() as FlowCodeNodeModel);
 }
@@ -55,6 +64,7 @@ function GetNodeASTPortTypeName(not_useed_port: FlowCodePortModel, node: FlowCod
                     }
                 }
                 break
+            case Operations.CALL_METHOD:
             case Operations.ADD_CONSTRUCTOR:
                 port = GetNodePortByName(node, PortStructures.Constructor.Type);
                 if (port) {
@@ -85,7 +95,7 @@ function GetNodeASTPortTypeName(not_useed_port: FlowCodePortModel, node: FlowCod
     }
     return null;
 }
-function GetNodePortByName(node: FlowCodeNodeModel, name: string): FlowCodePortModel | undefined {
+export function GetNodePortByName(node: FlowCodeNodeModel, name: string): FlowCodePortModel | undefined {
     let ports = node.getPorts();
     let variablePortName = Object.keys(ports).find((v: any) => {
         let temp = v as string;

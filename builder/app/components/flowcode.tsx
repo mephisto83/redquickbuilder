@@ -18,7 +18,7 @@ import TextInput from './textinput';
 import { FlowCodeLinkHandlers, FlowCodePortModel } from './flowcode/FlowCodePortModel';
 import { Node } from '../methods/graph_types';
 import { refreshFlowModel, saveFlowModel } from '../actions/remoteActions';
-import { PortHandler, PortHandlerType } from './flowcode/PortHandler';
+import { FlowNodeEventType, PortHandler, PortHandlerType } from './flowcode/PortHandler';
 import { Operations, PortStructures } from './flowcode/flowutils';
 
 export const SBody = styled.div`
@@ -51,6 +51,8 @@ flex-grow: 1;
 
 
 export default class FlowCode extends Component<any, any> {
+    fireChecking: boolean = false;
+    fireCheckWaiting: boolean = false;
     constructor(props: any) {
         super(props);
         let id = UIA.GUID();
@@ -58,7 +60,38 @@ export default class FlowCode extends Component<any, any> {
         this.state = { ...setup, id };
     }
 
+    public fireCheck() {
+        let throttleTime = 1000;
+        if (!this.fireChecking) {
+            this.fireChecking = true;
+            let execute = () => {
+                console.log('firechecking')
+                if (this.fireCheckWaiting) {
+                    this.fireCheckWaiting = false
+                    setTimeout(execute, throttleTime);
+                }
+                else {
+                    let activeModel: SRD.DiagramModel = this.state.activeModel;
+                    let links = activeModel.getLinks();
+                    links.forEach((linkModel) => {
+                        processLinks(linkModel as DefaultLinkModel, FlowNodeEventType.Check);
+                    });
 
+                    let nodes = activeModel.getNodes() as FlowCodeNodeModel[];
+                    nodes.forEach((node) => {
+                        processNodes(node, FlowNodeEventType.Check)
+                    })
+                    console.log('fire check')
+                    this.fireChecking = false;
+                    this.forceUpdate();
+                }
+            }
+            setTimeout(execute, throttleTime)
+        }
+        else {
+            this.fireCheckWaiting = true;
+        }
+    }
     public newModel(id: string): {
         activeModel: SRD.DiagramModel,
         diagramEngine: SRD.DiagramEngine
@@ -77,14 +110,16 @@ export default class FlowCode extends Component<any, any> {
 
         activeModel.registerListener({
             eventDidFire: (event: BaseEvent) => {
-                console.log(event);
                 let temp: any = event;
 
                 if (event && event.firing && temp.isCreated) {
                     let defaultLinkModel: DefaultLinkModel = temp.link;
                     registerLinkListeners(defaultLinkModel);
-                    registerNodeListeners(temp.node);
+                    registerNodeListeners(temp.node, this.fireCheck.bind(this));
                     this.forceUpdate();
+                }
+                else if (event && event.firing) {
+
                 }
                 return true;
             },
@@ -176,11 +211,23 @@ export default class FlowCode extends Component<any, any> {
                                 type: Operations.ADD_CONSTRUCTOR, name: 'Add Constructor', operation: true
                             }} name={'Add Constructor'} color={Operations.ADD_CONSTRUCTOR} />
                             <TrayItemWidget model={{
+                                type: Operations.ANONYMOUS_FUNCTION, name: 'Anonymous Function', operation: true
+                            }} name={'Anonymous Function'} color={Operations.ANONYMOUS_FUNCTION} />
+                            <TrayItemWidget model={{
                                 type: Operations.ADD_PARAMETER, name: 'Parameter', operation: true
                             }} name={'Add Parameter'} color={Operations.ADD_PARAMETER} />
                             <TrayItemWidget model={{
                                 type: Operations.VARIABLE_GET, name: 'Variable', operation: true
                             }} name={'Variable'} color={Operations.VARIABLE_GET} />
+                            <TrayItemWidget model={{
+                                type: Operations.GET_PROPERTY, name: 'Get Property', operation: true
+                            }} name={'Get Property'} color={Operations.GET_PROPERTY} />
+                            <TrayItemWidget model={{
+                                type: Operations.SET_PROPERTY, name: 'Set Property', operation: true
+                            }} name={'Set Property'} color={Operations.SET_PROPERTY} />
+                            <TrayItemWidget model={{
+                                type: Operations.CALL_METHOD, name: 'Call Method', operation: true
+                            }} name={'Call Method'} color={Operations.CALL_METHOD} />
                             <TrayItemWidget model={{
                                 type: Operations.ADD_CONSTANT, name: 'Constant', operation: true
                             }} name={'Constant'} color={Operations.ADD_CONSTANT} />
@@ -233,22 +280,86 @@ export default class FlowCode extends Component<any, any> {
         );
     }
 }
-function registerNodeListeners(node: FlowCodeNodeModel) {
+function registerNodeListeners(node: FlowCodeNodeModel, fireCheck?: Function) {
     if (node && node.registerListener) {
-        node.registerListener({
-            removing: (evt: BaseEvent) => {
-                console.log(evt);
-                let { targetPort, sourcePort } = evt as any;
-                if (targetPort) {
-                    let linkHandlers = sourcePort.getLinkHandlers();
-                    handleLinkHandlers(linkHandlers, null, sourcePort, targetPort, 'source');
-                    linkHandlers = targetPort.getLinkHandlers();
-                    handleLinkHandlers(linkHandlers, null, sourcePort, targetPort, 'target');
-                }
-                return true;
+        let removing = (evt: BaseEvent) => {
+            let { targetPort, sourcePort } = evt as any;
+            if (targetPort || sourcePort) {
+
+                let linkHandlers = sourcePort ? sourcePort.getLinkHandlers() : [];
+                handleLinkHandlers(linkHandlers, null, sourcePort, targetPort, 'source', FlowNodeEventType.Removing);
+
+                linkHandlers = targetPort ? targetPort.getLinkHandlers() : [];
+                handleLinkHandlers(linkHandlers, null, sourcePort, targetPort, 'target', FlowNodeEventType.Removing);
+
             }
+            return true;
+        };
+        node.registerListener({
+            eventDidFire: (evt: any) => {
+                if (evt.function === FlowNodeEventType.Removing) {
+                    removing(evt);
+                }
+                else if (evt.function === FlowNodeEventType.PortValueUpdated) {
+                }
+                if (fireCheck) {
+                    fireCheck()
+                }
+            },
+            eventWillFire: (evt: BaseEvent) => {
+            },
+            entityRemoved: (evt: BaseEvent) => {
+                let temp: any = evt;
+                let node: FlowCodeNodeModel = temp.entity;
+                let ports = node.getPorts();
+                for (var i in ports) {
+                    let links = ports[i].getLinks();
+                    Object.entries(links).forEach((item: [string, LinkModel<SRD.LinkModelGenerics>]) => {
+                        let [, linkModel] = item;
+
+                        processLinks(linkModel as DefaultLinkModel, FlowNodeEventType.NodeRemoving);
+                    })
+                }
+            },
+            removing
         });
     }
+}
+function processLinks(linkModel: DefaultLinkModel, eventType: FlowNodeEventType) {
+    let sourcePort = linkModel.getSourcePort() as FlowCodePortModel;
+    let targetPort = linkModel.getTargetPort() as FlowCodePortModel;
+    let linkHandlers: FlowCodeLinkHandlers[] = [];
+    if (sourcePort) {
+        linkHandlers = sourcePort.getLinkHandlers();
+        handleLinkHandlers(linkHandlers, linkModel, sourcePort, targetPort, 'source', eventType);
+    }
+    if (targetPort) {
+        linkHandlers = targetPort.getLinkHandlers();
+        handleLinkHandlers(linkHandlers, linkModel, sourcePort, targetPort, 'target', eventType);
+    }
+}
+function processNodes(node: FlowCodeNodeModel, eventType: FlowNodeEventType) {
+ 
+        let portNames = node.getNodeHandlers();
+        let ports = node.getPorts();
+        portNames.forEach((portName: string) => {
+
+            if (ports && ports[portName]) {
+                let flowPortModel = ports[portName] as FlowCodePortModel;
+                let handlers = flowPortModel.getLinkHandlers();
+                handlers.forEach((handle) => {
+                    PortHandler.Handle({
+                        link: null,
+                        sourcePort: flowPortModel.getOptions().in ? flowPortModel : null,
+                        targetPort: !flowPortModel.getOptions().in ? flowPortModel : null,
+                        interestPort: !flowPortModel.getOptions().in ? 'target' : 'source',
+                        node: flowPortModel.getNode() as FlowCodeNodeModel,
+                        eventType: eventType,
+                        type: handle.type
+                    });
+                })
+            }
+        }) 
 }
 function registerLinkListeners(defaultLinkModel: DefaultLinkModel) {
     if (defaultLinkModel && defaultLinkModel.registerListener)
@@ -258,7 +369,7 @@ function registerLinkListeners(defaultLinkModel: DefaultLinkModel) {
 
                 if (sourcePort) {
                     let linkHandlers = sourcePort.getLinkHandlers();
-                    handleLinkHandlers(linkHandlers, defaultLinkModel, sourcePort, defaultLinkModel.getTargetPort() as FlowCodePortModel, 'source');
+                    handleLinkHandlers(linkHandlers, defaultLinkModel, sourcePort, defaultLinkModel.getTargetPort() as FlowCodePortModel, 'source', FlowNodeEventType.PortChanged);
                 }
             },
             targetPortChanged: (portEvent: BaseEvent) => {
@@ -266,13 +377,13 @@ function registerLinkListeners(defaultLinkModel: DefaultLinkModel) {
 
                 if (targetPort) {
                     let linkHandlers = targetPort.getLinkHandlers();
-                    handleLinkHandlers(linkHandlers, defaultLinkModel, defaultLinkModel.getSourcePort() as FlowCodePortModel, targetPort, 'target');
+                    handleLinkHandlers(linkHandlers, defaultLinkModel, defaultLinkModel.getSourcePort() as FlowCodePortModel, targetPort, 'target', FlowNodeEventType.PortChanged);
                 }
             },
         });
 }
 
-function handleLinkHandlers(linkHandlers: FlowCodeLinkHandlers[], defaultLinkModel: DefaultLinkModel | null, sourcePort: FlowCodePortModel, targetPort: FlowCodePortModel, interestPort: 'source' | 'target') {
+function handleLinkHandlers(linkHandlers: FlowCodeLinkHandlers[], defaultLinkModel: DefaultLinkModel | null, sourcePort: FlowCodePortModel, targetPort: FlowCodePortModel, interestPort: 'source' | 'target', eventType: FlowNodeEventType) {
     linkHandlers.forEach((linkHandle: FlowCodeLinkHandlers) => {
         PortHandler.Handle({
             link: defaultLinkModel,
@@ -280,7 +391,8 @@ function handleLinkHandlers(linkHandlers: FlowCodeLinkHandlers[], defaultLinkMod
             targetPort,
             interestPort: interestPort,
             node: sourcePort.getNode() as FlowCodeNodeModel,
-            type: linkHandle.type
+            type: linkHandle.type,
+            eventType: eventType
         });
     });
 }
@@ -298,6 +410,7 @@ function ConstructNodeModel(type: string, ops: { operation?: boolean, color?: st
     if (![
         Operations.START_FUNCTION,
         Operations.FOREACH_CALLBACK,
+        Operations.ANONYMOUS_FUNCTION,
         Operations.MAP_CALLBACK,
         Operations.ADD_CONSTANT,
         Operations.ADD_TYPE,
@@ -311,10 +424,12 @@ function ConstructNodeModel(type: string, ops: { operation?: boolean, color?: st
         Operations.ADD_TYPE,
         Operations.FOREACH_CALLBACK,
         Operations.MAP_CALLBACK,
+        Operations.ANONYMOUS_FUNCTION,
         Operations.ADD_CONSTANT,
         Operations.ADD_PARAMETER,
         Operations.VARIABLE_GET,
-        Operations.ADD_SEQUENCE
+        Operations.ADD_SEQUENCE,
+        Operations.ADD_CONSTRUCTOR
     ].some(v => v === type)) {
         node.addFlowOut();
     }
@@ -322,7 +437,6 @@ function ConstructNodeModel(type: string, ops: { operation?: boolean, color?: st
     if (Operations.ADD_PARAMETER === type) {
         let newPort = node.addInPort('variable');
         newPort.setPortName('variable');
-        newPort.prompt();
         let typePort = node.addInPort('type');
         typePort.addLinkHandler(PortHandlerType.FunctionParameterType, node.getID());
         node.addOutPort('value');
@@ -334,6 +448,14 @@ function ConstructNodeModel(type: string, ops: { operation?: boolean, color?: st
         newPort.addLinkHandler(PortHandlerType.Constructor, node.getID())
         newPort.setStatic();
 
+        return node;
+    }
+    if (Operations.CALL_METHOD === type) {
+        let newPort = node.addInPort('type');
+        newPort.setPortName(PortStructures.Generic.Type);
+        newPort.addLinkHandler(PortHandlerType.FromCallableReference, node.getID())
+        newPort.setStatic();
+        node.setNodeHandler([PortStructures.CallableExpression.Method])
         return node;
     }
     if (Operations.ADD_SEQUENCE === type) {
@@ -485,7 +607,7 @@ function ConstructNodeModel(type: string, ops: { operation?: boolean, color?: st
                     node.addOutPort(classTemp.name ? classTemp.name.escapedText : '', ast.kind);
                     break;
                 case ts.SyntaxKind.VariableDeclaration:
-                    let newPort = node.addInPort('variable');
+                    let newPort = node.addOutPort('variable');
                     newPort.prompt();
                     let typePort = node.addInPort('type');
                     typePort.setPortName(PortStructures.Generic.Type);

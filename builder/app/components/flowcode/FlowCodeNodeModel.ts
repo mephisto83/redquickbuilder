@@ -7,6 +7,7 @@ import ts from 'typescript';
 export interface FlowCodeNodeModelOptions extends BasePositionModelOptions {
 	name?: string;
 	color?: string;
+	nodeHandlers?: string[];
 	panel?: boolean;
 	operation?: boolean;
 	addInPort?: boolean;
@@ -139,7 +140,12 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 		}
 		return this.addPort(p);
 	}
-
+	setNodeHandler(ports: string[]) {
+		this.options.nodeHandlers = ports;
+	}
+	getNodeHandlers() {
+		return this.options.nodeHandlers || [];
+	}
 	addOutPort(label: string, kind?: ts.SyntaxKind, after = true): FlowCodePortModel {
 		const p = new FlowCodePortModel({
 			in: false,
@@ -160,6 +166,7 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 		this.options.color = event.data.color;
 		this.options.nodeType = event.data.nodeType;
 		this.options.operation = event.data.operation;
+		this.options.nodeHandlers = event.data.nodeHandlers;
 		this.sourceOptions = event.data.sourceOptions;
 		this.portsIn = _.map(event.data.portsInOrder, (id) => {
 			return this.getPortFromID(id);
@@ -176,6 +183,7 @@ export class FlowCodeNodeModel extends NodeModel<FlowCodeNodeModelGenerics> {
 			color: this.options.color,
 			sourceOptions: this.sourceOptions,
 			operation: this.options.operation,
+			nodeHandlers: this.options.nodeHandlers,
 			nodeType: this.options.nodeType,
 			portsInOrder: _.map(this.portsIn, (port) => {
 				return port.getID();

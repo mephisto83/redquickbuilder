@@ -8,14 +8,16 @@ import {
 import { DefaultLinkModel } from '@projectstorm/react-diagrams';
 import { AbstractModelFactory, DeserializeEvent } from '@projectstorm/react-canvas-core';
 import ts from 'typescript';
-import { PortHandler } from './PortHandler';
+import { FlowNodeEventType, PortHandler } from './PortHandler';
 import { FlowCodeNodeModel } from './FlowCodeNodeModel';
+import { PortType } from './flowutils';
 
 export interface FlowCodePortModelOptions extends PortModelOptions {
 	label?: string;
 	in?: boolean;
 	isFlow?: boolean;
 	portName?: string;
+	portType?: PortType;
 	kind?: ts.SyntaxKind
 	isStatic?: boolean;
 	prompt?: boolean;
@@ -66,6 +68,9 @@ export class FlowCodePortModel extends PortModel<FlowCodePortModelGenerics> {
 	setName(name: string) {
 		this.options.valueTitle = name;
 	}
+	getValueTitle() {
+		return this.options.valueTitle;
+	}
 	getLinkHandlers(): FlowCodeLinkHandlers[] {
 		return this.linkHandlers;
 	}
@@ -75,16 +80,26 @@ export class FlowCodePortModel extends PortModel<FlowCodePortModelGenerics> {
 	setStatic() {
 		this.options.isStatic = true;
 	}
+	setPortType(portType: PortType) {
+		this.options.portType = portType;
+	}
+	getPortType() {
+		return this.options.portType;
+	}
 	// onConnected(onconnect: Function): void {
 	// 	this.onconnect = onconnect;
 	// }
 	select(func: any) {
 		this.options.selectFunc = func;
 	}
+	getSelectFunc() {
+		return this.options.selectFunc;
+	}
 	deserialize(event: DeserializeEvent<this>) {
 		super.deserialize(event);
 		this.options.in = event.data.in;
 		this.options.label = event.data.label;
+		this.options.portType = event.data.portType;
 		this.options.isStatic = event.data.isStatic;
 		this.options.name = event.data.name;
 		this.options.valueTitle = event.data.valueTitle;
@@ -98,6 +113,7 @@ export class FlowCodePortModel extends PortModel<FlowCodePortModelGenerics> {
 			in: this.options.in,
 			portName: this.options.portName,
 			isStatic: this.options.isStatic,
+			portType: this.options.portType,
 			valueTitle: this.options.valueTitle,
 			kind: this.options.kind,
 			label: this.options.label,
@@ -114,7 +130,7 @@ export class FlowCodePortModel extends PortModel<FlowCodePortModelGenerics> {
 		// }
 		let node = this.getNode() as FlowCodeNodeModel;
 		this.linkHandlers.forEach((handler: FlowCodeLinkHandlers) => {
-			PortHandler.Handle({ type: handler.type, link, targetPort: port as FlowCodePortModel, sourcePort: this, node });
+			PortHandler.Handle({ type: handler.type, link, targetPort: port as FlowCodePortModel, eventType: FlowNodeEventType.Check, interestPort: 'source', sourcePort: this, node });
 		})
 		return link as T;
 	}

@@ -7,6 +7,7 @@ import styled from '@emotion/styled';
 import TextInput from '../textinput';
 import SelectInput from '../selectinput';
 import ts from 'typescript';
+import { FlowNodeEventType } from './PortHandler';
 export interface FlowCodePortLabelProps {
 	port: FlowCodePortModel;
 	engine: DiagramEngine;
@@ -78,19 +79,32 @@ export class FlowCodePortLabel extends React.Component<FlowCodePortLabelProps, a
 			value: ''
 		};
 	}
+
 	getInput() {
 		let options = this.props.port.getOptions();
 		return (<span style={{ position: 'relative' }}>
-			<div style={{ position: 'absolute', top: 0, left: 0, width: 250, height: 70 }}>
-				<TextInput onBlur={() => {
+			<div style={{
+				position: 'absolute',
+				top: 0,
+				left: 0,
+				width: 250,
+				height: 70,
+				backgroundColor: 'white',
+				borderRadius: 3,
+				boxShadow: '5px 10px 12px #888888'
+			}}>
+				<TextInput label={this.props.port.getName()} onBlur={() => {
+					this.props.port.getNode().setLocked(false)
 					this.setState({ showInput: false })
 				}} value={this.state.value} onChange={(val: string) => {
 					options.value = val;
+					this.props.port.getNode().setLocked(false)
 					this.setState({ showInput: false });
 				}} />
 			</div>
 		</span>)
 	}
+
 	getSelect() {
 		let options = this.props.port.getOptions();
 		let selectOptions: any;
@@ -109,16 +123,26 @@ export class FlowCodePortLabel extends React.Component<FlowCodePortLabelProps, a
 			case 'enumerationValue':
 				selectOptions = (function () { return enumerationValueSelect(null) })()
 				break;
+			default:
+				let selectFunc = this.props.port.getSelectFunc();
+				if (selectFunc) {
+					selectOptions = selectFunc();
+				} else {
+					selectOptions = [];
+				}
 		}
 		return (<span style={{ position: 'relative' }}>
 			<div style={{ position: 'absolute', top: 0, left: 0, width: 250, height: 70 }}>
 				<SelectInput options={selectOptions} onBlur={() => {
 					this.setState({ showSelect: false })
+					this.props.port.getNode().setLocked(false)
 				}} value={options.value} onChange={(val: string) => {
 					options.value = val;
 					options.valueTitle = selectOptions.find((v: any) => v.value === val).title;
 
 					this.setState({ showSelect: false });
+					this.props.port.getNode().setLocked(false)
+					this.props.port.getNode().fireEvent({},  FlowNodeEventType.PortValueUpdated)
 				}} />
 			</div>
 		</span>)
@@ -145,13 +169,16 @@ export class FlowCodePortLabel extends React.Component<FlowCodePortLabelProps, a
 				case 'modelType':
 				case 'enumeration':
 				case 'enumerationValue':
+				case 'method':
 					hasSelectPrompting = true;
 					break;
 			}
 			if (options && hasPrompting) {
+				this.props.port.getNode().setLocked(true)
 				this.setState({ showInput: true, value: options.value || options.label });
 			}
 			else if (options && hasSelectPrompting) {
+				this.props.port.getNode().setLocked(true)
 				this.setState({ showSelect: true, value: options.value || options.label });
 			}
 		}}>{options.valueTitle || options.value || options.label}</span></SLabel>;
