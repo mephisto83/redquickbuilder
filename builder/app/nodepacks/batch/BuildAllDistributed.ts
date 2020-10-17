@@ -35,7 +35,8 @@ import ApplyLoginValidations from './ApplyLoginValidations';
 import CollectionDataChainsIntoCollections, {
 	CollectionSharedReference,
 	CollectionSharedMenuDataSource,
-	CollectionDataChainsRelatedToMenuSource
+	CollectionDataChainsRelatedToMenuSource,
+	CollectionPruneDataChain
 } from '../CollectionDataChainsIntoCollections';
 import JobService, { Job, JobFile } from '../../jobs/jobservice';
 import ModifyUpdateLinks from '../ModifyUpdateLinks';
@@ -192,6 +193,7 @@ const CollectionSharedReferenceTo = 'Add Collections Shared Refs';
 const Collection_SharedMenuDataSource = 'Add Shared Menu Data Source';
 const Collection_DataChainsRelatedToMenuSource = 'Add Data Chains related to menu source';
 export const CollectionScreenWithoutDatachainDistributed = 'CollectionScreenWithoutDatachainDistributed';
+export const PruneDataChainCollections = 'PruneDataChainCollections';
 export const ApplyTemplates = 'ApplyTemplates';
 export const ChangeInputToSelects = 'Change Input To Selects';
 export const ApplyValidationFromProperties = 'ApplyValidationFromProperties';
@@ -250,6 +252,7 @@ const buildAllProgress = [
 	...waiting(CollectionComponentNodes),
 	...waiting(CollectionScreenNodes),
 	...waiting(CollectionConnectDataChainCollection),
+	{ name: PruneDataChainCollections },
 	{ name: APPLY_PERMISSION_CHAINS },
 	{ name: APPLY_EXECUTION_CHAINS },
 	{ name: APPLY_VALIDATION_CHAINS },
@@ -456,6 +459,10 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 			currentJobFile,
 			NodeTypes.Screen
 		);
+
+		await run(buildAllProgress, PruneDataChainCollections, async (progressFunc: any) => {
+			await CollectionPruneDataChain();
+		});
 
 		await threadRun(buildAllProgress, CollectionComponentNodes, currentJobFile, NodeTypes.ComponentNode);
 		await threadRun(buildAllProgress, ApplyTemplates, currentJobFile, NodeTypes.Model);

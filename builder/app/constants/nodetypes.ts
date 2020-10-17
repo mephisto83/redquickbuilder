@@ -436,6 +436,7 @@ export const UIActionMethodParameterTypes = {
 };
 export const NodeProperties = {
 	ViewPackage: 'view-package',
+	DataChainCollectionChildrenCount: 'DataChainCollectionChildrenCount',
 	IsFetchOutput: 'IsFetchOutput',
 	UIActionMethod: 'UIActionMethod',
 	HideStyle: 'HideStyle',

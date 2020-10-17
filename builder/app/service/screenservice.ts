@@ -2007,7 +2007,6 @@ function getUIMethodParameters(parameters: any, options?: { passingParameters: b
 				case UIActionMethodParameterTypes.StateViewModel:
 					return 'this.state.viewModel';
 				case UIActionMethodParameterTypes.RouteDescription:
-					debugger;
 					if (v && v.routeArgNodes && v.componentApiNodes) {
 						return createInternalApiArgumentsCode(
 							v.componentApiNodes.map((v: string) => GetNodeById(v)),
