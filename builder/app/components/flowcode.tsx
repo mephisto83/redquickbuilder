@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import * as UIA from '../actions/uiactions';
 import * as Titles from './titles';
-import createEngine, { DiagramModel, DefaultNodeModel, DefaultLinkModel, DefaultDiagramState, LinkModel } from '@projectstorm/react-diagrams';
+import createEngine, { DiagramModel, DefaultNodeModel, DagreEngine, DefaultLinkModel, DefaultDiagramState, LinkModel, DiagramEngine, PathFindingLinkFactory } from '@projectstorm/react-diagrams';
 import { BaseEvent, CanvasWidget } from '@projectstorm/react-canvas-core';
 import DemoCanvasWidget from './canvaswidget';
 import * as SRD from '@projectstorm/react-diagrams';
@@ -19,7 +19,7 @@ import { FlowCodeLinkHandlers, FlowCodePortModel } from './flowcode/FlowCodePort
 import { Node } from '../methods/graph_types';
 import { refreshFlowModel, saveFlowModel } from '../actions/remoteActions';
 import { FlowNodeEventType, PortHandler, PortHandlerType } from './flowcode/PortHandler';
-import { FlowCodeCommand, Operations, PortStructures } from './flowcode/flowutils';
+import { FlowCodeCommand, Operations, PortStructures, PortType } from './flowcode/flowutils';
 
 export const SBody = styled.div`
 flex-grow: 1;
@@ -48,17 +48,48 @@ export const SLayer = styled.div`
 position: relative;
 flex-grow: 1;
 `;
-
+const context: any = {};
+export function callAutoDistribute() {
+    context.autoDistribute();
+}
 
 export default class FlowCode extends Component<any, any> {
     fireChecking: boolean = false;
     fireCheckWaiting: boolean = false;
+    engine: DagreEngine;
     constructor(props: any) {
         super(props);
         let id = UIA.GUID();
         let setup = this.newModel(id);
+        this.engine = new DagreEngine({
+            graph: {
+                rankdir: 'LR',
+                ranker: 'longest-path',
+                marginx: 25,
+                marginy: 25,
+                nodesep: 10
+            },
+            includeLinks: true
+        });
         this.state = { ...setup, id };
+        context.autoDistribute = this.autoDistribute.bind(this);
     }
+
+    autoDistribute = () => {
+        this.engine.redistribute(this.state.activeModel);
+
+        // only happens if pathfing is enabled (check line 25)
+        this.reroute();
+        this.state.engine.repaintCanvas();
+    };
+
+    reroute() {
+        (this.state.engine as DiagramEngine)
+            .getLinkFactories()
+            .getFactory<PathFindingLinkFactory>(PathFindingLinkFactory.NAME)
+            .calculateRoutingMatrix();
+    }
+
 
     public fireCheck() {
         let throttleTime = 1000;
@@ -94,7 +125,7 @@ export default class FlowCode extends Component<any, any> {
     }
     public newModel(id: string): {
         activeModel: SRD.DiagramModel,
-        diagramEngine: SRD.DiagramEngine
+        engine: SRD.DiagramEngine
     } {
         let activeModel = new SRD.DiagramModel();
         var engine = createEngine();
@@ -104,8 +135,7 @@ export default class FlowCode extends Component<any, any> {
             .registerFactory(new FlowCodePortFactory());
         engine.getNodeFactories().registerFactory(new FlowCodeNodeFactory());
 
-        let diagramEngine = engine;
-        diagramEngine.setModel(activeModel);
+        engine.setModel(activeModel);
 
 
         activeModel.registerListener({
@@ -131,12 +161,12 @@ export default class FlowCode extends Component<any, any> {
 
         return {
             activeModel,
-            diagramEngine
+            engine
         }
     }
     componentDidUpdate(prevProps: any, prevState: any, snapshot: any) {
         if (prevProps && prevProps.code !== this.props.code) {
-            this.state.activeModel.deserializeModel(JSON.parse(this.props.code), this.state.diagramEngine);
+            this.state.activeModel.deserializeModel(JSON.parse(this.props.code), this.state.engine);
             this.setState({ functionName: this.props.functionName })
         }
     }
@@ -162,8 +192,8 @@ export default class FlowCode extends Component<any, any> {
     render() {
 
         const { state } = this.props;
-        let { diagramEngine, activeModel } = this.state;
-        if (!diagramEngine) {
+        let { engine, activeModel } = this.state;
+        if (!engine) {
             return <div></div>
         }
         return (
@@ -255,16 +285,16 @@ export default class FlowCode extends Component<any, any> {
                     <SLayer
                         onDrop={(event) => {
                             var data = JSON.parse(event.dataTransfer.getData('storm-diagram-node'));
-                            var nodesCount = _.keys(diagramEngine.getModel().getNodes()).length;
+                            var nodesCount = _.keys(engine.getModel().getNodes()).length;
 
                             var node: FlowCodeNodeModel | null = null;
                             if (data.type) {
                                 node = ConstructNodeModel(data.type, data, this.props.fileSource)
                             }
                             if (node) {
-                                var point = diagramEngine.getRelativeMousePoint(event);
+                                var point = engine.getRelativeMousePoint(event);
                                 node.setPosition(point);
-                                diagramEngine.getModel().addNode(node);
+                                engine.getModel().addNode(node);
                                 this.forceUpdate();
                             }
                         }}
@@ -272,7 +302,7 @@ export default class FlowCode extends Component<any, any> {
                             event.preventDefault();
                         }}>
                         <DemoCanvasWidget>
-                            <CanvasWidget engine={diagramEngine} />
+                            <CanvasWidget engine={engine} />
                         </DemoCanvasWidget>
                     </SLayer>
                 </SContent>
@@ -542,13 +572,11 @@ function ConstructNodeModel(type: string, ops: { operation?: boolean, color?: st
                 case ts.SyntaxKind.FunctionDeclaration:
                     let func = ast as ts.FunctionDeclaration;
                     func.parameters.forEach((param: ts.ParameterDeclaration) => {
-                        let temp: any = param.name;
-                        let paramAny: any = param;
-                        if (temp.text || temp.escapedText) {
-                            let port = node.addInPort(temp.text || temp.escapedText, param.kind);
-                            if (paramAny.type) {
-                                port.portType = paramAny.type.escapedText;
-                            }
+                        let temp = param.name;
+                        let paramAny: ts.ParameterDeclaration = param;
+                        let port = node.addInPort(temp.getText(), param.kind);
+                        if (paramAny.type) {
+                            port.portType = paramAny.type.getText();
                         }
                     })
                     if (func.type) {
@@ -620,6 +648,14 @@ function ConstructNodeModel(type: string, ops: { operation?: boolean, color?: st
                     let expressionPort = node.addInPort('expression');
                     expressionPort.setPortName(PortStructures.Generic.Expression);
                     expressionPort.addLinkHandler(PortHandlerType.FunctionParameterExpressionType, node.getID());
+                    break;
+                case ts.SyntaxKind.EnumDeclaration:
+                    let enumerationDec = ast as ts.EnumDeclaration;
+                    enumerationDec.members.forEach((member: ts.EnumMember) => {
+                        let outPort = node.addOutPort(member.getText());
+                        outPort.setPortName(member.getText());
+                        outPort.setPortType(PortType.EnumerationValue);
+                    })
                     break;
 
             }

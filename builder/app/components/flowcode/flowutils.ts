@@ -1,8 +1,8 @@
-import ts from "typescript";
-import { FlowCodeStatements } from "../../constants/flowcode_ast";
-import { FlowCodeNodeModel } from "./FlowCodeNodeModel";
-import { FlowCodePortModel } from "./FlowCodePortModel";
-import { PortHandler } from "./PortHandler";
+import ts from 'typescript';
+import { FlowCodeStatements } from '../../constants/flowcode_ast';
+import { FlowCodeNodeModel } from './FlowCodeNodeModel';
+import { FlowCodePortModel } from './FlowCodePortModel';
+import { PortHandler } from './PortHandler';
 
 export const PortStructures = {
     Generic: {
@@ -40,7 +40,7 @@ export const FlowCodeCommand = {
 }
 
 export enum FlowCodeNodeCommandKey {
-    AddInputParameter = "AddInputParameter",
+    AddInputParameter = 'AddInputParameter',
     SetOutputPort = 'SetOutPort'
 }
 export interface FlowCodeNodeCommands {
@@ -67,10 +67,12 @@ export const Operations = {
 };
 
 export enum PortType {
-    MethodParameters = "method-parameters",
+    MethodParameters = 'method-parameters',
+    MethodOutput = 'method-output',
     MethodParameterOutputs = 'method-parameter-outputs',
     MethodSequence = 'method-sequence',
-    OutputType = 'ouput-type'
+    OutputType = 'ouput-type',
+    EnumerationValue = 'enumeration-value'
 }
 export function GetPortASTTypeName(port: FlowCodePortModel) {
     return GetNodeASTPortTypeName(port, port.getNode() as FlowCodeNodeModel);
@@ -98,8 +100,23 @@ function getNextNode(key: string, target: 'target' | 'source', node: FlowCodeNod
     return null;
 }
 
-
-function GetNodeASTPortTypeName(not_useed_port: FlowCodePortModel, node: FlowCodeNodeModel): ts.Node | null {
+function GetMethodPortType(node: FlowCodeNodeModel) {
+    let astType: ts.Node | null = GetPortASTType(node, PortStructures.CallableExpression.Method);
+    if (astType && node) {
+        let methodPort = GetNodePortByName(node, PortStructures.CallableExpression.Method);
+        if (methodPort) {
+            let method = getSelectedMethod(methodPort, astType as ts.ClassDeclaration);
+            if (method && method.type) {
+                return method.type;
+            }
+            else {
+                return null;
+            }
+        }
+    }
+    return null;
+}
+function GetNodeASTPortTypeName(currentPort: FlowCodePortModel, node: FlowCodeNodeModel): ts.Node | null {
     let nodeType = node.getNodeType();
     let isOperation = node.isOperation();
     let nextPort: FlowCodePortModel | null = null;
@@ -118,11 +135,21 @@ function GetNodeASTPortTypeName(not_useed_port: FlowCodePortModel, node: FlowCod
                 }
                 break;
             case Operations.CALL_METHOD:
+                let portType = currentPort.getPortType();
+                if (portType === PortType.MethodOutput) {
+                    return GetMethodPortType(node);
+                }
+                nextPort = getNextNode(PortStructures.Constructor.Type, 'source', node);
+                if (nextPort) {
+                    return GetNodeASTPortTypeName(nextPort, nextPort.getNode() as FlowCodeNodeModel);
+                }
+                break;
             case Operations.ADD_CONSTRUCTOR:
                 nextPort = getNextNode(PortStructures.Constructor.Type, 'source', node);
                 if (nextPort) {
                     return GetNodeASTPortTypeName(nextPort, nextPort.getNode() as FlowCodeNodeModel);
                 }
+                break;
         }
     }
     else {
@@ -167,4 +194,36 @@ export function GetNodePortsByType(node: FlowCodeNodeModel, portType: PortType):
     return variablePortNames.map((variablePortName: string) => {
         return (ports as any)[variablePortName] as FlowCodePortModel;
     });
+}
+
+export function getSelectedMethod(methodPort: FlowCodePortModel, astType: ts.ClassDeclaration): ts.MethodDeclaration | null {
+    if (methodPort) {
+        let classDec = astType;
+        if (classDec) {
+            let selectedMethod = classDec.members.find((member: ts.ClassElement) => {
+                return member.kind === ts.SyntaxKind.MethodDeclaration && methodPort && member.getText().trim() === methodPort.getValueTitle();
+            });
+            return selectedMethod as ts.MethodDeclaration || null;
+        }
+    }
+    return null;
+}
+
+
+export function GetPortASTType(node: FlowCodeNodeModel, portName: string): ts.Node | null {
+    let ports = node.getPorts();
+    let variablePortName = Object.keys(ports).find((v: any) => {
+        let temp = v as string;
+        let options = (ports[temp] as FlowCodePortModel).getOptions();
+        if (options && options.portName === portName) {
+            return true;
+        }
+    });
+
+    if (variablePortName) {
+        let temp: ts.Node | null = GetPortASTTypeName(ports[variablePortName] as FlowCodePortModel);
+        return temp;
+    }
+
+    return null;
 }

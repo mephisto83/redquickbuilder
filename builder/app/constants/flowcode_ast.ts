@@ -74,7 +74,7 @@ export const FlowCodeStatements: IFlowCodeStatements = {
 export function buildAst(config: IFlowCodeConfig) {
 
     if (config) {
-        config.ast = captureContents(config);
+        config.ast = captureContents(config, false, true);
     }
 }
 
@@ -169,7 +169,7 @@ export function buildFunctionsFromString(fileContents: string, filePath: string 
         let ast: any = captureContents(fcConfig, noCapture);
         fcConfig.filePath = filePath;
         fcConfig.ast = ast;
-        flowCodeFile[ast && ast.name && ast.name.escapedText ? ast.name.escapedText : text] = fcConfig;
+        flowCodeFile[ast && ast.simpleName ? ast && ast.simpleName : (ast && ast.name && ast.name.escapedText ? ast.name.escapedText : text)] = fcConfig;
     });
     return flowCodeFile
 }
@@ -242,7 +242,7 @@ function captureModules(node: ts.Node): ts.Node[] {
 
     return result;
 }
-function captureContents(config: IFlowCodeConfig, noCapture?: boolean): ts.Node | null | undefined {
+function captureContents(config: IFlowCodeConfig, noCapture?: boolean, skipModifierCheck?: boolean): ts.Node | null | undefined {
     let result: ts.Node | null = null;
 
 
@@ -258,13 +258,25 @@ function captureContents(config: IFlowCodeConfig, noCapture?: boolean): ts.Node 
                     case ts.SyntaxKind.ClassDeclaration:
                     case ts.SyntaxKind.InterfaceDeclaration:
                     case ts.SyntaxKind.VariableDeclaration:
-                        if (noCapture) {
-                            result = node;
+                    case ts.SyntaxKind.EnumDeclaration:
+                        if (node.modifiers || skipModifierCheck) {
+                            if (skipModifierCheck || node.modifiers && node.modifiers.find((modifier: ts.Modifier) => {
+                                return modifier.kind === ts.SyntaxKind.ExportKeyword;
+                            })) {
+
+                                if (noCapture) {
+                                    result = node;
+                                }
+                                else {
+                                    let temp: any = node;
+                                    if (temp && temp.name && temp.name.getText) {
+                                        temp.simpleName = temp.name.getText();
+                                    }
+                                    result = (node);
+                                }
+                                return;
+                            }
                         }
-                        else {
-                            result = stripConvertParent(node);
-                        }
-                        return;
                 }
 
                 return ts.visitEachChild(node, visit, context);
@@ -272,6 +284,6 @@ function captureContents(config: IFlowCodeConfig, noCapture?: boolean): ts.Node 
             return ts.visitNode(rootNode, visit);
         };
     ts.transform<ts.SourceFile>(res, [transformer]);
-
+        
     return result;
 }

@@ -48,7 +48,7 @@ export default class TreeViewMenu extends Component<any, any> {
 						}
 					}}
 				>
-					{this.props.hideIcon ? null : <i style={{ ...this.error() }} className={`${this.icon()}`} />}
+					{this.props.hideIcon ? null : <i style={{ color: this.iconcolor(), ...this.error() }} className={`${this.icon()}`} />}
 					<span
 						style={{ ...this.color(), ...this.greyed(), ...this.error() }}
 						title={this.props.description || this.props.title}
@@ -66,7 +66,7 @@ export default class TreeViewMenu extends Component<any, any> {
 								}
 							}}
 						>
-							<i className="fa fa-angle-left pull-right" style={{ color: this.color() }} />
+							<i className="fa fa-angle-left pull-right" style={{ color: this.iconcolor() }} />
 							{this.props.right ? this.props.right : null}
 						</span>
 					)}

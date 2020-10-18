@@ -12,7 +12,7 @@ import { Responsive, WidthProvider } from 'react-grid-layout';
 import { Visual } from '../actions/uiactions';
 import { QuickAccess, GraphLink } from '../methods/graph_types';
 import path from 'path';
-import FlowCode from './flowcode';
+import FlowCode, { callAutoDistribute } from './flowcode';
 import { DeclartionColors, IFlowCodeConfig, IFlowCodeStatements, LoadFileSource } from '../constants/flowcode_ast';
 
 class FlowCodeViewer extends Component<any, any> {
@@ -67,15 +67,8 @@ class FlowCodeViewer extends Component<any, any> {
 				/>)
 			})
 		}
-		return [<TreeViewMenu
-			key="typescriptflows"
-			title="Typescript"
-			active
-			open={this.state.typescriptFlowMenu}
-			onClick={() => {
-				this.setState({ typescriptFlowMenu: !this.state.typescriptFlowMenu })
-			}}>
-			<TreeViewMenu title="load" onClick={() => {
+		return [
+			<TreeViewMenu key="loadbutton" title="load" onClick={() => {
 				LoadFileSource().then((fileSource) => {
 					let treeStruct: any = this.state.treeStruct || {};
 					if (this.state.fileSource) {
@@ -97,10 +90,22 @@ class FlowCodeViewer extends Component<any, any> {
 					});
 					this.setState({ treeStruct: treeStruct, fileSource })
 				})
-			}} />
-			{typescriptFlows}
-			{this.getTypescriptAsts()}
-		</TreeViewMenu>];
+			}} />,
+			<TreeViewMenu key="redraw" title="Redraw" onClick={() => {
+				callAutoDistribute();
+			}} />,
+			<TreeViewMenu
+				key="typescriptflows"
+				title="Typescript"
+				active
+				open={this.state.typescriptFlowMenu}
+				onClick={() => {
+					this.setState({ typescriptFlowMenu: !this.state.typescriptFlowMenu })
+				}}>
+
+				{typescriptFlows}
+				{this.getTypescriptAsts()}
+			</TreeViewMenu>];
 	}
 	getTypescriptAsts() {
 		let result: any[] = [];
@@ -159,7 +164,11 @@ class FlowCodeViewer extends Component<any, any> {
 			let [key, config] = value;
 			let colorKey: any = config.ast ? config.ast.kind : '';
 			result.push(<TreeViewMenu active title={key} key={key} iconcolor={DeclartionColors[colorKey] || config.color} onDragStart={(event: any) => {
-				event.dataTransfer.setData('storm-diagram-node', JSON.stringify({ type: key, file: file, color: DeclartionColors[colorKey] || config.color }));
+				event.dataTransfer.setData('storm-diagram-node', JSON.stringify({
+					type: key,
+					file: file,
+					color: DeclartionColors[colorKey] || config.color
+				}));
 			}} />)
 		})
 
