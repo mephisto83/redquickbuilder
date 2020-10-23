@@ -37,6 +37,7 @@ import SetupViewTypes from '../../app/nodepacks/batch/SetupViewTypes';
 import BuildDashboards from '../../app/nodepacks/screens/dashboard/BuildDashboards';
 import ConnectDashboards from '../../app/nodepacks/screens/dashboard/ConnectDashboards';
 import ChangeInputToSelect from '../../app/nodepacks/screens/ChangeInputToSelect';
+import { fs_existsSync, fs_readFileSync } from '../../app/generators/modelgenerators';
 
 let app_state;
 
@@ -58,8 +59,8 @@ export default async function executeJob(
   SetPause(true);
   console.log(`----------jobInstancePath:  ${jobInstancePath} -----------`)
 	const partPath = path.join(jobInstancePath, JobServiceConstants.INPUT);
-	if (partPath && fs.existsSync(partPath)) {
-		const partContent: string = fs.readFileSync(partPath, 'utf8');
+	if (partPath && fs_existsSync(partPath)) {
+		const partContent: string = fs_readFileSync(partPath, 'utf8');
 		if (partContent) {
 			const jobPart: JobItem = JSON.parse(partContent);
 			const { config } = jobPart;
@@ -177,7 +178,7 @@ export default async function executeJob(
 		console.log(options);
 		throw new Error('missing partPath');
 	}
-	if (fs.existsSync(partPath)) {
+	if (fs_existsSync(partPath)) {
 		await sleep();
 	}
 	SetPause(false);

@@ -35,6 +35,7 @@ import { bindTemplate, FunctionTypes, FunctionTemplateKeys } from '../constants/
 import { NodeType, Filter } from '../components/titles';
 import NamespaceGenerator from './namespacegenerator';
 import { enumerate } from '../utils/utils';
+import { fs_readFileSync } from './modelgenerators';
 
 const RETURN_GET_CLASS = './app/templates/models/itemfilters/item_filter.tpl';
 const FILTER_PROPERTY_FUNCTION_VALUE = './app/templates/models/itemfilters/filter_property_function_value.tpl';
@@ -97,7 +98,7 @@ export default class ModelItemFilterGenerator {
 		let graph = GetRootGraph(state);
 		let result: any = {};
 
-		let _return_get_class = fs.readFileSync(RETURN_GET_CLASS, 'utf8');
+		let _return_get_class = fs_readFileSync(RETURN_GET_CLASS, 'utf8');
 		let allfilters = NodesByType(state, NodeTypes.ModelFilter);
 		let modelitemfilters = NodesByType(state, NodeTypes.ModelItemFilter);
 		modelitemfilters.map((modelitemfilter: { id: string }) => {
@@ -119,7 +120,7 @@ export default class ModelItemFilterGenerator {
 			let parameters: any[] = [];
 
 			if (true || (filterModel && filterModel.properties)) {
-				let filterPropFunction = fs.readFileSync(FILTER_PROPERTY_FUNCTION_VALUE, 'utf8');
+				let filterPropFunction = fs_readFileSync(FILTER_PROPERTY_FUNCTION_VALUE, 'utf8');
 				let filters: any = [];
 				parameters = parameters.filter((x) => x).unique().sort();
 				if (filterMethodParameters && filterMethodParameters.length) {

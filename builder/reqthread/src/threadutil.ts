@@ -20,6 +20,7 @@ import { Graph } from '../../app/methods/graph_types';
 import unprune from '../../app/methods/unprune';
 import prune from '../../app/methods/prune';
 import StoreGraph, { LoadGraph } from '../../app/methods/storeGraph';
+import { fs_existsSync, fs_readdirSync, fs_readFileSync } from '../../app/generators/modelgenerators';
 
 export interface AgentDirectories {
 	[id: string]: AgentDirectory;
@@ -28,7 +29,7 @@ export interface AgentDirectory {
 	[id: string]: {};
 }
 export function getAgentTrees(folder: string): AgentDirectories {
-	if (fs.existsSync(folder)) {
+	if (fs_existsSync(folder)) {
 		let agentDirectories = getDirectories(folder);
 		let result: AgentDirectories = {};
 		agentDirectories.forEach((agent) => {
@@ -36,7 +37,7 @@ export function getAgentTrees(folder: string): AgentDirectories {
 			let projects = getDirectories(path.join(folder, agent));
 			projects.map((project) => {
 				result[agent][project] = JSON.parse(
-					fs.readFileSync(path.join(folder, agent, project, 'config.json'), 'utf8')
+					fs_readFileSync(path.join(folder, agent, project, 'config.json'), 'utf8')
 				);
 			});
 		});
@@ -50,7 +51,7 @@ export function sleep(ms: number = 3 * 1000) {
 }
 
 const isDirectory = (source) => fs.lstatSync(source).isDirectory();
-export const getDirectories = (source) => fs.readdirSync(source).filter((name) => isDirectory(path.join(source, name)));
+export const getDirectories = (source) => fs_readdirSync(source).filter((name) => isDirectory(path.join(source, name)));
 let app_state;
 export async function setupJob(graphFolder: string) {
 	let graph = await openFile(path.join(graphFolder, JobServiceConstants.GRAPH_FILE), GetDispatchFunc());
@@ -88,7 +89,7 @@ export async function openFile(fileName: string, dispatch: any): Promise<Graph> 
 		let dirPath = path.dirname(fileName);
 		console.log(fileName);
 		let opened_graph: Graph;
-		if (fs.existsSync(path.join(dirPath, JobServiceConstants.GRAPH_FOLDER))) {
+		if (fs_existsSync(path.join(dirPath, JobServiceConstants.GRAPH_FOLDER))) {
 			opened_graph = await JobService.JoinFile(dirPath, path.basename(fileName));
 		} else {
 			opened_graph = await LoadGraph(fileName);

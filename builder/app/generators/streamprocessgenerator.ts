@@ -11,6 +11,7 @@ import {
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
+import { fs_readFileSync } from './modelgenerators';
 
 const TEST_CLASS = './app/templates/tests/tests.tpl';
 const STREAM_PROCESS_TEMPLATE = './app/templates/stream_process/stream_process.tpl';
@@ -20,7 +21,7 @@ const STREAM_PROCESS_FUNCTION_TEMPLATE = './app/templates/stream_process/stream_
 export default class StreamProcessGenerator {
 	static GenerateStaticMethods(models: any) {
 		let agents = models.filter((x: any) => GetNodeProp(x, NodeProperties.IsAgent));
-		let _streamProcessFunctionTemplate = fs.readFileSync(STREAM_PROCESS_FUNCTION_TEMPLATE, 'utf8');
+		let _streamProcessFunctionTemplate = fs_readFileSync(STREAM_PROCESS_FUNCTION_TEMPLATE, 'utf8');
 		let staticMethods: any = [];
 		agents.map((agent: any) => {
 			models.map((model: any) => {
@@ -39,7 +40,7 @@ export default class StreamProcessGenerator {
 	}
 	static GenerateStaticMethodTests(models: any[]) {
 		let agents = models.filter((x: any) => GetNodeProp(x, NodeProperties.IsAgent));
-		let _streamProcessTemplateTests = fs.readFileSync(STREAM_PROCESS_TEMPLATE_TESTS, 'utf8');
+		let _streamProcessTemplateTests = fs_readFileSync(STREAM_PROCESS_TEMPLATE_TESTS, 'utf8');
 		let _streamProcessFunctionTemplate = _streamProcessTemplateTests;
 		let staticMethods: any[] = [];
 		agents.map((agent: any) => {
@@ -64,8 +65,8 @@ export default class StreamProcessGenerator {
 			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration));
 		let graphRoot = GetRootGraph(state);
 		let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
-		let _streamProcessTemplate = fs.readFileSync(STREAM_PROCESS_TEMPLATE, 'utf8');
-		let _streamProcessTemplateTests = fs.readFileSync(TEST_CLASS, 'utf8');
+		let _streamProcessTemplate = fs_readFileSync(STREAM_PROCESS_TEMPLATE, 'utf8');
+		let _streamProcessTemplateTests = fs_readFileSync(TEST_CLASS, 'utf8');
 		let statics = StreamProcessGenerator.GenerateStaticMethods(models);
 		let staticTests = StreamProcessGenerator.GenerateStaticMethodTests(models);
 		_streamProcessTemplate = bindTemplate(_streamProcessTemplate, {

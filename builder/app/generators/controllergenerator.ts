@@ -26,6 +26,7 @@ import {
 	MethodFunctions
 } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
+import { fs_existsSync, fs_readFileSync } from './modelgenerators';
 
 const CONTROLLER_CLASS_TEMPLATE = './app/templates/controller/controller.tpl';
 const CONTROLLER_CLASS_FUNCTION_TEMPLATE = './app/templates/controller/controller_functions.tpl';
@@ -49,9 +50,9 @@ export default class ControllerGenerator {
 			(x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration)
 		);
 
-		let _controllerTemplateClass = fs.readFileSync(CONTROLLER_CLASS_TEMPLATE, 'utf8');
-		let _controllerTemplateFunction = fs.readFileSync(CONTROLLER_CLASS_FUNCTION_TEMPLATE, 'utf8');
-		let _controllerTemplateFunctionGet = fs.readFileSync(CONTROLLER_CLASS_FUNCTION_GET_TEMPLATE, 'utf8');
+		let _controllerTemplateClass = fs_readFileSync(CONTROLLER_CLASS_TEMPLATE, 'utf8');
+		let _controllerTemplateFunction = fs_readFileSync(CONTROLLER_CLASS_FUNCTION_TEMPLATE, 'utf8');
+		let _controllerTemplateFunctionGet = fs_readFileSync(CONTROLLER_CLASS_FUNCTION_GET_TEMPLATE, 'utf8');
 		let root = GetRootGraph(state);
 		let result: any = {};
 		controllers.map((controller: any) => {
@@ -80,8 +81,8 @@ export default class ControllerGenerator {
 							var ft = MethodFunctions[GetNodeProp(maestro_function, NodeProperties.FunctionType)];
 							if (ft) {
 								let tempFunction = ft.controller || _controllerTemplateFunction;
-								if (fs.existsSync(tempFunction)) {
-									tempFunction = fs.readFileSync(tempFunction, 'utf8');
+								if (fs_existsSync(tempFunction)) {
+									tempFunction = fs_readFileSync(tempFunction, 'utf8');
 								}
 								let parameters = '';
 								let parameter_route = '';

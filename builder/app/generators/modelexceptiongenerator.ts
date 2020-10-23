@@ -19,6 +19,7 @@ import { bindTemplate } from '../constants/functiontypes';
 import { NodeType } from '../components/titles';
 import NamespaceGenerator from './namespacegenerator';
 import { enumerate } from '../utils/utils';
+import { fs_readFileSync } from './modelgenerators';
 
 const RETURN_GET_CLASS = './app/templates/models/exceptions/exceptions_class.tpl';
 const TEST_CLASS = './app/templates/tests/tests.tpl';
@@ -31,7 +32,7 @@ export default class ModelReturnGenerator {
 		let graph = GetRootGraph(state);
 		let result: any = {};
 
-		let _return_get_class = fs.readFileSync(RETURN_GET_CLASS, 'utf8');
+		let _return_get_class = fs_readFileSync(RETURN_GET_CLASS, 'utf8');
 		let allfilters = NodesByType(state, NodeTypes.ModelFilter);
 		let allmodels = NodesByType(state, NodeTypes.Model)
 			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration))

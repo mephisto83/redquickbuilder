@@ -2,7 +2,7 @@ import fs from 'fs';
 import * as ts from 'typescript';
 import path from 'path';
 import { getGenericDirectory } from '../actions/remoteActions';
-import { fs_readFileSync } from '../generators/modelgenerators';
+import { fs_existsSync, fs_readdirSync, fs_readFileSync } from '../generators/modelgenerators';
 import MemoryCompilerHost from './ast/compiler/MemoryCompilerHost';
 import { NEW_LINE } from './nodetypes';
 import { PortHandler } from '../components/flowcode/PortHandler';
@@ -13,6 +13,7 @@ export interface IFlowCodeConfig {
     color: string;
     template: string;
     ast?: ts.Node | null;
+    imports?: ts.Node[];
     filePath?: string;
     isParameter?: boolean;
 }
@@ -96,49 +97,24 @@ declare namespace fl {
 
     }
 }
-function stripConvertParent(item: any): any {
-    let result: any = {};
-    for (var i in item) {
-        if (Array.isArray(item[i])) {
-            result[i] = item[i].map((v: any) => stripConvertParent(v));
-        }
-        else if (typeof item[i] === 'object') {
-            if (typeof item[i] !== 'function') {
-                if (i !== 'parent') {
-                    result[i] = stripConvertParent(item[i]);
-                }
-            }
-        }
-        else if (typeof item[i] === 'function') {
-            if (i === 'getText' && item.getText) {
-                result.escapedText = result.escapedText || item.getText();
-            }
-        }
-        else {
-            result[i] = item[i];
-        }
-    }
-    return result;
-}
-export function buildFunctions() {
-    // let fileContents = fs_readFileSync('./app/templates/reactweb/v1/src/actions/uiactions.d.ts', 'utf8') as string;
 
-    // buildFunctionsFromString(fileContents);
+export function buildFunctions() {
 }
+
 export async function LoadFileSource(): Promise<IFlowCodeFile> {
     let fileSpace: IFlowCodeFile = {}
     return getGenericDirectory().then((folder: string | undefined) => {
         if (folder) {
             console.log(folder);
             function innerProcess(folder: string) {
-                let files = fs.readdirSync(folder)
+                let files = fs_readdirSync(folder)
                 files.forEach((file: string) => {
                     let file_dir_path = path.join(folder, file);
                     if (file.endsWith('.d.ts')) {
                         PortHandler.storeFlowLibrary(file, file_dir_path);
-                        let fileContent = fs.readFileSync(file_dir_path, 'utf8');
+                        let fileContent = fs_readFileSync(file_dir_path, 'utf8');
                         fileSpace[file_dir_path] = buildFunctionsFromString(fileContent, file_dir_path);
-                    } else if (fs.existsSync(file_dir_path) && fs.lstatSync(file_dir_path).isDirectory()) {
+                    } else if (fs_existsSync(file_dir_path) && fs.lstatSync(file_dir_path).isDirectory()) {
                         innerProcess(file_dir_path);
                     }
                 })
@@ -149,9 +125,29 @@ export async function LoadFileSource(): Promise<IFlowCodeFile> {
     })
 }
 export function buildFunctionsFromString(fileContents: string, filePath: string = 'x.ts', noCapture?: boolean): IFlowCodeStatements {
-    let res = ts.createSourceFile('x.ts', fileContents, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
-
+    let res = ts.createSourceFile(filePath, fileContents, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+    let importLib: ts.Node[] = [];
     let flowCodeFile: IFlowCodeStatements = {};
+    res.statements.filter((statement: ts.Statement) => {
+        switch (statement.kind) {
+            case ts.SyntaxKind.ImportDeclaration:
+                return true;
+            default:
+                return false;
+        }
+    }).forEach((statement: ts.Statement) => {
+
+        let text = statement.getFullText();
+        let fcConfig: IFlowCodeConfig = {
+            template: text,
+            color: '#f1038f'
+        };
+        let ast: any = captureContents(fcConfig, noCapture, false, filePath);
+        if (ast) {
+            importLib.push(ast);
+        }
+    })
+
     res.statements.filter((statement: ts.Statement) => {
         switch (statement.kind) {
             case ts.SyntaxKind.ImportDeclaration:
@@ -166,16 +162,17 @@ export function buildFunctionsFromString(fileContents: string, filePath: string 
             color: '#f1038f'
         };
 
-        let ast: any = captureContents(fcConfig, noCapture);
+        let ast: any = captureContents(fcConfig, noCapture, false, filePath);
         fcConfig.filePath = filePath;
         fcConfig.ast = ast;
+        fcConfig.imports = importLib;
         flowCodeFile[ast && ast.simpleName ? ast && ast.simpleName : (ast && ast.name && ast.name.escapedText ? ast.name.escapedText : text)] = fcConfig;
     });
     return flowCodeFile
 }
 
 export function buildRules() {
-    let fileContents = fs.readFileSync('D:\\dev\\redquickbuilder\\builder\\node_modules\\typescript\\lib\\typescript.d.ts', 'utf-8');
+    let fileContents = fs_readFileSync('D:\\dev\\redquickbuilder\\builder\\node_modules\\typescript\\lib\\typescript.d.ts', 'utf-8');
 
     let res = ts.createSourceFile('x.ts', fileContents, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS)
 
@@ -242,11 +239,11 @@ function captureModules(node: ts.Node): ts.Node[] {
 
     return result;
 }
-function captureContents(config: IFlowCodeConfig, noCapture?: boolean, skipModifierCheck?: boolean): ts.Node | null | undefined {
+function captureContents(config: IFlowCodeConfig, noCapture?: boolean, skipModifierCheck?: boolean, filePath?: string): ts.Node | null | undefined {
     let result: ts.Node | null = null;
 
 
-    let res = ts.createSourceFile('x.ts', `
+    let res = ts.createSourceFile(filePath || 'x.ts', `
     ${config.declarations ? config.declarations.join(NEW_LINE) : ''}
     ${config.template}`, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
 
@@ -254,6 +251,9 @@ function captureContents(config: IFlowCodeConfig, noCapture?: boolean, skipModif
         (rootNode: T) => {
             function visit(node: ts.Node): ts.Node | undefined {
                 switch (node.kind) {
+                    case ts.SyntaxKind.ImportDeclaration:
+                        result = node;
+                        break;
                     case ts.SyntaxKind.FunctionDeclaration:
                     case ts.SyntaxKind.ClassDeclaration:
                     case ts.SyntaxKind.InterfaceDeclaration:
@@ -284,6 +284,6 @@ function captureContents(config: IFlowCodeConfig, noCapture?: boolean, skipModif
             return ts.visitNode(rootNode, visit);
         };
     ts.transform<ts.SourceFile>(res, [transformer]);
-        
+
     return result;
 }

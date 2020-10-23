@@ -36,6 +36,7 @@ import ValidationRuleGenerator from './validationrulegenerator';
 import PermissionGenerator from './permissiongenerator';
 import ModelItemFilterGenerator from './modelitemfiltergenerator';
 import { Node } from '../methods/graph_types';
+import { fs_existsSync, fs_readFileSync } from './modelgenerators';
 
 const MAESTRO_CLASS_TEMPLATE = './app/templates/maestro/maestro.tpl';
 const MAESTRO_INTERFACE_TEMPLATE = './app/templates/maestro/imaestro.tpl';
@@ -65,13 +66,13 @@ export default class MaestroGenerator {
 			(x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration)
 		);
 
-		const _maestroTemplateClass = fs.readFileSync(MAESTRO_CLASS_TEMPLATE, 'utf8');
-		const _MAESTRO_INTERFACE_TEMPLATE = fs.readFileSync(MAESTRO_INTERFACE_TEMPLATE, 'utf8');
-		const _testClass = fs.readFileSync(TEST_CLASS, 'utf8');
-		const testFunctionTemplate = fs.readFileSync(MAESTRO_FUNCTION_TESTS, 'utf8');
-		const testFunctionGetSameParentTemplate = fs.readFileSync(MAESTRO_FUNCTION_SAME_AGENT_MODEL_TESTS, 'utf8');
+		const _maestroTemplateClass = fs_readFileSync(MAESTRO_CLASS_TEMPLATE, 'utf8');
+		const _MAESTRO_INTERFACE_TEMPLATE = fs_readFileSync(MAESTRO_INTERFACE_TEMPLATE, 'utf8');
+		const _testClass = fs_readFileSync(TEST_CLASS, 'utf8');
+		const testFunctionTemplate = fs_readFileSync(MAESTRO_FUNCTION_TESTS, 'utf8');
+		const testFunctionGetSameParentTemplate = fs_readFileSync(MAESTRO_FUNCTION_SAME_AGENT_MODEL_TESTS, 'utf8');
 
-		const testFunctionGetTemplate = fs.readFileSync(MAESTRO_FUNCTION_GET_TESTS, 'utf8');
+		const testFunctionGetTemplate = fs_readFileSync(MAESTRO_FUNCTION_GET_TESTS, 'utf8');
 		const root = GetRootGraph(state);
 		const graph = GetCurrentGraph(state);
 		const result: any = {};
@@ -101,16 +102,16 @@ export default class MaestroGenerator {
 						const ft = MethodFunctions[function_type];
 						if (ft) {
 							let tempFunction = ft.template;
-							if (fs.existsSync(ft.template)) {
-								tempFunction = fs.readFileSync(ft.template, 'utf8');
+							if (fs_existsSync(ft.template)) {
+								tempFunction = fs_readFileSync(ft.template, 'utf8');
 							}
 							let interfaceFunction = ft.interface;
-							if (fs.existsSync(ft.interface)) {
-								interfaceFunction = fs.readFileSync(ft.interface, 'utf8');
+							if (fs_existsSync(ft.interface)) {
+								interfaceFunction = fs_readFileSync(ft.interface, 'utf8');
 							}
 							let testFunction = ft.test;
-							if (fs.existsSync(testFunction)) {
-								testFunction = fs.readFileSync(testFunction, 'utf8');
+							if (fs_existsSync(testFunction)) {
+								testFunction = fs_readFileSync(testFunction, 'utf8');
 							}
 							let value_type = '';
 							let parent_type = '';
@@ -467,7 +468,7 @@ export default class MaestroGenerator {
 									}
 									switch (function_type) {
 										case FunctionTypes.Get_ManyToMany_Agent_Value__IListChild:
-											templ = fs.readFileSync(get_agent_manytomany_listchild_interface, 'utf8');
+											templ = fs_readFileSync(get_agent_manytomany_listchild_interface, 'utf8');
 											break;
 									}
 									if (ft.test) {

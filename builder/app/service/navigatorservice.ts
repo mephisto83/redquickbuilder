@@ -16,6 +16,7 @@ import { bindTemplate } from "../constants/functiontypes";
 import { GetScreens, GetScreenOption } from "./screenservice";
 import { NEW_LINE, UITypes } from "../constants/nodetypes";
 import { EnableMenu } from "../components/titles";
+import { fs_readFileSync } from "../generators/modelgenerators";
 
 export function GenerateScreens(options) {
   const temps = BindScreensToTemplate();
@@ -149,7 +150,7 @@ export function GenerateNavigationRoot() {
 }
 export function BindScreensToTemplate() {
   const screens = GetScreens();
-  const template = fs.readFileSync(
+  const template = fs_readFileSync(
     "./app/templates/navigation/navigation.tpl",
     "utf8"
   );

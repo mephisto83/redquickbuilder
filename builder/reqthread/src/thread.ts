@@ -7,6 +7,7 @@ import { RedQuickDistributionCommand, RedQuickDistributionMessage } from '../../
 import ThreadManagement from './threadmanagement';
 import { ChildProcessOptions } from './childprocess';
 import { DistrConfig } from './distrconfig';
+import { fs_existsSync, fs_readFileSync } from '../../app/generators/modelgenerators';
 
 let threadManagement: ThreadManagement = new ThreadManagement();
 process.on(
@@ -56,7 +57,7 @@ async function job(options) {
 	let { folderPath, agentName, projectName, fileName } = options;
 	let jobPath = path.join(folderPath, agentName, projectName, fileName);
 	console.log(`jobPath: ${jobPath}`);
-	if (fs.existsSync(jobPath)) {
+	if (fs_existsSync(jobPath)) {
 		let jobsIndirectories = getDirectories(jobPath);
 		if (jobsIndirectories && jobsIndirectories.length) {
 			threadManagement.send({
@@ -169,8 +170,8 @@ async function loop() {
 const updateAgent = async (options: any) => {
 	let { folderPath, agentName, projectName } = options;
 	let agentConfig = path.join(folderPath, 'agents', agentName, projectName, 'config.json');
-	if (fs.existsSync(agentConfig)) {
-		let fileContents = fs.readFileSync(agentConfig, 'utf8');
+	if (fs_existsSync(agentConfig)) {
+		let fileContents = fs_readFileSync(agentConfig, 'utf8');
 		try {
 			let config = JSON.parse(fileContents);
 			config.updated = Date.now();

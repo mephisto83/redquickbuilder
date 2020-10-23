@@ -92,12 +92,31 @@ export const NodeTypes = {
 export const ConditionTypes = {
 	Enumeration: 'Enumeration'
 };
+
+ function fs_readdirSync(pa: string): string[] {
+	try {
+		return fs.readdirSync(pa);
+	}
+	catch {
+		if (pa.indexOf('./app') !== -1) {
+			try {
+				return fs.readdirSync('./' + pa.substring('./app'.length));
+			} catch (e) {
+				return [];
+			}
+		}
+	}
+	return [];
+}
+
+
+
 export const NodeTypeIcons: any = {};
 export function GetNodeTypeIcon(type: string | number) {
 	if (!NodeTypeIcons[type]) {
 		let files: string[] = [];
 		try {
-			files = fs.readdirSync('./app/css/svg');
+			files = fs_readdirSync('./app/css/svg');
 		} catch (e) {
 			console.log(e);
 			try {

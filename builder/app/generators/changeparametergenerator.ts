@@ -30,6 +30,7 @@ import {
 	AFTER_EFFECTS
 } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
+import { fs_readFileSync } from './modelgenerators';
 
 const TEST_CLASS = './app/templates/tests/tests.tpl';
 const STREAM_PROCESS_CHANGE_CLASS_EXTENSION =
@@ -60,10 +61,10 @@ export default class ChangeParameterGenerator {
 		const graphRoot = GetRootGraph(state);
 		const namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
 
-		const _testClass = fs.readFileSync(TEST_CLASS, 'utf8');
-		const _streamProcessChangeClassExtension = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_EXTENSION, 'utf8');
-		const _streamProcessChangeClassConstructors = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR, 'utf8');
-		const _streamProcessChangeClassConstrictorsTest = fs.readFileSync(
+		const _testClass = fs_readFileSync(TEST_CLASS, 'utf8');
+		const _streamProcessChangeClassExtension = fs_readFileSync(STREAM_PROCESS_CHANGE_CLASS_EXTENSION, 'utf8');
+		const _streamProcessChangeClassConstructors = fs_readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR, 'utf8');
+		const _streamProcessChangeClassConstrictorsTest = fs_readFileSync(
 			STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR_TESTS,
 			'utf8'
 		);
@@ -76,7 +77,7 @@ export default class ChangeParameterGenerator {
 				const constructors = [];
 				const tests: any[] = [];
 				const updates_with: any[] = [];
-				const staticFunctionTemplate = fs.readFileSync(MODEL_STATIC_TEMPLATES, 'utf8');
+				const staticFunctionTemplate = fs_readFileSync(MODEL_STATIC_TEMPLATES, 'utf8');
 				afterEffects
 					.filter((afterEffect: { id: any }) => {
 						const functionType = GetNodeProp(afterEffect, NodeProperties.AfterMethod);
@@ -102,7 +103,7 @@ export default class ChangeParameterGenerator {
 							const stream_process_change_parameter =
 								AFTER_EFFECTS[functionType][MethodTemplateKeys.stream_process_change_parameter];
 							if (stream_process_change_parameter) {
-								let spcp_template = fs.readFileSync(stream_process_change_parameter, 'utf8');
+								let spcp_template = fs_readFileSync(stream_process_change_parameter, 'utf8');
 								spcp_template = bindTemplate(spcp_template, {
 									model: GetCodeName(model),
 									value: GetNodeProp(model, NodeProperties.ValueName) || 'value',
@@ -123,7 +124,7 @@ export default class ChangeParameterGenerator {
 
 							const update_with = AFTER_EFFECTS[functionType][MethodTemplateKeys.update_with];
 							if (update_with) {
-								let spcp_template = fs.readFileSync(update_with, 'utf8');
+								let spcp_template = fs_readFileSync(update_with, 'utf8');
 								spcp_template = bindTemplate(spcp_template, {
 									model_update: GetCodeName(
 										GetMethodNodeProp(

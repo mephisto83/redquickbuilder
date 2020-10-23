@@ -14,6 +14,7 @@ import { ProgressTracking } from './progressTracking';
 import { AgentProjects } from '../../app/jobs/interfaces';
 import JobService, { JobServiceConstants, getFiles, ensureDirectory } from '../../app/jobs/jobservice';
 import { uuidv4 } from '../../app/utils/array';
+import { fs_existsSync, fs_readFileSync } from '../../app/generators/modelgenerators';
 let oneHour = 1000 * 60 * 60;
 
 export default class Distribution {
@@ -87,23 +88,23 @@ export default class Distribution {
 		return localDev;
 	}
 	writeAgentStrucuture(localDev: LocalDev) {
-		if (!fs.existsSync(path.join(this.configuration.workingDirectory, './agents'))) {
+		if (!fs_existsSync(path.join(this.configuration.workingDirectory, './agents'))) {
 			fs.mkdirSync(path.join(this.configuration.workingDirectory, './agents'));
 		}
 		let agentPath = path.join(this.configuration.workingDirectory, './agents', this.getAgentName());
-		if (!fs.existsSync(agentPath)) {
+		if (!fs_existsSync(agentPath)) {
 			fs.mkdirSync(agentPath);
 		}
 
 		Object.keys(localDev.projects).forEach((pn) => {
-			if (!fs.existsSync(path.join(agentPath, pn))) {
+			if (!fs_existsSync(path.join(agentPath, pn))) {
 				fs.mkdirSync(path.join(agentPath, pn));
 			}
 			fs.writeFileSync(path.join(agentPath, pn, `config.json`), this.getProjectConfig(localDev, pn), 'utf8');
 		});
 	}
 	// ensureJob(localDev: LocalDev) {
-	// 	if (!fs.existsSync(path.join(this.configuration.workingDirectory, './jobs'))) {
+	// 	if (!fs_existsSync(path.join(this.configuration.workingDirectory, './jobs'))) {
 	// 		fs.mkdirSync(path.join(this.configuration.workingDirectory, './jobs'));
 	// 	}
 	// }
@@ -119,7 +120,7 @@ export default class Distribution {
 	}
 	hasLocalDev() {
 		console.log('has local dev?');
-		return fs.existsSync(path.join(this.configuration.workingDirectory || './', './dev.local'));
+		return fs_existsSync(path.join(this.configuration.workingDirectory || './', './dev.local'));
 	}
 	storeLocalDev(ld: LocalDev) {
 		console.log('storing local dev');
@@ -131,7 +132,7 @@ export default class Distribution {
 	}
 	getLocalDev(): LocalDev {
 		console.log('get local dev');
-		let localDev = fs.readFileSync(path.join(this.configuration.workingDirectory || './', './dev.local'), 'utf8');
+		let localDev = fs_readFileSync(path.join(this.configuration.workingDirectory || './', './dev.local'), 'utf8');
 		return JSON.parse(localDev);
 	}
 	initLocalDev(): LocalDev {

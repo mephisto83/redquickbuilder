@@ -2,6 +2,8 @@
 /* eslint-disable promise/param-names */
 /* eslint-disable promise/always-return */
 
+import { fs_existsSync, fs_readFileSync } from "../generators/modelgenerators";
+
 const fs = require('fs');
 const cheerioInstance = require('cheerio');
 // import path from 'path';
@@ -20,9 +22,9 @@ function executeSpawnCmd(cmd: any, args: any, options: any) {
 		if (process.platform === 'win32') {
 			child = spawn(cmd, args, options);
 		} else {
-			child = spawn('sudo', [ cmd, ...args ], options);
+			child = spawn('sudo', [cmd, ...args], options);
 		}
-		options._kill = function() {
+		options._kill = function () {
 			child.kill();
 		};
 		child.stdout.on('data', () => {
@@ -68,7 +70,7 @@ const appSettingsCopySettings = `
 `;
 
 function createReactWeb() {
-	let build = fs.readFileSync('./workspace.json', 'utf8');
+	let build: any = fs_readFileSync('./workspace.json', 'utf8');
 	build = JSON.parse(build);
 	const { appName } = build;
 	const localDir = path.join(build.workspace);
@@ -76,8 +78,8 @@ function createReactWeb() {
 	return (
 		Promise.resolve()
 			.then(() => {
-				if (fs.existsSync(`./${appName}`)) {
-					return executeSpawnCmd('rimraf', [ '-f', `./${appName}` ], {
+				if (fs_existsSync(`./${appName}`)) {
+					return executeSpawnCmd('rimraf', ['-f', `./${appName}`], {
 						shell: true,
 						cwd: localDir
 					});
@@ -85,7 +87,7 @@ function createReactWeb() {
 			})
 			.then(() => {
 				console.log('cloding creat react app');
-				return executeSpawnCmd('npx', [ 'create-react-app', appName, '--template', 'typescript' ], {
+				return executeSpawnCmd('npx', ['create-react-app', appName, '--template', 'typescript'], {
 					shell: true,
 					cwd: localDir
 				});
@@ -111,7 +113,7 @@ function createReactWeb() {
 					'tslint-etc'
 				].map((dependency) => {
 					promise = promise.then(() =>
-						executeSpawnCmd('yarn', [ 'add', dependency ], {
+						executeSpawnCmd('yarn', ['add', dependency], {
 							shell: true,
 							cwd: path.join(localDir, appName)
 						})
@@ -124,13 +126,13 @@ function createReactWeb() {
 			.then(() => {
 				console.log('installing fontawesome');
 				console.log(path.join(localDir, appName));
-				return executeSpawnCmd('yarn', [ 'add', '@fortawesome/fontawesome-free' ], {
+				return executeSpawnCmd('yarn', ['add', '@fortawesome/fontawesome-free'], {
 					shell: true,
 					cwd: path.join(localDir, appName)
 				});
 			})
 			.then(() => {
-				let contents = fs.readFileSync('./tslint-imports.json', 'utf8');
+				let contents = fs_readFileSync('./tslint-imports.json', 'utf8');
 				fs.writeFileSync(path.join(`./${appName}`, 'tslint-imports.json'), contents, 'utf8');
 			})
 			.catch((e) => {
@@ -141,15 +143,15 @@ function createReactWeb() {
 	);
 }
 function createElectronIO() {
-	let build = fs.readFileSync('./workspace.json', 'utf8');
+	let build: any = fs_readFileSync('./workspace.json', 'utf8');
 	build = JSON.parse(build);
 	const { appName } = build;
 	const localDir = path.join(build.workspace);
 	console.log(localDir);
 	return Promise.resolve()
 		.then(() => {
-			if (fs.existsSync(`./${appName}`)) {
-				return executeSpawnCmd('rimraf', [ '-f', `./${appName}` ], {
+			if (fs_existsSync(`./${appName}`)) {
+				return executeSpawnCmd('rimraf', ['-f', `./${appName}`], {
 					shell: true,
 					cwd: localDir
 				});
@@ -187,7 +189,7 @@ function createElectronIO() {
 		.then(() => {
 			console.log('installing yarn');
 			console.log(path.join(localDir, appName));
-			return executeSpawnCmd('yarn', [ 'install' ], {
+			return executeSpawnCmd('yarn', ['install'], {
 				shell: true,
 				cwd: path.join(localDir, appName)
 			});
@@ -195,14 +197,14 @@ function createElectronIO() {
 		.then(() => {
 			console.log('installing fontawesome');
 			console.log(path.join(localDir, appName));
-			return executeSpawnCmd('yarn', [ 'add', '@fortawesome/fontawesome-free' ], {
+			return executeSpawnCmd('yarn', ['add', '@fortawesome/fontawesome-free'], {
 				shell: true,
 				cwd: path.join(localDir, appName)
 			});
 		})
 		.then(() => {
 			const packagejsonfilepath = path.join(localDir, appName, 'package.json');
-			const packageJson = JSON.parse(fs.readFileSync(packagejsonfilepath));
+			const packageJson = JSON.parse(fs_readFileSync(packagejsonfilepath));
 			const devScript = packageJson.scripts.dev;
 			const port = Math.floor(Math.random() * 30000) + 1000;
 			packageJson.scripts.dev = devScript.replace(/START_HOT=1/g, `START_HOT=1 PORT=${port}`);
@@ -215,79 +217,79 @@ function createElectronIO() {
 		});
 }
 function createReactNative() {
-	let build = fs.readFileSync('./workspace.json', 'utf8');
+	let build: any = fs_readFileSync('./workspace.json', 'utf8');
 	build = JSON.parse(build);
 	const { appName } = build;
 	const localDir = path.join(build.workspace, `./${appName}`);
 	return Promise.resolve()
 		.then(() =>
-			executeSpawnCmd('react-native', [ 'init', appName ], {
+			executeSpawnCmd('react-native', ['init', appName], {
 				cwd: build.workspace,
 				shell: true
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('npm', [ 'install', 'native-base', '--save' ], {
+			executeSpawnCmd('npm', ['install', 'native-base', '--save'], {
 				shell: true,
 				cwd: localDir
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('react-native', [ 'link' ], {
+			executeSpawnCmd('react-native', ['link'], {
 				shell: true,
 				cwd: localDir
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('npm', [ 'install', 'redux', '--save' ], {
+			executeSpawnCmd('npm', ['install', 'redux', '--save'], {
 				shell: true,
 				cwd: localDir
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('npm', [ 'install', 'react-redux', '--save' ], {
+			executeSpawnCmd('npm', ['install', 'react-redux', '--save'], {
 				shell: true,
 				cwd: localDir
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('npm', [ 'install', 'redux-thunk', '--save' ], {
+			executeSpawnCmd('npm', ['install', 'redux-thunk', '--save'], {
 				shell: true,
 				cwd: localDir
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('npm', [ 'install', 'react-navigation', '--save' ], {
+			executeSpawnCmd('npm', ['install', 'react-navigation', '--save'], {
 				shell: true,
 				cwd: localDir
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('npm', [ 'install', 'react-navigation-stack', '--save' ], {
+			executeSpawnCmd('npm', ['install', 'react-navigation-stack', '--save'], {
 				shell: true,
 				cwd: localDir
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('npm', [ 'install', 'react-navigation-drawer', '--save' ], {
+			executeSpawnCmd('npm', ['install', 'react-navigation-drawer', '--save'], {
 				shell: true,
 				cwd: localDir
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('npm', [ 'install', 'react-native-reanimated', '--save' ], {
+			executeSpawnCmd('npm', ['install', 'react-native-reanimated', '--save'], {
 				shell: true,
 				cwd: localDir
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('npm', [ 'install', 'react-native-gesture-handler', '--save' ], {
+			executeSpawnCmd('npm', ['install', 'react-native-gesture-handler', '--save'], {
 				shell: true,
 				cwd: localDir
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('react-native', [ 'link', 'react-native-gesture-handler' ], {
+			executeSpawnCmd('react-native', ['link', 'react-native-gesture-handler'], {
 				shell: true,
 				cwd: localDir
 			})
@@ -298,120 +300,120 @@ function createReactNative() {
 		});
 }
 function createWorkSpace() {
-	let build = fs.readFileSync('./workspace.json', 'utf8');
+	let build: any = fs_readFileSync('./workspace.json', 'utf8');
 	build = JSON.parse(build);
 	const solutionPath = path.resolve(`./${build.solutionName}.sln`);
 	return Promise.resolve()
 		.then(() => {
-			if (!fs.existsSync(`${build.solutionName}`)) {
-				return executeSpawnCmd('dotnet', [ 'new', 'sln', '--force', '-n', build.solutionName ], {});
+			if (!fs_existsSync(`${build.solutionName}`)) {
+				return executeSpawnCmd('dotnet', ['new', 'sln', '--force', '-n', build.solutionName], {});
 			}
 		})
-		.then(() => executeSpawnCmd('dotnet', [ 'new', 'web', '--force', '-n', `${build.solutionName}.Web` ], {}))
-		.then(() => executeSpawnCmd('dotnet', [ 'new', 'mstest', '--force', '-n', `${build.solutionName}.Tests` ], {}))
+		.then(() => executeSpawnCmd('dotnet', ['new', 'web', '--force', '-n', `${build.solutionName}.Web`], {}))
+		.then(() => executeSpawnCmd('dotnet', ['new', 'mstest', '--force', '-n', `${build.solutionName}.Tests`], {}))
 		.then(() =>
-			executeSpawnCmd('dotnet', [ 'new', 'classlib', '--force', '-n', `${build.solutionName}.Models` ], {})
+			executeSpawnCmd('dotnet', ['new', 'classlib', '--force', '-n', `${build.solutionName}.Models`], {})
 		)
 		.then(() =>
-			executeSpawnCmd('dotnet', [ 'new', 'classlib', '--force', '-n', `${build.solutionName}.Interfaces` ], {})
+			executeSpawnCmd('dotnet', ['new', 'classlib', '--force', '-n', `${build.solutionName}.Interfaces`], {})
 		)
 		.then(() =>
-			executeSpawnCmd('dotnet', [ 'new', 'classlib', '--force', '-n', `${build.solutionName}.Controllers` ], {})
+			executeSpawnCmd('dotnet', ['new', 'classlib', '--force', '-n', `${build.solutionName}.Controllers`], {})
 		)
 		.then(() => {
 			const projectPath = `${build.solutionName}.Tests/${build.solutionName}.Tests.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'sln', solutionPath, 'add', projectPath ], {});
+			return executeSpawnCmd('dotnet', ['sln', solutionPath, 'add', projectPath], {});
 		})
 		.then(() => {
 			const projectPath = `${build.solutionName}.Web/${build.solutionName}.Web.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'sln', solutionPath, 'add', projectPath ], {});
+			return executeSpawnCmd('dotnet', ['sln', solutionPath, 'add', projectPath], {});
 		})
 		.then(() => {
 			const projectPath = `${build.solutionName}.Models/${build.solutionName}.Models.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'sln', solutionPath, 'add', projectPath ], {});
+			return executeSpawnCmd('dotnet', ['sln', solutionPath, 'add', projectPath], {});
 		})
 		.then(() => {
 			const projectPath = `${build.solutionName}.Interfaces/${build.solutionName}.Interfaces.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'sln', solutionPath, 'add', projectPath ], {});
+			return executeSpawnCmd('dotnet', ['sln', solutionPath, 'add', projectPath], {});
 		})
 		.then(() => {
 			const projectPath = `${build.solutionName}.Controllers/${build.solutionName}.Controllers.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'sln', solutionPath, 'add', projectPath ], {});
+			return executeSpawnCmd('dotnet', ['sln', solutionPath, 'add', projectPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
 			const projectPath = `${build.solutionName}.Controllers/${build.solutionName}.Controllers.csproj`;
 			const relPath = `${build.solutionName}.Interfaces/${build.solutionName}.Interfaces.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'add', projectPath, 'reference', relPath ], {});
+			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
 			const projectPath = `${build.solutionName}.Controllers/${build.solutionName}.Controllers.csproj`;
 			const relPath = `${build.solutionName}.Models/${build.solutionName}.Models.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'add', projectPath, 'reference', relPath ], {});
+			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
 			const projectPath = `${build.solutionName}.Web/${build.solutionName}.Web.csproj`;
 			const relPath = `${build.solutionName}.Interfaces/${build.solutionName}.Interfaces.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'add', projectPath, 'reference', relPath ], {});
+			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
 			const projectPath = `${build.solutionName}.Web/${build.solutionName}.Web.csproj`;
 			const relPath = `${build.solutionName}.Models/${build.solutionName}.Models.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'add', projectPath, 'reference', relPath ], {});
+			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
 			const projectPath = `${build.solutionName}.Web/${build.solutionName}.Web.csproj`;
 			const relPath = `${build.solutionName}.Controllers/${build.solutionName}.Controllers.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'add', projectPath, 'reference', relPath ], {});
+			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
 			const projectPath = `${build.solutionName}.Interfaces/${build.solutionName}.Interfaces.csproj`;
 			const relPath = `${build.solutionName}.Models/${build.solutionName}.Models.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'add', projectPath, 'reference', relPath ], {});
+			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
 			const projectPath = `${build.solutionName}.Tests/${build.solutionName}.Tests.csproj`;
 			const relPath = `${build.solutionName}.Models/${build.solutionName}.Models.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'add', projectPath, 'reference', relPath ], {});
+			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
 			const projectPath = `${build.solutionName}.Tests/${build.solutionName}.Tests.csproj`;
 			const relPath = `${build.solutionName}.Interfaces/${build.solutionName}.Interfaces.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'add', projectPath, 'reference', relPath ], {});
+			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
 			const projectPath = `${build.solutionName}.Tests/${build.solutionName}.Tests.csproj`;
 			const relPath = `${build.solutionName}.Controllers/${build.solutionName}.Controllers.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'add', projectPath, 'reference', relPath ], {});
+			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
 			const projectPath = `${build.solutionName}.Tests/${build.solutionName}.Tests.csproj`;
 			const relPath = `${build.solutionName}.Web/${build.solutionName}.Web.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
-			return executeSpawnCmd('dotnet', [ 'add', projectPath, 'reference', relPath ], {});
+			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// D:\dev\redquick\RedQuick\RedQuickCore
@@ -438,15 +440,15 @@ function createWorkSpace() {
 				promise = promise.then(() =>
 					executeSpawnCmd(
 						'dotnet',
-						[ 'add', project, 'package', 'RedQuick' ], // , '-s', source
+						['add', project, 'package', 'RedQuick'], // , '-s', source
 						{}
 					)
 				);
 				promise = promise.then(() =>
-					executeSpawnCmd('dotnet', [ 'add', project, 'package', 'Swashbuckle.AspNetCore' ], {})
+					executeSpawnCmd('dotnet', ['add', project, 'package', 'Swashbuckle.AspNetCore'], {})
 				);
 				promise = promise.then(() =>
-					executeSpawnCmd('dotnet', [ 'add', project, 'package', 'Microsoft.AspNetCore.StaticFiles' ], {})
+					executeSpawnCmd('dotnet', ['add', project, 'package', 'Microsoft.AspNetCore.StaticFiles'], {})
 				);
 			});
 
@@ -454,17 +456,17 @@ function createWorkSpace() {
 
 			webProjectDeps.map((dep) => {
 				promise = promise.then(() =>
-					executeSpawnCmd('dotnet', [ 'add', webProject, 'package', dep, '-s', source ], {})
+					executeSpawnCmd('dotnet', ['add', webProject, 'package', dep, '-s', source], {})
 				);
 			});
 
 			dependencies.map((depen) => {
-				promise = promise.then(() => executeSpawnCmd('dotnet', [ 'add', testProject, 'package', depen ], {}));
+				promise = promise.then(() => executeSpawnCmd('dotnet', ['add', testProject, 'package', depen], {}));
 			});
 
 			promise = promise.then(() => {
 				console.log('updating the tests project output setting');
-				const tp = fs.readFileSync(testProject, 'utf8');
+				const tp = fs_readFileSync(testProject, 'utf8');
 				const $ = cheerioInstance.load(tp, {
 					xmlMode: true
 				});
@@ -479,7 +481,7 @@ function createWorkSpace() {
 			});
 			promise = promise.then(() => {
 				console.log('updating the webProject output setting');
-				const tp = fs.readFileSync(webProject, 'utf8');
+				const tp = fs_readFileSync(webProject, 'utf8');
 				const $ = cheerioInstance.load(tp, {
 					xmlMode: true
 				});

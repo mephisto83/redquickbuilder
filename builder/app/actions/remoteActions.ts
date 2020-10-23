@@ -54,6 +54,7 @@ import { platform } from 'os';
 import { NodeTypeColors } from '../constants/nodetypes';
 import { HandlerEvents } from '../ipc/handler-events';
 import { SELECTED_LINK } from '../actions/uiactions';
+import { fs_existsSync, fs_readdirSync, fs_readFileSync } from '../generators/modelgenerators';
 // import { loadConfigs } from './ipcActions';
 // import { loadConfigs } from './ipcActions';
 const ipcRenderer = require('electron').ipcRenderer;
@@ -280,8 +281,8 @@ export async function takeDashboardShot(folder: any, name?: string, getNodes?: a
 			if (nodese) {
 				let projectJson: any = {};
 				let temppath = path.join(folder, 'project.json');
-				if (fs.existsSync(temppath)) {
-					projectJson = JSON.parse(fs.readFileSync(temppath, 'utf8'));
+				if (fs_existsSync(temppath)) {
+					projectJson = JSON.parse(fs_readFileSync(temppath, 'utf8'));
 				}
 				if (name) {
 					projectJson[name] = nodese.map((v: any) => {
@@ -498,7 +499,7 @@ export async function BuildReport() {
 	const workspace = root.workspaces ? root.workspaces[platform()] || root.workspace : root.workspace;
 	let folder = path.join(workspace, graph.title, 'mindmaps');
 
-	if (root.reportDirectory && fs.existsSync(root.reportDirectory)) {
+	if (root.reportDirectory && fs_existsSync(root.reportDirectory)) {
 		folder = root.reportDirectory;
 	}
 	let nodes = NodesByType(graph, [NodeTypes.Enumeration, NodeTypes.Model, NodeTypes.AgentAccessDescription]);
@@ -877,15 +878,15 @@ export function saveGraph(graph: any) {
 	return async (dispatch: any, getState: () => any) => {
 		const currentGraph = GetRootGraph(getState());
 		if (currentGraph && currentGraph.graphFile) {
-			if (fs.existsSync(currentGraph.graphFile)) {
+			if (fs_existsSync(currentGraph.graphFile)) {
 				if (lastSavedDate !== currentGraph.updated) {
-					if (fs.existsSync(currentGraph.graphFile)) {
+					if (fs_existsSync(currentGraph.graphFile)) {
 						const fileFolder = path.dirname(currentGraph.graphFile);
 						const backupFolder = path.join(fileFolder, BUILDER_BACK_UP);
-						if (!fs.existsSync(backupFolder)) {
+						if (!fs_existsSync(backupFolder)) {
 							fs.mkdirSync(backupFolder);
 						}
-						const files = fs.readdirSync(backupFolder);
+						const files = fs_readdirSync(backupFolder);
 						let fileName = path.basename(currentGraph.graphFile);
 						let fileNumber = 0;
 						files.forEach(function (file: string) {

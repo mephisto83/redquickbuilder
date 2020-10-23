@@ -2,6 +2,7 @@ import { GetConfigurationNodes, GetNodeProp, NodeProperties } from '../actions/u
 import { ConfigurationProperties } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
+import { fs_readFileSync } from './modelgenerators';
 export default class ConfigurationGenerator {
 	static Generate(options: any) {
 		let temp = GetConfigurationNodes();
@@ -12,7 +13,7 @@ export default class ConfigurationGenerator {
 				res[key] = res[key] || GetNodeProp(node, key);
 			});
 		});
-		let template = fs.readFileSync('./app/templates/components/configuration.tpl', 'utf8');
+		let template = fs_readFileSync('./app/templates/components/configuration.tpl', 'utf8');
 		template = bindTemplate(template, res);
 
 		let temps = [

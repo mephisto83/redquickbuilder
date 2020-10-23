@@ -22,6 +22,7 @@ import CommunicationTower, {
 import { RunnerContext, CommandCenter } from '../../app/jobs/interfaces';
 import StoreGraph from '../../app/methods/storeGraph';
 import { setAppConfigPath } from '../../app/actions/remoteActions';
+import { fs_existsSync, fs_readFileSync } from '../../app/generators/modelgenerators';
 let communicationTower: CommunicationTower;
 let runnerContext: RunnerContext = {
 	agents: {},
@@ -37,8 +38,8 @@ let runnerContext: RunnerContext = {
 	try {
 		let appConfig = {};
 		let appConfigPath = getAppConfigPath();
-		if (fs.existsSync(appConfigPath)) {
-			appConfig = JSON.parse(fs.readFileSync(path.join(appConfigPath, 'applicationConfig.json'), 'utf8'));
+		if (fs_existsSync(appConfigPath)) {
+			appConfig = JSON.parse(fs_readFileSync(path.join(appConfigPath, 'applicationConfig.json'), 'utf8'));
 		}
 		setAppConfigPath(appConfigPath, appConfig);
 		console.log(`----------- appConfigPath ----------`);
@@ -92,7 +93,7 @@ export function getAppConfigPath($folder?: string) {
 }
 
 export function ensureDirectorySync(dir) {
-	if (!fs.existsSync(dir)) {
+	if (!fs_existsSync(dir)) {
 		console.log(`doesnt exist : ${dir}`);
 	} else {
 	}
@@ -103,7 +104,7 @@ export function ensureDirectorySync(dir) {
 			if (dir.startsWith(path.sep)) {
 				tempDir = `${path.sep}${tempDir}`;
 			}
-			if (!fs.existsSync(tempDir)) {
+			if (!fs_existsSync(tempDir)) {
 				fs.mkdirSync(tempDir);
 			}
 		}
@@ -278,7 +279,7 @@ async function checkTransferredFile(message: RedQuickDistributionMessage): Promi
 				message.projectName,
 				message.fileName
 			);
-			if (fs.existsSync(path_join(relativePath, JobServiceConstants.OUTPUT))) {
+			if (fs_existsSync(path_join(relativePath, JobServiceConstants.OUTPUT))) {
 				if (await JobService.CanJoinFiles(relativePath, JobServiceConstants.OUTPUT)) {
 					console.debug(relativePath);
 					AppendToJobCompletedList(async () => {
@@ -318,7 +319,7 @@ async function handleCompltedJobItem(message: RedQuickDistributionMessage): Prom
 				message.projectName,
 				message.fileName
 			);
-			if (fs.existsSync(path_join(relativePath, JobServiceConstants.OUTPUT))) {
+			if (fs_existsSync(path_join(relativePath, JobServiceConstants.OUTPUT))) {
 				if (await JobService.CanJoinFiles(relativePath, JobServiceConstants.OUTPUT)) {
 					console.debug(relativePath);
 					AppendToJobCompletedList(async () => {
@@ -427,7 +428,7 @@ async function setAgentProjects(message: RedQuickDistributionMessage): Promise<L
 }
 
 async function processJobs() {
-	if (fs.existsSync(JobServiceConstants.JobsFilePath())) {
+	if (fs_existsSync(JobServiceConstants.JobsFilePath())) {
 		// Get jobs from ./jobs directory.
 		let projectFolders = getDirectories(JobServiceConstants.JobsFilePath());
 		await projectFolders.forEachAsync(async (projectFolder) => {
@@ -436,7 +437,7 @@ async function processJobs() {
 				projectFolder,
 				JobServiceConstants.JOB_NAME
 			);
-			if (fs.existsSync(jobFilePath)) {
+			if (fs_existsSync(jobFilePath)) {
 				await executeStep(jobFilePath);
 			}
 		});
@@ -447,7 +448,7 @@ async function executeStep(jobFilePath: string) {
 	// console.debug('read job file path');
 	// console.debug(jobFilePath);
 	// console.debug('execute step');
-	let jobConfigContents = fs.readFileSync(jobFilePath, 'utf8');
+	let jobConfigContents = fs_readFileSync(jobFilePath, 'utf8');
 	let jobConfig: JobFile = JSON.parse(jobConfigContents);
 	if (!jobConfig.error && !jobConfig.completed) {
 		try {
@@ -515,16 +516,16 @@ function GetCurrentJobInformation() {
 	return currentJobInformation;
 }
 async function createJobs() {
-	if (fs.existsSync(JobServiceConstants.JobsFilePath())) {
+	if (fs_existsSync(JobServiceConstants.JobsFilePath())) {
 		let jobFiles = getFiles(JobServiceConstants.JobsFilePath());
 		await jobFiles.forEachAsync(async (jobFileName) => {
 			try {
 				let jobFilePath = path_join(JobServiceConstants.JobsFilePath(), jobFileName);
-				let fileContents = fs.readFileSync(jobFilePath, 'utf8');
+				let fileContents = fs_readFileSync(jobFilePath, 'utf8');
 				let jobFile: JobFile = JSON.parse(fileContents);
 				if (jobFile && jobFile.graphPath && !jobFile.created) {
-					if (fs.existsSync(jobFile.graphPath)) {
-						let graphFileContents = fs.readFileSync(jobFile.graphPath, 'utf8');
+					if (fs_existsSync(jobFile.graphPath)) {
+						let graphFileContents = fs_readFileSync(jobFile.graphPath, 'utf8');
 						try {
 							jobFile.created = true;
 							await JobService.WriteJob(jobFile, graphFileContents);

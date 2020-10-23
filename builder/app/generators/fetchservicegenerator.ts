@@ -32,6 +32,7 @@ import {
 	MethodFunctions
 } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
+import { fs_readFileSync } from './modelgenerators';
 
 const CONTROLLER_CLASS_FETCH_FUNCTION = './app/templates/controller/fetch_service_function.tpl';
 const CONTROLLER_CLASS_FETCH_FUNCTION_Get_PROPERTY = './app/templates/controller/fetch_service_set_property.tpl';
@@ -55,9 +56,9 @@ export default class FetchServiceGenerator {
 		const controllers = NodesByType(state, NodeTypes.FetchService);
 		controllers.map((controller: { id: any }) => {
 			const controllerUser = 'controllerUser';
-			let controllerTemplateClass = fs.readFileSync(CONTROLLER_CLASS_TEMPLATE, 'utf-8');
-			const fetchServiceFunction = fs.readFileSync(CONTROLLER_CLASS_FETCH_FUNCTION, 'utf-8');
-			const fetchServiceFunctionGetProperty = fs.readFileSync(
+			let controllerTemplateClass = fs_readFileSync(CONTROLLER_CLASS_TEMPLATE, 'utf-8');
+			const fetchServiceFunction = fs_readFileSync(CONTROLLER_CLASS_FETCH_FUNCTION, 'utf-8');
+			const fetchServiceFunctionGetProperty = fs_readFileSync(
 				CONTROLLER_CLASS_FETCH_FUNCTION_Get_PROPERTY,
 				'utf-8'
 			);

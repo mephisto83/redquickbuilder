@@ -37,6 +37,7 @@ import NamespaceGenerator from './namespacegenerator';
 import { enumerate } from '../utils/utils';
 import { Node } from '../methods/graph_types';
 import AfterEffectsGenerator from './aftereffectsgenerator';
+import { fs_readFileSync } from './modelgenerators';
 
 const EXECUTOR_CLASS = './app/templates/executor/executor_class.tpl';
 const EXECUTOR_INTERFACE = './app/templates/executor/executor_class_interface.tpl';
@@ -117,20 +118,20 @@ export default class ExecutorGenerator {
 		const result: any = {};
 
 		const executor_nodes = NodesByType(state, NodeTypes.Executor);
-		const _executor_class = fs.readFileSync(EXECUTOR_CLASS, 'utf8');
-		const _executor_class_interface = fs.readFileSync(EXECUTOR_INTERFACE, 'utf8');
-		const _executor_methods = fs.readFileSync(EXECUTOR_METHODS, 'utf8');
-		const _executor_methods_composite_input = fs.readFileSync(EXECUTOR_METHOD_COMPOSITE_INPUT, 'utf8');
-		const _executor_methods_interface = fs.readFileSync(EXECUTOR_METHODS_INTERFACE, 'utf8');
-		const _executor_create = fs.readFileSync(EXECUTOR_CREATE, 'utf8');
-		const _executor_create_composite_input = fs.readFileSync(EXECUTOR_CREATE_COMPOSITE_INPUT, 'utf8');
-		const _executor_update = fs.readFileSync(EXECUTOR_UPDATE, 'utf8');
-		const _executor_delete = fs.readFileSync(EXECUTOR_DELETE, 'utf8');
-		const _executor_get = fs.readFileSync(EXECUTOR_GET, 'utf8');
-		const _exe_method = fs.readFileSync(EXECUTOR_ENTRY_METHODS, 'utf8');
-		const _exe_method_interface = fs.readFileSync(EXECUTOR_ENTRY_METHODS_INTERFACE, 'utf8');
-		const _exe_case = fs.readFileSync(EXECUTOR_METHOD_CASE, 'utf8');
-		const _testClass = fs.readFileSync(TEST_CLASS, 'utf8');
+		const _executor_class = fs_readFileSync(EXECUTOR_CLASS, 'utf8');
+		const _executor_class_interface = fs_readFileSync(EXECUTOR_INTERFACE, 'utf8');
+		const _executor_methods = fs_readFileSync(EXECUTOR_METHODS, 'utf8');
+		const _executor_methods_composite_input = fs_readFileSync(EXECUTOR_METHOD_COMPOSITE_INPUT, 'utf8');
+		const _executor_methods_interface = fs_readFileSync(EXECUTOR_METHODS_INTERFACE, 'utf8');
+		const _executor_create = fs_readFileSync(EXECUTOR_CREATE, 'utf8');
+		const _executor_create_composite_input = fs_readFileSync(EXECUTOR_CREATE_COMPOSITE_INPUT, 'utf8');
+		const _executor_update = fs_readFileSync(EXECUTOR_UPDATE, 'utf8');
+		const _executor_delete = fs_readFileSync(EXECUTOR_DELETE, 'utf8');
+		const _executor_get = fs_readFileSync(EXECUTOR_GET, 'utf8');
+		const _exe_method = fs_readFileSync(EXECUTOR_ENTRY_METHODS, 'utf8');
+		const _exe_method_interface = fs_readFileSync(EXECUTOR_ENTRY_METHODS_INTERFACE, 'utf8');
+		const _exe_case = fs_readFileSync(EXECUTOR_METHOD_CASE, 'utf8');
+		const _testClass = fs_readFileSync(TEST_CLASS, 'utf8');
 		const agentFunctionDic: any = {};
 		const agentFunctionInterfaceDic: any = {};
 		const executor_entry_methods: any = [];
@@ -318,7 +319,7 @@ export default class ExecutorGenerator {
 									template = `await {{node}}.Execute(agent, data, change, result);`;
 									break;
 								case ExecutorRules.AddModelReference:
-									template = fs.readFileSync(
+									template = fs_readFileSync(
 										`app/templates/executor/snippets/add-model-reference.tpl`,
 										'utf8'
 									);

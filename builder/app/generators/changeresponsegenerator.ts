@@ -12,6 +12,7 @@ import {
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
+import { fs_readFileSync } from './modelgenerators';
 
 const STREAM_PROCESS_CHANGE_CLASS_EXTENSION =
 	'./app/templates/stream_process/stream_process_response_class_extention.tpl';
@@ -40,17 +41,17 @@ export default class ChangeResponseGenerator {
 		let graphRoot = GetRootGraph(state);
 		let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
 
-		let _streamProcessChangeClassExtension = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_EXTENSION, 'utf8');
-		let _streamProcessChangeClassConstructors = fs.readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR, 'utf8');
-		let _streamProcessChangeClassConstructorsTest = fs.readFileSync(
+		let _streamProcessChangeClassExtension = fs_readFileSync(STREAM_PROCESS_CHANGE_CLASS_EXTENSION, 'utf8');
+		let _streamProcessChangeClassConstructors = fs_readFileSync(STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR, 'utf8');
+		let _streamProcessChangeClassConstructorsTest = fs_readFileSync(
 			STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR_TEST,
 			'utf8'
 		);
-		let _streamProcessChangeClassConstructorsFailed = fs.readFileSync(
+		let _streamProcessChangeClassConstructorsFailed = fs_readFileSync(
 			STREAM_PROCESS_CHANGE_CLASS_CONSTRUCTOR_FAILED,
 			'utf8'
 		);
-		let _test: any = fs.readFileSync(TEST_CLASS, 'utf8');
+		let _test: any = fs_readFileSync(TEST_CLASS, 'utf8');
 		let result: any = {};
 		agents.map((agent: any) => {
 			let constructors: string[] = [];

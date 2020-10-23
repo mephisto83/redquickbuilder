@@ -94,6 +94,7 @@ import { StyleLib } from '../constants/styles';
 import { ViewTypes } from '../constants/viewtypes';
 import { RouteSource, RouteSourceType } from '../interface/methodprops';
 import { constructCellStyles } from './sharedservice';
+import { fs_readFileSync } from '../generators/modelgenerators';
 
 export function GenerateScreens(options: { language: any }) {
 	const { language } = options;
@@ -118,11 +119,11 @@ export function GenerateScreenMarkup(id: string, language: string) {
 		switch (language) {
 			case UITypes.ElectronIO:
 			case UITypes.ReactWeb:
-				template = fs.readFileSync('./app/templates/screens/el_screen.tpl', 'utf8');
+				template = fs_readFileSync('./app/templates/screens/el_screen.tpl', 'utf8');
 				break;
 			case UITypes.ReactNative:
 			default:
-				template = fs.readFileSync('./app/templates/screens/rn_screen.tpl', 'utf8');
+				template = fs_readFileSync('./app/templates/screens/rn_screen.tpl', 'utf8');
 				break;
 		}
 		return bindTemplate(template, {
@@ -467,7 +468,7 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 		const itemRender = GetItemRender(node, extraimports, language);
 		const formReader = GetFormRender(node, extraimports, language);
 		const apiProperties = WriteDescribedApiProperties(node);
-		layoutSrc = bindTemplate(fs.readFileSync(template, 'utf8'), {
+		layoutSrc = bindTemplate(fs_readFileSync(template, 'utf8'), {
 			item_render: itemRender,
 			form_render: formReader,
 			data,
@@ -500,7 +501,7 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 	switch (language) {
 		case UITypes.ElectronIO:
 			ending = '.tsx';
-			templateStr = fs.readFileSync('./app/templates/screens/el_screenoption.tpl', 'utf8');
+			templateStr = fs_readFileSync('./app/templates/screens/el_screenoption.tpl', 'utf8');
 			styleRules = buildStyle(node);
 			cssFile = constructCssFile(css, `.${(GetCodeName(node) || '').toJavascriptName()}`);
 			cssFile += styleRules;
@@ -509,7 +510,7 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 			break;
 		case UITypes.ReactWeb:
 			ending = '.tsx';
-			templateStr = fs.readFileSync('./app/templates/screens/el_screenoption.tpl', 'utf8');
+			templateStr = fs_readFileSync('./app/templates/screens/el_screenoption.tpl', 'utf8');
 			styleRules = buildStyle(node);
 			cssFile = ''; // constructCssFile(css, `.${(GetCodeName(node) || '').toJavascriptName()}`);
 			cssFile += styleRules;
@@ -521,7 +522,7 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 			break;
 		case UITypes.ReactNative:
 		default:
-			templateStr = fs.readFileSync('./app/templates/screens/rn_screenoption.tpl', 'utf8');
+			templateStr = fs_readFileSync('./app/templates/screens/rn_screenoption.tpl', 'utf8');
 			break;
 	}
 	const results: any[] = [];
@@ -576,7 +577,7 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 }
 export function bindComponent(node: any, componentBindingDefinition: any, language: string) {
 	if (componentBindingDefinition && componentBindingDefinition.template) {
-		const template: any = fs.readFileSync(componentBindingDefinition.template, 'utf8');
+		const template: any = fs_readFileSync(componentBindingDefinition.template, 'utf8');
 		const { properties } = componentBindingDefinition;
 		const graph: any = GetCurrentGraph();
 		const bindProps: any = {};
@@ -842,11 +843,11 @@ export function GenerateRNComponents(
 				switch (language) {
 					case UITypes.ElectronIO:
 					case UITypes.ReactWeb:
-						template = fs.readFileSync('./app/templates/screens/el_screenoption.tpl', 'utf8');
+						template = fs_readFileSync('./app/templates/screens/el_screenoption.tpl', 'utf8');
 						break;
 					case UITypes.ReactNative:
 					default:
-						template = fs.readFileSync('./app/templates/screens/rn_screenoption.tpl', 'utf8');
+						template = fs_readFileSync('./app/templates/screens/rn_screenoption.tpl', 'utf8');
 						break;
 				}
 
@@ -965,11 +966,11 @@ export function GenerateCss(id: string, language: any) {
 		switch (language) {
 			case UITypes.ElectronIO:
 			case UITypes.ReactWeb:
-				template = fs.readFileSync('./app/templates/screens/el_screen.tpl', 'utf8');
+				template = fs_readFileSync('./app/templates/screens/el_screen.tpl', 'utf8');
 				break;
 			case UITypes.ReactNative:
 			default:
-				template = fs.readFileSync('./app/templates/screens/rn_screen.tpl', 'utf8');
+				template = fs_readFileSync('./app/templates/screens/rn_screen.tpl', 'utf8');
 				break;
 		}
 		return bindTemplate(template, {
@@ -2336,10 +2337,10 @@ function GenerateElectronIORoutes(screens: any[], language: string) {
 	let routefile;
 	switch (language) {
 		case UITypes.ReactWeb:
-			routefile = fs.readFileSync('./app/templates/reactweb/routes.tpl', 'utf8');
+			routefile = fs_readFileSync('./app/templates/reactweb/routes.tpl', 'utf8');
 			break;
 		default:
-			routefile = fs.readFileSync('./app/templates/electronio/routes.tpl', 'utf8');
+			routefile = fs_readFileSync('./app/templates/electronio/routes.tpl', 'utf8');
 			break;
 	}
 	const import_ = `import {{name}} from './screens/{{jsname}}';`;
@@ -2406,7 +2407,7 @@ function GenerateElectronIORoutes(screens: any[], language: string) {
 }
 export function BindScreensToTemplate(language = UITypes.ReactNative) {
 	const screens = GetScreens();
-	let template = fs.readFileSync('./app/templates/screens/screen.tpl', 'utf8');
+	let template = fs_readFileSync('./app/templates/screens/screen.tpl', 'utf8');
 	const moreresults = [];
 	let fileEnding = '.js';
 	switch (language) {

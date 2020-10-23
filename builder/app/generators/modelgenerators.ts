@@ -685,17 +685,53 @@ ${items}
 	}
 }
 
-export function fs_readFileSync(pa: string, typ: string) {
+export function fs_readFileSync(pa: string, typ: string = 'utf-8'): string {
 	try {
 		return fs.readFileSync(pa, typ);
 	}
 	catch {
 		if (pa.indexOf('./app') !== -1) {
 			try {
-				return fs.readFileSync('./' + pa.substring('./app'.length));
+				return fs.readFileSync('./' + pa.substring('./app'.length), 'utf8');
 			} catch (e) {
 				return '';
 			}
 		}
 	}
+	return '';
 }
+
+
+export function fs_existsSync(pa: string): boolean {
+	try {
+		return fs.existsSync(pa);
+	}
+	catch {
+		if (pa.indexOf('./app') !== -1) {
+			try {
+				return fs.existsSync('./' + pa.substring('./app'.length));
+			} catch (e) {
+				return false;
+			}
+		}
+	}
+	return false;
+}
+
+export function fs_readdirSync(pa: string): string[] {
+	try {
+		return fs.readdirSync(pa);
+	}
+	catch {
+		if (pa.indexOf('./app') !== -1) {
+			try {
+				return fs.readdirSync('./' + pa.substring('./app'.length));
+			} catch (e) {
+				return [];
+			}
+		}
+	}
+	return [];
+}
+
+

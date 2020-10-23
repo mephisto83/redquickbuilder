@@ -21,6 +21,7 @@ import { bindTemplate } from '../constants/functiontypes';
 import { NodeType } from '../components/titles';
 import NamespaceGenerator from './namespacegenerator';
 import { enumerate } from '../utils/utils';
+import { fs_readFileSync } from './modelgenerators';
 
 const MODEL_GET_CLASS = './app/templates/models/gets/model_get_class.tpl';
 const MODEL_GET_FUNCTION = './app/templates/models/gets/model_get_function.tpl';
@@ -57,10 +58,10 @@ export default class ModelGetGenerator {
 		const graph = GetRootGraph(state);
 		const result: any = {};
 
-		const _get_class = fs.readFileSync(MODEL_GET_CLASS, 'utf8');
-		const _get_methods = fs.readFileSync(MODEL_GET_FUNCTION, 'utf8');
-		const _get_methods_many_to_many = fs.readFileSync(MODEL_GET_MANY_TO_MANY_FUNCTION, 'utf8');
-		const _get_method_many_to_many_get_child = fs.readFileSync(MODEL_GET_MANY_TO_MANY_FUNCTION_GET_CHILD, 'utf8');
+		const _get_class = fs_readFileSync(MODEL_GET_CLASS, 'utf8');
+		const _get_methods = fs_readFileSync(MODEL_GET_FUNCTION, 'utf8');
+		const _get_methods_many_to_many = fs_readFileSync(MODEL_GET_MANY_TO_MANY_FUNCTION, 'utf8');
+		const _get_method_many_to_many_get_child = fs_readFileSync(MODEL_GET_MANY_TO_MANY_FUNCTION_GET_CHILD, 'utf8');
 		const allmodels = NodesByType(state, NodeTypes.Model)
 			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration))
 			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromController));

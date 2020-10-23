@@ -7,6 +7,7 @@ import os from 'os';
 import { getDirectories } from './threadutil';
 import executeJob from './executeJob';
 import JobService, { Job, JobServiceConstants } from '../../app/jobs/jobservice';
+import { fs_existsSync, fs_readFileSync } from '../../app/generators/modelgenerators';
 
 export default async function task(
 	jobPath: string,
@@ -30,7 +31,7 @@ export default async function task(
 }
 
 function getUnfinishedJob(jobPath: string): Job {
-	let folderExists = fs.existsSync(jobPath);
+	let folderExists = fs_existsSync(jobPath);
 	if (folderExists) {
 		let jobList = getDirectories(jobPath);
 		let res = jobList
@@ -58,9 +59,9 @@ function isJobComplete(jobConfig: Job) {
 }
 function getJobConfig(jobInstancePath: string): Job {
 	const configFile: string = path.join(jobInstancePath, JobServiceConstants.JOB_NAME);
-	if (fs.existsSync(jobInstancePath)) {
-		if (fs.existsSync(configFile)) {
-			const jobConfiguration: Job = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+	if (fs_existsSync(jobInstancePath)) {
+		if (fs_existsSync(configFile)) {
+			const jobConfiguration: Job = JSON.parse(fs_readFileSync(configFile, 'utf8'));
 			jobConfiguration.absolutePath = configFile;
 			jobConfiguration.configAbsolutePath = configFile;
 			jobConfiguration.jobInstancePath = jobInstancePath;
@@ -83,7 +84,7 @@ async function updateJobConfig(jobConfig: Job) {
 	}
 }
 function ifJobExists(jobPath: string) {
-	let folderExists = fs.existsSync(jobPath);
+	let folderExists = fs_existsSync(jobPath);
 	if (folderExists) {
 		let jobList = getDirectories(jobPath);
 		return jobList.length;

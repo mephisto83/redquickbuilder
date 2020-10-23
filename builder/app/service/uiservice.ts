@@ -3,6 +3,7 @@ import { GetCodeName, GetModelNodes, GetRootGraph } from "../actions/uiactions";
 import { NEW_LINE } from "../constants/nodetypes";
 import { GraphKeys } from "../methods/graph_methods";
 import fs from 'fs';
+import { fs_readFileSync } from "../generators/modelgenerators";
 export function GenerateUi(options) {
     let { state, key } = options;
     let defaultColors = {
@@ -25,7 +26,7 @@ export function GenerateUi(options) {
         alterNate[t] = '#' + (colors.split('-')[_i]);
 
     })
-    let template = fs.readFileSync('./app/templates/themes/react_variables.tpl', 'utf8');
+    let template = fs_readFileSync('./app/templates/themes/react_variables.tpl', 'utf8');
 
     let templates = [bindTemplate(template, {
         ...defaultColors,

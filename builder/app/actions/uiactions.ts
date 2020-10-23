@@ -41,6 +41,7 @@ import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectC
 import { ProgrammingLanguages, NodePropertyTypesByLanguage, NEW_LINE } from '../constants/nodetypes';
 import fs from 'fs';
 import routes from '../constants/routes';
+import { fs_existsSync, fs_readFileSync } from '../generators/modelgenerators';
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';
 export const BATCH = 'BATCH';
@@ -2961,11 +2962,11 @@ export function GetConditionClause(
 	if (template) {
 		switch (language) {
 			case NodeConstants.ProgrammingLanguages.JavaScript:
-				conditionTemplate = fs.readFileSync(templatejs, 'utf8');
+				conditionTemplate = fs_readFileSync(templatejs, 'utf8');
 				isjavascript = true;
 				break;
 			default:
-				conditionTemplate = fs.readFileSync(template, 'utf8');
+				conditionTemplate = fs_readFileSync(template, 'utf8');
 				break;
 		}
 	} else {
@@ -3598,14 +3599,14 @@ export function loadRedQuickConfiguration() {
 			let redquickbuilder_folder = path.join(userDir, '.redquickbuilder');
 			Promise.resolve().then(async () => {
 				await ensureDirectory(redquickbuilder_folder);
-				if (!fs.existsSync(redquickbuilder_folder)) {
+				if (!fs_existsSync(redquickbuilder_folder)) {
 					fs.writeFileSync(
 						path.join(redquickbuilder_folder, 'config.json'),
 						JSON.stringify(createRedQuickConfiguration()),
 						'utf-8'
 					);
 				}
-				let content = fs.readFileSync(path.join(redquickbuilder_folder, 'config.json'), 'utf-8');
+				let content = fs_readFileSync(path.join(redquickbuilder_folder, 'config.json'), 'utf-8');
 				let config = JSON.parse(content);
 				dispatch(Batch([ UIC(VISUAL, RED_QUICK_CONFIG, config) ]));
 			});
@@ -3634,10 +3635,10 @@ export function updateRedQuickConfiguration(config: RedQuickConfiguration) {
 			let redquickbuilder_folder = path.join(userDir, '.redquickbuilder');
 			Promise.resolve().then(async () => {
 				await ensureDirectory(redquickbuilder_folder);
-				if (fs.existsSync(redquickbuilder_folder)) {
+				if (fs_existsSync(redquickbuilder_folder)) {
 					fs.writeFileSync(path.join(redquickbuilder_folder, 'config.json'), JSON.stringify(config), 'utf-8');
 				}
-				let content = fs.readFileSync(path.join(redquickbuilder_folder, 'config.json'), 'utf-8');
+				let content = fs_readFileSync(path.join(redquickbuilder_folder, 'config.json'), 'utf-8');
 				config = JSON.parse(content);
 				dispatch(Batch([ UIC(VISUAL, RED_QUICK_CONFIG, config) ]));
 			});
@@ -3645,7 +3646,7 @@ export function updateRedQuickConfiguration(config: RedQuickConfiguration) {
 	};
 }
 export async function ensureDirectory(dir: any) {
-	if (!fs.existsSync(dir)) {
+	if (!fs_existsSync(dir)) {
 		console.log(`doesnt exist : ${dir}`);
 	} else {
 	}
@@ -3656,7 +3657,7 @@ export async function ensureDirectory(dir: any) {
 			if (dir.startsWith(path.sep)) {
 				tempDir = `${path.sep}${tempDir}`;
 			}
-			if (!fs.existsSync(tempDir)) {
+			if (!fs_existsSync(tempDir)) {
 				fs.mkdirSync(tempDir);
 			}
 		}

@@ -4,7 +4,8 @@ import ts from 'typescript';
 import { buildFunctionsFromString, DeclartionColors, IFlowCodeConfig, IFlowCodeFile, IFlowCodeStatements } from '../../constants/flowcode_ast';
 import { FlowCodeNodeModel, FlowCodeSourceOptions } from './FlowCodeNodeModel';
 import { FlowCodePortModel } from './FlowCodePortModel';
-import { FlowCodeNodeCommandKey, FlowCodeNodeCommands, GetNodePortByName, GetNodePortsByType, GetPortASTType, GetPortASTTypeName, getSelectedMethod, Operations, PortStructures, PortType } from './flowutils';
+import { FlowCodeNodeCommandKey, FlowCodeNodeCommands, GetASTType, GetNodePortByName, GetNodePortsByType, GetPortASTType, GetPortASTTypeName, GetReferenceType, getSelectedMethod, Operations, PortStructures, PortType } from './flowutils';
+import { fs_readFileSync } from '../../generators/modelgenerators';
 
 export interface PortHandlerArg {
     type: string;
@@ -90,6 +91,13 @@ export class PortHandler {
         }
         return null;
     }
+    static getSourceFiles(): string[] {
+        let result: string[] = [];
+        if (this.flowLibrary) {
+            return Object.keys(this.flowLibrary);
+        }
+        return result;
+    }
     static getSource(options: FlowCodeSourceOptions): IFlowCodeStatements | undefined {
         if (this.flowLibrary && this.flowLibrary[options.file]) {
             let result = this.flowLibrary[options.file];
@@ -98,7 +106,7 @@ export class PortHandler {
                     return this.flowLibrary[options.file].flowCodeStatements;
                 }
                 try {
-                    let contents = fs.readFileSync(options.file, 'utf-8');
+                    let contents = fs_readFileSync(options.file, 'utf-8');
                     let statements = buildFunctionsFromString(contents, options.file, true);
                     this.flowLibrary[options.file].flowCodeStatements = statements;
                     return this.flowLibrary[options.file].flowCodeStatements;
@@ -294,7 +302,7 @@ function HandleSetupMethodOutput(arg: HandlerParams) {
                             });
                             if (selectedMethod) {
                                 let methodDec = selectedMethod as ts.MethodDeclaration;
-                               
+
                                 if (methodDec) {
                                     if (methodDec.type && methodDec.type.kind !== ts.SyntaxKind.VoidKeyword) {
                                         outportsToExist.push({
@@ -333,66 +341,83 @@ function HandleSetupMethodParameters(arg: HandlerParams) {
         let astType: ts.Node | null = GetPortASTType(node, PortStructures.CallableExpression.Method);
         if (astType && node) {
             switch (astType.kind) {
+                case ts.SyntaxKind.TypeReference:
+                    let refNode = GetReferenceType(astType as ts.TypeReferenceNode);
+                    if (refNode) {
+                        switch (refNode.kind) {
+                            case ts.SyntaxKind.InterfaceDeclaration:
+                            case ts.SyntaxKind.ClassDeclaration:
+                                setupMethodParameters(node, astType);
+                                break;
+                        }
+                    }
+                    break;
                 case ts.SyntaxKind.InterfaceDeclaration:
                 case ts.SyntaxKind.ClassDeclaration:
-                    let inportsToExists: { name: string; kind: ts.SyntaxKind, paramDec: ts.ParameterDeclaration }[] = [];
-                    let outportsToExist: { name: string; kind: ts.SyntaxKind }[] = [];
-                    let ports = node.getPorts();
-                    let methodPort = GetNodePortByName(node, PortStructures.CallableExpression.Method)
-                    if (methodPort) {
-                        let classDec = astType as ts.ClassDeclaration;
-                        if (classDec) {
-                            let selectedMethod = classDec.members.find((member: ts.ClassElement) => {
-                                return member.kind === ts.SyntaxKind.MethodDeclaration && methodPort && member.getText().trim() === methodPort.getValueTitle();
-                            });
-                            if (selectedMethod) {
-                                let methodDec = selectedMethod as ts.MethodDeclaration;
-                                if (methodDec && methodDec.parameters) {
-                                    methodDec.parameters.forEach((parameter: ts.ParameterDeclaration) => {
-                                        inportsToExists.push({
-                                            name: parameter.getText(),
-                                            kind: parameter.kind,
-                                            paramDec: parameter
-                                        })
-                                    })
-                                }
-                                
-                            }
-                        }
-
-                        inportsToExists.forEach((item) => {
-                            if (node)
-                                if (!ports[item.name]) {
-                                    let newPort = node.addInPort(item.name, item.kind) as FlowCodePortModel;
-                                    newPort.setPortType(PortType.MethodParameters);
-                                    newPort.setName(item.name);
-                                    newPort.setPortName(item.name);
-                                    let { paramDec } = item;
-                                    if (paramDec.type && paramDec.type.kind === ts.SyntaxKind.FunctionType) {
-                                        newPort.addLinkHandler(PortHandlerType.AutoComposeFunctionInterface, node.getID());
-                                    }
-                                }
-                        });
-                        outportsToExist.forEach((item) => {
-                            if (node)
-                                if (!ports[item.name]) {
-                                    let outputPort = node.addOutPort(item.name, item.kind);
-                                    outputPort.setName(PortStructures.Constructor.OutputPort)
-                                    outputPort.setPortName(PortStructures.Constructor.OutputPort)
-                                }
-                        });
-                        clearUnwantedPorts(ports, inportsToExists, outportsToExist, node, (customPort: FlowCodePortModel, name: string) => {
-                            if (!customPort.isStatic() && customPort.getPortType() === PortType.MethodParameters && node) {
-                                return true;
-                            }
-                            return false;
-                        });
-                    }
+                    setupMethodParameters(node, astType);
                     break;
             }
         }
     }
 }
+function setupMethodParameters(node: FlowCodeNodeModel, astType: ts.Node) {
+    let inportsToExists: { name: string; kind: ts.SyntaxKind; paramDec: ts.ParameterDeclaration; }[] = [];
+    let outportsToExist: { name: string; kind: ts.SyntaxKind; }[] = [];
+    let ports = node.getPorts();
+    let methodPort = GetNodePortByName(node, PortStructures.CallableExpression.Method);
+    if (methodPort) {
+        astType = GetASTType(astType as ts.ClassDeclaration | ts.TypeReferenceNode | ts.InterfaceDeclaration);
+        let classDec = astType as ts.ClassDeclaration;
+
+        if (classDec) {
+            let selectedMethod = classDec.members.find((member: ts.ClassElement) => {
+                return member.kind === ts.SyntaxKind.MethodDeclaration && methodPort && member.getText().trim() === methodPort.getValueTitle();
+            });
+            if (selectedMethod) {
+                let methodDec = selectedMethod as ts.MethodDeclaration;
+                if (methodDec && methodDec.parameters) {
+                    methodDec.parameters.forEach((parameter: ts.ParameterDeclaration) => {
+                        inportsToExists.push({
+                            name: parameter.getText(),
+                            kind: parameter.kind,
+                            paramDec: parameter
+                        });
+                    });
+                }
+
+            }
+        }
+
+        inportsToExists.forEach((item) => {
+            if (node)
+                if (!ports[item.name]) {
+                    let newPort = node.addInPort(item.name, item.kind) as FlowCodePortModel;
+                    newPort.setPortType(PortType.MethodParameters);
+                    newPort.setName(item.name);
+                    newPort.setPortName(item.name);
+                    let { paramDec } = item;
+                    if (paramDec.type && paramDec.type.kind === ts.SyntaxKind.FunctionType) {
+                        newPort.addLinkHandler(PortHandlerType.AutoComposeFunctionInterface, node.getID());
+                    }
+                }
+        });
+        outportsToExist.forEach((item) => {
+            if (node)
+                if (!ports[item.name]) {
+                    let outputPort = node.addOutPort(item.name, item.kind);
+                    outputPort.setName(PortStructures.Constructor.OutputPort);
+                    outputPort.setPortName(PortStructures.Constructor.OutputPort);
+                }
+        });
+        clearUnwantedPorts(ports, inportsToExists, outportsToExist, node, (customPort: FlowCodePortModel, name: string) => {
+            if (!customPort.isStatic() && customPort.getPortType() === PortType.MethodParameters && node) {
+                return true;
+            }
+            return false;
+        });
+    }
+}
+
 function ClearPortsOfType(portType: PortType, node: FlowCodeNodeModel) {
     let ports = node.getPorts();
     for (var port in ports) {
@@ -411,6 +436,8 @@ function HandleFromCallableReference(arg: HandlerParams) {
         let astType: ts.Node | null = GetPortASTType(node, PortStructures.Generic.Type);
         if (astType) {
             switch (astType.kind) {
+                case ts.SyntaxKind.TypeReference:
+                case ts.SyntaxKind.InterfaceDeclaration:
                 case ts.SyntaxKind.ClassDeclaration:
                     let ports = node.getPorts();
                     if (!ports[PortStructures.CallableExpression.Method]) {
@@ -434,6 +461,10 @@ function HandleFromCallableReference(arg: HandlerParams) {
                                         }
                                     }
                                 }
+                                if (astType && astType.kind === ts.SyntaxKind.TypeReference) {
+                                    astType = GetReferenceType(astType as ts.TypeReferenceNode)
+                                }
+
                                 let classDec = astType as ts.ClassDeclaration;
                                 if (classDec) {
                                     return classDec.members.filter((member: ts.ClassElement) => {
@@ -458,8 +489,6 @@ function HandleFromCallableReference(arg: HandlerParams) {
                     }
 
                     break
-                case ts.SyntaxKind.InterfaceDeclaration:
-                    break;
             }
         }
     }
@@ -484,12 +513,27 @@ function HandleFunctionParameterExpressionType(arg: HandlerParams) {
             if (temp && temp.name) {
                 (ports[variablePortName] as FlowCodePortModel).setName(temp.name.getText())
             }
+            else if (temp && temp.kind === ts.SyntaxKind.TypeReference) {
+                (ports[variablePortName] as FlowCodePortModel).setName(WriteText(temp))
+            }
             else {
                 let flowPort = (ports[variablePortName] as FlowCodePortModel);
                 flowPort.setName(flowPort.getName())
             }
         }
     }
+}
+
+function WriteText(txt: ts.TypeReferenceNode) {
+    if (txt) {
+        let argsText = '';
+        if (txt.typeArguments && txt.typeArguments.length) {
+            argsText = `<${txt.typeArguments.map(v => v.getText()).join()}>`;
+        }
+        return txt.typeName.getText() + argsText;
+    }
+
+    return '';
 }
 
 function HandleFunctionParameterType(arg: HandlerParams) {

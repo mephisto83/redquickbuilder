@@ -29,6 +29,7 @@ import { NodeType } from '../components/titles';
 import NamespaceGenerator from './namespacegenerator';
 import { enumerate } from '../utils/utils';
 import { Node } from '../methods/graph_types';
+import { fs_readFileSync } from './modelgenerators';
 
 const RETURN_GET_CLASS = './app/templates/models/returns/returns_class.tpl';
 const RETURN_GET_FUNCTION = './app/templates/models/returns/returns_funcs.tpl';
@@ -42,8 +43,8 @@ export default class ModelReturnGenerator {
 		let graph = GetRootGraph(state);
 		let result: any = {};
 
-		let _return_get_class = fs.readFileSync(RETURN_GET_CLASS, 'utf8');
-		let _return_get_methods = fs.readFileSync(RETURN_GET_FUNCTION, 'utf8');
+		let _return_get_class = fs_readFileSync(RETURN_GET_CLASS, 'utf8');
+		let _return_get_methods = fs_readFileSync(RETURN_GET_FUNCTION, 'utf8');
 		let allfilters = NodesByType(state, NodeTypes.ModelFilter);
 		let allmodels = NodesByType(state, NodeTypes.Model)
 			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration))

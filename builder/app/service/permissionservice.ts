@@ -19,6 +19,7 @@ import { bindTemplate } from '../constants/functiontypes';
 import fs from 'fs';
 import { ProgrammingLanguages, STANDARD_CONTROLLER_USING, NameSpace, NEW_LINE } from '../constants/nodetypes';
 import NamespaceGenerator from '../generators/namespacegenerator';
+import { fs_readFileSync } from '../generators/modelgenerators';
 function GetMethodDefinitionPermissionSection(id: any) {
 	let methodDefinition = GetMethodDefinition(id);
 	if (methodDefinition && methodDefinition.permission) {
@@ -31,7 +32,7 @@ function GetMethodDefinitionPermissionSection(id: any) {
 export function GetPermissionMethodImplementation(id: any, language = ProgrammingLanguages.CSHARP) {
 	let permissionSection = GetMethodDefinitionPermissionSection(id);
 	let { implementation } = permissionSection;
-	let implementation_template = fs.readFileSync(implementation, 'utf8');
+	let implementation_template = fs_readFileSync(implementation, 'utf8');
 	let parameters = GetPermissionMethodParametersImplementation(id, language);
 	let conditions = GetCombinedCondition(id, language);
 
@@ -49,7 +50,7 @@ export function GetPermissionMethodInterface(id: any, language = ProgrammingLang
 	}
 	let { interface_ } = permissionSection;
 
-	let interface_template = fs.readFileSync(interface_, 'utf8');
+	let interface_template = fs_readFileSync(interface_, 'utf8');
 	let parameters = GetPermissionMethodParametersImplementation(id, language);
 
 	return bindTemplate(interface_template, {
@@ -126,7 +127,7 @@ export function BuildAgentPermissionInterface(agentId: any, permissions: any, la
 		})
 		.filter((x: any) => x)
 		.join(NEW_LINE);
-	let template = fs.readFileSync('./app/templates/permissions/permissions_interface.tpl', 'utf8');
+	let template = fs_readFileSync('./app/templates/permissions/permissions_interface.tpl', 'utf8');
 
 	return bindTemplate(template, {
 		agent_type: GetCodeName(agentId),
@@ -145,8 +146,8 @@ export function BuildAgentPermissionImplementation(
 		})
 		.filter((x: any) => x)
 		.join(NEW_LINE);
-	let template = fs.readFileSync('./app/templates/permissions/permissions_impl.tpl', 'utf8');
-	let _constructTemplate = fs.readFileSync('./app/templates/permissions/constructor.tpl', 'utf8');
+	let template = fs_readFileSync('./app/templates/permissions/permissions_impl.tpl', 'utf8');
+	let _constructTemplate = fs_readFileSync('./app/templates/permissions/constructor.tpl', 'utf8');
 	let customService = GetCustomServiceImplementations(NodeTypes.Permission) || '';
 	let constructor = bindTemplate(_constructTemplate, {
 		agent_type: `${GetCodeName(agentId)}`,

@@ -1,5 +1,4 @@
 /* eslint-disable import/no-duplicates */
-import { readFileSync } from 'fs';
 import {
 	GenerateChainFunctions,
 	GenerateChainFunctionSpecs,
@@ -27,7 +26,7 @@ import { GetNodeLinkedTo, TARGET, GetNodesLinkedTo } from '../methods/graph_meth
 import NamespaceGenerator from './namespacegenerator';
 import * as GraphMethods from '../methods/graph_methods';
 import { Graph } from '../methods/graph_types';
-import ModelGenerator from './modelgenerators';
+import ModelGenerator, { fs_readFileSync } from './modelgenerators';
 
 export default class DataChainGenerator {
 	static GenerateCS(options: { state: any; key?: any; language: any }) {
@@ -129,19 +128,19 @@ export default class DataChainGenerator {
 				name: 'data-chain'
 			},
 			{
-				template: readFileSync('./app/utils/observable.ts', 'utf8'),
+				template: fs_readFileSync('./app/utils/observable.ts', 'utf8'),
 				relative: './src/actions',
 				relativeFilePath: `./observable${fileEnding}`,
 				name: 'observable'
 			},
 			{
-				template: readFileSync('./app/utils/array.ts', 'utf8'),
+				template: fs_readFileSync('./app/utils/array.ts', 'utf8'),
 				relative: './src/actions',
 				relativeFilePath: `./array${fileEnding}`,
 				name: 'array'
 			},
 			{
-				template: readFileSync('./app/utils/redgraph.ts', 'utf8'),
+				template: fs_readFileSync('./app/utils/redgraph.ts', 'utf8'),
 				relative: './src/actions',
 				relativeFilePath: `./redgraph${fileEnding}`,
 				name: 'redgraph.ts'
@@ -149,7 +148,7 @@ export default class DataChainGenerator {
 			// Specific for web sites
 			// Need an alternative for ReactNative
 			{
-				template: readFileSync('./app/actions/redutils.ts', 'utf8'),
+				template: fs_readFileSync('./app/actions/redutils.ts', 'utf8'),
 				relative: './src/actions',
 				relativeFilePath: `./redutils${fileEnding}`,
 				name: 'redutils.js'
@@ -163,7 +162,7 @@ export default class DataChainGenerator {
 					relative: './test',
 					relativeFilePath: './data-chain.spec.js',
 					name: 'data-chain.spec.js',
-					template: bindTemplate(readFileSync('./app/templates/electronio/spec.tpl', 'utf8'), {
+					template: bindTemplate(fs_readFileSync('./app/templates/electronio/spec.tpl', 'utf8'), {
 						tests: tests.join(NEW_LINE)
 					})
 				});

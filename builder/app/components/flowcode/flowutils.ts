@@ -2,7 +2,10 @@ import ts from 'typescript';
 import { FlowCodeStatements } from '../../constants/flowcode_ast';
 import { FlowCodeNodeModel } from './FlowCodeNodeModel';
 import { FlowCodePortModel } from './FlowCodePortModel';
+import fs from 'fs';
+import path from 'path';
 import { PortHandler } from './PortHandler';
+import { fs_existsSync } from '../../generators/modelgenerators';
 
 export const PortStructures = {
     Generic: {
@@ -100,14 +103,30 @@ function getNextNode(key: string, target: 'target' | 'source', node: FlowCodeNod
     return null;
 }
 
-function GetMethodPortType(node: FlowCodeNodeModel) {
+export function GetASTType(type: ts.ClassDeclaration | ts.TypeReferenceNode | ts.InterfaceDeclaration): ts.ClassDeclaration | ts.InterfaceDeclaration {
+    switch (type.kind) {
+        case ts.SyntaxKind.TypeReference:
+            let res = GetReferenceType(type as ts.TypeReferenceNode);
+            if (res) {
+                return res as ts.ClassDeclaration | ts.InterfaceDeclaration;
+            }
+            break;
+    }
+    return type as ts.ClassDeclaration | ts.InterfaceDeclaration;
+}
+
+function GetMethodPortType(node: FlowCodeNodeModel): ts.Node | null {
     let astType: ts.Node | null = GetPortASTType(node, PortStructures.CallableExpression.Method);
     if (astType && node) {
         let methodPort = GetNodePortByName(node, PortStructures.CallableExpression.Method);
         if (methodPort) {
             let method = getSelectedMethod(methodPort, astType as ts.ClassDeclaration);
             if (method && method.type) {
-                return method.type;
+                let methodTypeDec = method.type as ts.TypeReferenceNode;
+                return methodTypeDec;
+            }
+            if (method && method.type) {
+                return FindTypeByName(method.type.getText());
             }
             else {
                 return null;
@@ -115,6 +134,97 @@ function GetMethodPortType(node: FlowCodeNodeModel) {
         }
     }
     return null;
+}
+
+export function GetReferenceType(methodTypeDec: ts.TypeReferenceNode): ts.Node | null {
+    let methodTypeName = methodTypeDec.typeName.getText();
+    let fileName = methodTypeDec.getSourceFile().fileName;
+    fileName = fileName.split('/').join(path.sep).split('\\').join(path.sep);
+    if (fileName) {
+        let source = PortHandler.getSource({
+            file: fileName,
+            type: ''
+        });
+        if (source) {
+            for (let s in source) {
+                if (source[s].ast) {
+                    let { ast, imports } = source[s];
+                    if (imports) {
+                        let res = null;
+                        imports.find((_import: ts.Node) => {
+                            let importDeclation = _import as ts.ImportDeclaration;
+                            let importClause = importDeclation.importClause;
+                            let importSpec: ts.ImportSpecifier | null | undefined = null;
+                            if (importClause) {
+                                let { namedBindings, name } = importClause;
+                                if (namedBindings) {
+                                    let namedImports = namedBindings as ts.NamedImports;
+                                    if (namedImports && namedImports.elements) {
+                                        importSpec = namedImports.elements.find((importSpecifier: ts.ImportSpecifier) => {
+                                            if (methodTypeName) {
+                                                return importSpecifier.name.getText() === methodTypeName
+                                            }
+                                            return false;
+                                        });
+                                    }
+                                }
+                                if (name) {
+
+                                }
+                            }
+                            if (importSpec) {
+                                let relativeDir = importDeclation.moduleSpecifier.getText().split(`'`).join('').split('"').join('').split('`').join('');
+                                let filePath = path.join(path.dirname(fileName), relativeDir);
+                                //check if there is a d.ts
+                                if (fs_existsSync(filePath + '.d.ts')) {
+                                    let source = PortHandler.getSource({
+                                        file: filePath + '.d.ts',
+                                        type: ''
+                                    });
+                                    if (source) {
+                                        if (methodTypeName) {
+                                            if (source[methodTypeName]) {
+                                                res = source[methodTypeName].ast;
+                                                return true;
+                                            }
+                                        }
+                                    }
+                                }
+                                else if (fs_existsSync(path.join(filePath, `index.d.ts`))) {
+
+                                }
+                            }
+                        })
+                        if (res) {
+                            return res;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return null;
+}
+
+function FindTypeByName(name: string): ts.Node | null {
+    let result = null;
+
+    let files = PortHandler.getSourceFiles()
+    files.find((file: string) => {
+        let source = PortHandler.getSource({
+            file: file,
+            type: ''
+        });
+        if (source) {
+            for (let s in source) {
+                if (source[s].ast) {
+                    let ast = source[s].ast;
+
+                }
+            }
+        }
+    })
+    return result;
 }
 function GetNodeASTPortTypeName(currentPort: FlowCodePortModel, node: FlowCodeNodeModel): ts.Node | null {
     let nodeType = node.getNodeType();
@@ -158,6 +268,9 @@ function GetNodeASTPortTypeName(currentPort: FlowCodePortModel, node: FlowCodeNo
         let flowCodeConfig = PortHandler.getFlowConfig(sourceNode);
         if (flowCodeConfig && flowCodeConfig.ast) {
             switch (flowCodeConfig.ast.kind) {
+                case ts.SyntaxKind.TypeReference:
+                    debugger;
+                    break;
                 case ts.SyntaxKind.ClassDeclaration:
                 case ts.SyntaxKind.InterfaceDeclaration:
                     return flowCodeConfig.ast;
@@ -196,11 +309,12 @@ export function GetNodePortsByType(node: FlowCodeNodeModel, portType: PortType):
     });
 }
 
-export function getSelectedMethod(methodPort: FlowCodePortModel, astType: ts.ClassDeclaration): ts.MethodDeclaration | null {
+export function getSelectedMethod(methodPort: FlowCodePortModel, astType: ts.ClassDeclaration | ts.InterfaceDeclaration | ts.TypeReferenceNode): ts.MethodDeclaration | null {
     if (methodPort) {
-        let classDec = astType;
-        if (classDec) {
-            let selectedMethod = classDec.members.find((member: ts.ClassElement) => {
+        astType = GetASTType(astType as ts.ClassDeclaration | ts.TypeReferenceNode | ts.InterfaceDeclaration);
+        let classDec = astType as ts.ClassDeclaration;
+        if (classDec && classDec.members) {
+            let selectedMethod = classDec.members.find((member: ts.ClassElement | ts.TypeElement) => {
                 return member.kind === ts.SyntaxKind.MethodDeclaration && methodPort && member.getText().trim() === methodPort.getValueTitle();
             });
             return selectedMethod as ts.MethodDeclaration || null;

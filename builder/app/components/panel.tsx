@@ -17,6 +17,8 @@ export default class Panel extends Component<any, any> {
 			boxBodyStyle.height = '100%';
 			boxBodyStyle.overflow = 'auto';
 			boxBodyStyle.maxHeight = 'calc(100vh - 115px)';
+			style.maxHeight = '100%';
+			style.height = '100%';
 		}
 		return (
 			<div className="box box-default" style={style}>

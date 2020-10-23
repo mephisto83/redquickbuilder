@@ -65,7 +65,7 @@ import {
 	showViewer, viewFlowCode
 } from './remoteActions';
 import ThemeServiceGenerator from '../generators/themeservicegenerator';
-import ModelGenerator from '../generators/modelgenerators';
+import ModelGenerator, { fs_existsSync, fs_readdirSync, fs_readFileSync } from '../generators/modelgenerators';
 
 const { ipcRenderer } = require('electron');
 const REACTWEB = 'reactweb';
@@ -663,16 +663,16 @@ function generateFolderStructure(
 	relative: any,
 	target_dir: string
 ) {
-	const directories = fs.readdirSync(dir);
+	const directories = fs_readdirSync(dir);
 	relative = relative || dir;
 	directories.map((item) => {
 		const dirPath = path.join(dir, item);
-		if (fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory()) {
+		if (fs_existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory()) {
 			const reldir = dir.substr(relative.length);
 			ensureDirectory(path.join(target_dir, reldir, item));
 			generateFolderStructure(dirPath, lib, relative, target_dir);
-		} else if (fs.existsSync(dirPath)) {
-			let file = fs.readFileSync(dirPath, 'utf8');
+		} else if (fs_existsSync(dirPath)) {
+			let file = fs_readFileSync(dirPath, 'utf8');
 			const reldir = dir.substr(relative.length);
 			file = bindTemplate(file, lib);
 			ensureDirectory(path.join(target_dir, reldir));
@@ -968,7 +968,7 @@ function CreateRegistrations(nodes: any[], namefunc: any = null, interfacefunc: 
 	return nodes.map((v: any) => `builder.RegisterType<${namefunc(v)}>().As<${interfacefunc(v)}>();`).join(NEW_LINE);
 }
 function ensureDirectory(dir: any) {
-	if (!fs.existsSync(dir)) {
+	if (!fs_existsSync(dir)) {
 		console.log(`doesnt exist : ${dir}`);
 	} else {
 	}
@@ -979,7 +979,7 @@ function ensureDirectory(dir: any) {
 			if (dir.startsWith(path.sep)) {
 				tempDir = `${path.sep}${tempDir}`;
 			}
-			if (!fs.existsSync(tempDir)) {
+			if (!fs_existsSync(tempDir)) {
 				fs.mkdirSync(tempDir);
 			}
 		}
@@ -1008,11 +1008,11 @@ const CodeTypeToArea = {
 };
 
 function deleteAll(directory: any) {
-	if (fs.existsSync(directory) && fs.lstatSync(directory).isDirectory()) {
-		const files = fs.readdirSync(directory);
+	if (fs_existsSync(directory) && fs.lstatSync(directory).isDirectory()) {
+		const files = fs_readdirSync(directory);
 		files.forEach((file) => {
 			const dirPath = path.join(directory, file);
-			if (fs.existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory()) {
+			if (fs_existsSync(dirPath) && fs.lstatSync(dirPath).isDirectory()) {
 				deleteAll(dirPath);
 			} else {
 				fs.unlinkSync(path.join(directory, file));

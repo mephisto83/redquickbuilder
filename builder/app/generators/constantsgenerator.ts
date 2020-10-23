@@ -11,6 +11,7 @@ import {
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
+import { fs_readFileSync } from './modelgenerators';
 
 const CONSTANTS_CLASS = './app/templates/constants.tpl';
 const CONSTANTS_JS_CLASS = './app/templates/constants_js.tpl';
@@ -28,7 +29,7 @@ export default class ConstantsGenerator {
 		let graphRoot = GetRootGraph(state);
 		let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
 
-		let _constantsClass = fs.readFileSync(CONSTANTS_CLASS, 'utf8');
+		let _constantsClass = fs_readFileSync(CONSTANTS_CLASS, 'utf8');
 		let result: any = {};
 		values.map((value: { model: any; name: any }) => {
 			let { model, name } = value;
@@ -70,7 +71,7 @@ export default class ConstantsGenerator {
 		let graphRoot = GetRootGraph(state);
 		let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
 
-		let _constantsClass = fs.readFileSync(CONSTANTS_JS_CLASS, 'utf8');
+		let _constantsClass = fs_readFileSync(CONSTANTS_JS_CLASS, 'utf8');
 		let result: any = {};
 		values.map((value: { model: any; name: any }) => {
 			let { model, name } = value;

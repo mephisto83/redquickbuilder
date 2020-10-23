@@ -24,6 +24,7 @@ import {
 import ControllerGenerator from './controllergenerator';
 import { addNewLine } from '../utils/array';
 import { GetNodesLinkedTo } from '../methods/graph_methods';
+import { fs_readFileSync } from './modelgenerators';
 
 export default class ControllerActionGenerator {
 	static GenerateService(options: any) {
@@ -40,7 +41,7 @@ export default class ControllerActionGenerator {
 				break;
 		}
 		let temp = NodesByType(state, NodeTypes.Method);
-		const serviceTemplate = fs.readFileSync('./app/templates/screens/service.tpl', 'utf8');
+		const serviceTemplate = fs_readFileSync('./app/templates/screens/service.tpl', 'utf8');
 		const methodTemplate = `
 {{methodName}}: async (params${useAny ? ': any' : ''}) => {
     let { template, query } = params;

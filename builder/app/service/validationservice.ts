@@ -29,6 +29,7 @@ import {
 } from '../constants/nodetypes';
 import NamespaceGenerator from '../generators/namespacegenerator';
 import { Node } from '../methods/graph_types';
+import { fs_readFileSync } from '../generators/modelgenerators';
 function GetMethodDefinitionValidationSection(id: any) {
 	let methodDefinition = GetMethodDefinition(id);
 	if (methodDefinition && methodDefinition.validation) {
@@ -47,7 +48,7 @@ export function GetValidationEntries(
 		let validation_entry = as_interface
 			? './app/templates/validation/validation_entry_interface.tpl'
 			: './app/templates/validation/validation_entry.tpl';
-		let validation_entry_template = fs.readFileSync(validation_entry, 'utf8');
+		let validation_entry_template = fs_readFileSync(validation_entry, 'utf8');
 
 		let validatorNodes = dictionary[agent];
 		let methods = validatorNodes
@@ -64,7 +65,7 @@ export function GetValidationEntries(
 				return GetMethodNodeProp(x, FunctionTemplateKeys.Model);
 			});
 
-		let validation_case_template = fs.readFileSync('./app/templates/validation/validation_case.tpl', 'utf8');
+		let validation_case_template = fs_readFileSync('./app/templates/validation/validation_case.tpl', 'utf8');
 		return Object.keys(methods).map((modelId) => {
 			let parameters = `${GetCodeName(modelId)} model, ${GetCodeName(agent)} agent, ${GetCodeName(
 				modelId
@@ -114,7 +115,7 @@ export function GetValidationMethodImplementation(id: any, language = Programmin
 		return false;
 	}
 	let { implementation } = validationSection;
-	let implementation_template = fs.readFileSync(implementation, 'utf8');
+	let implementation_template = fs_readFileSync(implementation, 'utf8');
 	let parameters = GetValidationMethodParametersImplementation(id, language);
 	let conditions = GetCombinedCondition(id, language);
 
@@ -132,7 +133,7 @@ export function GetValidationMethodInterface(id: any, language = ProgrammingLang
 	}
 	let { interface_ } = validationSection;
 
-	let interface_template = fs.readFileSync(interface_, 'utf8');
+	let interface_template = fs_readFileSync(interface_, 'utf8');
 	let parameters = GetValidationMethodParametersImplementation(id, language);
 
 	return bindTemplate(interface_template, {
@@ -250,7 +251,7 @@ export function BuildAgentValidationInterface(
 		})
 		.filter((x: any) => x)
 		.join(NEW_LINE);
-	let template = fs.readFileSync('./app/templates/validation/validation_interface.tpl', 'utf8');
+	let template = fs_readFileSync('./app/templates/validation/validation_interface.tpl', 'utf8');
 	let validation_entries: any = GetValidationEntries(agentId, true, language);
 
 	return bindTemplate(template, {
@@ -272,8 +273,8 @@ export function BuildAgentValidationImplementation(
 		.filter((x: any) => x)
 		.join(NEW_LINE);
 	let validation_entries: any = GetValidationEntries(agentId, false, language) || [];
-	let template = fs.readFileSync('./app/templates/validation/validations_impl.tpl', 'utf8');
-	let _constructTemplate = fs.readFileSync('./app/templates/validation/constructor.tpl', 'utf8');
+	let template = fs_readFileSync('./app/templates/validation/validations_impl.tpl', 'utf8');
+	let _constructTemplate = fs_readFileSync('./app/templates/validation/constructor.tpl', 'utf8');
 	let constructor = bindTemplate(_constructTemplate, {
 		agent_type: `${GetCodeName(agentId)}`,
 		arbiters: GetArbiterPropertyImplementations(4)

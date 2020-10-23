@@ -17,6 +17,7 @@ import { bindTemplate } from '../constants/functiontypes';
 import { NodeType } from '../components/titles';
 import NamespaceGenerator from './namespacegenerator';
 import { Graph } from '../methods/graph_types';
+import { fs_readFileSync } from './modelgenerators';
 
 const VALIDATION_CLASS = './app/templates/validation/validation_class.tpl';
 const VALIDATION_TEST = './app/templates/validation/tests/validation.tpl';
@@ -178,10 +179,10 @@ export default class ValidationRuleGenerator {
 		let result: any = {};
 
 		let nodes = NodesByType(state, NodeTypes.Validator);
-		let _validation_class = fs.readFileSync(VALIDATION_CLASS, 'utf8');
-		let _validation_property = fs.readFileSync(VALIDATION_PROPERTY, 'utf8');
-		let _validation_test = fs.readFileSync(VALIDATION_TEST, 'utf8');
-		let _testClass = fs.readFileSync(TEST_CLASS, 'utf8');
+		let _validation_class = fs_readFileSync(VALIDATION_CLASS, 'utf8');
+		let _validation_property = fs_readFileSync(VALIDATION_PROPERTY, 'utf8');
+		let _validation_test = fs_readFileSync(VALIDATION_TEST, 'utf8');
+		let _testClass = fs_readFileSync(TEST_CLASS, 'utf8');
 		nodes.map((node: any) => {
 			var agent: any = GetNodeProp(node, NodeProperties.ValidatorAgent);
 			var model: any = GetNodeProp(node, NodeProperties.ValidatorModel);

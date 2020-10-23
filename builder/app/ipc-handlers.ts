@@ -6,6 +6,7 @@ import path from 'path';
 import CommunicationTower, { RedQuickDistributionCommand } from './jobs/communicationTower';
 import { JobServiceConstants, sleep } from './jobs/jobservice';
 import { BrowserWindow } from 'electron';
+import { fs_existsSync, fs_readFileSync } from './generators/modelgenerators';
 var child_process = require('child_process'),
 	spawn = child_process.spawn;
 
@@ -156,7 +157,7 @@ export default class IPCHandlers {
 }
 
 export function ensureDirectorySync(dir: any) {
-	if (!fs.existsSync(dir)) {
+	if (!fs_existsSync(dir)) {
 		console.log(`doesnt exist : ${dir}`);
 	} else {
 	}
@@ -167,7 +168,7 @@ export function ensureDirectorySync(dir: any) {
 			if (dir.startsWith(path.sep)) {
 				tempDir = `${path.sep}${tempDir}`;
 			}
-			if (!fs.existsSync(tempDir)) {
+			if (!fs_existsSync(tempDir)) {
 				fs.mkdirSync(tempDir);
 			}
 		}
@@ -192,10 +193,10 @@ async function storeApplicationConfig(folder: string, key: string) {
 	let application = 'applicationConfig.json';
 	let applicationPathReq = path.join(getAppConfigPath('reqthread'), application);
 	let applicationPath = path.join(getAppConfigPath(), application);
-	if (!fs.existsSync(applicationPath)) {
+	if (!fs_existsSync(applicationPath)) {
 		fs.writeFileSync(applicationPath, JSON.stringify({}), 'utf8');
 	}
-	let file_contents = fs.readFileSync(applicationPath, 'utf8');
+	let file_contents = fs_readFileSync(applicationPath, 'utf8');
 	let applicationConfiguration: any = JSON.parse(file_contents);
 	if (applicationConfiguration) {
 		applicationConfiguration[key] = folder;
@@ -212,8 +213,8 @@ export function loadApplicationConfig() {
 	console.log('load application config');
 	let application = 'applicationConfig.json';
 	let applicationPath = path.join(getAppConfigPath(), application);
-	if (fs.existsSync(applicationPath)) {
-		let applicationConfiguration: any = JSON.parse(fs.readFileSync(applicationPath, 'utf8'));
+	if (fs_existsSync(applicationPath)) {
+		let applicationConfiguration: any = JSON.parse(fs_readFileSync(applicationPath, 'utf8'));
 
 		fs.writeFileSync(applicationPath, JSON.stringify(applicationConfiguration), 'utf8');
 
@@ -464,13 +465,13 @@ function writeJsonToFile(json: any, destination: any) {
 }
 function ensureDirectory(dir: any) {
 	return new Promise(function (resolve, fail) {
-		if (!fs.existsSync(dir)) {
+		if (!fs_existsSync(dir)) {
 			console.log('doesnt exist : ' + dir);
 		} else {
 			resolve();
 		}
 
-		if (!fs.existsSync(dir)) {
+		if (!fs_existsSync(dir)) {
 			fs.mkdirSync(dir);
 			resolve();
 		} else {

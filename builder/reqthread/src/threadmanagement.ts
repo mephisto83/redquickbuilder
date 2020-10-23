@@ -14,6 +14,7 @@ import { ProgressTracking } from './progressTracking';
 import { AgentProjects, AgentProject } from '../../app/jobs/interfaces';
 import JobService, { JobServiceConstants, getFiles, ensureDirectory } from '../../app/jobs/jobservice';
 import { uuidv4 } from '../../app/utils/array';
+import { fs_existsSync } from '../../app/generators/modelgenerators';
 let oneHour = 1000 * 60 * 60;
 
 export default class ThreadManagement {
@@ -231,7 +232,7 @@ export default class ThreadManagement {
 			completedJobItem.projectName,
 			completedJobItem.fileName
 		);
-		if (fs.existsSync(jobFolder)) {
+		if (fs_existsSync(jobFolder)) {
 			await JobService.deleteFolder(jobFolder);
 		}
 		// 	} catch (e) {

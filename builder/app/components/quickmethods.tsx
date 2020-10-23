@@ -38,7 +38,7 @@ import JobService from '../jobs/jobservice';
 import {
 	CollectionScreenWithoutDatachainDistributed,
 	CollectionConnectDataChainCollection,
-  CollectionPruneDataChain
+	CollectionPruneDataChain
 } from '../nodepacks/CollectionDataChainsIntoCollections';
 import ApplyTemplates from '../nodepacks/permission/ApplyTemplates';
 import ApplyValidationFromProperties from '../nodepacks/permission/ApplyValidationFromProperties';
@@ -49,14 +49,14 @@ import CreateComponentAll, { CreateComponentSharedAll } from '../nodepacks/batch
 import MenuGenerator from '../generators/menugenerator';
 import AddUserRequirements from '../nodepacks/batch/AddUserRequirements';
 import ChangeInputToSelect from '../nodepacks/screens/ChangeInputToSelect';
-import { Node } from '../methods/graph_types';
+import { Graph, Node } from '../methods/graph_types';
 import RedressProperties from '../nodepacks/batch/RedressProperties';
 import AddAgentAccessMethods from '../nodepacks/batch/AddAgentAccessMethods';
 import UpdateScreenParameters from '../nodepacks/screens/UpdateScreenParameters';
 import ConnectScreens, { ConnectScreenListRoutes } from '../nodepacks/batch/ConnectScreens';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import SelectInput from './selectinput';
-import { NodesByType, GetNodeProp } from '../methods/graph_methods';
+import { NodesByType, GetNodeProp, GetNodesByProperties } from '../methods/graph_methods';
 import CreateClaimService from '../nodepacks/batch/CreateClaimService';
 import ApplyPremissionChains from '../nodepacks/batch/ApplyPermissionChains';
 import ApplyExecutionChains from '../nodepacks/batch/ApplyExecutionChains';
@@ -220,7 +220,7 @@ class QuickMethods extends Component<any, any, any> {
 								<TreeViewMenu
 									title={'Create View Types'}
 									onClick={async () => {
-										const res = await CreateViewTypes(() => {});
+										const res = await CreateViewTypes(() => { });
 										graphOperation(res)(GetDispatchFunc(), GetStateFunc());
 									}}
 								/>
@@ -229,7 +229,7 @@ class QuickMethods extends Component<any, any, any> {
 									title="Create Component Shared All"
 									onClick={() => {
 										SetPause(true);
-										CreateComponentSharedAll(() => {}, null, (v: Node) => {
+										CreateComponentSharedAll(() => { }, null, (v: Node) => {
 											return true; // return v.id === currentNode.id;
 										}).then(() => {
 											SetPause(false);
@@ -241,7 +241,7 @@ class QuickMethods extends Component<any, any, any> {
 									title="Create Component All"
 									onClick={() => {
 										SetPause(true);
-										CreateComponentAll(() => {}).then(() => {
+										CreateComponentAll(() => { }).then(() => {
 											SetPause(false);
 										});
 									}}
@@ -251,7 +251,7 @@ class QuickMethods extends Component<any, any, any> {
 									title="Setup View Types"
 									onClick={() => {
 										SetPause(true);
-										SetupViewTypes(() => {}).then(() => {
+										SetupViewTypes(() => { }).then(() => {
 											SetPause(false);
 										});
 									}}
@@ -260,7 +260,7 @@ class QuickMethods extends Component<any, any, any> {
 								<TreeViewMenu
 									title="Add Agent Access Methods"
 									onClick={() => {
-										AddAgentAccessMethods(() => {});
+										AddAgentAccessMethods(() => { });
 									}}
 								/>
 								<TreeViewMenu
@@ -278,20 +278,20 @@ class QuickMethods extends Component<any, any, any> {
 								<TreeViewMenu
 									title="Connect Dashboards"
 									onClick={() => {
-										ConnectDashboards(() => true, () => {});
+										ConnectDashboards(() => true, () => { });
 									}}
 								/>
 								<TreeViewMenu
 									title="Connect Screens"
 									onClick={() => {
-										ConnectScreens(() => {}, () => true);
+										ConnectScreens(() => { }, () => true);
 									}}
 								/>
 								<TreeViewMenu
 									title="Connect Dashes only"
 									onClick={() => {
 										ConnectScreens(
-											() => {},
+											() => { },
 											(v: Node) => GetNodeProp(v, NodeProperties.IsDashboard)
 										);
 									}}
@@ -317,7 +317,7 @@ class QuickMethods extends Component<any, any, any> {
 								<TreeViewMenu
 									title="Connect Screen List Routes"
 									onClick={() => {
-										ConnectScreenListRoutes(() => {});
+										ConnectScreenListRoutes(() => { });
 									}}
 								/>
 								<TreeViewMenu
@@ -428,6 +428,25 @@ class QuickMethods extends Component<any, any, any> {
 											DistributeBuildAllJobs();
 										}}
 									/>
+									<TreeViewMenu title="Get Duplicate" onClick={() => {
+										let graph: Graph = UIA.GetCurrentGraph();
+										let nodes = graph.nodes.map((id) => graph.nodeLib[id]).filter(v => ![
+											NodeTypes.DataChain,
+											NodeTypes.Property,
+											NodeTypes.Concept,
+											NodeTypes.MenuDataSource,
+											NodeTypes.Attribute].some(t => t === GetNodeProp(v, NodeProperties.NODEType)));
+										let groups = nodes.groupBy((x: Node) => `${UIA.GetCodeName(x)} ${GetNodeProp(x, NodeProperties.NODEType)}`);
+										let temp: any = Object.entries(groups).filter((item: [string, any]) => {
+											let [key, nodes] = item;
+
+											return nodes.length > 1;
+										});
+										if (temp && temp.length) {
+											let randSpot = Math.floor(Math.random() * temp.length);
+											UIA.setPinned(temp[randSpot][1].map((v: any) => v.id), true)
+										}
+									}} />
 									<TreeViewMenu
 										title="Check Access"
 										icon="fa fa-plus"
@@ -517,7 +536,7 @@ class QuickMethods extends Component<any, any, any> {
 									title="Connect Dashboards"
 									icon="fa fa-plus"
 									onClick={() => {
-										ConnectDashboards(() => true, () => {});
+										ConnectDashboards(() => true, () => { });
 									}}
 								/>
 								<TreeViewMenu
@@ -574,7 +593,7 @@ class QuickMethods extends Component<any, any, any> {
 										this.props.setState();
 										if (!this.state.buildingAll) {
 											this.setState({ buildingAll: true });
-											BuildAll(() => {});
+											BuildAll(() => { });
 										}
 									}}
 								/>
@@ -591,7 +610,7 @@ class QuickMethods extends Component<any, any, any> {
 									title="Update Screen Urls"
 									icon="fa fa-plus"
 									onClick={() => {
-										UpdateScreenUrls(() => {});
+										UpdateScreenUrls(() => { });
 									}}
 								/>
 								<TreeViewMenu
@@ -605,7 +624,7 @@ class QuickMethods extends Component<any, any, any> {
 								<TreeViewMenu
 									title="Add Title Service"
 									onClick={() => {
-										this.props.graphOperation([ addTitleService({ newItems: {} }) ]);
+										this.props.graphOperation([addTitleService({ newItems: {} })]);
 									}}
 								/>
 								<TreeViewMenu
@@ -626,21 +645,21 @@ class QuickMethods extends Component<any, any, any> {
 									title="Add Agent Methods"
 									icon="fa fa-plus"
 									onClick={() => {
-										AddAgentMethods(() => {});
+										AddAgentMethods(() => { });
 									}}
 								/>
 								<TreeViewMenu
 									title="Add Agent Access Methods"
 									icon="fa fa-plus"
 									onClick={() => {
-										AddAgentAccessMethods(() => {});
+										AddAgentAccessMethods(() => { });
 									}}
 								/>
 								<TreeViewMenu
 									title="Update Screen Parameters"
 									icon="fa fa-plus"
 									onClick={() => {
-										UpdateScreenParameters(() => {});
+										UpdateScreenParameters(() => { });
 									}}
 								/>
 							</TreeViewMenu>
@@ -763,7 +782,7 @@ class QuickMethods extends Component<any, any, any> {
 											const viewName =
 												`${UIA.Visual(state, 'View Package Title') || ''}` ||
 												UIA.GetNodeTitle(currentNode);
-											[ ViewTypes.Create, ViewTypes.Update, ViewTypes.Delete, ViewTypes.Get ]
+											[ViewTypes.Create, ViewTypes.Update, ViewTypes.Delete, ViewTypes.Get]
 												.filter((x) => this.state.selectedMethods[x])
 												.map((t) => {
 													operations.push({

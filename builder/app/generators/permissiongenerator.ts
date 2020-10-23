@@ -41,6 +41,7 @@ import {
 import NamespaceGenerator from './namespacegenerator';
 import ExtensionGenerator from './extensiongenerator';
 import { enumerate } from '../utils/utils';
+import { fs_readFileSync } from './modelgenerators';
 
 const TEST_CASE = './app/templates/permissions/tests/test_case.tpl';
 const TEST_CLASS = './app/templates/tests/tests.tpl';
@@ -241,7 +242,7 @@ export default class PermissionGenerator {
 			let useIncludedInList = GetNodeProp(dpNode, NodeProperties.IncludedInList);
 
 			if (useIncludedInList) {
-				let permissionCaseIncludedInList = fs.readFileSync(PERMISSIONS_CASE_INCLUDED_IN_LIST, 'utf8');
+				let permissionCaseIncludedInList = fs_readFileSync(PERMISSIONS_CASE_INCLUDED_IN_LIST, 'utf8');
 				var tempBindingValues: any = {
 					method,
 					// It currently happens to be that this is correct, but maybe in the future this needs to be more general.
@@ -266,7 +267,7 @@ export default class PermissionGenerator {
 				});
 			}
 			if (useEnumeration) {
-				let permissionCaseEnumerationTemplate = fs.readFileSync(PERMISSIONS_CASE_ENUMERATION, 'utf8');
+				let permissionCaseEnumerationTemplate = fs_readFileSync(PERMISSIONS_CASE_ENUMERATION, 'utf8');
 				let enumInstance = PermissionGenerator.createEnumerationInstanceList(dpNode, enumerationNode, method);
 				let name = PermissionGenerator.createInstanceEnumerationListName(dpNode, enumerationNode, method);
 				var tempBindingValues: any = {
@@ -292,7 +293,7 @@ export default class PermissionGenerator {
 
 			if (useExtension) {
 				let definition = GetNodeProp(extentionNode, NodeProperties.UIExtensionDefinition);
-				let permissionCaseExtensionTemplate = fs.readFileSync(PERMISSIONS_CASE_EXTENSION, 'utf8');
+				let permissionCaseExtensionTemplate = fs_readFileSync(PERMISSIONS_CASE_EXTENSION, 'utf8');
 				let extensionInstance = PermissionGenerator.createExtensionInstanceList(dpNode, extentionNode, method);
 				let name = PermissionGenerator.createInstanceEnumerationListName(
 					dpNode,
@@ -476,8 +477,8 @@ export default class PermissionGenerator {
 	}
 	static GenerateCases(state: any, permission: { id: any }, agent: any, model: any) {
 		var graph = GetCurrentGraph(state);
-		let _manyToManyMatchCondition = fs.readFileSync(MATCH_TO_MANY_REFERENCE_PARAMETER, 'utf8');
-		let _matchReferenceCondition = fs.readFileSync(MATCH_REFERENCE, 'utf8');
+		let _manyToManyMatchCondition = fs_readFileSync(MATCH_TO_MANY_REFERENCE_PARAMETER, 'utf8');
+		let _matchReferenceCondition = fs_readFileSync(MATCH_REFERENCE, 'utf8');
 		let result: any = {};
 		if (permission) {
 			for (var method in Methods) {
@@ -634,7 +635,7 @@ export default class PermissionGenerator {
 												GetNodeProp(t, NodeProperties.CodeName) ||
 												GetNodeProp(t, NodeProperties.NODEType);
 											let name = `${casename}_valid_items`;
-											let permissionCaseEnumerationTemplate = fs.readFileSync(
+											let permissionCaseEnumerationTemplate = fs_readFileSync(
 												PERMISSIONS_CASE_ENUMERATION,
 												'utf8'
 											);
@@ -702,7 +703,7 @@ export default class PermissionGenerator {
 
 		let cases = PermissionGenerator.GetTestExtensionNodeValues(graph, permission, method, agent, model);
 		let enums = PermissionGenerator.EnumerateCases(cases);
-		let testCaseProperty = fs.readFileSync(TEST_CASE_PROPERTY, 'utf8');
+		let testCaseProperty = fs_readFileSync(TEST_CASE_PROPERTY, 'utf8');
 		let methodNode = GetLinkChainItem({
 			id: permission.id,
 			links: [
@@ -892,7 +893,7 @@ export default class PermissionGenerator {
 		let manyToMany: any = null;
 		let many_to_many_register: any = '';
 		let many_to_many_constructor: any = '';
-		let testCase: any = fs.readFileSync(TEST_CASE, 'utf8');
+		let testCase: any = fs_readFileSync(TEST_CASE, 'utf8');
 		let result: any = [];
 		let methodNode = permission
 			? GetLinkChainItem({
@@ -909,14 +910,14 @@ export default class PermissionGenerator {
 		manyToMany = GetMethodPropNode(graph, methodNode, FunctionTemplateKeys.ManyToManyModel);
 
 		if (GetCodeName(parent)) {
-			many_to_many_register = fs.readFileSync(
+			many_to_many_register = fs_readFileSync(
 				'./app/templates/permissions/tests/many_to_many_register.tpl',
 				'utf8'
 			);
 
 			switch (GetNodeProp(methodNode, NodeProperties.FunctionType)) {
 				case FunctionTypes.Get_ManyToMany_Agent_Value__IListChild:
-					testCase = fs.readFileSync(
+					testCase = fs_readFileSync(
 						'./app/templates/permissions/tests/Get_ManyToMany_Agent_Value__IListChild.tpl',
 						'utf8'
 					);
@@ -932,7 +933,7 @@ export default class PermissionGenerator {
 					}
 					break;
 				case FunctionTypes.Create_Parent$Child_Agent_Value__IListChild:
-					testCase = fs.readFileSync(
+					testCase = fs_readFileSync(
 						'./app/templates/permissions/tests/Create_Parent$Child_Agent_Value__IListChild.tpl',
 						'utf8'
 					);
@@ -948,7 +949,7 @@ export default class PermissionGenerator {
 					}
 					break;
 				case FunctionTypes.Get_Parent$Child_Agent_Value__IListChild:
-					testCase = fs.readFileSync(
+					testCase = fs_readFileSync(
 						'./app/templates/permissions/tests/Get_Parent$Child_Agent_Value__IListChild.tpl',
 						'utf8'
 					);
@@ -970,7 +971,7 @@ export default class PermissionGenerator {
 		}
 		switch (GetNodeProp(methodNode, NodeProperties.FunctionType)) {
 			case FunctionTypes.Get_Object_Agent_Value__Object:
-				many_to_many_register = fs.readFileSync(
+				many_to_many_register = fs_readFileSync(
 					'./app/templates/permissions/tests/many_to_many_register.tpl',
 					'utf8'
 				);
@@ -982,7 +983,7 @@ export default class PermissionGenerator {
 						ref2: FunctionTemplateKeys.Model
 					});
 
-					many_to_many_constructor = bindTemplate(fs.readFileSync(MANY_TO_MANY_CONSTRUCTOR, 'utf8'), {
+					many_to_many_constructor = bindTemplate(fs_readFileSync(MANY_TO_MANY_CONSTRUCTOR, 'utf8'), {
 						many_to_many: GetCodeName(manyToMany)
 					});
 				} else {
@@ -1083,12 +1084,12 @@ export default class PermissionGenerator {
 
 		let namespace = graphRoot ? graphRoot[GraphMethods.GraphKeys.NAMESPACE] : null;
 
-		let _testTemplate = fs.readFileSync(TEST_CLASS, 'utf8');
-		let _permissionInterface = fs.readFileSync(PERMISSIONS_INTERFACE, 'utf8');
-		let _permissionImplementation = fs.readFileSync(PERMISSIONS_IMPL, 'utf8');
-		let _permissionInterfaceMethods = fs.readFileSync(PERMISSIONS_INTERFACE_METHODS, 'utf8');
-		let _permissionMethods = fs.readFileSync(PERMISSIONS_METHODS, 'utf8');
-		let _permissionArbiters = fs.readFileSync(PERMISSIONS_ARBITER_PROP, 'utf8');
+		let _testTemplate = fs_readFileSync(TEST_CLASS, 'utf8');
+		let _permissionInterface = fs_readFileSync(PERMISSIONS_INTERFACE, 'utf8');
+		let _permissionImplementation = fs_readFileSync(PERMISSIONS_IMPL, 'utf8');
+		let _permissionInterfaceMethods = fs_readFileSync(PERMISSIONS_INTERFACE_METHODS, 'utf8');
+		let _permissionMethods = fs_readFileSync(PERMISSIONS_METHODS, 'utf8');
+		let _permissionArbiters = fs_readFileSync(PERMISSIONS_ARBITER_PROP, 'utf8');
 		let result: any = {};
 
 		agents.map((agent: any) => {
