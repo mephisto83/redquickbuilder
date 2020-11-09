@@ -1,7 +1,6 @@
-import { AbstractReactFactory, FactoryBank, FactoryBankListener, LayerModel, LayerModelGenerics } from '@projectstorm/react-canvas-core';
+import { LayerModel, LayerModelGenerics, FactoryBank, AbstractReactFactory, NodeModelGenerics, FactoryBankListener } from '@projectstorm/react-canvas-core';
 import { NodeModel } from '../node/NodeModel';
 import { DiagramEngine } from '../../DiagramEngine';
-import { NodeModelGenerics } from '@projectstorm/react-diagrams';
 export interface NodeLayerModelGenerics extends LayerModelGenerics {
     CHILDREN: NodeModel;
     ENGINE: DiagramEngine;
