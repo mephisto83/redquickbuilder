@@ -1,7 +1,6 @@
-import { AbstractReactFactory, FactoryBank, FactoryBankListener, LayerModel, LayerModelGenerics } from '@projectstorm/react-canvas-core';
-import { LinkModel } from '../link/LinkModel';
+import { LayerModel, LayerModelGenerics, AbstractReactFactory, FactoryBank,  FactoryBankListener } from '@projectstorm/react-canvas-core';
+import { LinkModel, LinkModelGenerics } from '../link/LinkModel';
 import { DiagramEngine } from '../../DiagramEngine';
-import { LinkModelGenerics } from '@projectstorm/react-diagrams';
 export interface LinkLayerModelGenerics extends LayerModelGenerics {
     CHILDREN: LinkModel;
     ENGINE: DiagramEngine;
