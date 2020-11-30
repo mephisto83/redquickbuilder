@@ -1,7 +1,7 @@
 /* eslint-disable func-names */
 import { uuidv4 } from "../utils/array";
 import { NodeProperties, UITypes } from "../constants/nodetypes";
-import { NO_OP, GetNodeByProperties } from "../actions/uiactions";
+import { NO_OP, GetNodeByProperties } from "../actions/uiActions";
 
 export default function (args: any = {}) {
   // node3,node6,node7,node8,node11,node16,node19

@@ -5,7 +5,7 @@ import {
 	ADD_LINK_BETWEEN_NODES,
 	GetDispatchFunc,
 	GetStateFunc
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { NodeTypes, NodeProperties, LinkProperties } from '../constants/nodetypes';
 import { GetNodeProp } from '../methods/graph_methods';
 import { Node } from '../methods/graph_types';

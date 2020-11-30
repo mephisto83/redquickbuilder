@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import * as Titles from './titles';
 import TreeViewMenu from './treeviewmenu';
 import {
@@ -164,7 +164,7 @@ export default class ExecutionComponent extends Component<any, any> {
 		return (
 			<TreeViewMenu
 				open={this.state.open}
-				color={executions && executions.length ? ValidationColors.Ok : ValidationColors.Neutral}
+				color={valid ? ValidationColors.Ok : ValidationColors.Neutral}
 				active
 				error={!valid}
 				onClick={() => {

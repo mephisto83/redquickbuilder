@@ -1,5 +1,5 @@
 import { uuidv4 } from '../utils/array';
-import { GetNodesByProperties, GetNodeProp, GetCurrentGraph } from '../actions/uiactions';
+import { GetNodesByProperties, GetNodeProp, GetCurrentGraph } from '../actions/uiActions';
 import { NodeProperties, NodeTypes, LinkType } from '../constants/nodetypes';
 import { GetNodesLinkedTo, GetLinkBetween } from '../methods/graph_methods';
 import SetLinkInstanceUpdateTrue from './SetLinkInstanceUpdateTrue';

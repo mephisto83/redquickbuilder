@@ -1,6 +1,6 @@
 import { NodeProperties, Methods, LinkPropertyKeys, UITypes, NodeTypes } from '../../constants/nodetypes';
 import { uuidv4 } from '../../utils/array';
-import { GetNodeProp, UPDATE_NODE_PROPERTY, UPDATE_LINK_PROPERTY } from '../../actions/uiactions';
+import { GetNodeProp, UPDATE_NODE_PROPERTY, UPDATE_LINK_PROPERTY } from '../../actions/uiActions';
 import SetupViewTypeForCreate, { GetViewTypeModelType } from './SetupViewTypeForCreate';
 import SetupViewTypeForGetAll from './SetupViewTypeForGetAll';
 import AttachGetAllOnComponentDidMount from './AttachGetAllOnComponentDidMount';

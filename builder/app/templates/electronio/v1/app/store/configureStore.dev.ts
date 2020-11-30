@@ -8,7 +8,7 @@ import * as counterActions from '../actions/counter';
 import { counterStateType } from '../reducers/types';
 import * as controllerActions from "../actions/controllerActions";
 import * as navigationActions from "../actions/navigationActions";
-import * as uiActions from "../actions/uiactions";
+import * as uiActions from "../actions/uiActions";
 
 declare global {
   interface Window {

@@ -1,5 +1,5 @@
 import { JobServiceConstants, ensureDirectory, JobFile } from '../../jobs/jobservice';
-import { GetCurrentGraph } from '../../actions/uiactions';
+import { GetCurrentGraph } from '../../actions/uiActions';
 import { Graph } from '../../methods/graph_types';
 import fs from 'fs';
 import path from 'path';

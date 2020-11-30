@@ -6,7 +6,7 @@ import {
 	GetCodeName,
 	GetComponentExternalApiNodes,
 	GetNodeTitle
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { GetNodeProp } from '../methods/graph_methods';
 import { NodeProperties } from '../constants/nodetypes';
 import { Node } from '../methods/graph_types';

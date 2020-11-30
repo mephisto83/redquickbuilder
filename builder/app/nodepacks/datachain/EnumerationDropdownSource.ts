@@ -1,6 +1,6 @@
 import { uuidv4 } from '../../utils/array';
 import { NodeProperties } from '../../constants/nodetypes';
-import { GetNodeTitle, GetLambdaVariableTitle } from '../../actions/uiactions';
+import { GetNodeTitle, GetLambdaVariableTitle } from '../../actions/uiActions';
 
 export default function(args: {
 	viewPackages?: any;

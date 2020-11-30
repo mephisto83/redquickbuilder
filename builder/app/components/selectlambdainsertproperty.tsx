@@ -9,7 +9,7 @@ import {
 	ADD_LINK_BETWEEN_NODES,
 	LinkProperties,
 	GetNodeProp
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { NodeProperties } from '../constants/nodetypes';
 import { GraphNode } from 'webcola';
 import { Node } from '../methods/graph_types';

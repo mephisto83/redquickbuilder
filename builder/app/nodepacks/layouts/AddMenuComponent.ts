@@ -11,7 +11,7 @@ import {
 	GetComponentExternalApiNode,
 	AddLinkBetweenNodes,
 	CreateNewNode
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { DataChainTypeNames } from '../../constants/datachain';
 import NavigateToRoute from '../datachain/NavigateToRoute';
 import { uuidv4 } from '../../utils/array';

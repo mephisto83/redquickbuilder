@@ -11,7 +11,7 @@ import {
 	GetControllerNode,
 	GetMethodNodeProp,
 	GetCurrentGraph
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { ConfigurationProperties, NEW_LINE, LinkType, UITypes } from '../constants/nodetypes';
 import * as Titles from '../components/titles';
 import {
@@ -201,7 +201,7 @@ export default class ControllerActionGenerator {
 			})[0];
 			const service = `
 import { setFetchServiceFunction } from '../actions/redutils';
-import { GetState, GetDispatch } from '../actions/uiactions';
+import { GetState, GetDispatch } from '../actions/uiActions';
 import { ${GetCodeName(datachain)} } from '../actions/data-chain';
 import * as Util from "../actions/util";
 import service from './controllerService';

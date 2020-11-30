@@ -2,7 +2,7 @@
 // @flow
 import React, { Component } from 'react';
 import { UIConnect } from '../utils/utils';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import CheckBox from './checkbox';
 import { GraphLink } from '../methods/graph_types';
 

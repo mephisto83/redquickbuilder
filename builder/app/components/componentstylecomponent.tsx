@@ -4,7 +4,7 @@ import TreeViewMenu from './treeviewmenu';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import TextInput from './textinput';
 import * as Titles from './titles';
-import { GUID, NodeTypes, GetNodeTitle } from '../actions/uiactions';
+import { GUID, NodeTypes, GetNodeTitle } from '../actions/uiActions';
 import CheckBox from './checkbox';
 import { NodesByType, GetNodesLinkedTo } from '../methods/graph_methods';
 import TreeViewGroupButton from './treeviewgroupbutton';

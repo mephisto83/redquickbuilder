@@ -5,7 +5,7 @@ import { UIConnect } from '../utils/utils';
 
 import TreeViewMenu from './treeviewmenu';
 import TreeViewItem from './treeviewitem';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import * as Titles from './titles';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import TextInput from './textinput';

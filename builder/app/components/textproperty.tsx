@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from "react";
 import { UIConnect } from "../utils/utils";
-import * as UIA from "../actions/uiactions";
+import * as UIA from "../actions/uiActions";
 import TextInput from "./textinput";
 
 class TextProperty extends Component<any, any> {

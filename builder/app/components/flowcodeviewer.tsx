@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import TreeViewMenu from './treeviewmenu';
 import { EnumerationConfig } from '../interface/methodprops';
 import { GetNodeProp } from '../methods/graph_methods';
@@ -9,7 +9,7 @@ import { UIConnect } from '../utils/utils';
 import DashboardContainer from './dashboardcontainer';
 import Panel from './panel';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import { Visual } from '../actions/uiactions';
+import { Visual } from '../actions/uiActions';
 import { QuickAccess, GraphLink } from '../methods/graph_types';
 import path from 'path';
 import FlowCode, { callAutoDistribute } from './flowcode';

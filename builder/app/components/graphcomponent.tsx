@@ -6,7 +6,7 @@ import * as Cola from 'webcola';
 import React, { Component } from 'react';
 import * as GraphMethods from '../methods/graph_methods';
 // @flow
-import { NodeTypeColors, GetNodeProp } from '../actions/uiactions';
+import { NodeTypeColors, GetNodeProp } from '../actions/uiActions';
 import {
 	LinkStyles,
 	LinkType,

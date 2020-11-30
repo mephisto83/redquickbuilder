@@ -7,7 +7,7 @@
 import React, { Component } from 'react';
 import Draggable from 'react-draggable'; // The default
 import { UIConnect } from '../utils/utils';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 const { clipboard } = require('electron');
 import * as Titles from './titles';
 import {

@@ -1,5 +1,5 @@
 import { uuidv4 } from "../utils/array";
-import { LinkProperties } from "../actions/uiactions";
+import { LinkProperties } from "../actions/uiActions";
 export default function (args: any = {}) {
   // node0,node2
 

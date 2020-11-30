@@ -10,7 +10,7 @@ import {
 	LinkProperties,
 	GetNodeProp,
 	GUID
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { NodeProperties } from '../constants/nodetypes';
 import TreeViewMenu from './treeviewmenu';
 import TreeViewItemContainer from './treeviewitemcontainer';

@@ -9,7 +9,7 @@ import {
 	GetDispatchFunc,
 	GetStateFunc,
 	ValidationPropName
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { GetNodesLinkedTo, GetNodeLinkedTo } from '../../methods/graph_methods';
 import AddRegistrationValidation from './AddRegistrationValidation';
 

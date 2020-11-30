@@ -7,7 +7,7 @@ import {
 	GetJSCodeName,
 	GetCssName,
 	GetCurrentGraph
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { GenerateMarkupTag, ConvertViewTypeToComponentNode, GetStylesFor } from './screenservice';
 import { GetCellProperties, getComponentProperty } from '../methods/graph_methods';
 import { InstanceTypes } from '../constants/componenttypes';

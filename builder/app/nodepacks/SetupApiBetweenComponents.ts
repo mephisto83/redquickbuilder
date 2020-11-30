@@ -5,7 +5,7 @@ import {
 	GetComponentExternalApiNode,
 	ADD_NEW_NODE,
 	ADD_LINK_BETWEEN_NODES
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { existsLinkBetween } from '../methods/graph_methods';
 export interface ComponentApiSetup {
 	id: string | any;

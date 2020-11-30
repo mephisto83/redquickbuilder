@@ -5,7 +5,7 @@
 // @flow
 import React, { Component } from "react";
 import TreeViewMenu from "./treeviewmenu";
-import { Visual, NodeProperties, GetNodesByProperties, SELECTED_NODE, Node } from "../actions/uiactions";
+import { Visual, NodeProperties, GetNodesByProperties, SELECTED_NODE, Node } from "../actions/uiActions";
 import { SOURCE, GetConnectedNodesByType } from "../methods/graph_methods";
 import { NodeTypes } from "../constants/nodetypes";
 import { UIConnect } from "../utils/utils";

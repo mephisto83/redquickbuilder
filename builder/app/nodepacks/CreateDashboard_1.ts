@@ -5,7 +5,7 @@ import {
   UPDATE_NODE_PROPERTY,
   GetNodeByProperties,
   NodeTypes
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 
 export default function CreateDashboard_1(args: any = {}) {
   // node3,node4,node5,node6,node7,node8,node9,node10,node11,node12

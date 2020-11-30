@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import {
 	AfterEffect,
 	MountingDescription,

@@ -7,7 +7,7 @@ import {
 	GetRootGraph,
 	GetCurrentGraph,
 	GetAppSettings
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { Themes, HTMLElementGroups } from '../constants/themes';
 import { NEW_LINE, MediaQueries, UITypes } from '../constants/nodetypes';
 

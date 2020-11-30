@@ -1,6 +1,6 @@
 import GetModelViewModelForList from './GetModelViewModelForList';
 import { GetConnectedNodesByType, GetNodesLinkedTo } from '../methods/graph_methods';
-import { GetState, GetNodeProp, GetCurrentGraph, GetNodeTitle } from '../actions/uiactions';
+import { GetState, GetNodeProp, GetCurrentGraph, GetNodeTitle } from '../actions/uiActions';
 import { NodeTypes, NodeProperties, LinkType, ApiNodeKeys } from '../constants/nodetypes';
 
 export default function(args: any = {}): any {

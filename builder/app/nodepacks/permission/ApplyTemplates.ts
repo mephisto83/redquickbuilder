@@ -1,4 +1,4 @@
-import { GetStateFunc, GetDispatchFunc, graphOperation, NodeTypes, NodesByType } from '../../actions/uiactions';
+import { GetStateFunc, GetDispatchFunc, graphOperation, NodeTypes, NodesByType } from '../../actions/uiActions';
 import ApplyAgentTemplates from './ApplyAgentTemplates';
 import { GetNodeProp } from '../../methods/graph_methods';
 import { NodeProperties } from '../../constants/nodetypes';

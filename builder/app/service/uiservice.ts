@@ -1,5 +1,5 @@
 import { bindTemplate } from "../constants/functiontypes";
-import { GetCodeName, GetModelNodes, GetRootGraph } from "../actions/uiactions";
+import { GetCodeName, GetModelNodes, GetRootGraph } from "../actions/uiActions";
 import { NEW_LINE } from "../constants/nodetypes";
 import { GraphKeys } from "../methods/graph_methods";
 import fs from 'fs';

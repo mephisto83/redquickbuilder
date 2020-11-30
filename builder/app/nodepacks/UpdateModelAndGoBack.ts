@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 import { uuidv4 } from '../utils/array';
 import { NodeProperties } from '../constants/nodetypes';
-import { GetNodeTitle } from '../actions/uiactions';
+import { GetNodeTitle } from '../actions/uiActions';
 
 export default function(args: any = {}) {
 	// node3

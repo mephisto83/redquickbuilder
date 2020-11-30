@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import * as Titles from './titles';
 import CheckBox from './checkbox';
 import TreeViewMenu from './treeviewmenu';

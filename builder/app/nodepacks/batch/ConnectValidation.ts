@@ -1,6 +1,6 @@
 import { LinkType, NodeProperties } from '../../constants/nodetypes';
 import { GetNodesLinkedTo, GetNodeProp } from '../../methods/graph_methods';
-import { GetCurrentGraph, GetNodeById } from '../../actions/uiactions';
+import { GetCurrentGraph, GetNodeById } from '../../actions/uiActions';
 import { ComponentEvents } from '../../constants/componenttypes';
 import AppendValidations from '../screens/AppendValidations';
 import { uuidv4 } from '../../utils/array';

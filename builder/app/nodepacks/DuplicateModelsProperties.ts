@@ -6,7 +6,7 @@ import {
 	GetNodeProp,
 	GetDispatchFunc,
   GetStateFunc
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { GraphLink, Node } from '../methods/graph_types';
 import { GetLinkBetween } from '../methods/graph_methods';
 import { NodeProperties, LinkProperties } from '../constants/nodetypes';

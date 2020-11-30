@@ -2,7 +2,7 @@
 
 import { uuidv4 } from '../utils/array';
 import { NodeProperties } from '../constants/nodetypes';
-import { GetNodeTitle } from '../actions/uiactions';
+import { GetNodeTitle } from '../actions/uiActions';
 
 export default function AddAgentAccess(args: any = {}) {
 	// node1,node2

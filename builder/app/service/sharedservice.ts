@@ -1,6 +1,6 @@
 import ComponentStyle, { ComponentStyleType } from '../components/componentstyle';
 import { GetNodeProp } from '../methods/graph_methods';
-import { GetJSCodeName } from '../actions/uiactions';
+import { GetJSCodeName } from '../actions/uiActions';
 import { NodeProperties } from '../constants/nodetypes';
 
 export function constructCellStyles(cellStyleArray: any, onComponent = false) {

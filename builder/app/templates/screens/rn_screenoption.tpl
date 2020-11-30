@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Platform, StyleSheet, TouchableOpacity, FlatList,Image } from "react-native";
 import { redConnect, titleService} from '{{relative_depth}}actions/util';
-import { GetItems, GetScreenParam, fetchModelInstanceChildren, GetItem, GetItems, SITE, GetC, StoreInLake, NavigateToScreen,  GetMenuDataSource, StoreResultInReducer, NavigateToRoute,  GetModelProperty, LoadModel, StoreModelArray } from '{{relative_depth}}actions/uiactions';
+import { GetItems, GetScreenParam, fetchModelInstanceChildren, GetItem, GetItems, SITE, GetC, StoreInLake, NavigateToScreen,  GetMenuDataSource, StoreResultInReducer, NavigateToRoute,  GetModelProperty, LoadModel, StoreModelArray } from '{{relative_depth}}actions/uiActions';
 import Models from '{{relative_depth}}model_keys';
 import StateKeys from '{{relative_depth}}state_keys';
 import RedGraph from '{{relative_depth}}actions/redgraph';
@@ -17,7 +17,7 @@ import * as ScreenInstance from '{{relative_depth}}actions/screenInstances';
 import getTheme from '{{relative_depth}}../native-base-theme/components';
 import { fetchModel, retrieveParameters } from '{{relative_depth}}actions/redutils';
 import material from '{{relative_depth}}../native-base-theme/variables/variables';
-import { GetScreenInstance, GetScreenInstanceObject, GetAppStateObject, GetModelInstance, GetModelInstanceObject } from '{{relative_depth}}actions/uiactions';
+import { GetScreenInstance, GetScreenInstanceObject, GetAppStateObject, GetModelInstance, GetModelInstanceObject } from '{{relative_depth}}actions/uiActions';
 import { DrawerActions } from 'react-navigation-drawer';
 import { Content, StyleProvider } from 'native-base';
 import { SingleSelect, Container, ListItem,

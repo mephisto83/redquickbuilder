@@ -16,7 +16,7 @@ import {
 	GetDispatchFunc,
 	GetStateFunc,
 	graphOperation
-} from '../../../actions/uiactions';
+} from '../../../actions/uiActions';
 import { NodeTypes, NodeProperties, LinkProperties } from '../../../constants/nodetypes';
 import { Node, Graph } from '../../../methods/graph_types';
 

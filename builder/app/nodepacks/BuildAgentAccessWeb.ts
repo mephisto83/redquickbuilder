@@ -27,7 +27,7 @@ import {
 	GetNodeById,
 	GetNodeProp,
 	UpdateLinkProperty
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import AddAgentAccess from './AddAgentAccess';
 import {
 	ScreenEffectApi,

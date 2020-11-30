@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
 import Routes from '../Routes';
 
-import { setHistory } from '../actions/uiactions';
+import { setHistory } from '../actions/uiActions';
 
 export default class Root extends Component<any, any> {
 	componentDidMount() {

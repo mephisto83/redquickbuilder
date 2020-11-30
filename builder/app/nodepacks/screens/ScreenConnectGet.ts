@@ -22,7 +22,7 @@ import {
 	GetNodeByProperties,
 	CreateNewNode,
 	AddLinkBetweenNodes
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import {
 	LinkType,
 	NodeProperties,

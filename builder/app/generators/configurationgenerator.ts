@@ -1,4 +1,4 @@
-import { GetConfigurationNodes, GetNodeProp, NodeProperties } from '../actions/uiactions';
+import { GetConfigurationNodes, GetNodeProp, NodeProperties } from '../actions/uiActions';
 import { ConfigurationProperties } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';

@@ -3,7 +3,7 @@
 
 import { uuidv4 } from '../utils/array';
 import { NodeProperties } from '../constants/nodetypes';
-import { GetNodeProp } from '../actions/uiactions';
+import { GetNodeProp } from '../actions/uiActions';
 
 export default function NavigateBackEventInstanceToAction(args: any = {}) {
 	// node0

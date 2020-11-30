@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { FlatList, Image } from '{{relative_depth}}html-components';
 import { redConnect, titleService} from '{{relative_depth}}actions/util';
-import { GetItems, GetScreenParam, GetItem, SITE, GetC, StoreInLake, NavigateToScreen, GetModelProperty, GetMenuDataSource, LoadModel, StoreResultInReducer, NavigateToRoute, StoreModelArray } from '{{relative_depth}}actions/uiactions';
+import { GetItems, GetScreenParam, GetItem, SITE, GetC, StoreInLake, NavigateToScreen, GetModelProperty, GetMenuDataSource, LoadModel, StoreResultInReducer, NavigateToRoute, StoreModelArray } from '{{relative_depth}}actions/uiActions';
 import Models from '{{relative_depth}}model_keys';
 import routes from '{{relative_depth}}constants/routes';
 import StateKeys from '{{relative_depth}}state_keys';
@@ -14,7 +14,7 @@ import * as navigate from '{{relative_depth}}actions/navigationActions';
 import * as DC from '{{relative_depth}}actions/data-chain';
 import * as S from '{{relative_depth}}actions/selector';
 import { fetchModel, retrieveParameters } from '{{relative_depth}}actions/redutils';
-import { GetScreenInstance, GetScreenInstanceObject, GetAppStateObject, GetModelInstance, GetModelInstanceObject } from '{{relative_depth}}actions/uiactions';
+import { GetScreenInstance, GetScreenInstanceObject, GetAppStateObject, GetModelInstance, GetModelInstanceObject } from '{{relative_depth}}actions/uiActions';
 import { Content, StyleProvider } from '{{relative_depth}}html-components';
 import {
   MultiSelectList, MultiViewList,

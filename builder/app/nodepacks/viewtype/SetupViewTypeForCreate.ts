@@ -8,7 +8,7 @@ import {
 	GetNodeByProperties,
 	UPDATE_LINK_PROPERTY,
 	GetNodeById
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import {
 	LinkType,
 	NodeProperties,

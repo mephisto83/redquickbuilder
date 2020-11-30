@@ -9,7 +9,7 @@ import {
   graphOperation,
   GetDispatchFunc,
   GetStateFunc
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import {
 	NodeTypes,
 	LinkType,

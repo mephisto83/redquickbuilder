@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import * as Titles from './titles';
 import CheckBox from './checkbox';
 import TreeViewMenu from './treeviewmenu';
@@ -24,7 +24,7 @@ import Panel from './panel';
 import GridLayout from 'react-grid-layout';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import NodeViewer from './nodeview';
-import { Visual } from '../actions/uiactions';
+import { Visual } from '../actions/uiActions';
 import { QuickAccess, GraphLink } from '../methods/graph_types';
 import RenderedCode from './renderedcode';
 const ResponsiveGridLayout = WidthProvider(Responsive);

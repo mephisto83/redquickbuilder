@@ -7,7 +7,7 @@ import {
 	GetNodeTitle,
 	GetNodeCode,
 	GetCodeName
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { NodeTypes, NEW_LINE, NodeProperties, SelectorType } from '../constants/nodetypes';
 import { addNewLine } from '../utils/array';
 
@@ -16,7 +16,7 @@ export default class SelectorGenerator {
 		let funcs = GenerateSelectorFunctions();
 		let temps = [
 			{
-        template: `import * as UIA from './uiactions';
+        template: `import * as UIA from './uiActions';
 
     import { $UpdateModels, $CreateModels } from './screenInfo';
 ${funcs.join(NEW_LINE)}`,

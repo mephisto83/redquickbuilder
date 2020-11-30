@@ -6,7 +6,7 @@ import {
 	CreateNewNode,
 	GetDispatchFunc,
 	GetCodeName
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { NodeTypes, LinkPropertyKeys, LinkType, NEW_LINE } from '../constants/nodetypes';
 import { GraphLink, Node } from '../methods/graph_types';
 import {

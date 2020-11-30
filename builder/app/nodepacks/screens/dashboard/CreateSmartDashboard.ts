@@ -12,7 +12,7 @@ import {
 	UPDATE_NODE_PROPERTY,
 	ADD_NEW_NODE,
 	NodeTypes
-} from '../../../actions/uiactions';
+} from '../../../actions/uiActions';
 import CreateDashboard_1 from '../../CreateDashboard_1';
 import AddComponent from '../../AddComponent';
 import {

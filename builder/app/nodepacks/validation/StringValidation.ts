@@ -1,6 +1,6 @@
 import { uuidv4 } from '../../utils/array';
 import { NodeProperties } from '../../constants/nodetypes';
-import { GetNodeProp, GetNodeById } from '../../actions/uiactions';
+import { GetNodeProp, GetNodeById } from '../../actions/uiActions';
 function StringValidation(args: any = { sections: {}, condition: null, property: null }) {
 	// node0,node1,node2,node3,node4,node5
 

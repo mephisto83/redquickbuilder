@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { UIConnect } from '../utils/utils';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import * as Titles from './titles';
 import CheckBox from './checkbox';
 import ButtonList from './buttonlist';
@@ -63,7 +63,7 @@ import ApplyExecutionChains from '../nodepacks/batch/ApplyExecutionChains';
 import ApplyValidationChains from '../nodepacks/batch/ApplyValidationChains';
 import { SetPause } from '../methods/graph_methods';
 import SetupViewTypes from '../nodepacks/batch/SetupViewTypes';
-import { graphOperation, GetDispatchFunc, GetStateFunc } from '../actions/uiactions';
+import { graphOperation, GetDispatchFunc, GetStateFunc } from '../actions/uiActions';
 import SetupAuthenticationButtons from '../nodepacks/batch/SetupAuthenticationButtons';
 import AttachTitleService from '../nodepacks/batch/AttachTitleService';
 import { buildAst, buildFunctions, buildRules, FlowCodeStatements } from '../constants/flowcode_ast';
@@ -115,6 +115,19 @@ class QuickMethods extends Component<any, any, any> {
 							}}
 							icon="fa fa-tag"
 						>
+							<TreeViewMenu title="CHeck Current ViewType"
+								active
+								onClick={() => {
+									switch (GetNodeProp(currentNode, NodeProperties.NODEType)) {
+										case NodeTypes.ViewType:
+											debugger;
+											SetPause(true)
+											CreateComponentSharedAll(() => { }, null, (v: Node) => v.id === currentNode.id).then(() => {
+												SetPause(false);
+											})
+											break;
+									}
+								}} />
 							<TreeViewMenu
 								title="Check Shared Nodes"
 								open={UIA.Visual(state, 'Check Shared Nodes')}
@@ -252,6 +265,17 @@ class QuickMethods extends Component<any, any, any> {
 									onClick={() => {
 										SetPause(true);
 										SetupViewTypes(() => { }).then(() => {
+											SetPause(false);
+										});
+									}}
+								/>
+								<TreeViewMenu
+									title="Setup View Types (GetAll only)"
+									onClick={() => {
+										SetPause(true);
+										SetupViewTypes(() => { }, (v: Node) => {
+											return GetNodeProp(v, NodeProperties.ViewType) === ViewTypes.GetAll;
+										}).then(() => {
 											SetPause(false);
 										});
 									}}

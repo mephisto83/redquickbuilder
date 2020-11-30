@@ -1,4 +1,4 @@
-import { GetCurrentGraph, GetNodeTitle, NodeProperties, GetNodeProp } from '../actions/uiactions';
+import { GetCurrentGraph, GetNodeTitle, NodeProperties, GetNodeProp } from '../actions/uiActions';
 import { UITypes, Languages } from '../constants/nodetypes';
 
 export default class TitleServiceLibraryGenerator {

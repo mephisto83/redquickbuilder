@@ -8,7 +8,7 @@ import {
 	SetupConfigInstanceInformation
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
-import { GUID, GetCurrentGraph, GetNodeProp } from '../actions/uiactions';
+import { GUID, GetCurrentGraph, GetNodeProp } from '../actions/uiActions';
 import CompareComponent from './comparecomponent';
 import SelectInput from './selectinput';
 import { NodesByType } from '../methods/graph_methods';

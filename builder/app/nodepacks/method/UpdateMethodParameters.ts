@@ -1,6 +1,6 @@
 import { GetNodesLinkedTo } from '../../methods/graph_methods';
 import * as GraphMethods from '../../methods/graph_methods';
-import { GetCurrentGraph, GetNodeProp, GetNodesByProperties, REMOVE_NODE, ADD_NEW_NODE } from '../../actions/uiactions';
+import { GetCurrentGraph, GetNodeProp, GetNodesByProperties, REMOVE_NODE, ADD_NEW_NODE } from '../../actions/uiActions';
 import { LinkType, NodeProperties, LinkProperties, NodeTypes } from '../../constants/nodetypes';
 import { uuidv4 } from '../../utils/array';
 import { MethodFunctions } from '../../constants/functiontypes';

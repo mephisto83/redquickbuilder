@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import * as Titles from './titles';
 import createEngine, { DiagramModel, DefaultPortModel, PathFindingLinkFactory, DagreEngine, DefaultNodeModel, DefaultLinkModel, DefaultDiagramState, LinkModel, DiagramEngine } from '@projectstorm/react-diagrams';
 import { CanvasWidget } from '@projectstorm/react-canvas-core';
@@ -19,7 +19,7 @@ import { FlowCodePortModel } from './flowcode/FlowCodePortModel';
 import { GraphLink, Node } from '../methods/graph_types';
 import { refreshFlowModel, saveFlowModel } from '../actions/remoteActions';
 import { LinkPropertyKeys } from '../constants/nodetypes';
-import { GetLinkProperty } from '../actions/uiactions';
+import { GetLinkProperty } from '../actions/uiActions';
 
 const operations = {
     ADD_PARAMETER: '#843B62',

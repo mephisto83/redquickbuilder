@@ -9,7 +9,7 @@ import {
 	ADD_LINK_BETWEEN_NODES,
 	LinkProperties,
 	GetNodeProp
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { NodeProperties } from '../constants/nodetypes';
 class SelectInputProperty extends Component<any, any> {
 	render() {

@@ -12,7 +12,7 @@ import {
 	ComponentApiKeys,
 	GetComponentExternalApiNode,
 	ScreenOptionFilter
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { LinkType, NodeProperties, LinkProperties, NodeTypes, Methods } from '../../constants/nodetypes';
 import { ComponentEvents, ComponentLifeCycleEvents } from '../../constants/componenttypes';
 import ConnectLifecycleMethod from '../../components/ConnectLifecycleMethod';

@@ -13,12 +13,12 @@ import {
 	NodesByType,
 	GetCodeName,
 	GetLambdaVariableTitle
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { UIConnect } from '../utils/utils';
 import { GetNodeProp, GetNodesLinkedTo } from '../methods/graph_methods';
 import { NodeProperties, NEW_LINE, MakeConstant, LinkType } from '../constants/nodetypes';
 import fs from 'fs';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import ModelGenerator, { fs_readFileSync } from '../generators/modelgenerators';
 import { Node } from '../methods/graph_types';
 import ConstantsGenerator from '../generators/constantsgenerator';

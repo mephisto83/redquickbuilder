@@ -8,7 +8,7 @@ import {
 	GetNodeByProperties,
 	GetNodeTitle,
 	NO_OP
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import * as GraphMethods from '../methods/graph_methods';
 import { uuidv4 } from '../utils/array';
 

@@ -11,7 +11,7 @@ import {
   GetConnectedScreen,
   GetComponentExternalApiNodes,
   GetScreenUrl
-} from "../actions/uiactions";
+} from "../actions/uiActions";
 import { bindTemplate } from "../constants/functiontypes";
 import { GetScreens, GetScreenOption } from "./screenservice";
 import { NEW_LINE, UITypes } from "../constants/nodetypes";

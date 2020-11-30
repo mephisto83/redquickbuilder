@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import TextInput from './textinput';
-import { GetNodeById, GetNodeTitle } from '../actions/uiactions';
+import { GetNodeById, GetNodeTitle } from '../actions/uiActions';
 
 export default class Typeahead extends Component<any, any> {
 	constructor(props: any) {

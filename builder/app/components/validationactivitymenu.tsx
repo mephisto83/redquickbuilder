@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { UIConnect } from '../utils/utils';
 import ControlSideBarMenu, { ControlSideBarMenuItem, ControlSideBarMenuHeader } from './controlsidebarmenu';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import TabPane from './tabpane';
 import * as Titles from './titles';
 class ValidationActivityMenu extends Component<any, any> {

@@ -7,7 +7,7 @@ import * as Cola from 'webcola';
 import React, { Component } from 'react';
 import * as GraphMethods from '../methods/graph_methods';
 // @flow
-import { NodeTypeColors, GetNodeProp } from '../actions/uiactions';
+import { NodeTypeColors, GetNodeProp } from '../actions/uiActions';
 import {
 	LinkStyles,
 	LinkType,
@@ -440,7 +440,10 @@ export default class MindMap extends Component<any, any> {
 			.append('xhtml:object')
 			.attr('data', (d) => {
 				if (d && d.properties && d.properties.nodeType && NodeTypeColors[d.properties.nodeType]) {
-					return GetNodeTypeIcon(d.properties.nodeType);
+					let temp = GetNodeTypeIcon(d.properties.nodeType);
+					if (temp.indexOf('undefined') !== -1) {
+						return temp;
+					}
 				}
 				return './css/svg/003-cupcake.svg';
 			})

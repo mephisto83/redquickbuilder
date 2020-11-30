@@ -11,7 +11,7 @@ import {
 	Visual,
 	ApplicationConfig,
 	GetNodeTitle
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { NodeTypes } from '../constants/nodetypes';
 import { uuidv4 } from '../utils/array';
 import { Node, Graph, Version } from '../methods/graph_types';

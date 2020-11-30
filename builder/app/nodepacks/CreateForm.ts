@@ -4,7 +4,7 @@ import {
   GetModelPropertyChildren,
   GetNodeProp,
   NEW_COMPONENT_NODE
-} from "../actions/uiactions";
+} from "../actions/uiActions";
 import CreateFormInput from "./CreateFormInput";
 import { ComponentTypes, InstanceTypes } from "../constants/componenttypes";
 import SetupApiBetweenComponents from "./SetupApiBetweenComponents";

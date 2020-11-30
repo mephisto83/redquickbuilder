@@ -1,5 +1,5 @@
 import { GetNodesLinkedTo } from '../methods/graph_methods';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import { LinkType, NodeProperties, LinkProperties, NodeTypes } from '../constants/nodetypes';
 
 export default function CopyPermissionConditions(args: any = {}) {

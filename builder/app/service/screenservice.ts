@@ -30,7 +30,7 @@ import {
 	GetComponentApiNodes,
 	GetEventArguments,
 	GetCssName
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import * as GraphMethods from '../methods/graph_types';
 import { bindTemplate } from '../constants/functiontypes';
 import {
@@ -2343,7 +2343,9 @@ function GenerateElectronIORoutes(screens: any[], language: string) {
 			routefile = fs_readFileSync('./app/templates/electronio/routes.tpl', 'utf8');
 			break;
 	}
-	const import_ = `import {{name}} from './screens/{{jsname}}';`;
+	//const import_ = `import {{name}} from './screens/{{jsname}}';`;
+	const import_ = `const {{name}} = lazy(() => import('./screens/{{jsname}}'));`;
+/// const About = lazy(() => import('./routes/About'));
 	const routes: any[] = [];
 	const _screens: any[] = [];
 	screens.map((screen: GraphMethods.Node) => {

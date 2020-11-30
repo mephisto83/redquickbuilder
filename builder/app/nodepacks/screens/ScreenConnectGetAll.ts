@@ -14,7 +14,7 @@ import {
 	GetNodeByProperties,
 	AddLinkBetweenNodes,
 	CreateNewNode
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import {
 	LinkType,
 	NodeProperties,

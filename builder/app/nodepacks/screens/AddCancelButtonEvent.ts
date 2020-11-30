@@ -1,6 +1,6 @@
 import { GetNodeLinkedTo, GetNodesLinkedTo } from '../../methods/graph_methods';
 import { NodeTypes, LinkType, NodeProperties } from '../../constants/nodetypes';
-import { GetNodeProp } from '../../actions/uiactions';
+import { GetNodeProp } from '../../actions/uiActions';
 import NavigateBackEventInstanceToAction from '../NavigateBackEventInstanceToAction';
 
 export default function AddCancelButtonEvent(args: any = {}) {

@@ -14,7 +14,7 @@ import {
 	GetDispatchFunc,
 	GetStateFunc,
 	GetNodeByProperties
-} from '../../../actions/uiactions';
+} from '../../../actions/uiActions';
 import { Node, Graph } from '../../../methods/graph_types';
 import { ButtonDescription } from './CreateSmartDashboard';
 import { GetNodesLinkedTo, SOURCE, SetPause, GetNodeLinkedTo } from '../../../methods/graph_methods';

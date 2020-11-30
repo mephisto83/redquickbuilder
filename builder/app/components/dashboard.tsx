@@ -10,7 +10,7 @@ import DashboardLogo from './dashboardlogo';
 import Header from './header';
 import DashboardNavBar from './dashboardnavbar';
 import SidebarToggle from './sidebartoggle';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import NavBarMenu from './navbarmenu';
 import MainSideBar from './mainsidebar';
 import BatchMenu from './batchmenu';

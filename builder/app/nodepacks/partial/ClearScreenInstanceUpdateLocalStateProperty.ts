@@ -2,7 +2,7 @@
 
 import { uuidv4 } from '../../utils/array';
 import { NodeProperties } from '../../constants/nodetypes';
-import { GetNodeTitle, GetCodeName } from '../../actions/uiactions';
+import { GetNodeTitle, GetCodeName } from '../../actions/uiActions';
 
 export default function(args: any = {}) {
 	// node1,node2

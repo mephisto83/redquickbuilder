@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import * as Titles from './titles';
 import createEngine, { DiagramModel, DefaultNodeModel, DagreEngine, DefaultLinkModel, DefaultDiagramState, LinkModel, DiagramEngine, PathFindingLinkFactory } from '@projectstorm/react-diagrams';
 import { BaseEvent, CanvasWidget } from '@projectstorm/react-canvas-core';

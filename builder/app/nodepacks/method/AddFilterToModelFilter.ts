@@ -11,7 +11,7 @@ import {
 	GetCurrentGraph,
 	CHANGE_NODE_PROPERTY,
 	GetMethodProps
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { NodeProperties, LinkType, LinkProperties, NodeTypes } from '../../constants/nodetypes';
 import { GetNodeLinkedTo } from '../../methods/graph_methods';
 import { FunctionTemplateKeys } from '../../constants/functiontypes';

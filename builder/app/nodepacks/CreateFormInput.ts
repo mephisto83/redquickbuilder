@@ -6,7 +6,7 @@ import {
 	NEW_COMPONENT_NODE,
 	LinkProperties,
 	GetNodeTitle
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { InstanceTypes } from '../constants/componenttypes';
 import { ViewTypes } from '../constants/viewtypes';
 function createForm(

@@ -43,7 +43,7 @@ import {
 	ensureRouteSource,
 	IsModel,
 	GetCurrentGraph
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import {
 	NodeProperties,
 	NodeTypes,
@@ -68,7 +68,7 @@ import { equal } from 'assert';
 import { Node, Graph } from '../../methods/graph_types';
 import { LinkType } from '../../../app/constants/nodetypes';
 import { stringify } from 'querystring';
-import { NodePropertyTypes } from '../../actions/uiactions';
+import { NodePropertyTypes } from '../../actions/uiActions';
 
 export interface AfterEffectConvertArgs {
 	from: MethodDescription;
@@ -937,7 +937,7 @@ function GenerateSimpleValidations(
 			}
 			if (simpleValidation.date && simpleValidation.date.enabled) {
 				checks.push({
-					template: `!${valuePropString} && ${valuePropString} != default(DateTime)`,
+					template: `${valuePropString} != default(DateTime)`,
 					id: simpleValidation.id
 				});
 			}
@@ -1150,7 +1150,7 @@ function produceIfStatementComposition(
 						child,
 						graph,
 						checks,
-						[ ...visitedNodes, ...unvisitedChildren.map((v) => v.id) ].unique()
+						[...visitedNodes, ...unvisitedChildren.map((v) => v.id)].unique()
 					);
 					return `(${orstatement})`;
 				case NodeTypes.LeafNode:
@@ -1370,15 +1370,15 @@ function GenerateStretchMethods(
 						arbiterModels.push(item.model);
 						return `#{{"key":"stretch.${name}.${GetCodeName(item.model)}"}}# item_${index} = item_${index -
 							1} != null ? (await arbiter#{{"key":"stretch.${name}.${GetCodeName(
-							item.model
-						)}"}}#Static.GetBy(v => v.#{{"key":"stretch.${name}.${GetCodeName(item.model)}.${GetCodeName(
-							item.property
-						)}","model":"stretch.${name}.${GetCodeName(item.model)}","type":"property"}}# == item_${index -
+								item.model
+							)}"}}#Static.GetBy(v => v.#{{"key":"stretch.${name}.${GetCodeName(item.model)}.${GetCodeName(
+								item.property
+							)}","model":"stretch.${name}.${GetCodeName(item.model)}","type":"property"}}# == item_${index -
 							1}.#{{"key":"stretch.${name}.${GetCodeName(previousModel)}.${GetCodeName(
-							fromProperty
-						)}","model":"stretch.${name}.${GetCodeName(
-							previousModel
-						)}","type":"property"}}#)).FirstOrDefault() : null;`;
+								fromProperty
+							)}","model":"stretch.${name}.${GetCodeName(
+								previousModel
+							)}","type":"property"}}#)).FirstOrDefault() : null;`;
 					}
 				}
 				return false;
@@ -1519,8 +1519,8 @@ function CreateStreamProcessFunc(
 	ops = ops || { updatePath: false };
 	let updatePath = ops.updatePath
 		? `  #{{"key":"tomodel"}}#ChangeBy#{{"key":"agent"}}#.UpdatePath(parameters, AfterEffectChains.{{after_effect_parent}}.${codeTypeWord(
-				route ? route.name : ''
-			)});`
+			route ? route.name : ''
+		)});`
 		: '';
 	let method = `
         public static async Task ${funcName}(#{{"key":"model"}}# model, #{{"key":"agent"}}# agent, #{{"key":"model"}}#ChangeBy#{{"key":"agent"}}# change${ifAfterEffect}) {
@@ -1591,11 +1591,11 @@ function checkExistenceFunction(
           #{{"key":"tomodel"}}# checkModel = ${stretchClause || getClause};
           exists  = checkModel != null;
          ${(onTrue && ifvalue) || skipSettings === SkipSettings.SkipIfFlase
-				? ` if(${ifvalue}exists) {
+								? ` if(${ifvalue}exists) {
             ${onTrue || 'return'};
           }
           #{{"key":"tomodel"}}# value = checkModel;`
-				: ''}
+								: ''}
         `;
 					} else if (returnSetting.enabled) {
 						let getModelClause = `(await toArbiter#{{"key":"tomodel"}}#.GetBy(v => v.#{{"key":"tomodel.${GetCodeName(
@@ -1606,11 +1606,11 @@ function checkExistenceFunction(
           #{{"key":"tomodel"}}# checkModel = ${stretchClause || getModelClause}
           exists  = checkModel != null;
           ${onTrue && ifvalue
-				? ` if(${ifvalue}exists) {
+								? ` if(${ifvalue}exists) {
                 ${onTrue || 'return'};
               }
               #{{"key":"tomodel"}}# value = checkModel;`
-				: ''}
+								: ''}
         `;
 					}
 
@@ -1627,8 +1627,8 @@ function checkExistenceFunction(
 					checking_existence = `
           var exists = false;
           var checkModel = (await toArbiter#{{"key":"model"}}#.GetBy(v => v.#{{"key":"model.${GetCodeName(
-				targetProperty
-			)}","type":"property","model":"model"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();
+						targetProperty
+					)}","type":"property","model":"model"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();
           exists  = checkModel != null;
           if(${ifvalue}exists) {
             ${onTrue || 'return'};
@@ -1640,8 +1640,8 @@ function checkExistenceFunction(
 					checking_existence = `
           var exists = false;
           var checkModel = (await toArbiter#{{"key":"model"}}#.GetBy(v => v.#{{"key":"model.${GetCodeName(
-				targetProperty
-			)}","type":"property","model":"model"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();
+						targetProperty
+					)}","type":"property","model":"model"}}# == ${rel}.#{{"key":"${rel}.prop","type":"property","model":"${rel}"}}#)).FirstOrDefault();
           exists  = checkModel != null;
           if(${ifvalue}exists) {
             ${onTrue || 'return'};
@@ -1846,10 +1846,10 @@ function setupAfterEffect(
 				) {
 					next_steps += `
           ${setupSetProperties(
-				`${resultVariable}`,
-				step.constructModel.setProperties,
-				tempLambdaInsertArgumentValues
-			)}`;
+						`${resultVariable}`,
+						step.constructModel.setProperties,
+						tempLambdaInsertArgumentValues
+					)}`;
 				}
 
 				if (step.sendMessageToLakeConfig && step.sendMessageToLakeConfig.enabled) {
@@ -1934,6 +1934,8 @@ function setupSetProperties(
 				)}","type":"property","model":"${GetCodeName(targetModel)}"}}#`;
 				let isStringList: boolean =
 					GetNodeProp(targetProperty, NodeProperties.UIAttributeType) === NodePropertyTypes.LISTOFSTRINGS;
+				let isStringDict: boolean =
+					GetNodeProp(targetProperty, NodeProperties.UIAttributeType) === NodePropertyTypes.DICTSTRING;
 				tempLambdaInsertArgumentValues[`${GetCodeName(targetModel)}.${GetCodeName(targetProperty)}`] = {
 					property: targetProperty,
 					model: targetModel ? targetModel.id : '',
@@ -1981,6 +1983,31 @@ function setupSetProperties(
 							GetModelProperty(setupProperty),
 							GetModelName(setupProperty)
 						);
+						if (isStringDict) {
+							let func = 'Add';
+							if (
+								GetNodeProp(GetModelProperty(setupProperty), NodeProperties.UIAttributeType) ===
+								NodePropertyTypes.DICTSTRING
+							) {
+								func = 'AddRange';
+								return `
+							${prop_string} = ${prop_string} ?? new Dictionary<string, string>();
+							foreach(var d in ${fromPropModel}.#{{"key":"${keyname}","type":"property","model":"${GetModelName(
+									setupProperty
+								)}"}}#.Keys)
+							{
+								${prop_string}.TryAdd(d, ${fromPropModel}.#{{"key":"${keyname}","type":"property","model":"${GetModelName(
+									setupProperty
+								)}"}}#[d]);
+							}
+							${prop_string}.${func}(${fromPropModel}.#{{"key":"${keyname}","type":"property","model":"${GetModelName(
+									setupProperty
+								)}"}}#);`;
+							}
+							else {
+								return `${prop_string} = ${prop_string} ?? new Dictionary<string, string>();`
+							}
+						}
 						if (isStringList) {
 							let func = 'Add';
 							if (
@@ -2042,26 +2069,26 @@ function setupExistenceCheck(
 			let prev =
 				index === 0
 					? `${RelationToVariable(existenceCheck.head.relationType)}.#{{"key":"${GetModelName(
-							existenceCheck.head
-						)}.${GetCodeName(headProperty)}","type":"property","model":"${GetModelName(
-							existenceCheck.head
-						)}"}}#`
+						existenceCheck.head
+					)}.${GetCodeName(headProperty)}","type":"property","model":"${GetModelName(
+						existenceCheck.head
+					)}"}}#`
 					: `step${index - 1}.#{{"key":"${GetCodeName(
-							existenceCheck.orderedCheck[index - 1].model
-						)}.${GetCodeName(item.previousModelProperty)}","type":"property","model":"${GetCodeName(
-							existenceCheck.orderedCheck[index - 1].model
-						)}"}}#`;
+						existenceCheck.orderedCheck[index - 1].model
+					)}.${GetCodeName(item.previousModelProperty)}","type":"property","model":"${GetCodeName(
+						existenceCheck.orderedCheck[index - 1].model
+					)}"}}#`;
 			setupLambdaModelArgs(tempLambdaInsertArgumentValues, item.model);
 			lastModelType = GetCodeName(item.model);
 			steps.push(`let step${index} = ${index
 				? `step${index - 1}`
 				: `${RelationToVariable(
-						existenceCheck.head.relationType
-					)}`} != null ? (await arbiter#{{"key":"${GetCodeName(
-				item.model
-			)}"}}#.GetBy(v => v.#{{"key":"${GetCodeName(item.model)}.${GetCodeName(
-				item.modelProperty
-			)}","type":"property","model":"${GetCodeName(item.model)}"}}# == ${prev})) : null;
+					existenceCheck.head.relationType
+				)}`} != null ? (await arbiter#{{"key":"${GetCodeName(
+					item.model
+				)}"}}#.GetBy(v => v.#{{"key":"${GetCodeName(item.model)}.${GetCodeName(
+					item.modelProperty
+				)}","type":"property","model":"${GetCodeName(item.model)}"}}# == ${prev})) : null;
       `);
 		});
 		let test = existenceCheck.opposite ? '!=' : '==';
@@ -2074,8 +2101,8 @@ function setupExistenceCheck(
       ${steps.join(NEW_LINE)}
 
       ${outputAs === OutputType.Existence
-			? 'return step' + (steps.length - 1) + ` ${test} null`
-			: 'return step' + (steps.length - 1) + ''}
+				? 'return step' + (steps.length - 1) + ` ${test} null`
+				: 'return step' + (steps.length - 1) + ''}
     }`);
 	}
 

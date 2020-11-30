@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import CreateComponentAll, { CreateComponentSharedAll } from '../../app/nodepacks/batch/CreateComponentAll';
-import { GetCurrentGraph } from '../../app/actions/uiactions';
+import { GetCurrentGraph } from '../../app/actions/uiActions';
 import {
 	Job,
 	JobOutput,
@@ -81,9 +81,7 @@ export default async function executeJob(
 
 					break;
 				case Create_Component_Shared_All:
-					await CreateComponentSharedAll(onProgress, (model: any) => {
-						return filter && filter.models.indexOf(model.id) !== -1;
-					});
+					await CreateComponentSharedAll(onProgress);
 					console.log('Create Component All Shared completed');
 					break;
 				case BAD.Setup_View_Types:

@@ -7,7 +7,7 @@ import {
 	GetNodeById,
 	$addComponentApiNodes,
 	GetNodeByProperties
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { NodeProperties, LinkType, LinkProperties, LinkPropertyKeys, NodeTypes } from '../../constants/nodetypes';
 import { GetNodesLinkedTo, GetNodeLinkedTo } from '../../methods/graph_methods';
 import CreateValidatorForProperty from '../CreateValidatorForProperty';

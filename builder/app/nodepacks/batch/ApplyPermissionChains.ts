@@ -8,7 +8,7 @@ import {
 	GetDispatchFunc,
 	GetStateFunc,
 	AddLinkBetweenNodes
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { Node, GraphLink } from '../../methods/graph_types';
 import { LinkPropertyKeys, LinkType, NodeProperties, LinkProperties } from '../../constants/nodetypes';
 import {

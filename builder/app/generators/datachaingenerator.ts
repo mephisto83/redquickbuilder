@@ -11,7 +11,7 @@ import {
 	GetRootGraph,
 	GetCodeName,
 	getDataChainNameSpace
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import {
 	UITypes,
 	NEW_LINE,
@@ -207,7 +207,7 @@ let dcTemplate = (collections: any, funcs: string, rel = '', enumerations = [], 
     UIKeys,
     clearScreenInstance,
     SITE
-  } from '../${rel}actions/uiactions';
+  } from '../${rel}actions/uiActions';
 ${model_imports}
 import {
   GetMenuSource
@@ -223,7 +223,8 @@ import {
     equalsLength,
     alphanumericLike,
     alphanumeric,
-    alpha,
+	alpha,
+	AlphaNumericAttribute,
     MinLengthAttribute,
     EqualsModelProperty,
     MaxLengthAttribute,

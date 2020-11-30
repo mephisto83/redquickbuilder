@@ -20,7 +20,7 @@ import {
 	GetNodeByProperties,
 	UPDATE_LINK_PROPERTY,
 	updateComponentProperty
-} from '../../../actions/uiactions';
+} from '../../../actions/uiActions';
 import { LinkType, NodeProperties, LinkPropertyKeys } from '../../../constants/nodetypes';
 import AddButtonToComponent from '../../AddButtonToComponent';
 import GetModelObjectFromSelector from '../../GetModelObjectFromSelector';

@@ -4,7 +4,7 @@ import { UIConnect } from '../utils/utils';
 import FormControl from './formcontrol';
 
 import RadioButton from './radiobutton';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import { NodeProperties } from '../constants/nodetypes';
 import Box from './box';
 import * as Titles from './titles';

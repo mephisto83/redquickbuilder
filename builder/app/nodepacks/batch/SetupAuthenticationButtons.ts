@@ -7,7 +7,7 @@ import {
 	graphOperation,
 	PerformGraphOperation,
 	updateComponentProperty
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import ConnectLifecycleMethod from '../../components/ConnectLifecycleMethod';
 import * as Titles from '../../components/titles';
 import { InstanceTypes } from '../../constants/componenttypes';

@@ -8,7 +8,7 @@ import {
 	graphOperation,
 	GetDispatchFunc,
 	GetStateFunc
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { MethodFunctions, FunctionTemplateKeys } from '../../constants/functiontypes';
 import { NodeProperties, Methods, LinkType, LinkProperties, NodeTypes } from '../../constants/nodetypes';
 import { GetNodeLinkedTo } from '../../methods/graph_methods';

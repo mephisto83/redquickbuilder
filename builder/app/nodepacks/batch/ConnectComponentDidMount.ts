@@ -12,7 +12,7 @@ import {
 	GetNodeByProperties,
 	CreateNewNode,
 	AddLinkBetweenNodes
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { GetNodesLinkedTo, GetNodeProp } from '../../methods/graph_methods';
 import {
 	LinkType,

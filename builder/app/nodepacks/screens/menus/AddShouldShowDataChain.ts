@@ -1,6 +1,6 @@
 import { uuidv4 } from '../../../utils/array';
 import { NodeProperties, LinkProperties } from '../../../constants/nodetypes';
-import { GetNodeTitle, ADD_LINK_BETWEEN_NODES } from '../../../actions/uiactions';
+import { GetNodeTitle, ADD_LINK_BETWEEN_NODES } from '../../../actions/uiActions';
 export default function AddShouldShowDataChain(args: {
 	linkProperty?: any;
 	id: string;

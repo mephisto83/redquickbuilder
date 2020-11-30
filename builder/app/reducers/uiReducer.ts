@@ -1,5 +1,5 @@
 // @flow
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 export function updateUI(state, action) {
 	var newstate = { ...state };
 	newstate[action.section] = { ...newstate[action.section] || {} };

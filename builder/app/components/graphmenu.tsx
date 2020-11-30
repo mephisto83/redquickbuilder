@@ -5,7 +5,7 @@ import { UIConnect } from '../utils/utils';
 
 import DropDownMenu from './dropdown';
 import DropDownMenuItem from './dropdownmenuitem';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import * as Titles from './titles';
 
 const GRAPH_MENU = 'GRAPH_MENU';

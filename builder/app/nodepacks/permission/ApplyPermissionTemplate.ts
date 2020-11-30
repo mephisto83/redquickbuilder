@@ -1,4 +1,4 @@
-import { GetCurrentGraph, GetLinkProperty, GetPermissionMethod, GetMethodFunctionType } from '../../actions/uiactions';
+import { GetCurrentGraph, GetLinkProperty, GetPermissionMethod, GetMethodFunctionType } from '../../actions/uiActions';
 import {
 	LinkType,
 	NodeProperties,

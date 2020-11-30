@@ -16,7 +16,7 @@ import ChangeParameterGenerator from './changeparametergenerator';
 import ConstantsGenerator from './constantsgenerator';
 import PermissionGenerator from './permission_conditiongenerator';
 import StreamProcessGenerator from './streamprocessgenerator';
-import { NodesByType, GetNodeProp } from '../actions/uiactions';
+import { NodesByType, GetNodeProp } from '../actions/uiActions';
 import StreamProcessOrchestrationGenerator from './streamprocessorchestrationgenerator';
 import ChangeResponseGenerator from './changeresponsegenerator';
 import ExecutorGenerator from './executiongenerator';

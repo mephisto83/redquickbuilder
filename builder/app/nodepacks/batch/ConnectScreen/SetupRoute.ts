@@ -25,7 +25,7 @@ import {
 	AddLinkBetweenNodes,
 	CreateNewNode,
 	GetModelCodeProperties
-} from '../../../actions/uiactions';
+} from '../../../actions/uiActions';
 import { GetNodesLinkedTo, GetNodeLinkedTo, GetCellProperties, SOURCE } from '../../../methods/graph_methods';
 import {
 	LinkType,

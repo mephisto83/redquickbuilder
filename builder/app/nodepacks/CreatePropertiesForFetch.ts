@@ -13,7 +13,7 @@ import {
   GetMethodsProperty,
   GetNodeById,
   REMOVE_NODE
-} from "../actions/uiactions";
+} from "../actions/uiActions";
 import { FunctionTemplateKeys } from "../constants/functiontypes";
 
 export default function(args : any= {}) {

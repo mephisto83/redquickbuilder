@@ -11,7 +11,7 @@ import {
 	GetMethodProps,
 	GetNodesByProperties,
 	GetNodeTitle
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 
 import { NodeTypes, NodeProperties, LinkType, LinkPropertyKeys } from '../../constants/nodetypes';
 import { MethodFunctions, FunctionTemplateKeys } from '../../constants/functiontypes';

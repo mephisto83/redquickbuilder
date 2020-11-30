@@ -4,7 +4,7 @@ import { UIConnect } from '../utils/utils';
 import TextInput from './textinput';
 import SelectInput from './selectinput';
 import FormControl from './formcontrol';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import * as Titles from './titles';
 import {
 	createValidator,
@@ -21,7 +21,7 @@ import {
 } from '../methods/graph_methods';
 import { Validator, ValidatorItem, Enumeration } from '../methods/graph_types';
 import { NodeProperties, LinkType, LinkEvents, FilterRules, NodePropertyTypes } from '../constants/nodetypes';
-import { NodeTypes } from '../actions/uiactions';
+import { NodeTypes } from '../actions/uiActions';
 
 class ExecutorItem extends Component<any, any> {
 	render() {

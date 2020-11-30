@@ -1,5 +1,5 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodesByType, NodeTypes, GetRootGraph, GetNodeTitle } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, NodesByType, NodeTypes, GetRootGraph, GetNodeTitle } from '../actions/uiActions';
 import {
 	LinkType,
 	NodePropertyTypesByLanguage,

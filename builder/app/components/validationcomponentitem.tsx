@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import * as Titles from './titles';
 import SelectInput from './selectinput';
 import TextInput from './textinput';
@@ -46,7 +46,7 @@ import Typeahead from './typeahead';
 import CheckBox from './checkbox';
 import { MethodFunctions } from '../constants/functiontypes';
 import getLanguageMeaning, { NLMeaning, NLMethodType, Clause, NLValidationClauses, QuickType } from '../service/naturallang';
-import { GetCurrentGraph, GetCodeName } from '../actions/uiactions';
+import { GetCurrentGraph, GetCodeName } from '../actions/uiActions';
 import { viewCode } from '../actions/remoteActions';
 
 export default class ValidationComponentItem extends Component<any, any> {
@@ -714,8 +714,6 @@ export function updateValidationMethod({
 								simpleValidation.isBoolean.enabled = true;
 								break;
 							case NodeAttributePropertyTypes.DATE:
-								simpleValidation.isNotNull = CreateBoolean();
-								simpleValidation.isNotNull.enabled = true;
 								simpleValidation.date = CreateBoolean();
 								simpleValidation.date.enabled = true;
 								break;

@@ -1,4 +1,4 @@
-import { ADD_NEW_NODE, GetNodeTitle } from '../actions/uiactions';
+import { ADD_NEW_NODE, GetNodeTitle } from '../actions/uiActions';
 import { NodeTypes, NodeProperties, LinkProperties } from '../constants/nodetypes';
 
 export default function(args: any = {}) {

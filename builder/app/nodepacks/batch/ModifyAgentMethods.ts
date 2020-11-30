@@ -1,6 +1,6 @@
 import { NodesByType, GetNodesByProperties } from '../../methods/graph_methods';
 import { NodeTypes, NodeProperties } from '../../constants/nodetypes';
-import { GetCurrentGraph } from '../../actions/uiactions';
+import { GetCurrentGraph } from '../../actions/uiActions';
 import { FunctionTypes } from '../../constants/functiontypes';
 import { Node } from '../../methods/graph_types';
 import AddMethodFilterToMethod from '../method/AddFilterToModelFilter';

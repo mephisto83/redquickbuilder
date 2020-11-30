@@ -1,4 +1,4 @@
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import { NodeProperties, LinkEvents } from '../constants/nodetypes';
 import { addValidatator, createEventProp, createExecutor } from '../methods/graph_methods';
 

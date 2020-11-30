@@ -5,7 +5,7 @@ import { GetNodeProp } from '../methods/graph_methods';
 import { NodeProperties } from '../constants/nodetypes';
 import Panel from './panel';
 import { Node } from '../methods/graph_types';
-import { GetNodeTitle } from '../actions/uiactions';
+import { GetNodeTitle } from '../actions/uiActions';
 
 export default class NodeViewList extends Component<any, any> {
 	constructor(props: any) {

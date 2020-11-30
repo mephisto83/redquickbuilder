@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 /* eslint-disable prefer-const */
-import { GetValidationNode, GetCombinedCondition, GetNodeById, GetNodeProp } from '../actions/uiactions';
+import { GetValidationNode, GetCombinedCondition, GetNodeById, GetNodeProp } from '../actions/uiActions';
 import { ProgrammingLanguages, NodeProperties } from '../constants/nodetypes';
 
 export function buildValidation(args: any = { methodMethod: null }) {

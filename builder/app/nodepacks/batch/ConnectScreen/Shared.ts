@@ -10,7 +10,7 @@ import {
 	ADD_NEW_NODE,
 	GetNodeByProperties,
 	AddLinkBetweenNodes
-} from '../../../actions/uiactions';
+} from '../../../actions/uiActions';
 import {
 	GetNodesLinkedTo,
 	GetNodeProp,

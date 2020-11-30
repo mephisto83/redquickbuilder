@@ -3,7 +3,7 @@ import { Graph, Node, GraphLink } from '../../app/methods/graph_types';
 import { CityLayoutGrid, DistanceType } from './citylayoutgrid';
 import { Coordinate } from './coordinate';
 import { GetNodesLinkedTo, GetLinkBetween } from '../../app/methods/graph_methods';
-import { GetLinkProperty } from '../../app/actions/uiactions';
+import { GetLinkProperty } from '../../app/actions/uiActions';
 import { LinkPropertyKeys } from '../../app/constants/nodetypes';
 import Springy from './springy';
 

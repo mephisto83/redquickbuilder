@@ -1,5 +1,5 @@
 import { GetNodesLinkedTo } from "../../methods/graph_methods";
-import { GetCurrentGraph, GetNodeProp, ADD_NEW_NODE, addInstanceFunc } from "../../actions/uiactions";
+import { GetCurrentGraph, GetNodeProp, ADD_NEW_NODE, addInstanceFunc } from "../../actions/uiActions";
 import { LinkType, NodeProperties, NodeTypes, LinkProperties } from "../../constants/nodetypes";
 import { SCREEN_COMPONENT_EVENTS, ComponentLifeCycleEvents } from '../../constants/componenttypes';
 

@@ -8,13 +8,13 @@ import {
 	REMOVE_LINK_BETWEEN_NODES,
 	GetNodeByProperties,
 	UPDATE_LINK_PROPERTY
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { LinkType, NodeProperties, NodeTypes, LinkProperties, LinkPropertyKeys } from '../../constants/nodetypes';
 import CreateModelKeyDC from './CreateModelKeyDC';
 import { uuidv4 } from '../../utils/array';
 import { GetViewTypeModelType } from './SetupViewTypeForCreate';
 import CreateModelPropertyGetterDC from '../CreateModelPropertyGetterDC';
-import { CreateNewNode } from '../../actions/uiactions';
+import { CreateNewNode } from '../../actions/uiActions';
 import { DataChainFunctionKeys } from '../../constants/datachain';
 import { Node } from '../../methods/graph_types';
 
@@ -68,19 +68,21 @@ export default function SetupViewTypeForGetAll(args: any = {}) {
 			return null;
 		})
 	);
-	result.push(
-		...GetNodesLinkedTo(null, {
-			id: viewModelExternalNode.id,
-			link: LinkType.DataChainLink,
-			componentType: NodeTypes.DataChain
-		}).map((dc: { id: any }) => ({
-			operation: REMOVE_LINK_BETWEEN_NODES,
-			options: {
-				target: dc.id,
-				source: viewModelExternalNode.id
-			}
-		}))
-	);
+	if (viewModelExternalNode) {
+		result.push(
+			...GetNodesLinkedTo(null, {
+				id: viewModelExternalNode.id,
+				link: LinkType.DataChainLink,
+				componentType: NodeTypes.DataChain
+			}).map((dc: { id: any }) => ({
+				operation: REMOVE_LINK_BETWEEN_NODES,
+				options: {
+					target: dc.id,
+					source: viewModelExternalNode.id
+				}
+			}))
+		);
+	}
 
 	result.push(
 		...CreateModelKeyDC({
@@ -105,23 +107,26 @@ export default function SetupViewTypeForGetAll(args: any = {}) {
 			}
 		}
 	);
-	result.push(
-		...GetNodesLinkedTo(null, {
-			id: valueExternalNode.id,
-			link: LinkType.DataChainLink,
-			componentType: NodeTypes.DataChain
-		}).map((dc: { id: any }) => ({
-			operation: REMOVE_LINK_BETWEEN_NODES,
-			options: {
-				target: dc.id,
-				source: valueExternalNode.id
-			}
-		}))
-	);
-
+	if (valueExternalNode) {
+		result.push(
+			...GetNodesLinkedTo(null, {
+				id: valueExternalNode.id,
+				link: LinkType.DataChainLink,
+				componentType: NodeTypes.DataChain
+			}).map((dc: { id: any }) => ({
+				operation: REMOVE_LINK_BETWEEN_NODES,
+				options: {
+					target: dc.id,
+					source: valueExternalNode.id
+				}
+			}))
+		);
+	}
 	let temp: any;
 	// If the property is a reference to a model, then we can assume it will be an array of strings referencing the instances.
-	if (GetNodeProp(property, NodeProperties.NODEType) === NodeTypes.Model) {
+	// *11/21/2020* Just because the property is a reference to a model ,doesn't mean we can assume its an array.
+	// *11/21/2020* If both the property and the model are models, then it should be an array.
+	if (GetNodeProp(property, NodeProperties.NODEType) === NodeTypes.Model && GetNodeProp(model, NodeProperties.NODEType) === NodeTypes.Model) {
 		let dataChainTemplate = `
     function load#{{"key":"modelProperty"}}#PropertiesFrom#{{"key":"model"}}#s($obj: { blur: any, dirty: any, focus: any, focused: any, object: #{{"key":"model"}}# }) {
       if(!$obj || !$obj.object) {
@@ -177,7 +182,7 @@ export default function SetupViewTypeForGetAll(args: any = {}) {
 							temp = res.id;
 						}
 					),
-					function() {
+					function () {
 						return {
 							operation: ADD_LINK_BETWEEN_NODES,
 							options: {
@@ -187,7 +192,7 @@ export default function SetupViewTypeForGetAll(args: any = {}) {
 							}
 						};
 					},
-					function() {
+					function () {
 						return {
 							operation: ADD_LINK_BETWEEN_NODES,
 							options: {
@@ -202,11 +207,13 @@ export default function SetupViewTypeForGetAll(args: any = {}) {
 			{
 				operation: ADD_LINK_BETWEEN_NODES,
 				options() {
-					return {
-						source: valueExternalNode.id,
-						target: temp,
-						properties: { ...LinkProperties.DataChainLink }
-					};
+					if (valueExternalNode) {
+						return {
+							source: valueExternalNode.id,
+							target: temp,
+							properties: { ...LinkProperties.DataChainLink }
+						};
+					}
 				}
 			}
 		);
@@ -225,11 +232,13 @@ export default function SetupViewTypeForGetAll(args: any = {}) {
 			{
 				operation: ADD_LINK_BETWEEN_NODES,
 				options() {
-					return {
-						source: valueExternalNode.id,
-						target: temp,
-						properties: { ...LinkProperties.DataChainLink }
-					};
+					if (valueExternalNode) {
+						return {
+							source: valueExternalNode.id,
+							target: temp,
+							properties: { ...LinkProperties.DataChainLink }
+						};
+					}
 				}
 			}
 		);
@@ -247,11 +256,13 @@ export default function SetupViewTypeForGetAll(args: any = {}) {
 		result.push({
 			operation: ADD_LINK_BETWEEN_NODES,
 			options() {
-				return {
-					source: valueExternalNode.id,
-					target: selector.id,
-					properties: { ...LinkProperties.SelectorLink }
-				};
+				if (valueExternalNode) {
+					return {
+						source: valueExternalNode.id,
+						target: selector.id,
+						properties: { ...LinkProperties.SelectorLink }
+					};
+				}
 			}
 		});
 	}

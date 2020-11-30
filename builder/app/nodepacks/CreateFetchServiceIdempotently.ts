@@ -11,7 +11,7 @@ import {
 	GetMethodNodeProp,
 	REMOVE_LINK_BETWEEN_NODES,
 	UPDATE_NODE_PROPERTY
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import CreateFetchParameters from './CreateFetchParameters';
 import CreateFetchService from './CreateFetchService';
 import CreateFetchOutput from './CreateFetchOutput';

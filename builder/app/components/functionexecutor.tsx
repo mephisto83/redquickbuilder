@@ -3,7 +3,7 @@
 // @flow
 import React, { Component } from "react";
 import TreeViewMenu from "./treeviewmenu";
-import { Visual, NodeProperties, GetNodesByProperties, GetNodeProp } from "../actions/uiactions";
+import { Visual, NodeProperties, GetNodesByProperties, GetNodeProp } from "../actions/uiActions";
 import TreeViewItemContainer from "./treeviewitemcontainer";
 import SelectInput from "./selectinput";
 import { SOURCE, GetConnectedNodesByType, GetCellIdByTag, GetCellProperties, GetChildren, GetChild } from "../methods/graph_methods";

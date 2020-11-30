@@ -1,5 +1,5 @@
 import { Config } from 'electron';
-import { GetModelPropertyChildren, GUID, setRouteSource, GetModelCodeProperties } from '../actions/uiactions';
+import { GetModelPropertyChildren, GUID, setRouteSource, GetModelCodeProperties } from '../actions/uiActions';
 import datachainactivitymenu from '../components/datachainactivitymenu';
 import SimpleValidationComponent from '../components/simplevalidationconfig';
 import { Graph } from '../methods/graph_types';

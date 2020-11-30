@@ -4,7 +4,7 @@ import {
 	graphOperation,
 	GetDispatchFunc,
 	GetStateFunc
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { NodeProperties, NodeTypes } from '../../constants/nodetypes';
 import { AuthorizedDashboard, SelectTargetScreen } from '../../components/titles';
 import AddChainToNavigateNextScreen from './AddChainToNavigateNextScreen';

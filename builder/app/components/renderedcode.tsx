@@ -13,12 +13,12 @@ import {
 	NodesByType,
 	GetCodeName,
 	GetLambdaVariableTitle
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { UIConnect } from '../utils/utils';
 import { GetNodeProp, GetNodesLinkedTo } from '../methods/graph_methods';
 import { NodeProperties, NEW_LINE, MakeConstant, LinkType } from '../constants/nodetypes';
 import fs from 'fs';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import ModelGenerator from '../generators/modelgenerators';
 import { Node } from '../methods/graph_types';
 import ConstantsGenerator from '../generators/constantsgenerator';
@@ -37,7 +37,7 @@ export default class RenderedCode extends Component<any, any> {
 		const currentNode = UIA.Node(state, UIA.Visual(state, SELECTED_NODE));
 		let value: string = this.props.value || '';
 		return (
-			<Box stretch title={'Editor'}>
+			<Box bodyStyle={{ height: 'calc(100% - 30px)' }} stretch title={'Editor'}>
 				<MonacoEditor
 					height="100%"
 					width={'100%'}
@@ -45,7 +45,7 @@ export default class RenderedCode extends Component<any, any> {
 						monaco.editor.setTheme('vs-dark');
 					}}
 					language={this.props.language || 'csharp'}
-					onChange={(val: string) => {}}
+					onChange={(val: string) => { }}
 					value={value}
 					options={options}
 				/>

@@ -50,7 +50,7 @@ import {
 	setPinned,
 	handleCodeWindowMessage,
 	GetNodesByProperties, handleFlowCodeMessage, handleGraphMessage
-} from './uiactions';
+} from './uiActions';
 import { GraphKeys, GetNodesLinkedTo, SetFlowModel } from '../methods/graph_methods';
 import { HandlerEvents } from '../ipc/handler-events';
 import {
@@ -761,7 +761,7 @@ function generateReactWeb(workspace: string, state: any) {
 			writer: (temp: any) => {
 				Object.keys(temp).map((fileName) => {
 					let { relative } = temp[fileName];
-					relative = relative.replace('app', 'src');
+					relative = relative.replace('./app/', './src/');
 					let dirname = path.dirname(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`));
 					ensureDirectory(dirname);
 					console.log(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`));
@@ -775,7 +775,7 @@ function generateReactWeb(workspace: string, state: any) {
 
 		Object.keys(temp).map((fileName) => {
 			let { relative } = temp[fileName];
-			relative = relative.replace('app', 'src');
+			relative = relative.replace('./app/', './src/');
 			let dirname = path.dirname(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`));
 			ensureDirectory(dirname);
 			console.log(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`));

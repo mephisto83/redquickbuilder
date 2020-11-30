@@ -1,5 +1,5 @@
 import { uuidv4 } from "../utils/array";
-import { GetNodeByProperties } from "../actions/uiactions";
+import { GetNodeByProperties } from "../actions/uiActions";
 import { NodeProperties, NodeTypes } from "../constants/nodetypes";
 export default function (args : any= {}) {
   // node1,node2

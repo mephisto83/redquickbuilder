@@ -6,7 +6,7 @@ import {
 	GetMethodNodeProp,
 	GetNodeProp,
 	GetViewTypeModel
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { NodeTypes, UITypes, NodeProperties, Methods } from '../../constants/nodetypes';
 import SetupViewTypeFor from '../viewtype/SetupViewTypeFor';
 import { MethodFunctions, FunctionTemplateKeys } from '../../constants/functiontypes';

@@ -31,7 +31,7 @@ import {
 	GUID,
 	GetNodeById,
 	removeNodeById
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import Box from './box';
 import FormControl from './formcontrol';
 import * as Titles from './titles';

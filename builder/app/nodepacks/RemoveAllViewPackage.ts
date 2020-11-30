@@ -1,5 +1,5 @@
 import { NodeProperties } from '../constants/nodetypes';
-import { GetNodesByProperties, REMOVE_NODE } from '../actions/uiactions';
+import { GetNodesByProperties, REMOVE_NODE } from '../actions/uiActions';
 
 export default function RemoveAllViewPackage(args: any = {}) {
 	const result: any = [];

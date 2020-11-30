@@ -11,7 +11,7 @@ export default class Button extends React.Component<any, any> {
 		this.state = {};
 	}
 	getAttributes(): any {
-		const res = { disabled: 'disabled' };
+		const res: { disabled?: string } = { disabled: 'disabled' };
 		if (this.props.error) {
 			const { errors, valid, validated } = this.props.error;
 

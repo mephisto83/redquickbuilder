@@ -2,7 +2,7 @@
 import React, { Component } from "react";
 import { UIConnect } from "../utils/utils";
 import MainSideBar from "./mainsidebar";
-import * as UIA from "../actions/uiactions";
+import * as UIA from "../actions/uiActions";
 import SideBar from "./sidebar";
 import TreeViewMenu from "./treeviewmenu";
 import * as Titles from "./titles";

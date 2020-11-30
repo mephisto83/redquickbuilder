@@ -17,7 +17,7 @@ import {
 	OtherUses,
 	CssPseudoSelectors
 } from '../constants/themes';
-import { GetCurrentGraph, GUID, VisualEq } from '../actions/uiactions';
+import { GetCurrentGraph, GUID, VisualEq } from '../actions/uiActions';
 import TextInput from './textinput';
 import ColorInput from './colorinput';
 import Box from './box';

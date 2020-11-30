@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { UIConnect } from '../utils/utils';
 import ControlSideBarMenu, { ControlSideBarMenuItem, ControlSideBarMenuHeader } from './controlsidebarmenu';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import TabPane from './tabpane';
 import * as Titles from './titles';
 import FormControl from './formcontrol';
@@ -30,7 +30,7 @@ import { NodeTypes, NodeProperties } from '../constants/nodetypes';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachain';
-import { GetStateFunc, graphOperation } from '../actions/uiactions';
+import { GetStateFunc, graphOperation } from '../actions/uiActions';
 import { Node } from '../methods/graph_types';
 import BuildDataChainAfterEffectConverter from '../nodepacks/datachain/BuildDataChainAfterEffectConverter';
 import { mount } from 'enzyme';

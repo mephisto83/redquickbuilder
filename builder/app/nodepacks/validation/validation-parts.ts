@@ -1,5 +1,5 @@
 import { uuidv4 } from '../../utils/array';
-import { GetNodeById, GetNodeProp } from '../../actions/uiactions';
+import { GetNodeById, GetNodeProp } from '../../actions/uiActions';
 import { NodeProperties } from '../../constants/nodetypes';
 import { Node } from '../../methods/graph_types';
 

@@ -7,7 +7,7 @@ import {
 	GetDispatchFunc,
 	GetStateFunc,
 	GetNodeById
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { NodeTypes, NodeProperties } from '../../constants/nodetypes';
 
 export default async function SelectAllOnModelFilters(progresFunc: any) {

@@ -21,7 +21,7 @@ import {
 	JobProgressId,
 	JobItemId,
 	GetNodeTitle
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import Box from './box';
 import * as Titles from './titles';
 import ProgressBar from './progressbar';

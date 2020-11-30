@@ -10,7 +10,7 @@ import {
 	GetDispatchFunc,
 	GetStateFunc,
 	graphOperation
-} from '../../../actions/uiactions';
+} from '../../../actions/uiActions';
 import { NodeTypes, NodeProperties, LinkProperties } from '../../../constants/nodetypes';
 import { Node } from '../../../methods/graph_types';
 import { ViewTypes } from '../../../constants/viewtypes';

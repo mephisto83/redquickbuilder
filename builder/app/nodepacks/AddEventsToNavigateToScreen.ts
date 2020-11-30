@@ -1,6 +1,6 @@
 /* eslint-disable func-names */
 /* eslint-disable prefer-destructuring */
-import { $addComponentApiNodes } from '../actions/uiactions';
+import { $addComponentApiNodes } from '../actions/uiActions';
 import { LinkProperties, UITypes } from '../constants/nodetypes';
 import AddEvent from './AddEvent';
 

@@ -10,7 +10,7 @@ import {
 	GetDispatchFunc,
 	GetStateFunc,
 	AddLinkBetweenNodes
-} from '../../../actions/uiactions';
+} from '../../../actions/uiActions';
 import { Node, Graph } from '../../../methods/graph_types';
 import CreateSmartDashboard, { ButtonDescription } from './CreateSmartDashboard';
 import { GetNodesLinkedTo, SOURCE, SetPause } from '../../../methods/graph_methods';

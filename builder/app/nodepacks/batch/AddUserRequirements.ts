@@ -11,7 +11,7 @@ import {
 	GetCurrentGraph,
 	addInstanceFunc,
 	ADD_LINK_BETWEEN_NODES
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { NodeProperties, LinkType, LinkProperties } from '../../constants/nodetypes';
 import { MethodFunctions, FunctionTypes, HTTP_METHODS } from '../../constants/functiontypes';
 import { CreateAgentFunction } from '../../constants/nodepackages';

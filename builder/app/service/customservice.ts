@@ -6,7 +6,7 @@ import {
 	GetMethodNode,
 	GetState,
 	GetMethodParametersFor
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { bindTemplate } from '../constants/functiontypes';
 import { NEW_LINE, NodeTypes, NodeProperties } from '../constants/nodetypes';
 import { addNewLine } from '../utils/array';

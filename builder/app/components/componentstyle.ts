@@ -1,4 +1,4 @@
-import { GUID } from '../actions/uiactions';
+import { GUID } from '../actions/uiActions';
 export enum ComponentStyleType {
 	ComponentApi = 'ComponentApi'
 }

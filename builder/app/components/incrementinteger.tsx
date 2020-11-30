@@ -11,7 +11,7 @@ import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectC
 import SetterComponent from './settercomponent';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import TextInput from './textinput';
-import { GUID } from '../actions/uiactions';
+import { GUID } from '../actions/uiActions';
 import SelectInput from './selectinput';
 
 export default class IncrementIntegerComponent extends Component<any, any> {

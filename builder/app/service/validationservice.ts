@@ -15,7 +15,7 @@ import {
 	safeFormatTemplateProperty,
 	GetCurrentGraph,
 	GetNodeProp
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import * as GraphMethods from '../methods/graph_methods';
 import { bindTemplate, FunctionTemplateKeys } from '../constants/functiontypes';
 import fs from 'fs';

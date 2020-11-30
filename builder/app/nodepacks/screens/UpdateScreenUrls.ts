@@ -8,7 +8,7 @@ import {
 	GetStateFunc,
 	NodesByType,
 	GetScreenUrl
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { Node } from '../../methods/graph_types';
 
 export default async function UpdateScreenUrls(args: any = {}) {

@@ -7,7 +7,7 @@
 import React, { Component } from 'react';
 import Draggable from 'react-draggable'; // The default
 import { UIConnect } from '../utils/utils';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import * as Titles from './titles';
 import { NodeProperties, LinkType, LinkPropertyKeys, NodeTypes } from '../constants/nodetypes';
 import GenericPropertyContainer from './genericpropertycontainer';

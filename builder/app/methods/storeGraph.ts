@@ -6,7 +6,7 @@ import path, { relative } from 'path';
 import readline from 'readline';
 import stream from 'stream';
 import prune from './prune';
-import { GUID } from '../actions/uiactions';
+import { GUID } from '../actions/uiActions';
 const NEW_LINE_REPLACEMENT = '$Åøcå';
 const SECTION_HEADER = '$@HEADER#!@_';
 export const LINK_LIB = 'linkLib';

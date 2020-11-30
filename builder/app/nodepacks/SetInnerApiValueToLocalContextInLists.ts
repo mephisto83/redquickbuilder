@@ -4,7 +4,7 @@ import {
   NodesByType,
   GetComponentApiNode,
   CHANGE_NODE_PROPERTY
-} from "../actions/uiactions";
+} from "../actions/uiActions";
 import {
   ComponentApiTypes,
   ComponentTypeKeys

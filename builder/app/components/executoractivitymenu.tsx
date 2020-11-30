@@ -4,7 +4,7 @@ import { UIConnect } from '../utils/utils';
 import TextInput from './textinput';
 import SelectInput from './selectinput';
 import FormControl from './formcontrol';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import TabPane from './tabpane';
 import * as Titles from './titles';
 import CheckBox from './checkbox';

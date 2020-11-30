@@ -10,7 +10,7 @@ import {
 import SetterComponent from './settercomponent';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import TextInput from './textinput';
-import { GUID } from '../actions/uiactions';
+import { GUID } from '../actions/uiActions';
 import SelectInput from './selectinput';
 
 export default class IncrementDoubleComponent extends Component<any, any> {

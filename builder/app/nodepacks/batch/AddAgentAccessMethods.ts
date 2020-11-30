@@ -13,7 +13,7 @@ import {
 	graphOperation,
 	AddLinkBetweenNodes,
 	GetNodeProp
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import {
 	NodeTypes,
 	LinkType,

@@ -6,7 +6,7 @@ import {
 	NodesByType,
 	GetDispatchFunc,
 	GetStateFunc
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { NodeTypes, NodeProperties } from '../../constants/nodetypes';
 import CreateStandardClaimService from '../CreateStandardClaimService';
 import AddCopyPropertiesToExecutor from '../AddCopyPropertiesToExecutor';

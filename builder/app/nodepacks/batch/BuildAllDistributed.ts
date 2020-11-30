@@ -4,7 +4,7 @@
 /* eslint-disable promise/param-names */
 import CreateViewTypes from './CreateViewTypes';
 import AddAgentMethods from './AddAgentMethods';
-import CreateComponentAll from './CreateComponentAll';
+import CreateComponentAll, { CreateComponentSharedAll } from './CreateComponentAll';
 import { setFlag, Flags, SetPause } from '../../methods/graph_methods';
 import {
 	GetDispatchFunc,
@@ -15,7 +15,7 @@ import {
 	BuildAllProgress,
 	NodeTypes,
 	clearPinned
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import SelectAllOnModelFilters from './SelectAllOnModelFilters';
 import AddFiltersToGetAll from '../method/AddFiltersToGetAll';
 import UpdateScreenUrls from '../screens/UpdateScreenUrls';
@@ -334,10 +334,10 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 			AddUserRequirements();
 		});
 
-		await threadRun(buildAllProgress, Create_Component_Shared_All, currentJobFile, NodeTypes.Model, 10000);
+		 await threadRun(buildAllProgress, Create_Component_Shared_All, currentJobFile, NodeTypes.Model, 10000);
 
 		// await run(buildAllProgress, Create_Component_Shared_All, async (progresFunc: (arg0: number) => any) => {
-		// 	await JobService.StartJob(Create_Component_Shared_All, currentJobFile, 1, NodeTypes.Model);
+		// 	await CreateComponentSharedAll(progresFunc);
 		// });
 
 		await threadRun(buildAllProgress, Create_Component_All, currentJobFile, NodeTypes.Model, 1);

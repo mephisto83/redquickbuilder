@@ -6,7 +6,7 @@ import {
 	GetNodeTitle,
 	GetNodeByProperties,
 	GetNodesByProperties
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { NodeTypes, LinkProperties, NodeProperties } from '../constants/nodetypes';
 import { GetNodeProp } from '../methods/graph_methods';
 import { Node } from '../methods/graph_types';

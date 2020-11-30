@@ -1,3 +1,4 @@
+import path from 'path';
 import * as _ from '../utils/array';
 import fs from 'fs';
 export const NodeTypes = {
@@ -93,7 +94,8 @@ export const ConditionTypes = {
 	Enumeration: 'Enumeration'
 };
 
- function fs_readdirSync(pa: string): string[] {
+function fs_readdirSync(pa: string): string[] {
+	let _path = path;
 	try {
 		return fs.readdirSync(pa);
 	}
@@ -102,6 +104,11 @@ export const ConditionTypes = {
 			try {
 				return fs.readdirSync('./' + pa.substring('./app'.length));
 			} catch (e) {
+				try {
+					return fs.readdirSync(_path.join('./resources/app.asar/', pa.substring('./app'.length)))
+				} catch (e) {
+
+				}
 				return [];
 			}
 		}
@@ -1289,7 +1296,7 @@ export const LinkProperties = {
 	},
 	PermissionServiceMethod: {
 		type: LinkType.PermissionServiceMethod,
-		nodeTypes: [ NodeTypes.ServiceInterfaceMethod ]
+		nodeTypes: [NodeTypes.ServiceInterfaceMethod]
 	},
 	Lists: {
 		type: LinkType.Lists
@@ -1305,11 +1312,11 @@ export const LinkProperties = {
 	},
 	ExecutorServiceMethod: {
 		type: LinkType.ExecutorServiceMethod,
-		nodeTypes: [ NodeTypes.ServiceInterfaceMethod ]
+		nodeTypes: [NodeTypes.ServiceInterfaceMethod]
 	},
 	ValidatorServiceMethod: {
 		type: LinkType.ValidatorServiceMethod,
-		nodeTypes: [ NodeTypes.ServiceInterfaceMethod ]
+		nodeTypes: [NodeTypes.ServiceInterfaceMethod]
 	},
 	ServiceInterfaceMethod: {
 		type: LinkType.ServiceInterfaceMethod
@@ -1667,6 +1674,7 @@ export const OptionsTypes = {
 };
 export const NodePropertyTypes = {
 	STRING: 'STRING',
+	DICTSTRING: 'DICTSTRING',
 	LISTOFSTRINGS: 'LISTOFSTRINGS',
 	DATETIME: 'DATETIME',
 	INT: 'INT',
@@ -1701,6 +1709,7 @@ export const NodePropertyTypesByLanguage = {
 		[NodePropertyTypes.DATETIME]: 'DateTime',
 		[NodePropertyTypes.STRING]: 'string',
 		[NodePropertyTypes.LISTOFSTRINGS]: 'IList<string>',
+		[NodePropertyTypes.DICTSTRING]: 'IDictionary<string, string>',
 		[NodePropertyTypes.INT]: 'int',
 		[NodePropertyTypes.FLOAT]: 'float',
 		[NodePropertyTypes.DOUBLE]: 'double',
@@ -1712,6 +1721,7 @@ export const NodePropertyTypesByLanguage = {
 		[NodePropertyTypes.DATETIME]: 'any',
 		[NodePropertyTypes.STRING]: 'string',
 		[NodePropertyTypes.LISTOFSTRINGS]: 'IList<string>',
+		[NodePropertyTypes.DICTSTRING]: '{ [str: string]: string }',
 		[NodePropertyTypes.INT]: 'number',
 		[NodePropertyTypes.FLOAT]: 'number',
 		[NodePropertyTypes.DOUBLE]: 'number',
@@ -1725,8 +1735,8 @@ export const RED_QUICK_DATA = 'RedQuick.Data';
 export const RED_QUICK_ATTRIBUTES = 'RedQuick.Attributes';
 export const Usings = {
 	[ProgrammingLanguages.CSHARP]: {
-		[NodePropertyTypes.EMAIL]: [ RED_QUICK_DATA, RED_QUICK_ATTRIBUTES ],
-		[NodePropertyTypes.PHONENUMBER]: [ RED_QUICK_DATA, RED_QUICK_ATTRIBUTES ]
+		[NodePropertyTypes.EMAIL]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES],
+		[NodePropertyTypes.PHONENUMBER]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES]
 	}
 };
 export const NodeAttributePropertyTypes = {
@@ -1826,7 +1836,7 @@ export function GetValidationsFor(type: any) {
 export function GetMoreCompatibles(a: any, vector: string, result: any = []) {
 	var parents = GetValidationParents(a, vector).map((t) => t.id);
 	parents = parents.filter((t: any) => result.indexOf(t) === -1);
-	result = [ a, ...result, ...parents ].unique();
+	result = [a, ...result, ...parents].unique();
 	parents.map((t: any) => {
 		if (result.indexOf(t) !== -1) {
 			result = GetMoreCompatibles(t, vector, result);
@@ -1886,282 +1896,282 @@ export function GetValidationTypes(type: any) {
 
 export const ValidationCases: any = {
 	[ValidationRules.ListOfGuids]: {
-		types: [ NodePropertyTypes.LISTOFSTRINGS ],
+		types: [NodePropertyTypes.LISTOFSTRINGS],
 		vectors: {
-			content: [ ValidationRules.Any ],
+			content: [ValidationRules.Any],
 			length: true
 		},
 		cases: {
-			$true: function() {
+			$true: function () {
 				return `new List<string> { "${_.uuidv4()}"}`;
 			},
-			long: function() {
+			long: function () {
 				return `new List<string> { "${_.uuidv4()}asdf" }`;
 			},
-			$empty: function() {
+			$empty: function () {
 				return `new List<string>()`;
 			}
 		}
 	},
 	[ValidationRules.SocialSecurity]: {
-		types: [ NodePropertyTypes.STRING ],
+		types: [NodePropertyTypes.STRING],
 		vectors: {
-			content: [ ValidationRules.AlphaNumericPuncLike ],
+			content: [ValidationRules.AlphaNumericPuncLike],
 			length: true
 		},
 		cases: {
-			$true: function() {
+			$true: function () {
 				return `"${[].interpolate(0, 9, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
-			long: function() {
+			long: function () {
 				return `"${[].interpolate(0, 12, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
-			short: function() {
+			short: function () {
 				return `"${[].interpolate(0, 3, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
-			invalid: function() {
+			invalid: function () {
 				return `"${[].interpolate(0, 3, () => Math.floor(Math.random() * 10)).join('a')}"`;
 			},
-			empty: function() {
+			empty: function () {
 				return `"${[].interpolate(0, 0, () => Math.floor(Math.random() * 10)).join('')}"`;
 			}
 		}
 	},
 	[ValidationRules.Zip]: {
-		types: [ NodePropertyTypes.STRING ],
+		types: [NodePropertyTypes.STRING],
 		vectors: {
-			content: [ ValidationRules.ZipEmpty ],
+			content: [ValidationRules.ZipEmpty],
 			length: true
 		},
 		cases: {
-			$true: function() {
+			$true: function () {
 				return `"${[].interpolate(0, 5, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
-			long: function() {
+			long: function () {
 				return `"${[].interpolate(0, 12, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
-			short: function() {
+			short: function () {
 				return `"${[].interpolate(0, 3, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
-			invalid: function() {
+			invalid: function () {
 				return `"${[].interpolate(0, 3, () => Math.floor(Math.random() * 10)).join('a')}"`;
 			},
-			empty: function() {
+			empty: function () {
 				return `"${[].interpolate(0, 0, () => Math.floor(Math.random() * 10)).join('')}"`;
 			}
 		}
 	},
 	[ValidationRules.ZipEmpty]: {
-		types: [ NodePropertyTypes.STRING ],
+		types: [NodePropertyTypes.STRING],
 		vectors: {
 			content: true,
 			length: true
 		},
 		cases: {
-			$true: function() {
+			$true: function () {
 				return `"${[].interpolate(0, 5, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
-			long: function() {
+			long: function () {
 				return `"${[].interpolate(0, 12, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
-			short: function() {
+			short: function () {
 				return `"${[].interpolate(0, 3, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
-			$empty: function() {
+			$empty: function () {
 				return `"${[].interpolate(0, 0, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
-			invalid: function() {
+			invalid: function () {
 				return `"${[].interpolate(0, 3, () => Math.floor(Math.random() * 10)).join('a')}"`;
 			},
-			invalid2: function() {
+			invalid2: function () {
 				return `"${[].interpolate(0, 5, () => 'a').join('')}"`;
 			}
 		}
 	},
 	[ValidationRules.PastDate]: {
-		types: [ NodePropertyTypes.DATETIME ],
+		types: [NodePropertyTypes.DATETIME],
 		vectors: {
 			value: true
 		},
 		cases: {
-			$true: function() {
+			$true: function () {
 				return `Date.UtcNow().AddDays(1)`;
 			},
-			false: function() {
+			false: function () {
 				return `Date.UtcNow().AddDays(-1)`;
 			}
 		}
 	},
 
 	[ValidationRules.BeforeNow]: {
-		types: [ NodePropertyTypes.STRING ],
+		types: [NodePropertyTypes.STRING],
 		vectors: {
 			value: true
 		},
 		cases: {
-			$true: function() {
+			$true: function () {
 				return `Date.UtcNow().AddDays(-1)`;
 			},
-			false: function() {
+			false: function () {
 				return `Date.UtcNow().AddDays(1)`;
 			}
 		}
 	},
 	[ValidationRules.Email]: {
-		types: [ NodePropertyTypes.STRING ],
+		types: [NodePropertyTypes.STRING],
 		vectors: {
 			content: true
 		},
 		cases: {
-			$true: function() {
+			$true: function () {
 				return `"asdf@asdf.com"`;
 			},
-			false: function() {
+			false: function () {
 				return `"asdf@asdfdd@asdf@.com"`;
 			},
-			empty: function() {
+			empty: function () {
 				return `""`;
 			}
 		}
 	},
 	[ValidationRules.EmailEmpty]: {
-		types: [ NodePropertyTypes.STRING ],
+		types: [NodePropertyTypes.STRING],
 		vectors: {
 			content: true
 		},
 		cases: {
-			$true: function() {
+			$true: function () {
 				return `"asadf@asdf.com"`;
 			},
-			false: function() {
+			false: function () {
 				return `"asdf@afsdfdd@asdf@.com"`;
 			},
-			$empty: function() {
+			$empty: function () {
 				return `""`;
 			}
 		}
 	},
 	[ValidationRules.Credit]: {
-		types: [ NodePropertyTypes.STRING ],
+		types: [NodePropertyTypes.STRING],
 		vectors: {
 			content: true,
 			length: true
 		},
 		cases: {
-			$true: function() {
+			$true: function () {
 				return `"${[].interpolate(0, 16, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
-			long: function() {
+			long: function () {
 				return `"${[].interpolate(0, 23, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
-			short: function() {
+			short: function () {
 				return `"${[].interpolate(0, 3, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
-			$empty: function() {
+			$empty: function () {
 				return `"${[].interpolate(0, 0, () => Math.floor(Math.random() * 10)).join('')}"`;
 			},
-			invalid: function() {
+			invalid: function () {
 				return `"${[].interpolate(0, 16, () => Math.floor(Math.random() * 10)).join('a')}"`;
 			},
-			invalid2: function() {
+			invalid2: function () {
 				return `"${[].interpolate(0, 16, () => 'a').join('')}"`;
 			}
 		}
 	},
 	[ValidationRules.Url]: {
-		types: [ NodePropertyTypes.STRING ],
+		types: [NodePropertyTypes.STRING],
 		vectors: {
-			content: [ ValidationRules.UrlEmpty ]
+			content: [ValidationRules.UrlEmpty]
 		},
 		cases: {
-			$true: function() {
+			$true: function () {
 				return `"http://yahoo.com"`;
 			},
-			false: function() {
+			false: function () {
 				return `"asdf@afsdfdd@asdf@.com"`;
 			},
-			empty: function() {
+			empty: function () {
 				return `""`;
 			}
 		}
 	},
 	[ValidationRules.UrlEmpty]: {
-		types: [ NodePropertyTypes.STRING ],
+		types: [NodePropertyTypes.STRING],
 		vectors: {
-			content: [ ValidationRules.Any ]
+			content: [ValidationRules.Any]
 		},
 		cases: {
-			$true: function() {
+			$true: function () {
 				return `"http://yahoo.com"`;
 			},
-			false: function() {
+			false: function () {
 				return `"asdf@afsdfdd@asdf@.com"`;
 			},
-			$empty: function() {
+			$empty: function () {
 				return `""`;
 			}
 		}
 	},
 	[ValidationRules.Empty]: {
-		types: [ NodePropertyTypes.STRING ],
+		types: [NodePropertyTypes.STRING],
 		vectors: {
-			content: [ ValidationRules.Any ],
+			content: [ValidationRules.Any],
 			length: true
 		},
 		cases: {
-			false: function() {
+			false: function () {
 				return `"asdf"`;
 			},
-			$empty: function() {
+			$empty: function () {
 				return `""`;
 			}
 		}
 	},
 	[ValidationRules.NotEmpty]: {
-		types: [ NodePropertyTypes.STRING ],
+		types: [NodePropertyTypes.STRING],
 		vectors: {
-			content: [ ValidationRules.Any ],
+			content: [ValidationRules.Any],
 			length: true
 		},
 		cases: {
-			$false: function() {
+			$false: function () {
 				return `"asdf"`;
 			},
-			empty: function() {
+			empty: function () {
 				return `""`;
 			}
 		}
 	},
 	[ValidationRules.NumericOnly]: {
 		vectors: {
-			content: [ ValidationRules.Numeric ]
+			content: [ValidationRules.Numeric]
 		},
-		types: [ NodePropertyTypes.STRING ],
+		types: [NodePropertyTypes.STRING],
 		cases: {
-			$true: function() {
+			$true: function () {
 				return `"1234"`;
 			},
-			false: function() {
+			false: function () {
 				return `"asdf@ afsdfdd@asdf@.com"`;
 			},
-			empty: function() {
+			empty: function () {
 				return `""`;
 			}
 		}
 	},
 	[ValidationRules.Numeric]: {
 		vectors: {
-			content: [ ValidationRules.AlphaNumericPuncLike ]
+			content: [ValidationRules.AlphaNumericPuncLike]
 		},
-		types: [ NodePropertyTypes.STRING ],
+		types: [NodePropertyTypes.STRING],
 		cases: {
-			$true: function() {
+			$true: function () {
 				return `"1234.34"`;
 			},
-			false: function() {
+			false: function () {
 				return `"12QW"`;
 			},
-			empty: function() {
+			empty: function () {
 				return `""`;
 			}
 		}
@@ -2169,213 +2179,213 @@ export const ValidationCases: any = {
 	//Cant be empty, that would  be the only difference between it and Any.
 	[ValidationRules.AlphaNumericPuncLike]: {
 		vectors: {
-			content: [ ValidationRules.Any ]
+			content: [ValidationRules.Any]
 		},
-		types: [ NodePropertyTypes.STRING ],
+		types: [NodePropertyTypes.STRING],
 		cases: {
-			$true: function() {
+			$true: function () {
 				return `"httas21df.!@#$ #$%^^&*^&*()aom"`;
 			},
-			empty: function() {
+			empty: function () {
 				return `""`;
 			}
 		}
 	},
 	[ValidationRules.AlphaNumericLike]: {
 		vectors: {
-			content: [ ValidationRules.AlphaNumericPuncLike ]
+			content: [ValidationRules.AlphaNumericPuncLike]
 		},
-		types: [ NodePropertyTypes.STRING ],
+		types: [NodePropertyTypes.STRING],
 		cases: {
-			$true: function() {
+			$true: function () {
 				return `"httas21dfaom"`;
 			},
-			false: function() {
+			false: function () {
 				return `"asdf@ afsdfdd@asdf@.com"`;
 			},
-			$empty: function() {
+			$empty: function () {
 				return `""`;
 			}
 		}
 	},
 	[ValidationRules.AlphaOnly]: {
-		types: [ NodePropertyTypes.STRING ],
+		types: [NodePropertyTypes.STRING],
 		vectors: {
-			content: [ ValidationRules.AlphaOnlyWithSpaces ]
+			content: [ValidationRules.AlphaOnlyWithSpaces]
 		},
 		cases: {
-			$true: function() {
+			$true: function () {
 				return `"httasdfaom"`;
 			},
-			false: function() {
+			false: function () {
 				return `"asdf@ afsdfdd@asdf12f@.com"`;
 			},
-			empty: function() {
+			empty: function () {
 				return `""`;
 			}
 		}
 	},
 	[ValidationRules.AlphaOnlyWithSpaces]: {
-		types: [ NodePropertyTypes.STRING ],
+		types: [NodePropertyTypes.STRING],
 		vectors: {
-			content: [ ValidationRules.AlphaNumericPuncLike ]
+			content: [ValidationRules.AlphaNumericPuncLike]
 		},
 		cases: {
-			$true: function() {
+			$true: function () {
 				return `"httas dfaom"`;
 			},
-			$false: function() {
+			$false: function () {
 				return `"asdf@ afsdfdd@asdf12f@.com"`;
 			},
-			empty: function() {
+			empty: function () {
 				return `""`;
 			}
 		}
 	},
 	[ValidationRules.IsTrue]: {
-		types: [ NodePropertyTypes.BOOLEAN ],
+		types: [NodePropertyTypes.BOOLEAN],
 		vectors: {
-			value: [ ValidationRules.Any ]
+			value: [ValidationRules.Any]
 		},
 		cases: {
-			$true: function() {
+			$true: function () {
 				return 'true';
 			},
-			false: function() {
+			false: function () {
 				return 'false';
 			}
 		}
 	},
 	[ValidationRules.IsFalse]: {
-		types: [ NodePropertyTypes.BOOLEAN ],
+		types: [NodePropertyTypes.BOOLEAN],
 		vectors: {
-			value: [ ValidationRules.Any ]
+			value: [ValidationRules.Any]
 		},
 		cases: {
-			true: function() {
+			true: function () {
 				return 'true';
 			},
-			$false: function() {
+			$false: function () {
 				return 'false';
 			}
 		}
 	},
 	[ValidationRules.GreaterThanOrEqualTo]: {
-		types: [ NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT ],
+		types: [NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT],
 		vectors: {
 			value: {
-				[ValidationRules.GreaterThan]: function() {
+				[ValidationRules.GreaterThan]: function () {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.GreaterThanOrEqualTo]: function() {
+				[ValidationRules.GreaterThanOrEqualTo]: function () {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.EqualTo]: function() {
+				[ValidationRules.EqualTo]: function () {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.LessThan]: function() {
+				[ValidationRules.LessThan]: function () {
 					// based on a parameter, determine if there are any possible success cases.
 				},
-				[ValidationRules.LessThanOrEqualTo]: function() {
+				[ValidationRules.LessThanOrEqualTo]: function () {
 					// based on a parameter, determine if there are any possible success cases.
 				}
 			}
 		},
 		cases: {
-			$greater: function() {
+			$greater: function () {
 				return ' >= ';
 			},
-			notgreater: function() {
+			notgreater: function () {
 				return ' >= ';
 			}
 		}
 	},
 	[ValidationRules.GreaterThan]: {
-		types: [ NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT ],
+		types: [NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT],
 		vectors: {
 			value: {
-				[ValidationRules.GreaterThan]: function() {
+				[ValidationRules.GreaterThan]: function () {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.GreaterThanOrEqualTo]: function() {
+				[ValidationRules.GreaterThanOrEqualTo]: function () {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.EqualTo]: function() {
+				[ValidationRules.EqualTo]: function () {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.LessThan]: function() {
+				[ValidationRules.LessThan]: function () {
 					// based on a parameter, determine if there are any possible success cases.
 				},
-				[ValidationRules.LessThanOrEqualTo]: function() {
+				[ValidationRules.LessThanOrEqualTo]: function () {
 					// based on a parameter, determine if there are any possible success cases.
 				}
 			}
 		},
 		cases: {
-			$greater: function() {
+			$greater: function () {
 				return ' > ';
 			},
-			notgreater: function() {
+			notgreater: function () {
 				return ' > ';
 			}
 		}
 	},
 	[ValidationRules.LessThan]: {
-		types: [ NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT ],
+		types: [NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT],
 		vectors: {
 			value: {
-				[ValidationRules.GreaterThan]: function() {
+				[ValidationRules.GreaterThan]: function () {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.GreaterThanOrEqualTo]: function() {
+				[ValidationRules.GreaterThanOrEqualTo]: function () {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.EqualTo]: function() {
+				[ValidationRules.EqualTo]: function () {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.LessThan]: function() {
+				[ValidationRules.LessThan]: function () {
 					// based on a parameter, determine if there are any possible success cases.
 				},
-				[ValidationRules.LessThanOrEqualTo]: function() {
+				[ValidationRules.LessThanOrEqualTo]: function () {
 					// based on a parameter, determine if there are any possible success cases.
 				}
 			}
 		},
 		cases: {
-			$less: function() {
+			$less: function () {
 				return ' < ';
 			},
-			notless: function() {
+			notless: function () {
 				return ' < ';
 			}
 		}
 	},
 	[ValidationRules.EqualTo]: {
-		types: [ NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT ],
+		types: [NodePropertyTypes.DOUBLE, NodePropertyTypes.FLOAT, NodePropertyTypes.INT],
 		vectors: {
 			value: {
-				[ValidationRules.GreaterThan]: function() {
+				[ValidationRules.GreaterThan]: function () {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.GreaterThanOrEqualTo]: function() {
+				[ValidationRules.GreaterThanOrEqualTo]: function () {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.EqualTo]: function() {
+				[ValidationRules.EqualTo]: function () {
 					// based on a parameter, determining which validation is most restrictive should be possible.
 				},
-				[ValidationRules.LessThan]: function() {
+				[ValidationRules.LessThan]: function () {
 					// based on a parameter, determine if there are any possible success cases.
 				},
-				[ValidationRules.LessThanOrEqualTo]: function() {
+				[ValidationRules.LessThanOrEqualTo]: function () {
 					// based on a parameter, determine if there are any possible success cases.
 				}
 			}
 		},
 		cases: {
-			$equal_to: function() {
+			$equal_to: function () {
 				return ' = ';
 			},
-			not_equal: function() {
+			not_equal: function () {
 				return ' = ';
 			}
 		}
@@ -2402,7 +2412,7 @@ export const ExecutorUI: any = {
 		arguments: {
 			nodeType: NodeTypes.DataChain,
 			reference: {
-				types: [ NodeTypes.DataChain ],
+				types: [NodeTypes.DataChain],
 				title: NodeTypes.DataChain,
 				properties: {
 					[NodeProperties.CS]: true,
@@ -2420,7 +2430,7 @@ export const ExecutorUI: any = {
 			...COMMON_STRING_ARGS,
 			nodeType: NodeTypes.Model,
 			reference: {
-				types: [ NodeTypes.Model ]
+				types: [NodeTypes.Model]
 			}
 		}
 	},
@@ -2432,7 +2442,7 @@ export const ExecutorUI: any = {
 			...COMMON_STRING_ARGS,
 			nodeType: NodeTypes.Model,
 			reference: {
-				types: [ NodeTypes.Model ]
+				types: [NodeTypes.Model]
 			}
 		}
 	},
@@ -2444,7 +2454,7 @@ export const ExecutorUI: any = {
 			...COMMON_STRING_ARGS,
 			nodeType: NodeTypes.Model,
 			reference: {
-				types: [ NodeTypes.Model ]
+				types: [NodeTypes.Model]
 			}
 		}
 	},
@@ -2580,7 +2590,7 @@ export const FilterUI: { [str: string]: any } = {
 			...COMMON_STRING_ARGS,
 			nodeType: NodeTypes.Enumeration,
 			reference: {
-				types: [ NodeTypes.Enumeration, NodeTypes.ExtensionType ]
+				types: [NodeTypes.Enumeration, NodeTypes.ExtensionType]
 			}
 		}
 	},
@@ -2806,7 +2816,7 @@ export const ValidationUI: any = {
 			...COMMON_STRING_ARGS,
 			nodeType: NodeTypes.Enumeration,
 			reference: {
-				types: [ NodeTypes.Enumeration, NodeTypes.ExtensionType ]
+				types: [NodeTypes.Enumeration, NodeTypes.ExtensionType]
 			}
 		}
 	},

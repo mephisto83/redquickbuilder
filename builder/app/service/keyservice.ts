@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { bindTemplate } from '../constants/functiontypes';
-import { GetCodeName, GetModelNodes, GetRootGraph, NodesByType, GetNodeProp } from '../actions/uiactions';
+import { GetCodeName, GetModelNodes, GetRootGraph, NodesByType, GetNodeProp } from '../actions/uiActions';
 import { NEW_LINE, NodeTypes, NodeProperties, UITypes } from '../constants/nodetypes';
 import { GraphKeys } from '../methods/graph_methods';
 import { Node } from '../methods/graph_types';

@@ -17,7 +17,7 @@ import {
 	SELECTED_TAB,
 	DEFAULT_TAB,
 	SIDE_PANEL_OPEN
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { GetLinkBetween, getNodesGroups, getNodeLinks } from '../methods/graph_methods';
 import { Graph } from '../methods/graph_types';
 export const DataChainName = {

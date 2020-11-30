@@ -10,7 +10,7 @@ import {
 	graphOperation,
 	GetJSCodeName,
 	updateComponentProperty
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { AddInternalComponentApi, SetupApiToBottom } from './ConnectScreen/Shared';
 import { LinkProperties, NodeProperties } from '../../constants/nodetypes';
 

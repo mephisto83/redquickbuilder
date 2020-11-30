@@ -9,7 +9,7 @@ import {
 	GetState,
 	GetNodeProp,
 	ValidationPropName
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import {
 	UITypes,
 	NodeProperties,

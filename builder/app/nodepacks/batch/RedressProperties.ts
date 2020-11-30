@@ -9,7 +9,7 @@ import {
 	GetNodeProp,
 	UPDATE_NODE_PROPERTY,
 	GetNodeById
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { Node } from '../../methods/graph_types';
 
 export default function RedressProperties() {

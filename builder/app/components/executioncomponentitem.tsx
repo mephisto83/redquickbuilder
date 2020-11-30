@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { UIConnect } from '../utils/utils';
 import ControlSideBarMenu, { ControlSideBarMenuItem, ControlSideBarMenuHeader } from './controlsidebarmenu';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import TabPane from './tabpane';
 import * as Titles from './titles';
 import FormControl from './formcontrol';
@@ -16,17 +16,19 @@ import {
 	TargetMethodType,
 	EffectDescription,
 	MountingDescription,
+	CheckAfterEffectDataChainConfiguration,
 	MethodDescription,
 	ValidationConfig,
 	ExecutionConfig,
-	CreateNameSpaceConfig
+	CreateNameSpaceConfig,
+	ValidationColors
 } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import { NodeTypes, NodeProperties, NEW_LINE } from '../constants/nodetypes';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import { DataChainFunctionKeys, DataChainFunctions } from '../constants/datachain';
-import { GetStateFunc, graphOperation } from '../actions/uiactions';
+import { GetStateFunc, graphOperation } from '../actions/uiActions';
 import { Node } from '../methods/graph_types';
 import BuildDataChainAfterEffectConverter, {
 	DataChainType
@@ -50,10 +52,12 @@ export default class ExecutionComponentItem extends Component<any, any> {
 			return <span />;
 		}
 		let mountingItem: MountingDescription = this.props.mountingItem;
+		let valid = executionConfig.dataChainOptions ? CheckAfterEffectDataChainConfiguration(executionConfig.dataChainOptions) : false;
 		return (
 			<TreeViewMenu
 				open={this.state.open}
 				icon={'fa fa-circle-o'}
+				color={valid ? ValidationColors.Ok : ValidationColors.Neutral}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}

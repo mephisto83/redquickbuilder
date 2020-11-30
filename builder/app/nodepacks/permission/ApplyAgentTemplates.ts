@@ -7,7 +7,7 @@ import {
 	GetPermissionMethod,
 	GetMethodFunctionType,
 	GetMethodNodeProp
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { Node } from '../../methods/graph_types';
 import { FunctionTemplateKeys } from '../../constants/functiontypes';
 import ApplyPermissionTemplate from './ApplyPermissionTemplate';

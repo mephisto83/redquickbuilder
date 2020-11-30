@@ -4,7 +4,7 @@ import TopViewer from './topviewer';
 
 import TabPane from './tabpane';
 import Box from './box';
-import { VisualEq, Visual, JobProgressId, GetCurrentGraph, JOB_FILES } from '../actions/uiactions';
+import { VisualEq, Visual, JobProgressId, GetCurrentGraph, JOB_FILES } from '../actions/uiActions';
 import * as Titles from './titles';
 import { JobFile } from '../jobs/jobservice';
 import { GetStepIndex, GetStepCount } from '../nodepacks/batch/BuildAllDistributed';

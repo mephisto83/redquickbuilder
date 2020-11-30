@@ -10,10 +10,10 @@ import {
 import SetterComponent from './settercomponent';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import TextInput from './textinput';
-import { NodesByType, GUID } from '../actions/uiactions';
+import { NodesByType, GUID } from '../actions/uiActions';
 import SelectInput from './selectinput';
 import { NodeTypes, LinkType } from '../constants/nodetypes';
-import { GetCurrentGraph } from '../actions/uiactions';
+import { GetCurrentGraph } from '../actions/uiActions';
 import { GetNodesLinkedTo } from '../methods/graph_methods';
 import SwaggerCallParameters from './swaggercallparameters';
 

@@ -6,7 +6,7 @@ import ControlSideBarMenu, {
   ControlSideBarMenuItem,
   ControlSideBarMenuHeader
 } from "./controlsidebarmenu";
-import * as UIA from "../actions/uiactions";
+import * as UIA from "../actions/uiActions";
 import TabPane from "./tabpane";
 import * as Titles from "./titles";
 import FormControl from "./formcontrol";

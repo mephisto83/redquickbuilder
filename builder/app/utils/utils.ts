@@ -1,7 +1,7 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as _ from './array';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import * as IPCEvents from '../actions/ipcActions';
 import * as RemoteActions from '../actions/remoteActions';
 export function mapStateToProps(state: any) {

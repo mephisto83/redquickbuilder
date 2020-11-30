@@ -1,5 +1,5 @@
 import { CreateDefaultView, addInstanceEventsToForms, CreateAgentFunction } from "../../constants/nodepackages";
-import { GetDispatchFunc, GetStateFunc, GetNodeById, ADD_NEW_NODE, PerformGraphOperation, NodesByType, GetState, GetNodeProp, } from "../../actions/uiactions";
+import { GetDispatchFunc, GetStateFunc, GetNodeById, ADD_NEW_NODE, PerformGraphOperation, NodesByType, GetState, GetNodeProp, } from "../../actions/uiActions";
 import { UITypes, NodeProperties, NodeTypes, Methods } from "../../constants/nodetypes";
 import { ViewTypes } from "../../constants/viewtypes";
 import { HTTP_METHODS, FunctionTypes } from "../../constants/functiontypes";

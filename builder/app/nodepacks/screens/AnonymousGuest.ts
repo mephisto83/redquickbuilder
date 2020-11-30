@@ -8,7 +8,7 @@ import {
 	NodesByType,
 	GetState,
 	GetNodeProp
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { UITypes, NodeProperties, NodeTypes, Methods } from '../../constants/nodetypes';
 import { ViewTypes } from '../../constants/viewtypes';
 import { HTTP_METHODS, FunctionTypes } from '../../constants/functiontypes';

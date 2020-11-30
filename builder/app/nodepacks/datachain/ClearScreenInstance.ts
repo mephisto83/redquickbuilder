@@ -8,7 +8,7 @@ import {
 	ADD_TO_GROUP,
 	GetNodeTitle,
 	GetNodeProp
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import ClearScreenInstanceLocalStateProperty from '../partial/ClearScreenInstanceLocalStateProperty';
 import { NodeProperties, LinkProperties } from '../../constants/nodetypes';
 import ClearScreenInstanceUpdateLocalStateProperty from '../partial/ClearScreenInstanceUpdateLocalStateProperty';

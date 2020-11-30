@@ -11,7 +11,7 @@ import {
   ComponentIsViewType,
   GetNodeProp,
   GetLinkProperty
-} from "../actions/uiactions";
+} from "../actions/uiActions";
 import {
   LinkType,
   NodeTypes,

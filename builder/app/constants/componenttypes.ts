@@ -6,7 +6,7 @@ import {
 	GetState,
 	GetCodeName,
 	ComponentApiKeys
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { GetNodesLinkedTo } from '../methods/graph_methods';
 import { bindTemplate } from './functiontypes';
 

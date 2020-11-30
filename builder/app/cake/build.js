@@ -20,9 +20,9 @@ function executeSpawnCmd(cmd, args, options) {
 		if (process.platform === 'win32') {
 			child = spawn(cmd, args, options);
 		} else {
-			child = spawn('sudo', [ cmd, ...args ], options);
+			child = spawn('sudo', [cmd, ...args], options);
 		}
-		options._kill = function() {
+		options._kill = function () {
 			child.kill();
 		};
 		child.stdout.on('data', () => {
@@ -77,7 +77,7 @@ function createReactWeb() {
 		Promise.resolve()
 			.then(() => {
 				if (fs.existsSync(`./${appName}`)) {
-					return executeSpawnCmd('rimraf', [ '-f', `./${appName}` ], {
+					return executeSpawnCmd('rimraf', ['-f', `./${appName}`], {
 						shell: true,
 						cwd: localDir
 					});
@@ -85,7 +85,7 @@ function createReactWeb() {
 			})
 			.then(() => {
 				console.log('cloding creat react app');
-				return executeSpawnCmd('npx', [ 'create-react-app', appName, '--template', 'typescript' ], {
+				return executeSpawnCmd('npx', ['create-react-app', appName, '--template', 'typescript'], {
 					shell: true,
 					cwd: localDir
 				});
@@ -97,7 +97,7 @@ function createReactWeb() {
 					'@types/react-router@5.1.7',
 					'react-router-dom@5.2.0',
 					'@types/react-redux@7.1.9',
-					'typescript@3.8.3',
+					'typescript@4.0.3',
 					'node-sass@4.14.1',
 					'redux-thunk@2.3.0',
 					'react-redux@7.2.0',
@@ -109,7 +109,7 @@ function createReactWeb() {
 					'redux-logger@3.0.6'
 				].forEach((dependency) => {
 					promise = promise.then(() =>
-						executeSpawnCmd('yarn', [ 'add', dependency ], {
+						executeSpawnCmd('yarn', ['add', dependency], {
 							shell: true,
 							cwd: path.join(localDir, appName)
 						})
@@ -121,7 +121,7 @@ function createReactWeb() {
 			.then(() => {
 				console.log('installing fontawesome');
 				console.log(path.join(localDir, appName));
-				return executeSpawnCmd('yarn', [ 'add', '@fortawesome/fontawesome-free' ], {
+				return executeSpawnCmd('yarn', ['add', '@fortawesome/fontawesome-free'], {
 					shell: true,
 					cwd: path.join(localDir, appName)
 				});
@@ -142,7 +142,7 @@ function createElectronIO() {
 	return Promise.resolve()
 		.then(() => {
 			if (fs.existsSync(`./${appName}`)) {
-				return executeSpawnCmd('rimraf', [ '-f', `./${appName}` ], {
+				return executeSpawnCmd('rimraf', ['-f', `./${appName}`], {
 					shell: true,
 					cwd: localDir
 				});
@@ -180,7 +180,7 @@ function createElectronIO() {
 		.then(() => {
 			console.log('installing yarn');
 			console.log(path.join(localDir, appName));
-			return executeSpawnCmd('yarn', [ 'install' ], {
+			return executeSpawnCmd('yarn', ['install'], {
 				shell: true,
 				cwd: path.join(localDir, appName)
 			});
@@ -188,7 +188,7 @@ function createElectronIO() {
 		.then(() => {
 			console.log('installing fontawesome');
 			console.log(path.join(localDir, appName));
-			return executeSpawnCmd('yarn', [ 'add', '@fortawesome/fontawesome-free' ], {
+			return executeSpawnCmd('yarn', ['add', '@fortawesome/fontawesome-free'], {
 				shell: true,
 				cwd: path.join(localDir, appName)
 			});
@@ -197,9 +197,14 @@ function createElectronIO() {
 			const packagejsonfilepath = path.join(localDir, appName, 'package.json');
 			const packageJson = JSON.parse(fs.readFileSync(packagejsonfilepath));
 			const devScript = packageJson.scripts.dev;
-			const port = Math.floor(Math.random() * 30000) + 1000;
-			packageJson.scripts.dev = devScript.replace(/START_HOT=1/g, `START_HOT=1 PORT=${port}`);
-			fs.writeFileSync(packagejsonfilepath, JSON.stringify(packageJson), 'utf8');
+			if (devScript) {
+				const port = Math.floor(Math.random() * 30000) + 1000;
+				packageJson.scripts.dev = devScript.replace(/START_HOT=1/g, `START_HOT=1 PORT=${port}`);
+				fs.writeFileSync(packagejsonfilepath, JSON.stringify(packageJson), 'utf8');
+			}
+			else {
+				console.log('no dev script in package.json');
+			}
 		})
 		.catch((e) => {
 			console.log(e);
@@ -214,73 +219,73 @@ function createReactNative() {
 	const localDir = path.join(build.workspace, `./${appName}`);
 	return Promise.resolve()
 		.then(() =>
-			executeSpawnCmd('react-native', [ 'init', appName ], {
+			executeSpawnCmd('react-native', ['init', appName], {
 				cwd: build.workspace,
 				shell: true
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('npm', [ 'install', 'native-base', '--save' ], {
+			executeSpawnCmd('npm', ['install', 'native-base', '--save'], {
 				shell: true,
 				cwd: localDir
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('react-native', [ 'link' ], {
+			executeSpawnCmd('react-native', ['link'], {
 				shell: true,
 				cwd: localDir
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('npm', [ 'install', 'redux', '--save' ], {
+			executeSpawnCmd('npm', ['install', 'redux', '--save'], {
 				shell: true,
 				cwd: localDir
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('npm', [ 'install', 'react-redux', '--save' ], {
+			executeSpawnCmd('npm', ['install', 'react-redux', '--save'], {
 				shell: true,
 				cwd: localDir
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('npm', [ 'install', 'redux-thunk', '--save' ], {
+			executeSpawnCmd('npm', ['install', 'redux-thunk', '--save'], {
 				shell: true,
 				cwd: localDir
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('npm', [ 'install', 'react-navigation', '--save' ], {
+			executeSpawnCmd('npm', ['install', 'react-navigation', '--save'], {
 				shell: true,
 				cwd: localDir
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('npm', [ 'install', 'react-navigation-stack', '--save' ], {
+			executeSpawnCmd('npm', ['install', 'react-navigation-stack', '--save'], {
 				shell: true,
 				cwd: localDir
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('npm', [ 'install', 'react-navigation-drawer', '--save' ], {
+			executeSpawnCmd('npm', ['install', 'react-navigation-drawer', '--save'], {
 				shell: true,
 				cwd: localDir
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('npm', [ 'install', 'react-native-reanimated', '--save' ], {
+			executeSpawnCmd('npm', ['install', 'react-native-reanimated', '--save'], {
 				shell: true,
 				cwd: localDir
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('npm', [ 'install', 'react-native-gesture-handler', '--save' ], {
+			executeSpawnCmd('npm', ['install', 'react-native-gesture-handler', '--save'], {
 				shell: true,
 				cwd: localDir
 			})
 		)
 		.then(() =>
-			executeSpawnCmd('react-native', [ 'link', 'react-native-gesture-handler' ], {
+			executeSpawnCmd('react-native', ['link', 'react-native-gesture-handler'], {
 				shell: true,
 				cwd: localDir
 			})

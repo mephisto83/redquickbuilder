@@ -37,7 +37,7 @@ import {
 	pinConnectedNodesByLinkType,
 	GetNodeProp,
 	GetNodeById, GetModelCodeProperties, getConnectedNodesByLinkType, GetCodeName, GetNodeTitle
-} from './uiactions';
+} from './uiActions';
 import { processRecording } from '../utils/utilservice';
 import prune from '../methods/prune';
 import unprune from '../methods/unprune';
@@ -53,7 +53,7 @@ import { IfFalse } from '../components/titles';
 import { platform } from 'os';
 import { NodeTypeColors } from '../constants/nodetypes';
 import { HandlerEvents } from '../ipc/handler-events';
-import { SELECTED_LINK } from '../actions/uiactions';
+import { SELECTED_LINK } from './uiActions';
 import { fs_existsSync, fs_readdirSync, fs_readFileSync } from '../generators/modelgenerators';
 // import { loadConfigs } from './ipcActions';
 // import { loadConfigs } from './ipcActions';

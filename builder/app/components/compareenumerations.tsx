@@ -14,7 +14,7 @@ import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectC
 import SetterComponent from './settercomponent';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import TextInput from './textinput';
-import { GUID, GetCurrentGraph, GetNodeProp } from '../actions/uiactions';
+import { GUID, GetCurrentGraph, GetNodeProp } from '../actions/uiActions';
 import CompareComponent from './comparecomponent';
 import SelectInput from './selectinput';
 import { NodesByType } from '../methods/graph_methods';

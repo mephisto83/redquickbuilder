@@ -2,7 +2,7 @@
 // @flow
 import React, { Component } from 'react';
 import { UIConnect } from '../utils/utils';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import * as Titles from './titles';
 import TreeViewMenu from './treeviewmenu';
 import { LinkType } from '../constants/nodetypes';

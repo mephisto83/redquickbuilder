@@ -9,7 +9,7 @@ import {
 	GetDefaults,
 	ScreenOptionFilter,
 	GetCurrentGraph
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { NodeTypes } from '../../constants/nodetypes';
 import AddComponent from '../AddComponent';
 import { ComponentTypeKeys } from '../../constants/componenttypes';

@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 
 export default class NavBarButton extends Component<any, any> {
 	constructor(props: any) {

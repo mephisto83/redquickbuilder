@@ -5,7 +5,7 @@ import {
 	GetDispatchFunc,
 	GetStateFunc,
 	GetNodeById
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { Node } from '../methods/graph_types';
 import { NodeProperties } from '../constants/nodetypes';
 

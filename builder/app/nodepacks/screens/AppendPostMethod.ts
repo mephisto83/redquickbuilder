@@ -7,7 +7,7 @@ import {
 	CreateNewNode,
 	GetNodeByProperties,
 	GetNodeProp
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { FunctionTemplateKeys } from '../../constants/functiontypes';
 import {
 	LinkProperties,

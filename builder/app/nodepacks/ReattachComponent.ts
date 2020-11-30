@@ -11,7 +11,7 @@ import {
   GetNodeTitle,
   GetCodeName,
   $addComponentApiNodes
-} from "../actions/uiactions";
+} from "../actions/uiActions";
 import {
   GetLinkBetween,
   GetNodesLinkedTo,

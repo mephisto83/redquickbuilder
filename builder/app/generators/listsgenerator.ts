@@ -1,4 +1,4 @@
-import { NodesByType, GetCurrentGraph, GetCodeName } from '../actions/uiactions';
+import { NodesByType, GetCurrentGraph, GetCodeName } from '../actions/uiActions';
 import { NodeTypes, NEW_LINE, UITypes } from '../constants/nodetypes';
 import { GetNodesLinkedTo } from '../methods/graph_methods';
 

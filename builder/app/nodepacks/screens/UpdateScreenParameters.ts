@@ -13,7 +13,7 @@ import {
 	GetLinkProperty,
 	GetCurrentGraph,
 	$addComponentApiNodes
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { Node } from '../../methods/graph_types';
 import { MethodDescription } from '../../interface/methodprops';
 import { FunctionTypes, MethodFunctions } from '../../constants/functiontypes';

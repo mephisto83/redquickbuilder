@@ -1,4 +1,4 @@
-import { GetNodeProp, GetNodesByProperties, REMOVE_NODE } from '../actions/uiactions';
+import { GetNodeProp, GetNodesByProperties, REMOVE_NODE } from '../actions/uiActions';
 import { NodeProperties } from '../constants/nodetypes';
 
 export default function ClearPreviosuViewPackage(args: any = {}) {

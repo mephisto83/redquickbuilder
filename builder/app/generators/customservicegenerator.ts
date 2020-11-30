@@ -7,7 +7,7 @@ import {
 	GetRootGraph,
 	GetNodeTitle,
 	GetState
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import {
 	LinkType,
 	NodePropertyTypesByLanguage,

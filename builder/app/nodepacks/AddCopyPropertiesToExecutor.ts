@@ -1,7 +1,7 @@
 import { addValidatator, hasValidator, createExecutor } from '../methods/graph_methods';
 import { uuidv4 } from '../utils/array';
 import { ExecutorRules, ExecutorUI, NodeProperties } from '../constants/nodetypes';
-import { CHANGE_NODE_PROPERTY } from '../actions/uiactions';
+import { CHANGE_NODE_PROPERTY } from '../actions/uiActions';
 
 function AddCopyPropertiesToExecutor(args: any = {}) {
 	let { executor, currentNode } = args;

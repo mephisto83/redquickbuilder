@@ -29,7 +29,7 @@ import {
 	GetNodeByProperties,
 	GetLink,
 	HasLinkProperty
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { uuidv4 } from '../utils/array';
 import {
 	Graph,

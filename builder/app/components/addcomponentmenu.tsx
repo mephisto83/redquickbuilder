@@ -4,7 +4,7 @@
 
 import React from 'react';
 import TreeViewMenu from './treeviewmenu';
-import { Visual, Node, SELECTED_NODE } from '../actions/uiactions';
+import { Visual, Node, SELECTED_NODE } from '../actions/uiActions';
 import * as Titles from './titles';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import SelectInput from './selectinput';

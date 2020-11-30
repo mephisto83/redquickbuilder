@@ -8,7 +8,7 @@ import {
 	GetNodeTitle,
 	GetMethodsProperties,
 	GetModelCodeProperties
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import {
 	LinkType,
 	NodePropertyTypesByLanguage,

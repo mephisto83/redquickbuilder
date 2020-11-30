@@ -17,7 +17,7 @@ import {
 	GetModelPropertyChildren,
 	ADD_LINK_BETWEEN_NODES,
 	GetNodeByProperties
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { ComponentTypeKeys } from '../../constants/componenttypes';
 import CreateValidatorForProperty from '../CreateValidatorForProperty';
 import GetModelPropertyForViewType from './GetModelPropertyForViewType';

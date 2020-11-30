@@ -18,10 +18,10 @@ import {
 	NodesByType,
 	GetCodeName,
 	GetLambdaVariableTitle
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { GetNodeProp, GetNodesLinkedTo } from '../methods/graph_methods';
 import { NodeProperties, NEW_LINE, LinkType } from '../constants/nodetypes';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import { Node } from '../methods/graph_types';
 import { getTextEditorSuggestions } from '../service/naturallang';
 

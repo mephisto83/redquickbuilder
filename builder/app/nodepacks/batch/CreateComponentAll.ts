@@ -17,7 +17,7 @@ import {
 	GetModelReferencedByProperty,
 	AddLinkBetweenNodes,
 	graphOperation
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { CreateDefaultView } from '../../constants/nodepackages';
 import { GetViewTypeModelType } from '../viewtype/SetupViewTypeForCreate';
 import { findLink, GetNodesLinkedTo, GetLinkBetween } from '../../methods/graph_methods';
@@ -30,31 +30,16 @@ export async function CreateComponentSharedAll(progressFunc: any, filter?: any, 
 	console.log('Create Component All');
 	const result: any = [];
 	debugger;
-	const navigableScreens = GetNodesByProperties({
-		[NodeProperties.NODEType]: NodeTypes.NavigationScreen
-	});
-	const models = GetNodesByProperties({
-		[NodeProperties.NODEType]: NodeTypes.Model
-	})
-		.filter((v) => !GetNodeProp(v, NodeProperties.IsViewModel))
-		.filter((x) => !GetNodeProp(x, NodeProperties.IsUser));
-	const agents = GetNodesByProperties({
-		[NodeProperties.NODEType]: NodeTypes.Model,
-		[NodeProperties.IsAgent]: (v: any) => v
-	}).filter((x) => !GetNodeProp(x, NodeProperties.IsUser));
-	console.log('----------------- agents ---------------------------');
-	agents.map((v) => console.log(GetNodeTitle(v)));
-	console.log('----------------- end agents -----------------------');
-	console.log('----------------- model ---------------------------');
-	models.map((v) => console.log(GetNodeTitle(v)));
-	console.log('----------------- end models -----------------------');
+
 	const defaultViewTypes = NodesByType(null, NodeTypes.ViewType);
+	console.log(`defaultViewTypes.length : ${defaultViewTypes.length}`)
 	await defaultViewTypes
 		.filter((v: any) => (filterViewTypes ? filterViewTypes(v) : true))
 		.filter((v: Node) => GetNodeProp(v, NodeProperties.ViewType) !== ViewTypes.Delete)
 		.forEachAsync(async (viewType: Node, viewTypeIndex: any, viewTypeCount: any) => {
 			const { model, property } = GetViewTypeModelType(viewType.id);
 			if (filter && !filter(model)) {
+				console.log(`'Filtered out model: "${GetNodeTitle(model)}"`)
 				return;
 			}
 			let modelReferenceByProperty = GetModelReferencedByProperty(property.id);
@@ -64,7 +49,7 @@ export async function CreateComponentSharedAll(progressFunc: any, filter?: any, 
 				)}.${GetNodeTitle(property)} => ${GetNodeTitle(modelReferenceByProperty)}`
 			);
 
-			let isPluralRef = GetNodeProp(property, NodeProperties.NODEType) === NodeTypes.Model;
+			let isPluralRef = GetNodeProp(property, NodeProperties.NODEType) === NodeTypes.Model && GetNodeProp(model, NodeProperties.NODEType) === NodeTypes.Model;
 			// Try to find a group of components already implementing what we want.
 			let matchingDefaultViewType: Node | undefined = defaultViewTypes
 				.filter((v: Node) => v.id !== viewType.id)
@@ -77,12 +62,13 @@ export async function CreateComponentSharedAll(progressFunc: any, filter?: any, 
 					if (!currentLocalRef) {
 						throw new Error('View type isnt referencing a model');
 					}
-					let isPlural = GetNodeProp(local.property.id, NodeProperties.NODEType) === NodeTypes.Model;
+					let isPlural = GetNodeProp(local.property.id, NodeProperties.NODEType) === NodeTypes.Model &&
+						GetNodeProp(local.model.id, NodeProperties.NODEType) === NodeTypes.Model;
 					return (
 						isPluralRef === isPlural &&
 						modelReferenceByProperty.id === currentLocalRef.id &&
 						GetNodeProp(viewTypeNode, NodeProperties.ViewType) ===
-							GetNodeProp(viewType, NodeProperties.ViewType)
+						GetNodeProp(viewType, NodeProperties.ViewType)
 					);
 				});
 
@@ -94,17 +80,18 @@ export async function CreateComponentSharedAll(progressFunc: any, filter?: any, 
 					componentType: NodeTypes.ComponentNode
 				});
 				if (alreadyMadeSharedComponents && alreadyMadeSharedComponents.length) {
+					console.log('{Connecting to an existing shared component}');
 					SetupApiForDefaultViewType(viewType);
 					DuplicateDefaultViewTypes(matchingDefaultViewType, alreadyMadeSharedComponents, viewType);
 					if (progressFunc) await progressFunc(0);
 					return;
 				}
 			}
-
+			console.log('[Create shared component]');
 			CreateComponentModel({
 				model: property.id,
 				viewTypeModelId: viewType.id,
-				viewTypes: [ GetNodeProp(viewType, NodeProperties.ViewType) ],
+				viewTypes: [GetNodeProp(viewType, NodeProperties.ViewType)],
 				connectedModel: model.id,
 				isSharedComponent: true,
 				isDefaultComponent: true
@@ -117,7 +104,7 @@ export async function CreateComponentSharedAll(progressFunc: any, filter?: any, 
 
 function SetupApiForDefaultViewType(viewType: Node) {
 	graphOperation(
-		[ 'value', ApiNodeKeys.ViewModel, 'label', 'placeholder', 'error', 'success' ].map((v: string) => {
+		['value', ApiNodeKeys.ViewModel, 'label', 'placeholder', 'error', 'success'].map((v: string) => {
 			return SetupApiComponent({
 				component_a: {
 					external: v,
@@ -202,7 +189,7 @@ export function CreateComponentModel(args: any = {}) {
 	const {
 		model,
 		connectedModel,
-		viewTypes = [ ViewTypes.Create, ViewTypes.Update, ViewTypes.Get, ViewTypes.GetAll ],
+		viewTypes = [ViewTypes.Create, ViewTypes.Update, ViewTypes.Get, ViewTypes.GetAll],
 		defaultArgs = {},
 		navigableScreens = null
 	} = args;
@@ -219,8 +206,8 @@ export function CreateComponentModel(args: any = {}) {
 		const agentAccess = args.isSharedComponent
 			? true
 			: agentAccesses.find((aa: Node) =>
-					hasAccessNode(GetNodeById(args.agentId), GetNodeById(model), aa, viewType)
-				);
+				hasAccessNode(GetNodeById(args.agentId), GetNodeById(model), aa, viewType)
+			);
 		if (agentAccess || args.isSharedComponent) {
 			const agentCreds =
 				agentAccess && !args.isSharedComponent

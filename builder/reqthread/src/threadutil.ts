@@ -13,7 +13,7 @@ import {
 	SaveGraph,
 	GetCurrentGraph,
 	GetC
-} from '../../app/actions/uiactions';
+} from '../../app/actions/uiActions';
 import JobService, { JobServiceConstants } from '../../app/jobs/jobservice';
 import { setupCache, createGraph } from '../../app/methods/graph_methods';
 import { Graph } from '../../app/methods/graph_types';

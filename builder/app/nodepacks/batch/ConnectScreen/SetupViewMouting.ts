@@ -23,7 +23,7 @@ import {
 	GetComponentExternalApiNode,
 	GetComponentExternalApiNodes,
 	AddLinkBetweenNodes
-} from '../../../actions/uiactions';
+} from '../../../actions/uiActions';
 import {
 	GetNodesLinkedTo,
 	GetNodeProp,

@@ -5,7 +5,7 @@ import { GetNodeProp } from '../methods/graph_methods';
 import { NodeProperties, LinkPropertyKeys } from '../constants/nodetypes';
 import Panel from './panel';
 import { Node, GraphLink } from '../methods/graph_types';
-import { GetNodeTitle, GetLinkProperty, GetNodeForView } from '../actions/uiactions';
+import { GetNodeTitle, GetLinkProperty, GetNodeForView } from '../actions/uiActions';
 
 export default class LinkViewList extends Component<any, any> {
 	constructor(props: any) {

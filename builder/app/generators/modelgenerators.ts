@@ -18,7 +18,7 @@ import {
 	GetModelPropertyNodes,
 	GetState,
 	GetNodeTitle
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import {
 	LinkType,
 	NodePropertyTypesByLanguage,
@@ -429,6 +429,7 @@ export default class ModelGenerator {
             model.${GetCodeName(v)} = b.${GetCodeName(v)};
           }`;
 					case NodePropertyTypes.LISTOFSTRINGS:
+					case NodePropertyTypes.DICTSTRING:
 					case NodePropertyTypes.PHONENUMBER:
 					case NodePropertyTypes.EMAIL:
 					case NodePropertyTypes.DATETIME:

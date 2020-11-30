@@ -8,7 +8,7 @@ import {
 	NodesByType,
 	GetState,
 	GetNodeProp
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import {
 	UITypes,
 	NodeProperties,

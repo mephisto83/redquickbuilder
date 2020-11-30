@@ -21,7 +21,7 @@ import {
   OtherUses,
   CssPseudoSelectors
 } from "../constants/themes";
-import { GetCurrentGraph, GUID, GetNodes, GetNodeTitle, NodesByType, NodeProperties, GetNodeProp } from "../actions/uiactions";
+import { GetCurrentGraph, GUID, GetNodes, GetNodeTitle, NodesByType, NodeProperties, GetNodeProp } from "../actions/uiActions";
 import TextInput from "./textinput";
 import ColorInput from './colorinput';
 import Box from "./box";

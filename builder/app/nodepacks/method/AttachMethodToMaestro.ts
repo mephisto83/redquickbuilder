@@ -6,7 +6,7 @@ import {
 	NodeProperties,
 	GetNodeTitle,
 	CHANGE_NODE_PROPERTY
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { NodeTypes, LinkType } from '../../constants/nodetypes';
 import { existsLinkBetween } from '../../methods/graph_methods';
 

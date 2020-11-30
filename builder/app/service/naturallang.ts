@@ -6,12 +6,12 @@ import {
 	GetModelCodeProperties,
 	GetCurrentGraph,
 	GetNodeCode
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import * as monaco from 'monaco-editor';
 import { NodeTypes, NodeProperties, MakeConstant, NodeAttributePropertyTypes } from '../constants/nodetypes';
 import { Node } from '../methods/graph_types';
 import { RelationType, CreateBoolean, CreateMinLength, CreateMaxLength } from '../interface/methodprops';
-import { GetNodeTitle } from '../actions/uiactions';
+import { GetNodeTitle } from '../actions/uiActions';
 import { ViewTypes } from '../constants/viewtypes';
 import { GetNodesByProperties } from '../methods/graph_methods';
 let context: any = { world: null };
@@ -572,7 +572,7 @@ export default function getLanguageMeaning(
 				let [key, value] = item;
 				result.validation[`${key}`] = _nlp(isAClause).has(`#${key}`);
 			});
-		} else if (deletedThing) {
+		} else if (deletedThing.find((item: string) => temp.has(item))) {
 			result.methodType = NLMethodType.QuickMethod;
 			result.quickType = QuickType.IsNotDeleted;
 		}
@@ -817,26 +817,28 @@ export default function getLanguageMeaning(
 				context && context.model_output ? context.model_output : undefined
 			);
 		}
-		if (_nlp(firstClause).has(`#Agent`)) {
+
+		let possessive: any = _nlp(firstClause).possessives().termList().find(v => _nlp(v.clean).possessives().length);
+		if (possessive && _nlp(possessive.clean).has(`#Agent`)) {
 			result.actorClause.relationType = RelationType.Agent;
 			result.actorClause.agent = context ? context.agent : '';
 			actorProperties = findPotentialProperties(context && context.agent ? context.agent : undefined);
-		} else if (_nlp(firstClause).has(`#Model`)) {
+		} else if (possessive && _nlp(possessive.clean).has(`#Model`)) {
 			result.actorClause.relationType = RelationType.Model;
 			result.actorClause.agent = context ? context.model : '';
 			actorProperties = findPotentialProperties(context && context.model ? context.model : undefined);
 		}
-		if (_nlp(firstClause).has(`#Target`)) {
+		if (possessive && _nlp(possessive.clean).has(`#Target`)) {
 			result.actorClause.relationType = RelationType.Model;
 			result.actorClause.agent = context ? context.model : '';
 			targetProperties = findPotentialProperties(context && context.model ? context.model : undefined);
 		}
-		if (_nlp(firstClause).has(`#Parent`)) {
+		if (possessive && _nlp(possessive.clean).has(`#Parent`)) {
 			result.actorClause.relationType = RelationType.Parent;
 			result.actorClause.agent = context ? context.parent : '';
 			actorProperties = findPotentialProperties(context && context.parent ? context.parent : undefined);
 		}
-		if (_nlp(firstClause).has(`#ModelOutput`)) {
+		if (possessive && _nlp(possessive.clean).has(`#ModelOutput`)) {
 			result.actorClause.relationType = RelationType.ModelOutput;
 			result.actorClause.agent = context ? context.model_output : '';
 			actorProperties = findPotentialProperties(

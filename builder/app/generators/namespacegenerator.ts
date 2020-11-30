@@ -1,5 +1,5 @@
 import * as GraphMethods from '../methods/graph_methods';
-import { GetNodeProp, NodeProperties, NodesByType, GetState, NodeTypes } from '../actions/uiactions';
+import { GetNodeProp, NodeProperties, NodesByType, GetState, NodeTypes } from '../actions/uiActions';
 import { LinkType, NodePropertyTypesByLanguage, ProgrammingLanguages, NameSpace } from '../constants/nodetypes';
 import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';

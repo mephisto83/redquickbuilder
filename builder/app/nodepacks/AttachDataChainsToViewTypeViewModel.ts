@@ -6,7 +6,7 @@ import {
 	GetNodeTitle,
 	GetCurrentGraph,
 	ADD_LINK_BETWEEN_NODES
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { GetNodesLinkedTo, GetNodeLinkedTo } from '../methods/graph_methods';
 import CreateSetViewModelDataChain from './CreateSetViewModelDataChain';
 import { ComponentApiTypes } from '../constants/componenttypes';

@@ -10,7 +10,7 @@ import {
 	GetCurrentGraph,
 	GetLinkProperty,
 	isAccessNode
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { NodeTypes, NodeProperties, LinkType, Methods } from '../../constants/nodetypes';
 import { FunctionTypes, MethodFunctions, HTTP_METHODS } from '../../constants/functiontypes';
 import { CreateAgentFunction } from '../../constants/nodepackages';

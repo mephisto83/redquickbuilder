@@ -6,7 +6,7 @@ import TreeViewMenu from './treeviewmenu';
 import TextInput from './textinput';
 import TreeViewItem from './treeviewitem';
 import FormControl from './formcontrol';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import * as Titles from './titles';
 import { NodeProperties, NodeTypes } from '../constants/nodetypes';
 import TreeViewItemContainer from './treeviewitemcontainer';

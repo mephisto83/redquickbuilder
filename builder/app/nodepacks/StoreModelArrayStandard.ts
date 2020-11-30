@@ -1,7 +1,7 @@
 /* eslint-disable func-names */
 import { uuidv4 } from "../utils/array";
 import { NodeProperties } from "../constants/nodetypes";
-import { UPDATE_NODE_PROPERTY } from "../actions/uiactions";
+import { UPDATE_NODE_PROPERTY } from "../actions/uiActions";
 
 export default function (args: any = { state_key: "StateKeyReplace" }) {
   // node2

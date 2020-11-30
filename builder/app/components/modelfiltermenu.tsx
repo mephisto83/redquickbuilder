@@ -5,7 +5,7 @@ import TextInput from "./textinput";
 import SelectInput from "./selectinput";
 import FormControl from "./formcontrol";
 import MainSideBar from "./mainsidebar";
-import * as UIA from "../actions/uiactions";
+import * as UIA from "../actions/uiActions";
 import TabPane from "./tabpane";
 import SideBar from "./sidebar";
 import TreeViewMenu from "./treeviewmenu";

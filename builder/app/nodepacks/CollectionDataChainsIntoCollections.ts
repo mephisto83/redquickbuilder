@@ -14,7 +14,7 @@ import {
 	graphOperation,
 	updateComponentProperty,
 	removeNodeById
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { GetNodesLinkedTo, GetNodeLinkedTo, TARGET, SOURCE } from '../methods/graph_methods';
 import { NodeType } from '../components/titles';
 import { Graph, Node } from '../methods/graph_types';

@@ -1,13 +1,13 @@
 // @flow
 import React, { Component } from 'react';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import { EnumerationConfig } from '../interface/methodprops';
 import { GetNodeProp } from '../methods/graph_methods';
 import { NodeProperties } from '../constants/nodetypes';
 import { UIConnect } from '../utils/utils';
 import DashboardContainer from './dashboardcontainer';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import { Visual } from '../actions/uiactions';
+import { Visual } from '../actions/uiActions';
 import GraphView from './graphview';
 
 class GraphViewer extends Component<any, any> {

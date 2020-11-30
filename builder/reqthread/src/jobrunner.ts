@@ -13,7 +13,7 @@ import JobService, {
 	CurrentJobInformation
 } from '../../app/jobs/jobservice';
 import BuildAllDistributed, { BuildAllInfo } from '../../app/nodepacks/batch/BuildAllDistributed';
-import { GetCurrentGraph } from '../../app/actions/uiactions';
+import { GetCurrentGraph } from '../../app/actions/uiActions';
 import CommunicationTower, {
 	RedQuickDistributionCommand,
 	RedQuickDistributionMessage,

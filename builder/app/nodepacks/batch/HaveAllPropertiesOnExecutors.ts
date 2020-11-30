@@ -1,4 +1,4 @@
-import { NodesByType, graphOperation, GetDispatchFunc, GetStateFunc } from "../../actions/uiactions";
+import { NodesByType, graphOperation, GetDispatchFunc, GetStateFunc } from "../../actions/uiActions";
 import { NodeTypes } from "../../constants/nodetypes";
 import AddAllPropertiesToExecutor from "../AddAllPropertiesToExecutor";
 

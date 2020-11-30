@@ -29,7 +29,7 @@ export default class Box extends Component<any, any> {
 	}
 
 	render() {
-		const style: any = {};
+		const style: any = this.props.bodyStyle || {};
 		const styleAll: any = {};
 		let maxStyle: any = {};
 		if (this.props.maxheight) {

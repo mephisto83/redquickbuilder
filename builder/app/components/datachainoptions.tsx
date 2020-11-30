@@ -1,13 +1,14 @@
 // @flow
 import React, { Component } from 'react';
-import * as UIA from '../actions/uiactions';
+import * as UIA from '../actions/uiActions';
 import * as Titles from './titles';
 import TreeViewMenu from './treeviewmenu';
 import {
 	MountingDescription,
 	MethodDescription,
 	CheckAfterEffectDataChainConfiguration,
-	DataChainConfiguration
+	DataChainConfiguration,
+	ValidationColors
 } from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import CheckExistanceConfig from './checkexistenceconfig';
@@ -57,6 +58,7 @@ export default class DataChainOptions extends Component<any, any> {
 			<TreeViewMenu
 				open={this.state.open}
 				icon={valid ? 'fa fa-check-circle-o' : 'fa fa-circle-o'}
+				color={valid ? ValidationColors.Ok : ValidationColors.Neutral}
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}

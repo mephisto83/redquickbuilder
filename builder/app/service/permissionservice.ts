@@ -14,7 +14,7 @@ import {
 	GetCustomServiceImplementations,
 	NodeTypes,
 	GetCustomServiceDefinitions
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { bindTemplate } from '../constants/functiontypes';
 import fs from 'fs';
 import { ProgrammingLanguages, STANDARD_CONTROLLER_USING, NameSpace, NEW_LINE } from '../constants/nodetypes';

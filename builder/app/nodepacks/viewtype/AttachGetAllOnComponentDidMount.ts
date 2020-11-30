@@ -7,7 +7,7 @@ import {
 	AddLinkBetweenNodes,
 	GetNodeProp,
 	CreateNewNode
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import AddComponentDidMountToViewTypeComponent from './AddComponentDidMountToViewTypeComponent';
 import ConnectLifecycleMethod from '../../components/ConnectLifecycleMethod';
 import {

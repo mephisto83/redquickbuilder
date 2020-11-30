@@ -15,7 +15,7 @@ import {
 	GetJSCodeName,
 	GetNodeByProperties,
 	GetNodeTitle
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import {
 	LinkType,
 	NodePropertyTypesByLanguage,
@@ -33,6 +33,7 @@ import fs from 'fs';
 import { bindTemplate } from '../constants/functiontypes';
 import NamespaceGenerator from './namespacegenerator';
 import { Node, Graph } from '../methods/graph_types';
+import { GetNodeLinkedTo } from '../methods/graph_methods';
 export interface MenuObject {
 	items: { [str: string]: MenuItem };
 	children: { [str: string]: MenuChildren };
@@ -142,17 +143,25 @@ export default class MenuGenerator {
 		let code = Object.keys(menuObj.items)
 			.map((item: string) => {
 				let menuItem = menuObj.items[item];
+				let screen_;
 				if (menuItem.shouldShowDataChain) {
 				}
 				let { parent } = menuObj.items[item];
 				let disabledFunc = `false`;
 				if (menuItem.shouldBeDisabled) {
+					let navigationScreen = GetNodeProp(item, NodeProperties.NavigationScreen);
+					if (navigationScreen) {
+						screen = GetNodeLinkedTo(GetCurrentGraph(), {
+							id: navigationScreen,
+							link: LinkType.NavigationScreenImplementation
+						})
+					}
 					disabledFunc = `MA.${GetCodeName(menuItem.shouldBeDisabled)}({
             context: {
               getState,
               dispatch
             },
-            screen: Screens.${GetCodeName(item)}
+            ${screen ? `screen: Screens.${GetCodeName(screen)}` : ''}
           })`;
 				}
 				let shouldShowPart1 = '';
@@ -214,7 +223,8 @@ export default class MenuGenerator {
           import { titleService} from '../${rel}actions/util';
           import * as RedLists from '../${rel}actions/lists';
           import StateKeys from '../${rel}state_keys';
-          import ModelKeys from '../${rel}model_keys';
+		  import ModelKeys from '../${rel}model_keys';
+		  import * as Screens from '../${rel}actions/screenInstances';
           import { ViewModelKeys } from '../${rel}viewmodel_keys';
           import Models from '../${rel}model_keys';
           import RedObservable from '../${rel}actions/observable';

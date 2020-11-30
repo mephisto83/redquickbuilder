@@ -4,7 +4,7 @@ import {
   GetNodeTitle,
   ADD_LINK_BETWEEN_NODES,
   LinkProperties
-} from "../actions/uiactions";
+} from "../actions/uiActions";
 import ClearPreviousViewPackage from "./ClearPreviousViewPackage";
 import { GetNodesLinkedTo } from "../methods/graph_methods";
 export default function(args: any = {}) {

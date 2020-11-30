@@ -9,11 +9,11 @@ import {
 	GetStateFunc,
 	GetNodeByProperties,
 	GUID
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import { NodeProperties, NodeTypes, LinkProperties } from '../constants/nodetypes';
 import { Node } from '../methods/graph_types';
-import { NodePropertyTypes } from '../actions/uiactions';
-import { REMOVE_NODE } from '../actions/uiactions';
+import { NodePropertyTypes } from '../actions/uiActions';
+import { REMOVE_NODE } from '../actions/uiActions';
 
 export function SwaggerProcessData(nodeId: string, rawSwagger: SwaggerApi) {
 	let swaggerNodes = GetNodesByProperties(

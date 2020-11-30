@@ -38,6 +38,10 @@ export function AlphaNumericLikeAttribute() {
 	return createValidationAttribute(alphanumericLike, createDefaultError(`Only alphanumeric characters.`));
 }
 
+export function AlphaNumericAttribute(){
+	return createValidationAttribute(alphanumeric, createDefaultError(`Only alphanumeric characters.`));
+}
+
 export function AlphaOnlyWithSpacesAttribute() {
 	return createValidationAttribute(alphawithspaces, createDefaultError(`Only alphanumeric characters and spaces.`));
 }

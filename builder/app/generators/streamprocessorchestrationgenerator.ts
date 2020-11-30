@@ -13,7 +13,7 @@ import {
 	GetState,
 	GetCurrentGraph,
 	AgentHasExecutor
-} from '../actions/uiactions';
+} from '../actions/uiActions';
 import {
 	LinkType,
 	NodePropertyTypesByLanguage,

@@ -12,7 +12,7 @@ import {
 	executeGraphOperation,
 	setVisual,
 	BuildAllProgress
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import SelectAllOnModelFilters from './SelectAllOnModelFilters';
 import AddFiltersToGetAll from '../method/AddFiltersToGetAll';
 import HaveAllPropertiesOnExecutors from './HaveAllPropertiesOnExecutors';

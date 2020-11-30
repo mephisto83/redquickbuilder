@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Switch, Route } from 'react-router';
 import routes from './constants/routes';
 import { ViewModelKeys } from './viewmodel_keys';
@@ -12,10 +12,10 @@ fetchservice();
 
 export default () => (
   <App>
-    <Switch>
+    <Suspense fallback={<div>Loading...</div>}>
+      <Switch>
 {{routes}}
-     {/*  <Route path={routes.COUNTER} component={CounterPage} />
-      <Route path={routes.HOME} component={HomePage} /> */}
-    </Switch>
+      </Switch>
+    </Suspense>
   </App>
 );

@@ -1,5 +1,5 @@
 import { GetValidationMethodForViewType } from '../nodepacks/batch/SetupViewTypes';
-import { GetNodeProp, NodesByType, setVisual, GetDispatchFunc, GetStateFunc, GetNodeTitle } from '../actions/uiactions';
+import { GetNodeProp, NodesByType, setVisual, GetDispatchFunc, GetStateFunc, GetNodeTitle } from '../actions/uiActions';
 import { NodeProperties, Methods, NodeTypes } from '../constants/nodetypes';
 
 export const GetValidationMethodForViewType_ = 'GetValidationMethodForViewType';

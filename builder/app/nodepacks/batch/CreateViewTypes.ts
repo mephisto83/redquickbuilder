@@ -6,7 +6,7 @@ import {
 	ADD_NEW_NODE,
 	GetCurrentGraph,
 	GetModelReferencedByProperty
-} from '../../actions/uiactions';
+} from '../../actions/uiActions';
 import { NodeTypes, LinkType, NodeProperties, LinkProperties } from '../../constants/nodetypes';
 import { GetNodesLinkedTo, existsLinkBetween } from '../../methods/graph_methods';
 import { ViewTypes } from '../../constants/viewtypes';
