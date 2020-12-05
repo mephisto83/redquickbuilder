@@ -60,14 +60,18 @@ export function GetJSONReferenceInsertsMap(lambdaText: string) {
 	} = {};
 
 	getJSONReferenceInserts(lambdaText || '').map((v) => v.substr(2, v.length - 4)).map((v: string) => {
-		let ri: ReferenceInsert = JSON.parse(v);
-		res[ri.key] = {
-			template: `#{${v}}#`,
-			insert: ri
-		};
+		try {
+			let ri: ReferenceInsert = JSON.parse(v);
+			res[ri.key] = {
+				template: `#{${v}}#`,
+				insert: ri
+			};
+		} catch (e) {
+			console.log(v);
+			debugger;
+			throw e;
+		}
 	});
-	// .unique((_insert: ReferenceInsert) => {
-	// 	return _insert.key;
-	// });
+	
 	return res;
 }

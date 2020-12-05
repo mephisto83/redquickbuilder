@@ -143,19 +143,20 @@ export default class MenuGenerator {
 		let code = Object.keys(menuObj.items)
 			.map((item: string) => {
 				let menuItem = menuObj.items[item];
-				let screen_;
+				let screen = '';
 				if (menuItem.shouldShowDataChain) {
 				}
 				let { parent } = menuObj.items[item];
 				let disabledFunc = `false`;
+				let navigationScreen = GetNodeProp(item, NodeProperties.NavigationScreen);
+				if (navigationScreen) {
+					screen = GetNodeLinkedTo(GetCurrentGraph(), {
+						id: navigationScreen,
+						link: LinkType.NavigationScreenImplementation
+					})
+				}
 				if (menuItem.shouldBeDisabled) {
-					let navigationScreen = GetNodeProp(item, NodeProperties.NavigationScreen);
-					if (navigationScreen) {
-						screen = GetNodeLinkedTo(GetCurrentGraph(), {
-							id: navigationScreen,
-							link: LinkType.NavigationScreenImplementation
-						})
-					}
+
 					disabledFunc = `MA.${GetCodeName(menuItem.shouldBeDisabled)}({
             context: {
               getState,
@@ -172,6 +173,7 @@ export default class MenuGenerator {
               getState,
               dispatch
             },
+            ${screen ? `screen: Screens.${GetCodeName(screen)}` : ''}
           })){`;
 					shouldShowPart2 = '}';
 				}
@@ -181,6 +183,7 @@ export default class MenuGenerator {
               id: '${item}',
               disabled: ${disabledFunc},
               title: titleService.get(\`${item}\`, \`${GetNodeTitle(item)}\`),
+			  ${screen ? `screen: Screens.${GetCodeName(screen)},` : ''}
               parent: ${parent ? `'${parent}'` : 'null'}
             });
           ${shouldShowPart2}

@@ -81,7 +81,9 @@ import MethodProps, {
 	EffectDescription,
 	RouteSourceType,
 	AfterEffect,
-	ExecutionConfig
+	ExecutionConfig,
+	ValidationConfig,
+	PermissionConfig
 } from '../interface/methodprops';
 import { Node, GraphLink } from '../methods/graph_types';
 import ContentInfo from './contentinfo';
@@ -651,10 +653,10 @@ class AgentAccessView extends Component<any, any> {
 																						) => {
 																							if (
 																								this.state.agentAccess[
-																									agentIndex
+																								agentIndex
 																								] &&
 																								this.state.agentAccess[
-																									agentIndex
+																								agentIndex
 																								][modelIndex]
 																							) {
 																								return this.state
@@ -704,7 +706,7 @@ class AgentAccessView extends Component<any, any> {
 																			if (
 																				this.state.agentAccess[agentIndex] &&
 																				this.state.agentAccess[agentIndex][
-																					modelIndex
+																				modelIndex
 																				]
 																			) {
 																				return Object.values(
@@ -733,7 +735,7 @@ class AgentAccessView extends Component<any, any> {
 																		}
 																	);
 																	this.setState({
-																		agentAccess: [ ...this.state.agentAccess ]
+																		agentAccess: [...this.state.agentAccess]
 																	});
 																}}
 															>
@@ -850,7 +852,7 @@ class AgentAccessView extends Component<any, any> {
 																<th
 																	style={{ cursor: 'pointer' }}
 																	key={`${dashboard}`}
-																	onClick={() => {}}
+																	onClick={() => { }}
 																>
 																	{GetNodeTitle(dashboard)}
 																</th>
@@ -951,7 +953,7 @@ class AgentAccessView extends Component<any, any> {
 												</thead>
 												<tbody>
 													{this.state.models.map((model: string, modelIndex: number) => {
-														const result = [ <th>{GetNodeTitle(model)}</th> ];
+														const result = [<th>{GetNodeTitle(model)}</th>];
 
 														result.push(
 															...[].interpolate(
@@ -1051,7 +1053,7 @@ class AgentAccessView extends Component<any, any> {
 												<tbody>
 													{this.state.dashboards.map(
 														(dashboard: string, dashboardIndex: number) => {
-															const result = [ <th>{GetNodeTitle(dashboard)}</th> ];
+															const result = [<th>{GetNodeTitle(dashboard)}</th>];
 
 															result.push(
 																...this.state.agents.map(
@@ -1150,7 +1152,7 @@ class AgentAccessView extends Component<any, any> {
 												</thead>
 												<tbody>
 													{this.state.models.map((model: string, modelIndex: number) => {
-														const result = [ <th>{GetNodeTitle(model)}</th> ];
+														const result = [<th>{GetNodeTitle(model)}</th>];
 
 														result.push(
 															...[].interpolate(
@@ -1249,7 +1251,7 @@ class AgentAccessView extends Component<any, any> {
 												<tbody>
 													{this.state.dashboards.map(
 														(dashboard: string, dashboardIndex: number) => {
-															const result = [ <th>{GetNodeTitle(dashboard)}</th> ];
+															const result = [<th>{GetNodeTitle(dashboard)}</th>];
 
 															result.push(
 																...this.state.agents.map(
@@ -1347,14 +1349,14 @@ class AgentAccessView extends Component<any, any> {
 																(agentIndex: number) =>
 																	Object.keys(ViewTypes)
 																		.filter((v: string) => v !== ViewTypes.Delete)
-																		.map((v) => <th onClick={() => {}}>{v}</th>)
+																		.map((v) => <th onClick={() => { }}>{v}</th>)
 															)
 															.flatten()}
 													</tr>
 												</thead>
 												<tbody>
 													{this.state.models.map((model: string, modelIndex: number) => {
-														const result = [ <th>{GetNodeTitle(model)}</th> ];
+														const result = [<th>{GetNodeTitle(model)}</th>];
 
 														result.push(
 															...[].interpolate(
@@ -1476,7 +1478,7 @@ class AgentAccessView extends Component<any, any> {
 												<tbody>
 													{this.state.dashboards.map(
 														(dashboard: string, dashboardIndex: number) => {
-															const result = [ <th>{GetNodeTitle(dashboard)}</th> ];
+															const result = [<th>{GetNodeTitle(dashboard)}</th>];
 
 															result.push(
 																...this.state.agents.map(
@@ -1581,14 +1583,14 @@ class AgentAccessView extends Component<any, any> {
 															.map((agent: string) =>
 																Object.keys(ViewTypes)
 																	.filter((v: string) => v !== ViewTypes.Delete)
-																	.map((v) => <th onClick={() => {}}>{v}</th>)
+																	.map((v) => <th onClick={() => { }}>{v}</th>)
 															)
 															.flatten()}
 													</tr>
 												</thead>
 												<tbody>
 													{this.state.models.map((model: string, modelIndex: number) => {
-														const result = [ <th>{GetNodeTitle(model)}</th> ];
+														const result = [<th>{GetNodeTitle(model)}</th>];
 
 														result.push(
 															...this.state.agents.map(
@@ -1682,7 +1684,7 @@ class AgentAccessView extends Component<any, any> {
 												<tbody>
 													{this.state.dashboards.map(
 														(dashboard: string, dashboardIndex: number) => {
-															const result = [ <th>{GetNodeTitle(dashboard)}</th> ];
+															const result = [<th>{GetNodeTitle(dashboard)}</th>];
 
 															result.push(
 																...this.state.agents.map(
@@ -2044,7 +2046,7 @@ class AgentAccessView extends Component<any, any> {
 										methods,
 										outState: this.state,
 										effect: effect,
-										callback: (value: Effect) => {}
+										callback: (value: Effect) => { }
 									}
 								},
 								methodDescription,
@@ -2082,13 +2084,23 @@ class AgentAccessView extends Component<any, any> {
 										methods,
 										outState: this.state,
 										effect: effect,
-										callback: (value: Effect) => {}
+										callback: (value: Effect) => { }
 									}
 								},
 								methodDescription
 							);
 							if (effectItem.executions) {
 								effectItem.executions.forEach((exe: ExecutionConfig) => {
+									if (exe.dataChain) executionDataChains.push(exe.dataChain);
+								});
+							}
+							if (effectItem.validations) {
+								effectItem.validations.forEach((exe: ValidationConfig) => {
+									if (exe.dataChain) executionDataChains.push(exe.dataChain);
+								});
+							}
+							if (effectItem.permissions) {
+								effectItem.permissions.forEach((exe: PermissionConfig) => {
 									if (exe.dataChain) executionDataChains.push(exe.dataChain);
 								});
 							}
@@ -2116,7 +2128,7 @@ class AgentAccessView extends Component<any, any> {
 										methods,
 										outState: this.state,
 										effect: effect,
-										callback: (value: Effect) => {}
+										callback: (value: Effect) => { }
 									}
 								},
 								methodDescription,
@@ -2124,6 +2136,16 @@ class AgentAccessView extends Component<any, any> {
 							);
 							if (effectItem.executions) {
 								effectItem.executions.forEach((exe: ExecutionConfig) => {
+									if (exe.dataChain) executionDataChains.push(exe.dataChain);
+								});
+							}
+							if (effectItem.validations) {
+								effectItem.validations.forEach((exe: ValidationConfig) => {
+									if (exe.dataChain) executionDataChains.push(exe.dataChain);
+								});
+							}
+							if (effectItem.permissions) {
+								effectItem.permissions.forEach((exe: PermissionConfig) => {
 									if (exe.dataChain) executionDataChains.push(exe.dataChain);
 								});
 							}
@@ -2138,6 +2160,19 @@ class AgentAccessView extends Component<any, any> {
 			},
 			GetCurrentGraph()
 		).filter((v) => executionDataChains.indexOf(v.id) === -1);
+		unusedExecutionDataChains = [...unusedExecutionDataChains, ...GetNodesByProperties(
+			{
+				[NodeProperties.DataChainTypeCategory]: DataChainType.Validation
+			},
+			GetCurrentGraph()
+		).filter((v) => executionDataChains.indexOf(v.id) === -1)];
+		unusedExecutionDataChains = [...unusedExecutionDataChains, ...GetNodesByProperties(
+			{
+				[NodeProperties.DataChainTypeCategory]: DataChainType.Permission
+			},
+			GetCurrentGraph()
+		).filter((v) => executionDataChains.indexOf(v.id) === -1)];
+
 
 		if (unusedExecutionDataChains && unusedExecutionDataChains.length) {
 			debugger;

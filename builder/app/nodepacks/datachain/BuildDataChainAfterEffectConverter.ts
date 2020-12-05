@@ -93,6 +93,9 @@ export enum DataChainType {
 	Execution = 'Execution',
 	AfterEffect = 'AfterEffect'
 }
+export const DataChainTypeParameters = {
+	[DataChainType.Permission]: ['model', 'agent']
+}
 export default function BuildDataChainAfterEffectConverter(args: AfterEffectConvertArgs, callback: Function) {
 	let {
 		from,
@@ -405,8 +408,12 @@ export default function BuildDataChainAfterEffectConverter(args: AfterEffectConv
 	switch (type) {
 		case DataChainType.Permission:
 			can_complete = true;
+			let parentParameter = '';
+			if (from.properties.parent) {
+				parentParameter = `, #{{"key":"parent"}}# parent = null`;
+			}
 			from_parameter_template = `
-      public static async Task<bool> Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null)
+      public static async Task<bool> Execute(#{{"key":"model"}}# model = null, #{{"key":"agent"}}# agent = null${parentParameter})
       {
 
         Func<Task<bool>> func = async () => {
@@ -980,26 +987,16 @@ function GenerateSimpleValidations(
 						agentOrModel = 'model_output';
 						break;
 				}
-				// tempLambdaInsertArgumentValues[
-				// 	`${agentOrModel}.${GetCodeName(simpleValidation.referencesExisting.modelProperty)}`
-				// ] = {
-				// 	property: simpleValidation.referencesExisting.modelProperty,
-				// 	model: simpleValidation.referencesExisting.agent,
-				// 	type: ReferenceInsertType.Property
-				// };
-				// tempLambdaInsertArgumentValues[`${agentOrModel}`] = {
-				// 	model: simpleValidation.referencesExisting.agent,
-				// 	type: ReferenceInsertType.Model
-				// };
+
 				setupLambdaInsertArgs(
 					tempLambdaInsertArgumentValues,
 					simpleValidation.referencesExisting.model,
 					agentOrModel
 				);
 				let classModelKey = 'unknown';
-				if (simpleValidation.referencesExisting.model) {
+				if (simpleValidation.referencesExisting.modelProperty) {
 					let modelType = GetNodeLinkedTo(GetCurrentGraph(), {
-						id: simpleValidation.referencesExisting.model,
+						id: simpleValidation.referencesExisting.modelProperty,
 						link: LinkType.ModelTypeLink,
 						componentType: NodeTypes.Model
 					});
@@ -1011,26 +1008,38 @@ function GenerateSimpleValidations(
 					}
 				}
 				let refExists: any;
-				switch (GetNodeProp(simpleValidation.referencesExisting.model, NodeProperties.NODEType)) {
+				switch (GetNodeProp(simpleValidation.referencesExisting.modelProperty, NodeProperties.NODEType)) {
 					case NodeTypes.Model:
-						classModelKey = `class.${GetCodeName(simpleValidation.referencesExisting.model)}`;
-						tempLambdaInsertArgumentValues[classModelKey] = {
-							model: simpleValidation.referencesExisting.model
-						};
+						if (!classModelKey) {
+							classModelKey = classModelKey || `class.${GetCodeName(simpleValidation.referencesExisting.model)}`;
+							tempLambdaInsertArgumentValues[classModelKey] = {
+								model: simpleValidation.referencesExisting.model
+							};
+						}
 						tempLambdaInsertArgumentValues[
 							`${agentOrModel}.${GetCodeName(simpleValidation.referencesExisting.model)}`
 						] = {
 							model: simpleValidation.referencesExisting.model
 						};
-						refExists = `await (RedStrapper.Resolve<IRedArbiter<#{{"key":"${classModelKey}"}}#>>()).Get<#{{"key":"${classModelKey}"}}#>(${agentOrModel}.#{{"key":"${agentOrModel}.${GetCodeName(
+						refExists = `(await (RedStrapper.Resolve<IRedArbiter<#{{"key":"${classModelKey}"}}#>>()).Get<#{{"key":"${classModelKey}"}}#>(${agentOrModel}.#{{"key":"${agentOrModel}.${GetCodeName(
 							simpleValidation.referencesExisting.model
-						)}","type":"model"}}#)`;
+						)}","type":"model"}}#)) != null`;
 						checks.push({ template: refExists, id: simpleValidation.id });
 						break;
 					case NodeTypes.Property:
-						refExists = `await (RedStrapper.Resolve<IRedArbiter<#{{"key":"${classModelKey}"}}#>>()).Get<#{{"key":"${classModelKey}"}}#>(${agentOrModel}.#{{"key":"${agentOrModel}.${GetCodeName(
-							simpleValidation.referencesExisting.model
-						)}","model":"${classModelKey}","type":"property"}}#)`;
+						tempLambdaInsertArgumentValues[
+							`${classModelKey}.${GetCodeName(simpleValidation.referencesExisting.modelProperty)}`
+						] = {
+							property: simpleValidation.referencesExisting.modelProperty
+						};
+						tempLambdaInsertArgumentValues[
+							`${classModelKey}.${GetCodeName(simpleValidation.referencesExisting.model)}`
+						] = {
+							model: simpleValidation.referencesExisting.model
+						};
+						refExists = `(await (RedStrapper.Resolve<IRedArbiter<#{{"key":"${classModelKey}"}}#>>()).Get<#{{"key":"${classModelKey}"}}#>(${agentOrModel}.#{{"key":"${classModelKey}.${GetCodeName(
+							simpleValidation.referencesExisting.modelProperty
+						)}","model":"${classModelKey}","type":"property"}}#)) != null`;
 						checks.push({ template: refExists, id: simpleValidation.id });
 						break;
 				}
