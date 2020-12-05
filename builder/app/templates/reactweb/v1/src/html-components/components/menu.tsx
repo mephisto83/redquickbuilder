@@ -3,6 +3,17 @@ import RedGraph from '../../actions/redgraph';
 import './menu.css';
 import { redConnect, titleService } from '../../actions/util';
 
+interface MenuItem {
+	id: string,
+	properties: {
+		disabled: boolean | Function,
+		id: string,
+		parent: string | null,
+		title: string,
+		screen: string
+	}
+}
+
 export default class Menu extends Component<{ [index: string]: any }, { [index: string]: any }> {
 	constructor(props: any) {
 		super(props);
@@ -15,18 +26,18 @@ export default class Menu extends Component<{ [index: string]: any }, { [index: 
 			children = RedGraph.getChildren(this.props.value, this.props.id);
 			return (
 				<div className={`${'dropdown-content'} menu-drop-down-content`}>
-					{children.map((child, index) => this.renderItem(child, index))}
+					{children.map((child: MenuItem, index: number) => this.renderItem(child, index))}
 				</div>
 			);
 		}
 		children = RedGraph.getChildren(this.props.value, null);
 		return (
 			<div className={`topnav  menu-drop-down-content`}>
-				{children.map((child, index) => this.renderItem(child, index))}
+				{children.map((child: MenuItem, index: number) => this.renderItem(child, index))}
 			</div>
 		);
 	}
-	renderItem(child: any, index: number) {
+	renderItem(child: MenuItem, index: number) {
 		let id = RedGraph.getId(child);
 		let title = RedGraph.getTitle(this.props.value, id);
 		let children = RedGraph.getChildren(this.props.value, id);
@@ -57,7 +68,12 @@ export default class Menu extends Component<{ [index: string]: any }, { [index: 
 				key={`menu-leaf-${index}`}
 				onClick={() => {
 					if (this.props.onClick) {
-						this.props.onClick(id);
+						if (child && child.properties && child.properties.screen) {
+							this.props.onClick(child.properties.screen)
+						}
+						else {
+							this.props.onClick(id);
+						}
 					}
 				}}
 			>

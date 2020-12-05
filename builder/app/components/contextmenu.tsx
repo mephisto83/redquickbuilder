@@ -141,14 +141,14 @@ class ContextMenu extends Component<any, any> {
 	}
 
 	getMenuMode(mode: any) {
-		const result = [ ...this.generalMenu() ];
+		const result = [...this.generalMenu()];
 		const exit = () => {
 			this.props.setVisual(UIA.CONTEXT_MENU_MODE, null);
 		};
 		switch (mode) {
 			case 'layout':
 				result.push(
-					<TreeViewMenu open active title={Titles.Layout} toggle={() => {}}>
+					<TreeViewMenu open active title={Titles.Layout} toggle={() => { }}>
 						<TreeViewMenu
 							title={Titles.Layout}
 							icon="fa fa-taxi"
@@ -370,7 +370,7 @@ class ContextMenu extends Component<any, any> {
 										id: LinkType[v]
 									}))}
 									label={Titles.LinkType}
-									onChange={() => {}}
+									onChange={() => { }}
 									value={UIA.GetLinkProperty(link, LinkPropertyKeys.TYPE)}
 								/>
 							</TreeViewItemContainer>
@@ -556,12 +556,12 @@ class ContextMenu extends Component<any, any> {
 																		id: link.id,
 																		prop: LinkPropertyKeys.Enumeration,
 																		value: value
-																			? [ ...currentValue, enumer.id ]
+																			? [...currentValue, enumer.id]
 																			: [
-																					...currentValue.filter(
-																						(x: any) => x !== enumer.id
-																					)
-																				]
+																				...currentValue.filter(
+																					(x: any) => x !== enumer.id
+																				)
+																			]
 																	};
 																}
 															}
@@ -1060,14 +1060,14 @@ class ContextMenu extends Component<any, any> {
 								!this.state.agent ? (
 									[]
 								) : (
-									UIA.GetModelPropertyChildren(this.state.agent)
-										.filter((a: Node) => !GetNodeProp(a, NodeProperties.IsAgent))
-										.filter((a: Node) => !GetNodeProp(a, NodeProperties.IsUser))
-										.sort((a: Node, b: Node) =>
-											UIA.GetNodeTitle(a).localeCompare(UIA.GetNodeTitle(b))
-										)
-										.toNodeSelect()
-								)
+										UIA.GetModelPropertyChildren(this.state.agent)
+											.filter((a: Node) => !GetNodeProp(a, NodeProperties.IsAgent))
+											.filter((a: Node) => !GetNodeProp(a, NodeProperties.IsUser))
+											.sort((a: Node, b: Node) =>
+												UIA.GetNodeTitle(a).localeCompare(UIA.GetNodeTitle(b))
+											)
+											.toNodeSelect()
+									)
 							}
 							onChange={(value: any) => {
 								this.setState({
@@ -1094,12 +1094,12 @@ class ContextMenu extends Component<any, any> {
 								!this.state.agent ? (
 									[]
 								) : (
-									UIA.NodesByType(null, NodeTypes.Enumeration)
-										.sort((a: Node, b: Node) =>
-											UIA.GetNodeTitle(a).localeCompare(UIA.GetNodeTitle(b))
-										)
-										.toNodeSelect()
-								)
+										UIA.NodesByType(null, NodeTypes.Enumeration)
+											.sort((a: Node, b: Node) =>
+												UIA.GetNodeTitle(a).localeCompare(UIA.GetNodeTitle(b))
+											)
+											.toNodeSelect()
+									)
 							}
 							onChange={(value: any) => {
 								this.setState({
@@ -1342,33 +1342,33 @@ class ContextMenu extends Component<any, any> {
 							/>
 						</TreeViewItemContainer>
 						{this.state.componentA &&
-						this.state.componentB &&
-						this.state.externalApiB &&
-						this.state.internalApiB &&
-						this.state.internalApiA &&
-						this.state.externalApiA ? (
-							<TreeViewMenu
-								title="Setup Api Between Components"
-								description={SetupApiBetweenComponents.description}
-								active
-								onClick={() => {
-									this.props.graphOperation(
-										SetupApiBetweenComponents({
-											component_a: {
-												id: this.state.componentA,
-												external: this.state.externalApiA,
-												internal: this.state.internalApiA
-											},
-											component_b: {
-												id: this.state.componentB,
-												external: this.state.externalApiB,
-												internal: this.state.internalApiB
-											}
-										})
-									);
-								}}
-							/>
-						) : null}
+							this.state.componentB &&
+							this.state.externalApiB &&
+							this.state.internalApiB &&
+							this.state.internalApiA &&
+							this.state.externalApiA ? (
+								<TreeViewMenu
+									title="Setup Api Between Components"
+									description={SetupApiBetweenComponents.description}
+									active
+									onClick={() => {
+										this.props.graphOperation(
+											SetupApiBetweenComponents({
+												component_a: {
+													id: this.state.componentA,
+													external: this.state.externalApiA,
+													internal: this.state.internalApiA
+												},
+												component_b: {
+													id: this.state.componentB,
+													external: this.state.externalApiB,
+													internal: this.state.internalApiB
+												}
+											})
+										);
+									}}
+								/>
+							) : null}
 					</TreeViewMenu>
 				</TreeViewMenu>
 
@@ -1797,6 +1797,20 @@ class ContextMenu extends Component<any, any> {
 							</TreeViewMenu>
 						</TreeViewMenu>
 						<TreeViewMenu
+							title={Titles.RootMenu}
+							active
+							label={Titles.RootMenu}
+							onClick={(value: any) => {
+								let menuRoots = UIA.GetNodesByProperties({
+									[NodeProperties.MenuRootNode]: true
+								}, UIA.GetCurrentGraph());
+								menuRoots.forEach((node: Node) => {
+									UIA.updateComponentProperty(node.id, NodeProperties.MenuRootNode, false);
+								});
+								UIA.updateComponentProperty(currentNode.id, NodeProperties.MenuRootNode, true);
+							}}>
+						</TreeViewMenu>
+						<TreeViewMenu
 							open={UIA.Visual(state, 'Navigation Screens')}
 							active
 							title={NodeTypes.NavigationScreen}
@@ -2074,7 +2088,7 @@ class ContextMenu extends Component<any, any> {
 											value={this.state.method}
 										/>
 									</TreeViewItemContainer>
-									{[ ViewTypes.GetAll, ViewTypes.Get ].some((v) => v === viewType) ? (
+									{[ViewTypes.GetAll, ViewTypes.Get].some((v) => v === viewType) ? (
 										<TreeViewItemContainer>
 											<SelectInput
 												label={Titles.NavigateTo}
@@ -2178,7 +2192,7 @@ class ContextMenu extends Component<any, any> {
 														});
 												}
 												commands.push(() => CollectionDataChainsIntoCollections());
-												this.props.graphOperation([ ...commands ]);
+												this.props.graphOperation([...commands]);
 											}}
 										/>
 									) : null}
@@ -2373,7 +2387,7 @@ class ContextMenu extends Component<any, any> {
 											...CreateNavigateToScreenDC({
 												screen: this.state.screen,
 												node: currentNode.id,
-												callback: (navigateContext) => {}
+												callback: (navigateContext) => { }
 											})
 										]);
 									}}
@@ -2927,7 +2941,7 @@ class ContextMenu extends Component<any, any> {
 													claimServiceExecutor = claimServiceContext.executor;
 												}
 											}),
-											function(currentGraph) {
+											function (currentGraph) {
 												const steps = AddCopyPropertiesToExecutor({
 													currentNode: claimServiceExecutor,
 													executor: UIA.GetNodeProp(
@@ -3350,7 +3364,7 @@ class ContextMenu extends Component<any, any> {
 							</TreeViewItemContainer>
 							<TreeViewItemContainer>
 								<SelectInput
-									options={[ true, false ].map((v) => ({
+									options={[true, false].map((v) => ({
 										title: `${v}`,
 										id: v,
 										value: v
@@ -3623,7 +3637,7 @@ class ContextMenu extends Component<any, any> {
 							</TreeViewItemContainer>
 							<TreeViewItemContainer>
 								<SelectInput
-									options={[ true, false ].map((v) => ({
+									options={[true, false].map((v) => ({
 										title: `${v}`,
 										id: v,
 										value: v
@@ -3732,14 +3746,14 @@ class ContextMenu extends Component<any, any> {
 		const currentNodeType = UIA.GetNodeProp(currentNode, NodeProperties.NODEType);
 		switch (currentNodeType) {
 			case NodeTypes.DataChain:
-				return [ this.getDataChainContextMenu() ];
+				return [this.getDataChainContextMenu()];
 			case NodeTypes.ComponentNode:
 				const componentType = UIA.GetNodeProp(currentNode, NodeProperties.ComponentType);
 				switch (componentType) {
 					case 'Button':
-						return [ this.getButtonApiMenu(currentNode) ];
+						return [this.getButtonApiMenu(currentNode)];
 					default:
-						return [ this.getGenericComponentApiMenu(currentNode) ];
+						return [this.getGenericComponentApiMenu(currentNode)];
 				}
 				break;
 			default:
@@ -3758,7 +3772,7 @@ class ContextMenu extends Component<any, any> {
 				switch (componentType) {
 					case 'Menu':
 					case 'Button':
-						return [ this.getButtonEventMenu(currentNode) ];
+						return [this.getButtonEventMenu(currentNode)];
 				}
 				break;
 		}
@@ -3794,7 +3808,7 @@ class ContextMenu extends Component<any, any> {
 				active
 				toggle={() => {
 					const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-					ConnectScreens(() => {}, (v: any) => v.id === currentNode.id);
+					ConnectScreens(() => { }, (v: any) => v.id === currentNode.id);
 				}}
 			/>,
 			<TreeViewMenu
@@ -3802,7 +3816,7 @@ class ContextMenu extends Component<any, any> {
 				toggle={() => {
 					const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 					AddComponentsToScreenOptions(
-						() => {},
+						() => { },
 						(screen: Node) => {
 							return screen.id === currentNode.id;
 						}
@@ -3927,7 +3941,7 @@ class ContextMenu extends Component<any, any> {
 			case UITypes.ElectronIO:
 			case UITypes.ReactWeb:
 				return (
-					<TreeViewMenu open active title={Titles.Events} toggle={() => {}}>
+					<TreeViewMenu open active title={Titles.Events} toggle={() => { }}>
 						<TreeViewMenu
 							title={`${Titles.Add} onClick`}
 							onClick={() => {
@@ -4100,6 +4114,8 @@ class ContextMenu extends Component<any, any> {
 		const menuMode = UIA.Visual(state, UIA.CONTEXT_MENU_MODE);
 		const menuitems = this.getMenuMode(menuMode);
 		const defaultMenus = this.getDefaultMenu();
+		if (display === 'none')
+			return <div></div>
 		return (
 			<Draggable handle=".draggable-header,.draggable-footer">
 				<div

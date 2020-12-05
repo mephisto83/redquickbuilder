@@ -99,7 +99,7 @@ class EffectContextMenu extends Component<any, any> {
 			</TreeViewButtonGroup>
 		);
 	}
-	getRoutingApi(routing: Routing) {}
+	getRoutingApi(routing: Routing) { }
 	getMenuMode(mode: any) {
 		const result: any = [];
 		let effect: Effect = mode.effect;
@@ -141,7 +141,7 @@ class EffectContextMenu extends Component<any, any> {
 											? effectItem.source[urlParameter].model
 											: null;
 									let options = [
-										...[ urlParameter ]
+										...[urlParameter]
 											.filter(
 												methodDescription
 													? this.filterMethodDescriptionFunctionParameters(methodDescription)
@@ -191,8 +191,8 @@ class EffectContextMenu extends Component<any, any> {
 																value !== modelPropertyOption.id ? (
 																	'fa fa-square-o'
 																) : (
-																	'fa fa-square'
-																)
+																		'fa fa-square'
+																	)
 															}
 															title={UIA.GetNodeTitle(modelPropertyOption)}
 															onClick={() => {
@@ -232,8 +232,8 @@ class EffectContextMenu extends Component<any, any> {
 															value !== modelPropertyOption.id ? (
 																'fa fa-square-o'
 															) : (
-																'fa fa-square'
-															)
+																	'fa fa-square'
+																)
 														}
 														title={UIA.GetNodeTitle(modelPropertyOption)}
 														onClick={() => {
@@ -273,8 +273,8 @@ class EffectContextMenu extends Component<any, any> {
 															value !== agentPropertyOption.id ? (
 																'fa fa-square-o'
 															) : (
-																'fa fa-square'
-															)
+																	'fa fa-square'
+																)
 														}
 														onClick={() => {
 															effectItem.source = effectItem.source || {};
@@ -632,11 +632,14 @@ class EffectContextMenu extends Component<any, any> {
 
 	render() {
 		const { state } = this.props;
+		const display = UIA.Visual(state, UIA.EFFECT_CONTEXT_MENU) ? 'block' : 'none';
+		if (display === 'none')
+			return <div></div>
 		const exit = () => {
 			this.props.setVisual(UIA.EFFECT_CONTEXT_MENU, null);
 		};
 		const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-		const display = UIA.Visual(state, UIA.EFFECT_CONTEXT_MENU) ? 'block' : 'none';
+
 		const nodeType = UIA.Visual(state, UIA.EFFECT_CONTEXT_MENU)
 			? UIA.GetNodeProp(currentNode, NodeProperties.NODEType)
 			: null;
@@ -653,6 +656,7 @@ class EffectContextMenu extends Component<any, any> {
 			top: -2,
 			position: 'relative'
 		};
+		
 		return (
 			<Draggable handle=".draggable-header,.draggable-footer">
 				<div

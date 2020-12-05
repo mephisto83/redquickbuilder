@@ -50,3 +50,10 @@
       1. #{var temp @user} => User temp;
       1. #{arbiter get@user}(#{user @user~prop}); => await userArbiter.Get(user.Prop);
       1. #{return model_output @model_ouput}; => return model_output //Model_Output
+
+## To Build Nodes
+
+1. Create a Root Node
+    1. Make a new MenuDataSource node, and set it to root.
+1. Append desired MenuDataSource nodes
+1. Link Nodes to desired screens.

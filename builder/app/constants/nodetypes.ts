@@ -463,6 +463,7 @@ export const UIActionMethodParameterTypes = {
 export const NodeProperties = {
 	ViewPackage: 'view-package',
 	DataChainCollectionChildrenCount: 'DataChainCollectionChildrenCount',
+	MenuRootNode: 'MenuRootNode',
 	IsFetchOutput: 'IsFetchOutput',
 	UIActionMethod: 'UIActionMethod',
 	HideStyle: 'HideStyle',

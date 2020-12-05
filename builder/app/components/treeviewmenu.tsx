@@ -75,7 +75,7 @@ export default class TreeViewMenu extends Component<any, any> {
 					)}
 				</a>
 				<ul className="treeview-menu" style={{ display: this.display(), ...this.props.innerStyle || {} }}>
-					{this.props.children}
+					{!this.props.open ? null : this.props.children}
 				</ul>
 			</li>
 		);

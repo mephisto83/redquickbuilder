@@ -56,8 +56,11 @@ const DATA_SOURCE = "DATA_SOURCE";
 class DataChainContextMenu extends Component<any, any> {
   render() {
     var { state } = this.props;
-    var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
     let display = UIA.Visual(state, UIA.CONTEXT_MENU_MODE) ? "block" : "none";
+    if (display === 'none')
+      return <div></div>
+
+    var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
     let nodeType = UIA.Visual(state, UIA.CONTEXT_MENU_MODE)
       ? UIA.GetNodeProp(currentNode, NodeProperties.NODEType)
       : null;

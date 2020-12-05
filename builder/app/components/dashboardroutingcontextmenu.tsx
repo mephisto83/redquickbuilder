@@ -462,11 +462,14 @@ class DashboardRoutingContextMenu extends Component<any, any> {
 
 	render() {
 		const { state } = this.props;
+		const display = UIA.Visual(state, UIA.DASHBOARD_ROUTING_CONTEXT_MENU) ? 'block' : 'none';
+		if (display === 'none')
+			return <div></div>
+
 		const exit = () => {
 			this.props.setVisual(UIA.DASHBOARD_ROUTING_CONTEXT_MENU, null);
 		};
 		const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-		const display = UIA.Visual(state, UIA.DASHBOARD_ROUTING_CONTEXT_MENU) ? 'block' : 'none';
 		const nodeType = UIA.Visual(state, UIA.DASHBOARD_ROUTING_CONTEXT_MENU)
 			? UIA.GetNodeProp(currentNode, NodeProperties.NODEType)
 			: null;

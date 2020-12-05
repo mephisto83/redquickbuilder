@@ -53,6 +53,7 @@ export const DuplicateProperties = 'Duplicate Properties';
 export const BuildMenu = 'Build Menu';
 export const BuildCommands = 'Build Commands';
 export const PricePerNode = 'Node cost';
+export const RootMenu = 'Root Menu';
 export const GridAreas = 'Grid Areas';
 export const MethodThatValidationComesFrom = 'Method validation source';
 export const IsAuthenticatedLaunchHome = 'Is Authenticated Launch Page';

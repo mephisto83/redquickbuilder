@@ -55,7 +55,7 @@ class CopyContextComponent extends Component<any, any> {
 	}
 
 	getMenuItems() {
-		return [ this.contextMenuTypes(), ...this.contextCopies() ];
+		return [this.contextMenuTypes(), ...this.contextCopies()];
 	}
 	contextCopies() {
 		let { state } = this.props;
@@ -153,11 +153,14 @@ class CopyContextComponent extends Component<any, any> {
 	}
 	render() {
 		const { state } = this.props;
+		const display = UIA.Visual(state, UIA.COPY_CONTEXT_MENU) ? 'block' : 'none';
+		if (display === 'none')
+			return <div></div>
+			
 		const exit = () => {
 			this.props.setVisual(UIA.COPY_CONTEXT_MENU, null);
 		};
 		const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-		const display = UIA.Visual(state, UIA.COPY_CONTEXT_MENU) ? 'block' : 'none';
 		const nodeType = UIA.Visual(state, UIA.COPY_CONTEXT_MENU)
 			? UIA.GetNodeProp(currentNode, NodeProperties.NODEType)
 			: null;

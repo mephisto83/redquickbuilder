@@ -74,7 +74,7 @@ class ContextMenu extends Component<any, any> {
 			</TreeViewButtonGroup>
 		);
 	}
-	getRoutingApi(routing: Routing) {}
+	getRoutingApi(routing: Routing) { }
 	getMenuMode(mode: any) {
 		const result: any = [];
 		let routing: Routing = mode.routing;
@@ -166,8 +166,8 @@ class ContextMenu extends Component<any, any> {
 															value !== modelPropertyOption.id ? (
 																'fa fa-square-o'
 															) : (
-																'fa fa-square'
-															)
+																	'fa fa-square'
+																)
 														}
 														title={UIA.GetNodeTitle(modelPropertyOption)}
 														onClick={() => {
@@ -213,8 +213,8 @@ class ContextMenu extends Component<any, any> {
 														value !== modelPropertyOption.id ? (
 															'fa fa-square-o'
 														) : (
-															'fa fa-square'
-														)
+																'fa fa-square'
+															)
 													}
 													title={UIA.GetNodeTitle(modelPropertyOption)}
 													onClick={() => {
@@ -258,8 +258,8 @@ class ContextMenu extends Component<any, any> {
 														value !== agentPropertyOption.id ? (
 															'fa fa-square-o'
 														) : (
-															'fa fa-square'
-														)
+																'fa fa-square'
+															)
 													}
 													onClick={() => {
 														// route.source = {
@@ -510,6 +510,8 @@ class ContextMenu extends Component<any, any> {
 		};
 		const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
 		const display = UIA.Visual(state, UIA.ROUTING_CONTEXT_MENU) ? 'block' : 'none';
+		if (display === 'none')
+			return <div></div>
 		const nodeType = UIA.Visual(state, UIA.ROUTING_CONTEXT_MENU)
 			? UIA.GetNodeProp(currentNode, NodeProperties.NODEType)
 			: null;

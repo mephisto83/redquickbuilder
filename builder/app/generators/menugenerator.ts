@@ -108,25 +108,31 @@ export default class MenuGenerator {
 			let submenuItems = GraphMethods.GetNodesLinkedTo(graph, {
 				id: root.id,
 				link: LinkType.MenuLink,
-				direction: GraphMethods.SOURCE
+				direction: GraphMethods.SOURCE,
+				componentType: NodeTypes.MenuDataSource
 			});
 
 			menuObj.children[root.id] = menuObj.children[root.id] || createMenuChildren();
-
-			submenuItems.map((item: Node) => {
-				let isScreen = GetNodeProp(item, NodeProperties.NODEType) === NodeTypes.NavigationScreen;
-
-				menuObj.children[root.id][item.id] = {
-					[MenuChildProperty.IsScreen]: isScreen
-				};
-				this.constructMenu(item, menuObj, graph, root.id);
-			});
-			let menuItems = submenuItems.filter(
-				(node: Node) => GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.MenuDataSource
-			);
-			//If there is just one menu item, and its a screen. Menuitem should be a direct link
-			if (submenuItems.length === 1 && menuItems.length === 0) {
-				menuObj.items[root.id].leaf = true;
+			if (submenuItems.length) {
+				submenuItems.map((item: Node) => {
+					menuObj.children[root.id][item.id] = {};
+					this.constructMenu(item, menuObj, graph, root.id);
+				});
+			}
+			else {
+				let screen = GraphMethods.GetNodeLinkedTo(graph, {
+					id: root.id,
+					link: LinkType.MenuLink,
+					componentType: NodeTypes.NavigationScreen
+				});
+				if (screen) {
+					menuObj.items[root.id].isScreen = true;
+					menuObj.items[root.id].leaf = true;
+					menuObj.items[root.id].screen = screen.id
+				}
+				else {
+					console.warn('malformed menu, has no children, and no screen to connect')
+				}
 			}
 		}
 
@@ -143,51 +149,43 @@ export default class MenuGenerator {
 		let code = Object.keys(menuObj.items)
 			.map((item: string) => {
 				let menuItem = menuObj.items[item];
-				let screen = '';
+				let screen = menuItem.screen;
 				if (menuItem.shouldShowDataChain) {
 				}
 				let { parent } = menuObj.items[item];
 				let disabledFunc = `false`;
-				let navigationScreen = GetNodeProp(item, NodeProperties.NavigationScreen);
-				if (navigationScreen) {
-					screen = GetNodeLinkedTo(GetCurrentGraph(), {
-						id: navigationScreen,
-						link: LinkType.NavigationScreenImplementation
-					})
-				}
 				if (menuItem.shouldBeDisabled) {
-
 					disabledFunc = `MA.${GetCodeName(menuItem.shouldBeDisabled)}({
-            context: {
-              getState,
-              dispatch
-            },
-            ${screen ? `screen: Screens.${GetCodeName(screen)}` : ''}
-          })`;
+										context: {
+										getState,
+										dispatch
+										},
+										${screen ? `screen: Screens.${GetCodeName(screen)}` : ''}
+									})`;
 				}
 				let shouldShowPart1 = '';
 				let shouldShowPart2 = '';
 				if (menuItem.shouldShowDataChain) {
 					shouldShowPart1 = `if(MA.${GetCodeName(menuItem.shouldShowDataChain)}({
-            context: {
-              getState,
-              dispatch
-            },
-            ${screen ? `screen: Screens.${GetCodeName(screen)}` : ''}
-          })){`;
+												context: {
+												getState,
+												dispatch
+												},
+												${screen ? `screen: Screens.${GetCodeName(screen)}` : ''}
+											})){`;
 					shouldShowPart2 = '}';
 				}
 				return `
-          ${shouldShowPart1}
-            result.push({
-              id: '${item}',
-              disabled: ${disabledFunc},
-              title: titleService.get(\`${item}\`, \`${GetNodeTitle(item)}\`),
-			  ${screen ? `screen: Screens.${GetCodeName(screen)},` : ''}
-              parent: ${parent ? `'${parent}'` : 'null'}
-            });
-          ${shouldShowPart2}
-      `;
+						${shouldShowPart1}
+							result.push({
+							id: '${item}',
+							disabled: ${disabledFunc},
+							title: titleService.get(\`${item}\`, \`${GetNodeTitle(item)}\`),
+							${screen ? `screen: Screens.${GetCodeName(screen)},` : ''}
+							parent: ${parent ? `'${parent}'` : 'null'}
+							});
+						${shouldShowPart2}
+					`;
 			})
 			.join(NEW_LINE);
 
@@ -206,9 +204,9 @@ export default class MenuGenerator {
 		});
 		let menuObj: MenuObject;
 		if (topNavigationScreen) {
-			let topMenu = GraphMethods.GetNodeLinkedTo(graphRoot, {
-				id: topNavigationScreen.id,
-				link: LinkType.MenuLink
+			let topMenu = GetNodeByProperties({
+				[NodeProperties.MenuRootNode]: true,
+				[NodeProperties.NODEType]: NodeTypes.MenuDataSource
 			});
 			menuObj = this.constructMenu(topMenu, createMenuObj(), graphRoot, '');
 
