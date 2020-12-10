@@ -23,7 +23,8 @@ import {
 	LinkPropertyKeys,
 	SelectorType,
 	DefaultPropertyValueType,
-	NodeAttributePropertyTypes
+	NodeAttributePropertyTypes,
+	MenuDataSourcePurpose
 } from '../constants/nodetypes';
 import AddNameDescription from '../nodepacks/AddNameDescription';
 import GenericPropertyContainer from './genericpropertycontainer';
@@ -130,6 +131,7 @@ import ClearScreenConnection from '../nodepacks/screens/ClearScreenConnections';
 import { ClearApiBetweenComponents } from '../nodepacks/ClearApiBetweenComponents';
 import ConnectScreens from '../nodepacks/batch/ConnectScreens';
 import AddComponentsToScreenOptions from '../nodepacks/batch/AddComponentsToScreenOptions';
+import { updateComponentProperty } from '../actions/uiActions';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -1739,6 +1741,35 @@ class ContextMenu extends Component<any, any> {
 							this.props.toggleVisual('OPERATIONS');
 						}}
 					>
+						<TreeViewMenu
+							open={UIA.Visual(state, 'Menu Data Source Options Menu')}
+							active
+							title={'Menu Options'}
+							innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
+							toggle={() => {
+								this.props.toggleVisual('Menu Data Source Options Menu');
+							}}>
+							<TreeViewItemContainer>
+								<SelectInput
+									title={Titles.PriorityOrder}
+									label={Titles.PriorityOrder}
+									options={[].interpolate(0, 20, (v: number) => ({ title: v, value: v, id: v }))}
+									onChange={(value: any) => {
+										updateComponentProperty(currentNode.id, NodeProperties.Priority, value)
+									}}
+									value={GetNodeProp(currentNode, NodeProperties.Priority)}
+								/>
+								<SelectInput
+									title={Titles.Purpose}
+									label={Titles.Purpose}
+									options={Object.keys(MenuDataSourcePurpose).map((v: string) => ({ title: v, value: v, id: v }))}
+									onChange={(value: any) => {
+										updateComponentProperty(currentNode.id, NodeProperties.Purpose, value)
+									}}
+									value={GetNodeProp(currentNode, NodeProperties.Purpose)}
+								/>
+							</TreeViewItemContainer>
+						</TreeViewMenu>
 						<TreeViewMenu
 							open={UIA.Visual(state, 'Build Menu')}
 							active

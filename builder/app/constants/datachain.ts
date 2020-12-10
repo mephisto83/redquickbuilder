@@ -73,6 +73,8 @@ export const DataChainFunctionKeys = {
 	ModelKey: 'ModelKey',
 	ViewModelKey: 'ViewModelKey',
 	Lambda: 'Lambda',
+	Logout: 'Logout',
+	GoToLoginScreenWithNoCredentials: 'GoToLoginScreenWithNoCredentials',
 	MethodBaseValidation: 'MethodBaseValidation',
 	ModelMethodMenu: 'ModelMethodMenu',
 	NavigationMethodMenu: 'NavigationMethodMenu',
@@ -87,6 +89,7 @@ export const DataChainFunctionKeys = {
 export const DataChainTypeNames = {
 	NavigateToRoute: 'NavigateToRoute'
 };
+export const ComponentDidMountEffectDataChains = [DataChainFunctionKeys.GoToLoginScreenWithNoCredentials]
 export const DataChainFunctions: any = {
 	[DataChainFunctionKeys.Not]: {
 		ui: {},
@@ -94,6 +97,20 @@ export const DataChainFunctions: any = {
 			[NodeProperties.NODEType]: true
 		},
 		value: 'Not'
+	},
+	[DataChainFunctionKeys.Logout]: {
+		ui: {},
+		filter: {
+			[NodeProperties.NODEType]: true
+		},
+		value: 'Logout'
+	},
+	[DataChainFunctionKeys.GoToLoginScreenWithNoCredentials]: {
+		ui: {},
+		filter: {
+			[NodeProperties.NODEType]: true
+		},
+		value: 'GoToLoginScreenWithNoCredentials'
 	},
 	[DataChainFunctionKeys.Title]: {
 		ui: {
@@ -561,7 +578,7 @@ export const DataChainFunctions: any = {
 	}
 };
 export function connectNodeChain(prop: any, reverse?: any) {
-	return function(currentNode: any, value: any) {
+	return function (currentNode: any, value: any) {
 		var id = currentNode.id;
 		this.props.graphOperation(connectNodeChainCommands(prop, id, value, currentNode.properties[prop], reverse));
 	};
@@ -596,7 +613,7 @@ export function connectNodeChainCommands(prop: any, id: any, value: any, source:
 }
 
 export function snipNodeFromInbetween() {
-	return function(currentNode: any) {
+	return function (currentNode: any) {
 		let graph = GetCurrentGraph(GetState());
 		let links: any = getNodeLinks(graph, currentNode.id);
 		if (links.length === 2) {
@@ -641,7 +658,7 @@ export function snipNodeFromInbetween() {
 	};
 }
 export function insertNodeInbetween(_callback?: any, graph?: any) {
-	return function(currentNode: any, value: any) {
+	return function (currentNode: any, value: any) {
 		graph = graph || GetCurrentGraph(GetState());
 		let me: any = this;
 		let link = GetLinkBetween(currentNode.id, value, graph);
@@ -660,8 +677,8 @@ export function insertNodeInbetween(_callback?: any, graph?: any) {
 				parent: source.id,
 				groupProperties: groupParent
 					? {
-							id: groupParent
-						}
+						id: groupParent
+					}
 					: {},
 				linkProperties: { properties: { ...LinkProperties.DataChainLink } },
 				properties: {
@@ -730,14 +747,14 @@ export function InsertNodeInbetween(
 		result.push(
 			{
 				operation: ADD_NEW_NODE,
-				options: function() {
+				options: function () {
 					return {
 						nodeType: NodeTypes.DataChain,
 						parent: source.id,
 						groupProperties: groupParent
 							? {
-									id: groupParent
-								}
+								id: groupParent
+							}
 							: {},
 						linkProperties: { properties: { ...LinkProperties.DataChainLink } },
 						properties: {
@@ -763,7 +780,7 @@ export function InsertNodeInbetween(
 			},
 			{
 				operation: ADD_LINK_BETWEEN_NODES,
-				options: function() {
+				options: function () {
 					return {
 						source: link.source,
 						target: targetNode.id,
@@ -773,7 +790,7 @@ export function InsertNodeInbetween(
 			},
 			{
 				operation: CHANGE_NODE_PROPERTY,
-				options: function() {
+				options: function () {
 					return {
 						id: link.target,
 						value: targetNode.id,
@@ -786,7 +803,7 @@ export function InsertNodeInbetween(
 	return result;
 }
 export function connectChain() {
-	return function(currentNode: { id: any }, value: any) {
+	return function (currentNode: { id: any }, value: any) {
 		var id = currentNode.id;
 		this.props.graphOperation(ConnectChainCommand(id, value));
 	};
@@ -815,8 +832,8 @@ export function ConnectChainCommand(source: any, target: any) {
 export function AddChainCommand(currentNode: any, callback: () => void, graph: Graph, viewPackage = {}): any {
 	let groupProperties = GetNodeProp(currentNode, NodeProperties.GroupParent)
 		? {
-				id: getGroup(GetNodeProp(currentNode, NodeProperties.GroupParent), graph).id
-			}
+			id: getGroup(GetNodeProp(currentNode, NodeProperties.GroupParent), graph).id
+		}
 		: null;
 	return {
 		operation: ADD_NEW_NODE,
@@ -878,9 +895,9 @@ export const DataChainContextMethods: any = {
 	StandardLink: connectChain(),
 	InsertDataChain: insertNodeInbetween(),
 	SnipDataChain: snipNodeFromInbetween(),
-	SplitDataChain: function(currentNode: { id: any }) {
+	SplitDataChain: function (currentNode: { id: any }) {
 		let id = currentNode.id;
 		let { state } = this.props;
-		this.props.graphOperation([ SplitDataCommand(currentNode) ]);
+		this.props.graphOperation([SplitDataCommand(currentNode)]);
 	}
 };

@@ -12,9 +12,11 @@ import * as Globals from './globals';
 // }
 var accessToken = '';
 let userId: string;
+let accesstoken_nonce: string;
 let credentials: ServiceCredentials = {
 	accessToken: '',
-	userId: ''
+	userId: '',
+	accesstoken_nonce: ''
 };
 interface ServiceCredentials {
 	isAnonymous?: boolean;
@@ -22,6 +24,7 @@ interface ServiceCredentials {
 	userName?: any;
 	userId?: string;
 	accessToken?: string;
+	accesstoken_nonce?: string;
 }
 const CREDENTIALS = '$CREDENTIALS$';
 var getEndpoint = (baseDomain: any, path: any) => {
@@ -35,13 +38,25 @@ var getEndpoint = (baseDomain: any, path: any) => {
 	return endpoint;
 };
 
-export function setBearerAccessToken(access_token: string, _userId?: string) {
+export function setBearerAccessToken(access_token: string, _userId?: string, _accesstoken_nonce?: string) {
 	accessToken = access_token;
 	credentials = credentials || {};
 	credentials.accessToken = accessToken;
 	userId = _userId || '';
 	credentials.userId = _userId || '';
-	updateStoredCredentials();
+	accesstoken_nonce = _accesstoken_nonce || '';
+	credentials.accesstoken_nonce = accesstoken_nonce;
+	return updateStoredCredentials();
+}
+export function clearCredentials(callback: Function) {
+	setBearerAccessToken('', '', '')
+	storagePromise = storagePromise
+		.then(() => {
+			if (callback) {
+				callback();
+			}
+		})
+		.catch((e) => console.warn(e));
 }
 export function getUser() {
 	return userId || (credentials ? credentials.userId : null);
@@ -98,29 +113,29 @@ export function createRedService(domain: any, wsdomain?: any, _forceBase?: any) 
 		onUnauthorizedHandler: (arg0: any) => void;
 	var service = {
 		testMode: false,
-		setDomain: function(domain: any) {
+		setDomain: function (domain: any) {
 			baseDomain = domain;
 		},
-		onReceiveMessage: function(receiveMessageHandler: any) {
+		onReceiveMessage: function (receiveMessageHandler: any) {
 			receivedMessageHandler = receiveMessageHandler;
 		},
-		onUnauthorized: function(handler: any) {
+		onUnauthorized: function (handler: any) {
 			onUnauthorizedHandler = handler;
 		},
-		setWSDomain: function(domain: any) {
+		setWSDomain: function (domain: any) {
 			wsbaseDomain = domain;
 		},
-		setUserAccessToken: function(access_token: string) {
+		setUserAccessToken: function (access_token: string) {
 			accessToken = access_token;
 			service.r.connect();
 		},
-		setBearerAccessToken: function(access_token: string) {
+		setBearerAccessToken: function (access_token: string) {
 			accessToken = access_token;
 		},
-		getAccessToken: function() {
+		getAccessToken: function () {
 			return accessToken;
 		},
-		call: function(
+		call: function (
 			endpoint: RequestInfo,
 			method: any,
 			body?: { [x: string]: string | Blob } | undefined,
@@ -162,7 +177,7 @@ export function createRedService(domain: any, wsdomain?: any, _forceBase?: any) 
 			}
 			let receivedHeaders: any = {};
 			return fetchPromise
-				.then(function(response) {
+				.then(function (response) {
 					//setTimeout(() => null, 0);  // workaround for issue-6679
 					if (response.status === 401) {
 						throw {
@@ -181,12 +196,12 @@ export function createRedService(domain: any, wsdomain?: any, _forceBase?: any) 
 						});
 					}
 					if (options && options.asText) {
-						return response.text().then(function(txt) {
+						return response.text().then(function (txt) {
 							console.log(`called at ${new Date().toTimeString()} ${endpoint}`);
 							return txt;
 						});
 					}
-					return response.json().then(function(json) {
+					return response.json().then(function (json) {
 						console.log(`called at ${new Date().toTimeString()} ${endpoint}`);
 						return json;
 					});
@@ -208,31 +223,31 @@ export function createRedService(domain: any, wsdomain?: any, _forceBase?: any) 
 					return Promise.reject(e);
 				});
 		},
-		delete: function(path: any) {
+		delete: function (path: any) {
 			return Globals.getDefaultURL().then((_baseDomain: any) => {
 				var endpoint = getEndpoint(forceBase ? baseDomain || _baseDomain : _baseDomain, path);
 				return service.call(endpoint, 'DELETE');
 			});
 		},
-		put: function(path: any, body: any) {
+		put: function (path: any, body: any) {
 			return Globals.getDefaultURL().then((_baseDomain: any) => {
 				var endpoint = getEndpoint(forceBase ? baseDomain || _baseDomain : _baseDomain, path);
 				return service.call(endpoint, 'PUT', body);
 			});
 		},
-		post: function(path: any, body: any, options = {}) {
+		post: function (path: any, body: any, options = {}) {
 			return Globals.getDefaultURL().then((_baseDomain: any) => {
 				var endpoint = getEndpoint(forceBase ? baseDomain || _baseDomain : _baseDomain, path);
 				return service.call(endpoint, 'POST', body, options);
 			});
 		},
-		patch: function(path: any, body: any) {
+		patch: function (path: any, body: any) {
 			return Globals.getDefaultURL().then((_baseDomain: any) => {
 				var endpoint = getEndpoint(forceBase ? baseDomain || _baseDomain : _baseDomain, path);
 				return service.call(endpoint, 'PATCH', body);
 			});
 		},
-		get: function(path: any) {
+		get: function (path: any) {
 			return Globals.getDefaultURL().then((_baseDomain: any) => {
 				var endpoint = getEndpoint(forceBase ? baseDomain || _baseDomain : _baseDomain, path);
 				return service.call(endpoint, 'GET');
@@ -245,7 +260,7 @@ export function createRedService(domain: any, wsdomain?: any, _forceBase?: any) 
 					console.log('Web socket closed');
 				}
 			},
-			connect: function(
+			connect: function (
 				handler?: any,
 				onopen?: () => void,
 				onclose?: (arg0: CloseEvent) => void,
@@ -255,7 +270,7 @@ export function createRedService(domain: any, wsdomain?: any, _forceBase?: any) 
 				var promise: Promise<void | unknown> = Promise.resolve();
 				var oncatch = (e: { message: { json: () => Promise<any> } }) => {
 					if (e && e.message && e.message.json) {
-						return e.message.json().then((c: any) => console.log(c)).catch(() => {});
+						return e.message.json().then((c: any) => console.log(c)).catch(() => { });
 					}
 					console.log(e);
 				};
@@ -301,8 +316,8 @@ export function createRedService(domain: any, wsdomain?: any, _forceBase?: any) 
 										if (onclose) {
 											onclose(e);
 										}
-										setTimeout(function() {
-											resolve();
+										setTimeout(function () {
+											resolve(true);
 											promise = promise.then(() => {
 												return connectToService().catch(oncatch);
 											});
@@ -310,7 +325,7 @@ export function createRedService(domain: any, wsdomain?: any, _forceBase?: any) 
 									};
 								})
 								.catch((e: any) => {
-									resolve();
+									resolve(true);
 									return Promise.resolve()
 										.then(() => {
 											return oncatch(e);

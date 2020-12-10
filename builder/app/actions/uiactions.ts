@@ -2421,14 +2421,88 @@ export function GenerateDataChainMethod(id: string, options: { language: any }) 
         return false;
       }`;
 		case DataChainFunctionKeys.LoadUserCredentialsFromLocalStore:
+			let autoNavigateScript = '';
+			let navigationScreen = GetNodeByProperties({
+				[NodeProperties.IsHomeLaunchView]: true
+			});
+			if (navigationScreen) {
+				let screenImpl = GraphMethods.GetNodeLinkedTo(GetCurrentGraph(), {
+					id: navigationScreen.id,
+					link: NodeConstants.LinkType.NavigationScreenImplementation
+				});
+				if (screenImpl) {
+					autoNavigateScript = `navigate.Go({ route: routes.${GetCodeName(screenImpl)} })(GetDispatch(), GetState());`
+				}
+			}
 			return `(a${anyType}) => {
 
         $service.loadCredentials((credentials: any) => {
-          DC.${func}(credentials)
+		  DC.${func}(credentials);
+			if (credentials && credentials.accessToken && credentials.userId) {
+			  let setAt = GUID();
+			  $service.setBearerAccessToken(credentials.accessToken, credentials.userId, setAt);
+			  controller.isLoggedIn({
+				body: null,
+				dataChain: (res: any) => {
+				  console.log('Check user login status results');
+				  console.log(res);
+				  if(res.userName && res.userId) {
+					  ${autoNavigateScript}
+				  }
+				}
+			  })(GetDispatch(), GetState());
+			}
         });
 
         return a;
-     }`;
+	 }`;
+		case DataChainFunctionKeys.Logout:
+			let homeView = GetNodeByProperties({
+				[NodeProperties.IsHomeView]: true,
+				[NodeProperties.NODEType]: NodeTypes.Screen
+			});
+			let autoLogoutToHome = `navigate.Go({ route: routes.${GetCodeName(homeView)} })(GetDispatch(), GetState());`
+			return `(a${anyType}) => {
+        $service.clearCredentials((credentials: any) => {
+		  ${autoLogoutToHome}
+        });
+
+        return a;
+	 }`;
+		case DataChainFunctionKeys.GoToLoginScreenWithNoCredentials:
+			{
+				let homeView = GetNodeByProperties({
+					[NodeProperties.IsHomeView]: true,
+					[NodeProperties.NODEType]: NodeTypes.Screen
+				});
+				let autoLogoutToHome = `navigate.Go({ route: routes.${GetCodeName(homeView)} })(GetDispatch(), GetState());`
+				return `(a${anyType}) => {
+					$service.loadCredentials((credentials: any) => {
+						  if (credentials && credentials.accessToken && credentials.userId) {
+							let setAt = GUID();
+							$service.setBearerAccessToken(credentials.accessToken, credentials.userId, setAt);
+							controller.isLoggedIn({
+							  body: null,
+							  dataChain: (res: any) => {
+								console.log('Check user login status results');
+								console.log(res);
+								if(!res.userId) {
+									$service.clearCredentials((credentials: any) => {
+										${autoLogoutToHome}
+									  });
+								}
+							  }
+							})(GetDispatch(), GetState());
+						  }
+						  else { 
+							$service.clearCredentials((credentials: any) => {
+								${autoLogoutToHome}
+							});
+						  }
+					  });
+						return a;
+					}`;
+			}
 		case DataChainFunctionKeys.Equals:
 			return `(a${anyType}, b${anyType}) => a === b`;
 		case DataChainFunctionKeys.Required:

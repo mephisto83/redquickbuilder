@@ -164,6 +164,7 @@ import DashboardScreenNavigation from '../nodepacks/DashboardScreenNavigation';
 import CheckBoxProperty from './checkboxproperty';
 import AddShouldShowDataChain from '../nodepacks/screens/menus/AddShouldShowDataChain';
 import { startSequence, runSequence, viewFlowCode, populateGraphPackage, graphWindowCommand, BuildReport } from '../actions/remoteActions';
+import AddLogoutDataChain from '../nodepacks/screens/menus/AddLogoutDataChain';
 
 const { clipboard } = require('electron');
 
@@ -778,6 +779,27 @@ class Dashboard extends Component<any, any> {
 				},
 				icon: 'fa fa-rocket',
 				title: `Data Chain Is Disabled`
+			},
+			{
+				onClick: () => {
+					const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
+					let shouldBeDisabled: Node[] = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+						id: currentNode.id,
+						direction: SOURCE,
+						link: LinkType.DataChainIsDisabled
+					});
+					if (!shouldBeDisabled.length) {
+						this.props.graphOperation(
+							AddLogoutDataChain({
+								id: currentNode.id,
+								name: `Logout ${UIA.GetNodeTitle(currentNode)}`,
+								linkProperty: LinkProperties.DataChainLogout
+							})
+						);
+					}
+				},
+				icon: 'fas fa-sign-out-alt',
+				title: `Data Chain Logout`
 			},
 			{
 				onClick: () => {

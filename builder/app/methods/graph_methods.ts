@@ -139,6 +139,12 @@ export function GetNodeProp(node: any, prop: string, currentGraph?: any) {
 	}
 	return node && node.properties && node.properties[prop];
 }
+export function HasNodeProp(node: any, prop: string, currentGraph?: any) {
+	if (typeof node === 'string') {
+		node = GetNodeById(node, currentGraph) || node;
+	}
+	return node && node.properties && node.properties.hasOwnProperty(prop);
+}
 
 export const GraphKeys = {
 	NAMESPACE: 'namespace',

@@ -67,6 +67,7 @@ import { graphOperation, GetDispatchFunc, GetStateFunc } from '../actions/uiActi
 import SetupAuthenticationButtons from '../nodepacks/batch/SetupAuthenticationButtons';
 import AttachTitleService from '../nodepacks/batch/AttachTitleService';
 import { buildAst, buildFunctions, buildRules, FlowCodeStatements } from '../constants/flowcode_ast';
+import { GetAgentAccessLink } from '../service/screenservice';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -432,6 +433,11 @@ class QuickMethods extends Component<any, any, any> {
 									}}
 									icon="fa fa-tag"
 								>
+									<TreeViewMenu title="GetAgentAccessLink"
+										onClick={() => {
+											let res = GetAgentAccessLink(currentNode);
+											debugger;
+										}} />
 									<TreeViewMenu
 										title="FlowCode Test"
 										onClick={() => {

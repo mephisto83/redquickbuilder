@@ -28,7 +28,9 @@ import {
 	Effect,
 	EffectDescription,
 	ScreenEffectApi,
-	AfterEffect
+	AfterEffect,
+	ComponentDidMountEffectApiProps,
+	ComponentDidMountEffect
 } from '../interface/methodprops';
 import SelectInput from './selectinput';
 import { ViewTypes } from '../constants/viewtypes';
@@ -39,6 +41,7 @@ import { MethodFunctions, FunctionTemplateKeys, GetFunctionTypeOptions } from '.
 import CheckBox from './checkbox';
 import ScreenEffectsComponent from './screenEffectsComponent';
 import AfterEffectsComponent from './aftereffectscomponent';
+import ComponentDidMountEffectsComponent from './componentDidMountEffectsComponent';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ScreenEffectContextMenu extends Component<any, any> {
@@ -54,10 +57,7 @@ class ScreenEffectContextMenu extends Component<any, any> {
 		let { agent } = mode;
 		let screenEffectApis: ScreenEffectApi[] = mode.screenEffectApis;
 		if (screenEffectApis) {
-			const exit = () => {
-				this.props.setVisual(UIA.AGENT_SCREENEFFECT_CONTEXT_MENU, null);
-			};
-
+			
 			switch (mode) {
 				default:
 					result.push(
@@ -74,6 +74,25 @@ class ScreenEffectContextMenu extends Component<any, any> {
 					break;
 			}
 		}
+		let componentMountEffects: ComponentDidMountEffect[] = mode.componentMountEffects;
+		if (componentMountEffects) { 
+			switch (mode) {
+				default:
+					result.push(
+						<ComponentDidMountEffectsComponent
+							onChange={() => {
+								if (mode && mode.callback) {
+									mode.callback();
+								}
+							}}
+							api
+							effects={componentMountEffects}
+						/>
+					);
+					break;
+			}
+		}
+		
 		return result;
 	}
 

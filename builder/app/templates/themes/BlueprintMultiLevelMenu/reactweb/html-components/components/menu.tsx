@@ -16,12 +16,12 @@ export default class Menu extends Component<any, any> {
 			return (
 				<ul
 					style={{
-             display: this.props.open ? 'block' : '',
-             /*
-  // @ts-ignore */
-              '--item-count': children.length
-             }}
-					className={` nav nav  ${this.props.open ?  'nav-open' : ''} nav-treeview  flex-column `}
+						display: this.props.open ? 'block' : '',
+						/*
+			 // @ts-ignore */
+						'--item-count': children.length
+					}}
+					className={` nav nav  ${this.props.open ? 'nav-open' : ''} nav-treeview  flex-column `}
 				>
 					{children.map((child: any, index: any) => this.renderItem(child, index))}
 				</ul>
@@ -51,7 +51,7 @@ export default class Menu extends Component<any, any> {
 		let isActive = this.isActive(child, index);
 		let isParent = this.isParent(child, index);
 		return ` nav-icon  ${isParent ? 'fas fa-angle-right' : 'far fa-circle'} ${isActive
-			?  'icon-active'
+			? 'icon-active'
 			: ''}`;
 	}
 	renderItem(child: any, index: any) {
@@ -65,8 +65,8 @@ export default class Menu extends Component<any, any> {
 			<li
 				key={`li-${index}`}
 				className={` nav-item
-        ${openMenu === id ?  'menu-opn' : ''}
-        ${children && children.length ?  'has-treeview' : ''} menu-drop-down`}
+				${openMenu === id ? 'menu-opn' : ''}
+				${children && children.length ? 'has-treeview' : ''} menu-drop-down`}
 				onClick={() => {
 					if (this.props.toggleVisual) {
 						this.props.toggleVisual('menu-item-open', id);
@@ -75,14 +75,18 @@ export default class Menu extends Component<any, any> {
 							openMenu: this.state.openMenu === id ? '' : id
 						});
 					}
-					if (this.props.onClick) {
+
+					if (child && child.properties && child.properties.execute) {
+						child.properties.execute()
+					}
+					else if (this.props.onClick) {
 						this.props.onClick(id);
 					}
 				}}
 			>
 				<a
 					className={` nav-link  ${this.isActive(child, index)
-						?  'active' 						: ''} menu-drop-down-button`}
+						? 'active' : ''} menu-drop-down-button`}
 				>
 					<i className={`${this.getIcon(child, index)}`} />
 					<p>{titleService ? titleService.getTitle(title) : title}</p>

@@ -67,6 +67,7 @@ export const FunctionTypes = {
 	Register: 'Register',
 	AnonymousRegisterLogin: 'AnonymousRegisterLogin',
 	CheckUserLoginStatus: 'CheckUserLoginStatus',
+	IsLoggedIn: 'IsLoggedIn',
 	ForgotLogin: 'ForgotLogin',
 	ChangeUserPassword: 'ChangeUserPassword'
 	// IAgent_and_Permission_determing_the_permission_based_on_a_PROPERTY: 'Given an Agent and Permission, determing the permission based on a PROPERTY'
@@ -1477,6 +1478,25 @@ export const MethodFunctions: any = {
 	},
 	[FunctionTypes.CheckUserLoginStatus]: {
 		title: Titles.CheckUserLoginStatus,
+		constraints: {
+			...COMMON_CONSTRAINTS_ANONYMOUS
+		},
+		output: {
+			...COMMON_OUTPUT.LIST
+		},
+		permission: false,
+		validation: false,
+		filter: false,
+		parameters: {
+			body: false,
+			parameters: false
+		},
+		isList: false,
+		method: Methods.Create,
+		template_keys: { ...COMMON_FUNCTION_TEMPLATE_KEYS }
+	},
+	[FunctionTypes.IsLoggedIn]: {
+		title: Titles.IsLoggedIn,
 		constraints: {
 			...COMMON_CONSTRAINTS_ANONYMOUS
 		},

@@ -83,13 +83,12 @@ import MethodProps, {
 	AfterEffect,
 	ExecutionConfig,
 	ValidationConfig,
-	PermissionConfig
+	PermissionConfig,
+	ComponentDidMountEffect,
+	ComponentDidMountEffectApiProps
 } from '../interface/methodprops';
 import { Node, GraphLink } from '../methods/graph_types';
 import ContentInfo from './contentinfo';
-import { RouterRootState } from 'connected-react-router';
-import { multiple } from './editor.main.css';
-import { mount } from 'enzyme';
 import getLanguageMeaning from '../service/naturallang';
 import { effectAutoGeneratePVF } from './effectcontextmenu';
 import { mountingAutoGeneratePVF } from './mountingcontextmenu';
@@ -111,7 +110,9 @@ class AgentAccessView extends Component<any, any> {
 			agentMethod: [],
 			agentEffect: [],
 			agentScreenEffect: {},
-			dashboardScreenEffect: {}
+			componentDidMountEffects: {},
+			dashboardScreenEffect: {},
+			dashboardComponentDidMountEffects: {}
 		};
 	}
 
@@ -141,7 +142,9 @@ class AgentAccessView extends Component<any, any> {
 				agentRouting,
 				dashboardRouting,
 				agentScreenEffect,
-				dashboardScreenEffect
+				componentDidMountEffects,
+				dashboardScreenEffect,
+				dashboardComponentDidMountEffects
 			} = this.state;
 			if (agentEffect) {
 				agentEffect.forEach((array: any, aI: string) => {
@@ -179,6 +182,28 @@ class AgentAccessView extends Component<any, any> {
 					Object.keys(dashboardScreenEffect[agentId]).forEach((modelId: string) => {
 						let screenEffect: ScreenEffectApi[] = dashboardScreenEffect[agentId][modelId];
 						validateScreenEffect(screenEffect, result, `${GetNodeTitle(agentId)}/${GetNodeTitle(modelId)}`);
+					});
+				});
+			}
+			if (componentDidMountEffects) {
+				Object.keys(componentDidMountEffects).forEach((agentId: string) => {
+					Object.keys(componentDidMountEffects[agentId]).forEach((modelId: string) => {
+						Object.keys(componentDidMountEffects[agentId][modelId]).forEach((key: string) => {
+							let componentDidMountEffect: ComponentDidMountEffect[] = componentDidMountEffects[agentId][modelId][key];
+							validateComponentDidMountEffect(
+								componentDidMountEffect,
+								result,
+								`${GetNodeTitle(agentId)}/${GetNodeTitle(modelId)}/${key}`
+							);
+						});
+					});
+				});
+			}
+			if (dashboardComponentDidMountEffects) {
+				Object.keys(dashboardComponentDidMountEffects).forEach((agentId: string) => {
+					Object.keys(dashboardComponentDidMountEffects[agentId]).forEach((modelId: string) => {
+						let screenEffect: ComponentDidMountEffect[] = dashboardComponentDidMountEffects[agentId][modelId];
+						validateComponentDidMountEffect(screenEffect, result, `${GetNodeTitle(agentId)}/${GetNodeTitle(modelId)}`);
 					});
 				});
 			}
@@ -457,7 +482,7 @@ class AgentAccessView extends Component<any, any> {
 		// 	},
 		// 	graph
 		// ).filter((x) => !GetNodeProp(x, NodeProperties.IsUser));
-		let table_height = '450px';
+		let table_height = '550px';
 		return (
 			<TopViewer active={active}>
 				<section className="content">
@@ -500,6 +525,16 @@ class AgentAccessView extends Component<any, any> {
 												agentMethod: loadAgentMethods(onlyAgents, accessDescriptions, graph),
 												agentRouting: loadAgentRouting(onlyAgents, accessDescriptions, graph),
 												dashboardRouting: loadAgentDashboardRouting(
+													onlyAgents,
+													accessDescriptions,
+													graph
+												),
+												componentDidMountEffects: loadAgentComponentDidMountEffect(
+													onlyAgents,
+													accessDescriptions,
+													graph
+												),
+												dashboardComponentDidMountEffects: loadDashboardComponentDidMountEffect(
 													onlyAgents,
 													accessDescriptions,
 													graph
@@ -1610,7 +1645,22 @@ class AgentAccessView extends Component<any, any> {
 																			}
 
 																			let screenEffectApis: ScreenEffectApi[] = [];
-
+																			let componentMountEffects: ComponentDidMountEffect[] = [];
+																			if (this.hasComponentDidMountEffect(agent, model, v)) {
+																				componentMountEffects =
+																					this.getComponentDidMountEffects(
+																						agent,
+																						model,
+																						v
+																					) || componentMountEffects;
+																			} else {
+																				this.setComponentDidMountEffects(
+																					agent,
+																					model,
+																					v,
+																					componentMountEffects
+																				);
+																			}
 																			if (
 																				this.hasScreenEffects(agent, model, v)
 																			) {
@@ -1633,7 +1683,8 @@ class AgentAccessView extends Component<any, any> {
 																				agent,
 																				model,
 																				v,
-																				screenEffectApis
+																				screenEffectApis,
+																				componentMountEffects
 																			);
 																			return (
 																				<td key={tdkey}>
@@ -1700,6 +1751,15 @@ class AgentAccessView extends Component<any, any> {
 																		}
 
 																		let screenEffects: ScreenEffectApi[] = [];
+																		let componentMountEffects: ComponentDidMountEffect[] = [];
+																		if (this.hasDashboardComponentDidMountEffect(agent, dashboard)) {
+																			componentMountEffects =
+																				this.getDashboardComponentDidMountEffects(
+																					agent,
+																					dashboard
+																				) || componentMountEffects;
+																		}
+
 																		if (
 																			this.hasDashboardScreenEffects(
 																				agent,
@@ -1716,7 +1776,8 @@ class AgentAccessView extends Component<any, any> {
 																		let addScreenEffectBtn = this.createDashboardScreenEffectDescriptionButton(
 																			agent,
 																			dashboard,
-																			screenEffects
+																			screenEffects,
+																			componentMountEffects
 																		);
 
 																		return (
@@ -1752,11 +1813,11 @@ class AgentAccessView extends Component<any, any> {
 			</TopViewer>
 		);
 	}
-	private createScreenEffectButton(agent: string, model: string, v: string, screenEffectApis: ScreenEffectApi[]) {
+	private createScreenEffectButton(agent: string, model: string, v: string, screenEffectApis: ScreenEffectApi[], componentMountEffects: ComponentDidMountEffect[]) {
 		return (
 			<div className="btn-group">
 				<button
-					className={screenEffectApis && screenEffectApis.length ? 'btn btn-info' : 'btn btn-default'}
+					className={(screenEffectApis && screenEffectApis.length) || (componentMountEffects && componentMountEffects.length) ? 'btn btn-info' : 'btn btn-default'}
 					type="button"
 					onClick={() => {
 						this.props.setVisual(AGENT_SCREENEFFECT_CONTEXT_MENU, {
@@ -1764,6 +1825,7 @@ class AgentAccessView extends Component<any, any> {
 							model,
 							viewType: v,
 							screenEffectApis,
+							componentMountEffects,
 							callback: () => {
 								this.setState({
 									turn: GUID()
@@ -1780,18 +1842,20 @@ class AgentAccessView extends Component<any, any> {
 	private createDashboardScreenEffectDescriptionButton(
 		agent: string,
 		dashboard: string,
-		screenEffectApis: ScreenEffectApi[]
+		screenEffectApis: ScreenEffectApi[],
+		componentMountEffects: ComponentDidMountEffect[]
 	) {
 		return (
 			<div className="btn-group">
 				<button
-					className={screenEffectApis && screenEffectApis.length ? 'btn btn-info' : 'btn btn-default'}
+					className={(screenEffectApis && screenEffectApis.length || (componentMountEffects && componentMountEffects.length)) ? 'btn btn-info' : 'btn btn-default'}
 					type="button"
 					onClick={() => {
 						this.props.setVisual(DASHBOARD_SCREENEFFECT_CONTEXT_MENU, {
 							agent,
 							dashboard,
 							screenEffectApis,
+							componentMountEffects,
 							callback: () => {
 								this.setState({
 									turn: GUID()
@@ -2362,6 +2426,33 @@ class AgentAccessView extends Component<any, any> {
 			this.state.agentScreenEffect[agent][model][v]
 		);
 	}
+	private hasComponentDidMountEffect(agent: string, model: string, v: string) {
+		return (
+			this.state.componentDidMountEffects &&
+			this.state.componentDidMountEffects[agent] &&
+			this.state.componentDidMountEffects[agent][model] &&
+			this.state.componentDidMountEffects[agent][model][v]
+		);
+	}
+	private setComponentDidMountEffects(agent: string, model: string, v: string, value: ComponentDidMountEffect[]) {
+
+		if (this.state.componentDidMountEffects && !this.state.componentDidMountEffects[agent]) {
+			this.state.componentDidMountEffects[agent] = {};
+		}
+		if (
+			this.state.componentDidMountEffects &&
+			this.state.componentDidMountEffects[agent] &&
+			!this.state.componentDidMountEffects[agent][model]
+		) {
+			this.state.componentDidMountEffects[agent][model] = {};
+		}
+		if (this.state.componentDidMountEffects)
+			if (this.state.componentDidMountEffects[agent] && this.state.componentDidMountEffects[agent][model]) {
+				this.state.componentDidMountEffects[agent][model][v] = value;
+				this.setState({ componentDidMountEffects: this.state.componentDidMountEffects });
+			}
+	}
+
 	private setScreenEffects(agent: string, model: string, v: string, value: ScreenEffectApi[]) {
 		if (!this.state.agentScreenEffect) {
 			this.state.agentScreenEffect = {};
@@ -2386,6 +2477,10 @@ class AgentAccessView extends Component<any, any> {
 		this.state.agentScreenEffect[agent][model][v] = this.state.agentScreenEffect[agent][model][v] || [];
 		return this.state.agentScreenEffect[agent][model][v];
 	}
+	private getComponentDidMountEffects(agent: string, model: string, v: string): ComponentDidMountEffect[] {
+		this.state.componentDidMountEffects[agent][model][v] = this.state.componentDidMountEffects[agent][model][v] || [];
+		return this.state.componentDidMountEffects[agent][model][v];
+	}
 	private hasDashboardRouting(agent: string, dashboard: string) {
 		return (
 			this.state.dashboardRouting &&
@@ -2400,10 +2495,23 @@ class AgentAccessView extends Component<any, any> {
 			this.state.dashboardScreenEffect[agent][dashboard]
 		);
 	}
+	private hasDashboardComponentDidMountEffect(agent: string, dashboard: string): boolean {
+		return (
+			this.state.dashboardComponentDidMountEffects &&
+			this.state.dashboardComponentDidMountEffects[agent] &&
+			this.state.dashboardComponentDidMountEffects[agent][dashboard]
+		);
+	}
 	private getDashboardScreenEffects(agent: string, dashboard: string): ScreenEffectApi[] {
 		this.state.dashboardScreenEffect[agent][dashboard] = this.state.dashboardScreenEffect[agent][dashboard] || [];
 		return this.state.dashboardScreenEffect[agent][dashboard];
 	}
+
+	private getDashboardComponentDidMountEffects(agent: string, dashboard: string): ComponentDidMountEffect[] {
+		this.state.dashboardComponentDidMountEffects[agent][dashboard] = this.state.dashboardComponentDidMountEffects[agent][dashboard] || [];
+		return this.state.dashboardComponentDidMountEffects[agent][dashboard];
+	}
+
 	private hasFunctionKeyValue(agentIndex: number, modelIndex: number, v: string, functionKey: string) {
 		return (
 			this.state.agentMethod[agentIndex] &&
@@ -2533,6 +2641,28 @@ function validateScreenEffect(screenEffects: ScreenEffectApi[], result: any[], t
 						type={'danger'}
 						description={`${title}`}
 						title={screenEffect.name}
+						messages={messages}
+					/>
+				);
+			}
+		});
+	}
+}
+function validateComponentDidMountEffect(componentDidMounts: ComponentDidMountEffect[], result: any[], title: string) {
+	if (componentDidMounts) {
+		componentDidMounts.forEach((componentDidMount: ComponentDidMountEffect) => {
+			let messages: string[] = [];
+			ValidName(componentDidMount.name, messages, { lowerCase: false });
+
+			if (!componentDidMount.dataChain) {
+				messages.push('no datachain selected.');
+			}
+			if (messages.length) {
+				result.push(
+					<ContentInfo
+						type={'danger'}
+						description={`${title}`}
+						title={componentDidMount.name}
 						messages={messages}
 					/>
 				);
@@ -2739,19 +2869,6 @@ function loadAgentDashboardRouting(onlyAgents: any[], accessDescriptions: any[],
 							return !routing.routes.find((v) => v.linkId === x.id);
 						})
 						.filter(filterRoutes(routing))
-						.forEach((navLink) => {
-							// let isDashboard = GetNodeProp(navLink.target, NodeProperties.IsDashboard);
-							// routing.routes.push({
-							// 	agent: !isDashboard ? GetNodeProp(navLink.target, NodeProperties.Agent) : '',
-							// 	id: GUID(),
-							// 	model: !isDashboard ? GetNodeProp(navLink.target, NodeProperties.Model) : '',
-							// 	name: `${GetNodeTitle(navLink.source)} to ${GetNodeTitle(navLink.target)}`,
-							// 	viewType: !isDashboard ? GetNodeProp(navLink.target, NodeProperties.ViewType) : '',
-							// 	isDashboard,
-							// 	dashboard: isDashboard ? navLink.target : '',
-							// 	linkId: navLink.id
-							// });
-						});
 				}
 			}
 		});
@@ -2832,12 +2949,34 @@ function loadAgentScreenEffect(onlyAgents: any[], accessDescriptions: any[], gra
 
 	return res;
 }
+function loadAgentComponentDidMountEffect(onlyAgents: any[], accessDescriptions: any[], graph: any) {
+	let res: any = loadAgentObj<ComponentDidMountEffectApiProps>(
+		onlyAgents,
+		accessDescriptions,
+		graph,
+		LinkPropertyKeys.ComponentDidMountApiProps
+	);
+
+	return res;
+}
 function loadDashboardScreenEffect(onlyAgents: any[], accessDescriptions: any[], graph: any) {
 	let res: any = loadDashboard<ScreenEffectApi[]>(
 		onlyAgents,
 		accessDescriptions,
 		graph,
 		LinkPropertyKeys.DashboardScreenEffectApiProps,
+		true
+	);
+
+	return res;
+}
+
+function loadDashboardComponentDidMountEffect(onlyAgents: any[], accessDescriptions: any[], graph: any) {
+	let res: any = loadDashboard<ComponentDidMountEffect[]>(
+		onlyAgents,
+		accessDescriptions,
+		graph,
+		LinkPropertyKeys.DashboardComponentDidMountApiProps,
 		true
 	);
 

@@ -10,7 +10,8 @@ interface MenuItem {
 		id: string,
 		parent: string | null,
 		title: string,
-		screen: string
+		screen: string,
+		execute?: Function
 	}
 }
 
@@ -67,7 +68,10 @@ export default class Menu extends Component<{ [index: string]: any }, { [index: 
 				className={` menuDropDownMenu  menu-drop-down-button`}
 				key={`menu-leaf-${index}`}
 				onClick={() => {
-					if (this.props.onClick) {
+					if (child && child.properties && child.properties.execute) {
+						child.properties.execute()
+					}
+					else if (this.props.onClick) {
 						if (child && child.properties && child.properties.screen) {
 							this.props.onClick(child.properties.screen)
 						}

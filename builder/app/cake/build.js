@@ -97,7 +97,7 @@ function createReactWeb() {
 					'@types/react-router@5.1.7',
 					'react-router-dom@5.2.0',
 					'@types/react-redux@7.1.9',
-					'typescript@4.0.3',
+					'typescript@4.1.2',
 					'node-sass@4.14.1',
 					'redux-thunk@2.3.0',
 					'react-redux@7.2.0',
@@ -113,7 +113,10 @@ function createReactWeb() {
 							shell: true,
 							cwd: path.join(localDir, appName)
 						})
-					);
+					).catch((e) => {
+						console.log(e);
+						console.log('failed to install ' + dependency)
+					});
 				});
 				return promise;
 			})

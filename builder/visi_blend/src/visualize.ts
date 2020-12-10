@@ -21,21 +21,21 @@ export default async function Visualize(file: string) {
 
 	cityLayoutGrid = ApplyNodesToGrid(cityLayoutGrid, graph);
 
-	let result = Anneal(cityLayoutGrid, graph, {
-		T: 2,
-		kMax: 100000,
-		swap: graph.nodes.length / 2
-	});
+	// let result = Anneal(cityLayoutGrid, graph, {
+	// 	T: 2,
+	// 	kMax: 100000,
+	// 	swap: graph.nodes.length / 2
+	// });
 	// console.log(Springy);
 
-	// ForceDirect(graph, 100000);
-	// let forces = calculateForces(cityLayoutGrid, graph);
-	// for (var i = 0; i < 1000; i++) {
-	// 	forces = calculateForces(cityLayoutGrid, graph, forces);
-	// }
+	ForceDirect(graph, 100000);
+	let forces = calculateForces(cityLayoutGrid, graph);
+	for (var i = 0; i < 1000; i++) {
+		forces = calculateForces(cityLayoutGrid, graph, forces);
+	}
 
-	let newstress: number = MeasureStress(result, graph);
-	writeLine(`new stress : ${newstress}`);
+	// let newstress: number = MeasureStress(result, graph);
+	// writeLine(`new stress : ${newstress}`);
 }
 
 function ForceDirect(graph: Graph, loops: number) {

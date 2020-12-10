@@ -12,7 +12,9 @@ import { NodeProperties, NodeTypes } from '../constants/nodetypes';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import CheckBox from './checkbox';
 import SelectInput from './selectinput';
-import { NodesByType, GetNodesByProperties, GetNodeProp } from '../methods/graph_methods';
+import { NodesByType, GetNodesByProperties, GetNodeProp, HasNodeProp } from '../methods/graph_methods';
+import SearchByPropertiesView from './searchbypropertiesview';
+import { SearchPropertyViewItem } from './searchbypropertiesviewitem';
 
 const NODE_MANAGEMENT_MENU = 'NODE_MANAGEMENT_MENU';
 const NODE_MANAGEMENT = 'NODE_MANAGEMENT';
@@ -20,7 +22,8 @@ class NodeManagement extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
 		this.state = {
-			filter: ''
+			filter: '',
+			searchByPropertyOptions: null
 		};
 	}
 	toFilterString(node) {
@@ -43,17 +46,38 @@ class NodeManagement extends Component<any, any> {
 			args[NodeProperties.NODEType] = this.state.nodeType;
 		}
 
-		let nodes_ = this.state.searchByProperties
-			? GetNodesByProperties(args, graph).filter(
+		let nodes_ = [];
+		if (this.state.searchByProperties) {
+			if (this.state.searchByPropertyOptions) {
+				let excludedFromModel = this.state.searchByPropertyOptions.filter((v: SearchPropertyViewItem) => v.excludedProperty)
+				let includedFromModel = this.state.searchByPropertyOptions.filter((v: SearchPropertyViewItem) => !v.excludedProperty)
+				let searchParam: any = {};
+				includedFromModel.forEach((ifm: SearchPropertyViewItem) => {
+					searchParam[ifm.property] = ifm.value;
+				})
+				nodes_ = GetNodesByProperties(searchParam, graph)
+				if (excludedFromModel && excludedFromModel.length) {
+					nodes_ = nodes_.filter(v => !excludedFromModel.some((efm: SearchPropertyViewItem) => HasNodeProp(v, efm.property)))
+				}
+			}
+			else {
+				nodes_ = GetNodesByProperties(args, graph).filter(
 					(x) => UIA.GetNodeProp(x, NodeProperties.IsDashboard) === this.state.isDashboard
 				)
-			: UIA.GetNodes(state);
+			}
+		}
+		else {
+			nodes_ = UIA.GetNodes(state);
+		}
 		if (this.state.isShared) {
 			nodes_ = nodes_.filter((nod: any) => GetNodeProp(nod, NodeProperties.SharedComponent));
 		}
 		let groups = nodes_
 			.filter((x) => {
 				if (!filter || !x) {
+					if (this.state.searchByProperties) {
+						return true;
+					}
 					return false;
 				}
 
@@ -69,35 +93,35 @@ class NodeManagement extends Component<any, any> {
 				let groupKey = `NodeManagement-${group}`;
 				let groupNodes = UIA.Visual(state, groupKey)
 					? groups[group]
-							.subset(0, 100)
-							.sort((a, b) =>
-								UIA.GetNodeProp(a, NodeProperties.UIText).localeCompare(
-									UIA.GetNodeProp(b, NodeProperties.UIText)
-								)
+						.subset(0, 100)
+						.sort((a, b) =>
+							`${UIA.GetNodeProp(a, NodeProperties.UIText)}`.localeCompare(
+								`${UIA.GetNodeProp(b, NodeProperties.UIText)}`
 							)
-							.map((gn, gni) => {
-								return (
-									<TreeViewMenu
-										key={`node-${group}-${gi}-${gni}`}
-										hideArrow={true}
-										title={UIA.GetNodeProp(gn, NodeProperties.UIText)}
-										icon={
-											!UIA.GetNodeProp(gn, NodeProperties.Pinned) ? (
-												'fa fa-circle-o'
-											) : (
+						)
+						.map((gn, gni) => {
+							return (
+								<TreeViewMenu
+									key={`node-${group}-${gi}-${gni}`}
+									hideArrow={true}
+									title={UIA.GetNodeProp(gn, NodeProperties.UIText)}
+									icon={
+										!UIA.GetNodeProp(gn, NodeProperties.Pinned) ? (
+											'fa fa-circle-o'
+										) : (
 												'fa fa-check-circle-o'
 											)
-										}
-										toggle={() => {
-											this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-												prop: UIA.NodeProperties.Pinned,
-												id: gn.id,
-												value: !UIA.GetNodeProp(gn, NodeProperties.Pinned)
-											});
-										}}
-									/>
-								);
-							})
+									}
+									toggle={() => {
+										this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+											prop: UIA.NodeProperties.Pinned,
+											id: gn.id,
+											value: !UIA.GetNodeProp(gn, NodeProperties.Pinned)
+										});
+									}}
+								/>
+							);
+						})
 					: [];
 				return (
 					<TreeViewMenu
@@ -169,47 +193,13 @@ class NodeManagement extends Component<any, any> {
 					/>
 				</TreeViewItemContainer>
 				{!this.state.searchByProperties ? null : (
-					<TreeViewItemContainer>
-						<SelectInput
-							title={'Node Type'}
-							label={'Node Type'}
-							options={Object.keys(NodeTypes).map((x) => ({
-								title: x,
-								value: NodeTypes[x],
-								id: NodeTypes[x]
-							}))}
-							onChange={(val: boolean) => {
-								this.setState({ nodeType: val });
-							}}
-							value={this.state.nodeType}
-						/>
-					</TreeViewItemContainer>
+					<SearchByPropertiesView onSearch={(options: SearchPropertyViewItem[]) => {
+						this.setState({
+							searchByPropertyOptions: options
+						})
+					}} />
 				)}
-				{!this.state.searchByProperties ? null : (
-					<TreeViewItemContainer>
-						<SelectInput
-							title={Titles.Agents}
-							label={Titles.Agents}
-							options={GetNodesByProperties({ [NodeProperties.IsAgent]: true }, graph).toNodeSelect()}
-							onChange={(val: boolean) => {
-								this.setState({ agent: val });
-							}}
-							value={this.state.agent}
-						/>
-					</TreeViewItemContainer>
-				)}
-				{!this.state.searchByProperties ? null : (
-					<TreeViewItemContainer>
-						<CheckBox
-							title={'Is Dashboard'}
-							label={'Is Dashboard'}
-							onChange={(val: boolean) => {
-								this.setState({ isDashboard: val });
-							}}
-							value={this.state.isDashboard}
-						/>
-					</TreeViewItemContainer>
-				)}
+
 				<TreeViewItemContainer>
 					<CheckBox
 						title={'Is Shared'}

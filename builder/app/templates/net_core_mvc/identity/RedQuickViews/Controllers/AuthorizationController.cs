@@ -59,13 +59,20 @@ namespace {{namespace}}.Web.Controllers
                 _controllerUser = value;
             }
         }
+        
+        [Route("is/logged/in")]
+        [HttpPost]
+        public async Task<AuthenticationResult> IsLoggedIn()
+        {
+            return AuthenticationResult.UserStatus(controllerUser);
+        }
 
         [AllowAnonymous]
         [Route("check/user/login/status")]
         [HttpPost]
         public async Task<AuthenticationResult> CheckUserLoginStatus(RedRegisterViewModel model, string returnUrl = null)
         {
-            return AuthenticationResult.UserStatus(_controllerUser);
+            return AuthenticationResult.UserStatus(controllerUser);
         }
 
         [AllowAnonymous]

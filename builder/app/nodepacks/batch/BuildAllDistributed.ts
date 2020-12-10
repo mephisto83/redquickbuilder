@@ -140,7 +140,7 @@ async function run(array: BuildStep[], name: string, func: Function) {
 		return;
 	}
 	activate(array, name);
-	const times = [ Date.now() ];
+	const times = [Date.now()];
 	await func(async (progressValue: number) => {
 		times.push(Date.now());
 		let totalTime = 0;
@@ -152,11 +152,11 @@ async function run(array: BuildStep[], name: string, func: Function) {
 		const A = 1 - progressValue;
 		const estimation = totalTime * A / progressValue;
 		setProgress(array, name, progressValue, estimation, totalTime);
-		setVisual(BuildAllProgress, [ ...array ])(GetDispatchFunc(), GetStateFunc());
+		setVisual(BuildAllProgress, [...array])(GetDispatchFunc(), GetStateFunc());
 		await pause();
 	});
 	complete(array, name);
-	setVisual(BuildAllProgress, [ ...array ])(GetDispatchFunc(), GetStateFunc());
+	setVisual(BuildAllProgress, [...array])(GetDispatchFunc(), GetStateFunc());
 	await pause();
 }
 
@@ -290,7 +290,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		});
 
 		await run(buildAllProgress, AddTitleService, async (progressFunc: any) => {
-			graphOperation([ addTitleService({ newItems: {} }) ])(GetDispatchFunc(), GetStateFunc());
+			graphOperation([addTitleService({ newItems: {} })])(GetDispatchFunc(), GetStateFunc());
 		});
 
 		await run(buildAllProgress, GETALL_LIST_ROUTES, async (progressFunc: any) => {
@@ -334,7 +334,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 			AddUserRequirements();
 		});
 
-		 await threadRun(buildAllProgress, Create_Component_Shared_All, currentJobFile, NodeTypes.Model, 10000);
+		await threadRun(buildAllProgress, Create_Component_Shared_All, currentJobFile, NodeTypes.Model, 10000);
 
 		// await run(buildAllProgress, Create_Component_Shared_All, async (progresFunc: (arg0: number) => any) => {
 		// 	await CreateComponentSharedAll(progresFunc);
@@ -361,22 +361,22 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 			await JobService.CollectForJob(currentJobFile);
 		});
 
-		await run(buildAllProgress, APPLY_PERMISSION_CHAINS, async (progressFunc) => {
+		await run(buildAllProgress, APPLY_PERMISSION_CHAINS, async (progressFunc: any) => {
 			await ApplyPermissionChains();
 		});
 
-		await run(buildAllProgress, APPLY_EXECUTION_CHAINS, async (progressFunc) => {
+		await run(buildAllProgress, APPLY_EXECUTION_CHAINS, async (progressFunc: any) => {
 			await ApplyExecutionChains();
 		});
 
-		await run(buildAllProgress, APPLY_VALIDATION_CHAINS, async (progressFunc) => {
+		await run(buildAllProgress, APPLY_VALIDATION_CHAINS, async (progressFunc: any) => {
 			await ApplyValidationChains();
 		});
 
-		await run(buildAllProgress, AUTHENTICATION_BUTTONS, async (progressfunc) => {
+		await run(buildAllProgress, AUTHENTICATION_BUTTONS, async (progressfunc: any) => {
 			await SetupAuthenticationButtons();
 		});
-		await run(buildAllProgress, ATTACH_TITLE_SERVICE, async (progressfunc) => {
+		await run(buildAllProgress, ATTACH_TITLE_SERVICE, async (progressfunc: any) => {
 			await AttachTitleService();
 		});
 		await run(buildAllProgress, Add_Filters_To_Get_All, async (progresFunc: any) => {

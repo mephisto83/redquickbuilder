@@ -26,6 +26,23 @@ export default function ContinueAsScreen(args: any) {
       }
     }])(GetDispatchFunc(), GetStateFunc());
 
+    PerformGraphOperation([
+      {
+        operation: ADD_NEW_NODE,
+        options: {
+          nodeType: NodeTypes.Model,
+          properties: {
+            ...viewPackage,
+            [NodeProperties.ExcludeFromController]: true,
+            [NodeProperties.Pinned]: false,
+            [NodeProperties.UIText]: `Red Check If Logged In`
+          },
+          callback: (newNode: any) => {
+            newStuff.anonymousCheckIfLoggedIn = newNode.id;
+          }
+        }
+      }])(GetDispatchFunc(), GetStateFunc());
+
   // change to a function to check that the current credentials are still good.
   const anonymousRegisterLogin = CreateAgentFunction({
     viewPackage,
@@ -40,6 +57,22 @@ export default function ContinueAsScreen(args: any) {
     httpMethod: HTTP_METHODS.POST,
     functionType: FunctionTypes.CheckUserLoginStatus,
     functionName: `Check User Login Status`
+  })({ dispatch: GetDispatchFunc(), getState: GetStateFunc() });
+
+  // change to a function to check that the current credentials are still good.
+  CreateAgentFunction({
+    viewPackage,
+    model: GetNodeById(newStuff.anonymousCheckIfLoggedIn, graph),
+    agent: {},
+    maestro,
+    nodePackageType: "check-logged-in-status",
+    methodType: Methods.Create,
+    user: NodesByType(GetState(), NodeTypes.Model).find((x: any ) =>
+      GetNodeProp(x, NodeProperties.IsUser)
+    ),
+    httpMethod: HTTP_METHODS.POST,
+    functionType: FunctionTypes.IsLoggedIn,
+    functionName: `Is Logged In`
   })({ dispatch: GetDispatchFunc(), getState: GetStateFunc() });
 
   const continueMethodResults = CreateDefaultView.method({

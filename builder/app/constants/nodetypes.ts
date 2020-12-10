@@ -1,6 +1,11 @@
 import path from 'path';
 import * as _ from '../utils/array';
 import fs from 'fs';
+export const MenuDataSourcePurpose = {
+	Navigation: 'Navigation',
+	Logout: 'Logout',
+	Execute: 'Execute'
+}
 export const NodeTypes = {
 	Concept: 'concept',
 	Model: 'model',
@@ -20,6 +25,7 @@ export const NodeTypes = {
 	SwaggerApiPath: 'SwaggerApiPath',
 	SwaggerApiDescription: 'SwaggerApiDescription',
 	ScreenEffectApi: 'ScreenEffectApi',
+	ComponentDidMountEffectApi: 'ComponentDidMountEffectApi',
 	RootNode: 'composition-rootNode',
 	LeafNode: 'composition-leafNode',
 	ANDNode: 'composition-andNode',
@@ -574,6 +580,7 @@ export const NodeProperties = {
 	value: 'value',
 	Number: 'Number',
 	OnFocus: 'onFocus',
+	Purpose: 'Purpose',
 	OnChange: 'onChangeText',
 	SharedMenuCollection: 'SharedMenuCollection',
 	UIType: 'UIType',
@@ -850,6 +857,7 @@ export const LinkType = {
 	ScreenEffect: 'ScreenEffect', // Screen effects link to datachains, that can be used for defining $internalComponentState
 	// Connections to arguments used inside a lambda
 	ScreenEffectApi: 'ScreenEffectApi', // Screen effects api link to a datachain ,with the assumption that they will be an
+	ComponentDidMountEffectApi: 'ComponentDidMountEffectApi',
 	// internal component api
 	LambdaInsertArguments: 'LambdaInsertArguments',
 	ClaimServiceAuthorizationMethod: 'ClaimServiceAuthorizationMethod',
@@ -865,6 +873,7 @@ export const LinkType = {
 	ExecutionDataChain: 'ExecutionDataChain',
 	DataChainIsDisabled: 'DataChainIsDisabled',
 	Composition: 'Composition',
+	DataChainLogout: 'DataChainLogout',
 	SwaggerClass: 'SwaggerClass',
 	UIMethod: 'UIMethod',
 	SwaggerMethodDescription: 'SwaggerMethodDescription',
@@ -1135,6 +1144,8 @@ export const LinkPropertyKeys = {
 	MountingProps: 'mountingProps',
 	ScreenEffectApiProps: 'screenEffectApiProps',
 	DashboardScreenEffectApiProps: 'dashboardScreenEffectApiProps',
+	ComponentDidMountApiProps: 'componentDidMountApiProps',
+	DashboardComponentDidMountApiProps: 'dashboardComponentDidMountApiProps',
 	RoutingProps: 'routingProps',
 	EffectProps: 'effectProps',
 	ComponentProperty: 'ComponentProperty',
@@ -1193,6 +1204,9 @@ export const LinkProperties = {
 	ScreenEffectApi: {
 		type: LinkType.ScreenEffectApi
 	},
+	ComponentDidMountEffectApi: {
+		type: LinkType.ComponentDidMountEffectApi
+	},
 	DataChainScreenEffect: {
 		type: LinkType.DataChainScreenEffect
 	},
@@ -1222,6 +1236,9 @@ export const LinkProperties = {
 	},
 	DataChainIsDisabled: {
 		type: LinkType.DataChainIsDisabled
+	},
+	DataChainLogout: {
+		type: LinkType.DataChainLogout
 	},
 	NavigationScreen: {
 		type: LinkType.NavigationScreen

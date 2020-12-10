@@ -27,7 +27,8 @@ import {
 	MountingDescription,
 	Effect,
 	EffectDescription,
-	ScreenEffectApi
+	ScreenEffectApi,
+	ComponentDidMountEffect
 } from '../interface/methodprops';
 import SelectInput from './selectinput';
 import { ViewTypes } from '../constants/viewtypes';
@@ -37,6 +38,7 @@ import { Node } from '../methods/graph_types';
 import { MethodFunctions, FunctionTemplateKeys, GetFunctionTypeOptions } from '../constants/functiontypes';
 import CheckBox from './checkbox';
 import ScreenEffectsComponent from './screenEffectsComponent';
+import ComponentDidMountEffectsComponent from './componentDidMountEffectsComponent';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class DashboardScreenEffectContextMenu extends Component<any, any> {
@@ -66,6 +68,24 @@ class DashboardScreenEffectContextMenu extends Component<any, any> {
 							}}
 							api
 							screenEffects={screenEffectApis}
+						/>
+					);
+					break;
+			}
+		}
+		let componentMountEffects: ComponentDidMountEffect[] = mode.componentMountEffects;
+		if (componentMountEffects) { 
+			switch (mode) {
+				default:
+					result.push(
+						<ComponentDidMountEffectsComponent
+							onChange={() => {
+								if (mode && mode.callback) {
+									mode.callback();
+								}
+							}}
+							api
+							effects={componentMountEffects}
 						/>
 					);
 					break;

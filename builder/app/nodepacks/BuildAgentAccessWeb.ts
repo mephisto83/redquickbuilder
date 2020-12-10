@@ -41,7 +41,8 @@ import {
 	EffectDescription,
 	PermissionConfig,
 	ValidationConfig,
-	ExecutionConfig
+	ExecutionConfig,
+	ComponentDidMountEffect
 } from '../interface/methodprops';
 import { GraphLink, Graph, Node } from '../methods/graph_types';
 import { ViewTypes } from '../constants/viewtypes';
@@ -63,7 +64,9 @@ export default function BuildAgentAccessWeb(args: any) {
 		agentScreenEffect,
 		agentAccess,
 		agentMethod,
-		agentEffect
+		agentEffect,
+		componentDidMountEffects,
+		dashboardComponentDidMountEffects
 	} = args;
 
 	const graph = GetCurrentGraph();
@@ -77,12 +80,15 @@ export default function BuildAgentAccessWeb(args: any) {
 		GetNodeProp(x, NodeProperties.GeneratedConcept)
 	);
 	let screenEffects = NodesByType(graph, NodeTypes.ScreenEffectApi);
+	let componentDidMountEffectsNodes = NodesByType(graph, NodeTypes.ComponentDidMountEffectApi)
+
 	let links = LinksByType(graph, LinkType.NavigationScreen);
 	const result: any[] = [
 		...navigationScreens,
 		...contextParams,
 		...agentAccesss,
 		...screenEffects,
+		...componentDidMountEffectsNodes,
 		...generatedConcepts
 	].map((v: any) => ({
 		operation: REMOVE_NODE,
@@ -124,6 +130,11 @@ export default function BuildAgentAccessWeb(args: any) {
 					dashboardScreenEffect[agent] && dashboardScreenEffect[agent][dashboard]
 						? dashboardScreenEffect[agent][dashboard] || []
 						: [];
+				const componentDidMounts =
+					dashboardComponentDidMountEffects[agent] && dashboardComponentDidMountEffects[agent][dashboard]
+						? dashboardComponentDidMountEffects[agent][dashboard] || []
+						: [];
+
 				if (values && values.access) {
 					let agentAccessContext: any = null;
 					let temp: any = AddAgentAccess({
@@ -131,6 +142,7 @@ export default function BuildAgentAccessWeb(args: any) {
 						agentId: agent,
 						linkProps: {},
 						[LinkPropertyKeys.DashboardScreenEffectApiProps]: screenEffect,
+						[LinkPropertyKeys.DashboardComponentDidMountApiProps]: componentDidMounts,
 						[LinkPropertyKeys.DashboardAccessProps]: values,
 						[LinkPropertyKeys.DashboardRoutingProps]: { ...routing || {} },
 						[LinkPropertyKeys.DashboardViewMountProps]: { ...mounting },
@@ -149,6 +161,9 @@ export default function BuildAgentAccessWeb(args: any) {
 					}
 					result.push(() =>
 						screenEffectGen(screenEffect, agentAccessContext, urlParametersForMounting, dashboard, agent)
+					);
+					result.push(() =>
+						componentMountEffectGen(componentDidMounts, agentAccessContext, urlParametersForMounting, dashboard, agent)
 					);
 				}
 			}
@@ -170,6 +185,10 @@ export default function BuildAgentAccessWeb(args: any) {
 					agentScreenEffect[agent] && agentScreenEffect[agent][model]
 						? agentScreenEffect[agent][model] || {}
 						: {};
+				const componentDidMountEffect =
+					componentDidMountEffects[agent] && componentDidMountEffects[agent][model]
+						? componentDidMountEffects[agent][model] || {}
+						: {};
 				const mounting =
 					agentViewMount[agentIndex] && agentViewMount[agentIndex][modelIndex]
 						? agentViewMount[agentIndex][modelIndex] || {}
@@ -187,6 +206,7 @@ export default function BuildAgentAccessWeb(args: any) {
 							agentId: agent,
 							linkProps: { ...values },
 							[LinkPropertyKeys.ScreenEffectApiProps]: { ...screenEffect },
+							[LinkPropertyKeys.ComponentDidMountApiProps]: { ...componentDidMountEffect },
 							[LinkPropertyKeys.MethodProps]: { ...methods },
 							[LinkPropertyKeys.RoutingProps]: { ...routing },
 							[LinkPropertyKeys.MountingProps]: { ...mounting },
@@ -209,6 +229,21 @@ export default function BuildAgentAccessWeb(args: any) {
 
 								return screenEffectGen(
 									screenEffect[key],
+									agentAccessContext,
+									urlParametersForMounting,
+									model,
+									agent
+								);
+							});
+						},
+						() => {
+							return Object.keys(componentDidMountEffect).filter((d) => componentDidMountEffect[d]).map((key: string) => {
+								let urlParametersForMounting = mounting[key]
+									? getUrlParametersForMounting(mounting[key])
+									: [];
+
+								return componentMountEffectGen(
+									componentDidMountEffect[key],
 									agentAccessContext,
 									urlParametersForMounting,
 									model,
@@ -520,6 +555,65 @@ function screenEffectGen(
 							newnode.id,
 							agentAccessContext.entry,
 							LinkProperties.ScreenEffectApi
+						);
+					}
+				];
+			});
+	};
+}
+
+function componentMountEffectGen(
+	componentDidMountEffect: any,
+	agentAccessContext: any,
+	urlParametersForMounting: string[],
+	dashboard: any,
+	agent: any
+): any {
+	return () => {
+		return componentDidMountEffect
+			.filter((x: ComponentDidMountEffect) => agentAccessContext && x.dataChain)
+			.map((effect: ComponentDidMountEffect) => {
+				let newnode: any;
+				let contextualNode: any;
+				let createNewNode = CreateNewNode(
+					{
+						[NodeProperties.NODEType]: NodeTypes.ComponentDidMountEffectApi,
+						[NodeProperties.DataChain]: effect.dataChain,
+						[NodeProperties.UIText]: effect.name
+					},
+					(node: any) => {
+						newnode = node;
+					}
+				);
+				let contextualParameters = CreateNewNode(
+					{
+						[NodeProperties.NODEType]: NodeTypes.ContextualParameters,
+						[NodeProperties.ContextParams]: urlParametersForMounting,
+						[NodeProperties.DataChain]: effect.dataChain,
+						[NodeProperties.UIText]: `${GetNodeTitle(dashboard)} ${GetNodeTitle(agent)} CP`
+					},
+					(node: any) => {
+						contextualNode = node;
+					}
+				);
+				return [
+					createNewNode,
+					contextualParameters,
+					function () {
+						return AddLinkBetweenNodes(
+							contextualNode.id,
+							effect.dataChain,
+							LinkProperties.ContextualParameters
+						);
+					},
+					function () {
+						return AddLinkBetweenNodes(newnode.id, effect.dataChain, LinkProperties.ComponentDidMountEffectApi);
+					},
+					function () {
+						return AddLinkBetweenNodes(
+							newnode.id,
+							agentAccessContext.entry,
+							LinkProperties.ComponentDidMountEffectApi
 						);
 					}
 				];

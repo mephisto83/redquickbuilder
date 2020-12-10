@@ -17,6 +17,8 @@ export default function AddAgentAccess(args: any = {}) {
 		screenEffectApiProps,
 		dashboardAccessProps,
 		dashboardViewMountProps,
+		componentDidMountApiProps,
+		dashboardComponentDidMountApiProps,
 		dashboardEffectProps,
 		dashboardRoutingProps,
 		dashboardScreenEffectApiProps
@@ -39,12 +41,12 @@ export default function AddAgentAccess(args: any = {}) {
 		...viewPackages || {}
 	};
 	const result = [
-		function() {
+		function () {
 			return [
 				{
 					operation: 'NEW_NODE',
 					options: {
-						callback: function(node: { id: any }) {
+						callback: function (node: { id: any }) {
 							context.node0 = node.id;
 						}
 					}
@@ -52,7 +54,7 @@ export default function AddAgentAccess(args: any = {}) {
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'CHANGE_NODE_TEXT',
@@ -64,7 +66,7 @@ export default function AddAgentAccess(args: any = {}) {
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'CHANGE_NODE_PROPERTY',
@@ -77,7 +79,7 @@ export default function AddAgentAccess(args: any = {}) {
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'CHANGE_NODE_PROPERTY',
@@ -90,7 +92,7 @@ export default function AddAgentAccess(args: any = {}) {
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'CHANGE_NODE_PROPERTY',
@@ -103,7 +105,7 @@ export default function AddAgentAccess(args: any = {}) {
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'NEW_LINK',
@@ -113,14 +115,14 @@ export default function AddAgentAccess(args: any = {}) {
 						properties: {
 							type: args.dashboardId ? 'DashboardAccess' : 'ModelAccess',
 							ModelAccess: {},
-							nodeTypes: [ 'model' ]
+							nodeTypes: ['model']
 						}
 					}
 				}
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'NEW_LINK',
@@ -130,12 +132,14 @@ export default function AddAgentAccess(args: any = {}) {
 						properties: {
 							type: 'AgentAccess',
 							AgentAccess: {},
-							nodeTypes: [ 'model' ],
+							nodeTypes: ['model'],
 							...linkProps,
 							methodProps,
 							routingProps,
-              mountingProps,
-              screenEffectApiProps,
+							mountingProps,
+							screenEffectApiProps,
+							componentDidMountApiProps,
+							dashboardComponentDidMountApiProps,
 							effectProps,
 							dashboardScreenEffectApiProps,
 							dashboardEffectProps,
@@ -198,7 +202,7 @@ export default function AddAgentAccess(args: any = {}) {
 		...result,
 		...clearPinned,
 		...applyViewPackages,
-		function() {
+		function () {
 			if (context.callback) {
 				context.entry = context.node0;
 				context.callback(context);

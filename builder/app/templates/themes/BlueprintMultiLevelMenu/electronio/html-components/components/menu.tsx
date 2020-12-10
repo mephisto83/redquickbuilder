@@ -62,8 +62,8 @@ export default class Menu extends Component<any, any> {
 			<li
 				key={`li-${index}`}
 				className={`${styles['nav-item']}
-        ${openMenu === id ? styles['menu-opn'] : ''}
-        ${children && children.length ? styles['has-treeview'] : ''} menu-drop-down`}
+				${openMenu === id ? styles['menu-opn'] : ''}
+				${children && children.length ? styles['has-treeview'] : ''} menu-drop-down`}
 				onClick={() => {
 					if (this.props.toggleVisual) {
 						this.props.toggleVisual('menu-item-open', id);
@@ -72,7 +72,12 @@ export default class Menu extends Component<any, any> {
 							openMenu: this.state.openMenu === id ? '' : id
 						});
 					}
-					if (this.props.onClick) {
+
+
+					if (child && child.properties && child.properties.execute) {
+						child.properties.execute()
+					}
+					else if (this.props.onClick) {
 						this.props.onClick(id);
 					}
 				}}

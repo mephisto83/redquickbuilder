@@ -56,6 +56,13 @@ export interface ScreenEffectApiProps {
 	Delete?: ScreenEffectApi[];
 	Update?: ScreenEffectApi[];
 }
+export interface ComponentDidMountEffectApiProps {
+	GetAll?: ComponentDidMountEffect[];
+	Get?: ComponentDidMountEffect[];
+	Create?: ComponentDidMountEffect[];
+	Delete?: ComponentDidMountEffect[];
+	Update?: ComponentDidMountEffect[];
+}
 export interface DashboardScreenEffectApiProps {
 	apis: ScreenEffectApi[];
 }
@@ -135,7 +142,7 @@ export interface ConstructModelConfig extends ConfigItem {
 	model: string;
 	setProperties: SetPropertiesConfig;
 }
-export interface SendMessageToLakeConfig extends ConfigItem {}
+export interface SendMessageToLakeConfig extends ConfigItem { }
 export interface NextStepsConfiguration extends ConfigItem {
 	steps: NextStepConfiguration[];
 	descriptionId: string;
@@ -556,7 +563,7 @@ export function AddLinkBetweenCompositionNodes(graph: Graph, from: string, to: s
 			source: from,
 			properties: LinkProperties.Composition
 		},
-		() => {}
+		() => { }
 	);
 	return graph;
 }
@@ -636,8 +643,8 @@ export function createStaticParameter(): StaticParameter {
 export function setDefaultRouteSource(mountingItem: MountingDescription, urlParameter: string, k: string) {
 	if (
 		!mountingItem.source &&
-		[ 'model', 'agent' ].indexOf(urlParameter) !== -1 &&
-		[ 'model', 'agent' ].indexOf(k) !== -1
+		['model', 'agent'].indexOf(urlParameter) !== -1 &&
+		['model', 'agent'].indexOf(k) !== -1
 	) {
 		setRouteSource(mountingItem, urlParameter, k, RouteSourceType.UrlParameter);
 	}
@@ -907,7 +914,7 @@ export function SetupConfigInstanceInformation(
 	dataChainOptions.incrementDouble = dataChainOptions.incrementDouble || CreateIncrementDouble();
 	dataChainOptions.incrementInteger = dataChainOptions.incrementInteger || CreateIncrementInteger();
 	dataChainOptions.compareEnumeration = dataChainOptions.compareEnumeration || CreateCompareEnumeration();
-	dataChainOptions.compareEnumerations = dataChainOptions.compareEnumerations || [ CreateCompareEnumeration() ];
+	dataChainOptions.compareEnumerations = dataChainOptions.compareEnumerations || [CreateCompareEnumeration()];
 	dataChainOptions.swaggerCall = dataChainOptions.swaggerCall || CreateSwaggerCall();
 	let checkExistence = dataChainOptions.checkExistence;
 	let properties: any[] = [];
@@ -1075,18 +1082,18 @@ export interface BranchConfig {
 	enabled: boolean;
 	dataChainOptions: DataChainConfiguration;
 }
-export interface CopyConfig extends AfterEffectRelations {}
-export interface AreEqualConfig extends AfterEffectRelations {}
-export interface IsContainedConfig extends AfterEffectRelations {}
-export interface IsIntersectingConfig extends AfterEffectRelations {}
-export interface IsNotContainedConfig extends AfterEffectRelations {}
+export interface CopyConfig extends AfterEffectRelations { }
+export interface AreEqualConfig extends AfterEffectRelations { }
+export interface IsContainedConfig extends AfterEffectRelations { }
+export interface IsIntersectingConfig extends AfterEffectRelations { }
+export interface IsNotContainedConfig extends AfterEffectRelations { }
 export interface Setter extends HalfRelation {
 	value: string;
 }
-export interface SetBoolean extends Setter {}
-export interface SetInteger extends Setter {}
-export interface IncrementInteger extends Setter {}
-export interface IncrementDouble extends Setter {}
+export interface SetBoolean extends Setter { }
+export interface SetInteger extends Setter { }
+export interface IncrementInteger extends Setter { }
+export interface IncrementDouble extends Setter { }
 export interface SwaggerCall extends ConfigItem {
 	swagger: string;
 	swaggerApiPath: string;
@@ -1190,12 +1197,12 @@ export interface CopyEnumerationConfig extends ConfigItem {
 	targetProperty: string;
 }
 
-export interface BooleanConfig extends ConfigItem {}
+export interface BooleanConfig extends ConfigItem { }
 export interface NumberConfig extends ConfigItem {
 	value: string;
 	equal?: boolean;
 }
-export interface GetExistingConfig extends AfterEffectRelations {}
+export interface GetExistingConfig extends AfterEffectRelations { }
 /**
  * Describes how the model will be found
  */
@@ -1329,8 +1336,8 @@ export function CheckIsExisting(isExisting: CheckExistenceConfig) {
 		return true;
 	}
 	return isExisting.enabled &&
-	isExisting.targetProperty &&
-	(isExisting.relationType === RelationType.Agent ? isExisting.agentProperty : isExisting.modelProperty)
+		isExisting.targetProperty &&
+		(isExisting.relationType === RelationType.Agent ? isExisting.agentProperty : isExisting.modelProperty)
 		? true
 		: false;
 }
@@ -1340,8 +1347,8 @@ export function CheckGetExisting(getExisting: GetExistingConfig) {
 		return true;
 	}
 	return getExisting.enabled &&
-	getExisting.targetProperty &&
-	(getExisting.relationType === RelationType.Agent ? getExisting.agentProperty : getExisting.modelProperty)
+		getExisting.targetProperty &&
+		(getExisting.relationType === RelationType.Agent ? getExisting.agentProperty : getExisting.modelProperty)
 		? true
 		: false;
 }
@@ -1370,9 +1377,9 @@ export function CreateAfterEffect(): AfterEffect {
 	};
 }
 
-export interface PermissionConfig extends ValidationConfig {}
-export interface ExecutionConfig extends ValidationConfig {}
-export interface FilterConfig extends ValidationConfig {}
+export interface PermissionConfig extends ValidationConfig { }
+export interface ExecutionConfig extends ValidationConfig { }
+export interface FilterConfig extends ValidationConfig { }
 export interface ValidationConfig {
 	id: string;
 	name: string;
@@ -1416,7 +1423,12 @@ export interface ScreenEffect {
 	passDeep: boolean; // pass the component api down the tree to all the nodes.
 	dataChain: string;
 }
-export interface ScreenEffectApi extends ScreenEffect {}
+export interface ComponentDidMountEffect {
+	id: string;
+	name: string;
+	dataChain: string;
+}
+export interface ScreenEffectApi extends ScreenEffect { }
 export interface Routing {
 	routes: RouteDescription[];
 }
@@ -1452,8 +1464,8 @@ export enum RouteSourceType {
 	Model = 'model', // The value should be retrieved from the model for the page
 	Agent = 'agent', // The value should be retrieved from the agent for the page
 	Body = 'body',
-  UrlParameter = 'urlParameter', // The value should be retrieved from the url parameters for the page
-  Item = 'item' // In a list, each item has values that can be used.
+	UrlParameter = 'urlParameter', // The value should be retrieved from the url parameters for the page
+	Item = 'item' // In a list, each item has values that can be used.
 }
 
 export interface MethodDescription {

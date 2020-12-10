@@ -86,13 +86,14 @@ import {
 	getNodesLinkedFrom,
 	GetLinkBetween,
 	existsLinkBetween,
-	GetNodeLinkedTo
+	GetNodeLinkedTo,
+	findLink
 } from '../methods/graph_methods';
 import { HandlerType } from '../components/titles';
 import { addNewLine } from '../utils/array';
 import { StyleLib } from '../constants/styles';
 import { ViewTypes } from '../constants/viewtypes';
-import { RouteSource, RouteSourceType } from '../interface/methodprops';
+import { ComponentDidMountEffect, RouteSource, RouteSourceType } from '../interface/methodprops';
 import { constructCellStyles } from './sharedservice';
 import { fs_readFileSync } from '../generators/modelgenerators';
 
@@ -114,7 +115,7 @@ export function GenerateScreenMarkup(id: string, language: string) {
 	if (screenOption) {
 		const imports: any = GetScreenImports(id, language);
 
-		const elements: any = [ GenerateMarkupTag(screenOption, language, screen) ];
+		const elements: any = [GenerateMarkupTag(screenOption, language, screen)];
 		let template = null;
 		switch (language) {
 			case UITypes.ElectronIO:
@@ -210,7 +211,7 @@ export function constructCssFile(css: any, clsName: string) {
 					if (!isNaN(value)) {
 						// value = `${value}px`;
 					}
-					if (![ undefined, null, '' ].some((v) => value === v)) return `${temp.toLowerCase()}: ${value};`;
+					if (![undefined, null, ''].some((v) => value === v)) return `${temp.toLowerCase()}: ${value};`;
 				})
 				.filter((x) => x)
 				.join(NEW_LINE);
@@ -386,8 +387,8 @@ export function GetItemData(node: any) {
 		// data = `D.${GetJSCodeName(connectedNode)}(${data})`;
 		return `(()=> {
     return DC.${GetCodeName(connectedNode, {
-		includeNameSpace: true
-	})}(${defaultValue});
+			includeNameSpace: true
+		})}(${defaultValue});
 })()`;
 	}
 	return `(()=> {
@@ -423,7 +424,7 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 			})
 			.filter((v) => v[1])
 			.map((temp: (string | GraphMethods.Node)[]) => {
-				let [ type, nodeCode, tempnode ] = temp;
+				let [type, nodeCode, tempnode] = temp;
 				return {
 					node: tempnode,
 					code: `{
@@ -442,14 +443,14 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 		// if not a List or something like that
 		layoutSrc = layoutObj
 			? buildLayoutTree({
-					layoutObj,
-					currentRoot: null,
-					language,
-					imports,
-					node,
-					css,
-					injections
-				}).join(NEW_LINE)
+				layoutObj,
+				currentRoot: null,
+				language,
+				imports,
+				node,
+				css,
+				injections
+			}).join(NEW_LINE)
 			: GetDefaultElement();
 	} else {
 		// extraimports.push(`import * as Models from '${getRelativePathPrefix(relativePath)}model_keys.js';`);
@@ -536,14 +537,14 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 
 	const _consts = GetRNConsts(node.id ? node.id : node) || [];
 	const modelInstances = GetRNModelInstances(node.id ? node.id : node) || [];
-	const screen_options = addNewLine([ ..._consts, ...modelInstances ].unique().join(NEW_LINE), 4);
+	const screen_options = addNewLine([..._consts, ...modelInstances].unique().join(NEW_LINE), 4);
 
 	templateStr = bindTemplate(templateStr, {
 		name: GetCodeName(node),
 		title: `"${GetNodeTitle(node)}"`,
 		screen_options,
 		component_did_update: GetComponentDidUpdate(node),
-		imports: [ ...imports, cssImport, ...extraimports ].unique().join(NEW_LINE),
+		imports: [...imports, cssImport, ...extraimports].unique().join(NEW_LINE),
 		elements: addNewLine(layoutSrc, 4)
 	});
 	templateStr = bindTemplate(templateStr, {
@@ -558,19 +559,19 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 		},
 		cssJsFile
 			? {
-					template: cssJsFile,
-					relative: relativePath || './src/components',
-					relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}_css.ts`,
-					name: `${relativePath || './src/components/'}${(GetCodeName(node) || '').toJavascriptName()}_css.ts`
-				}
+				template: cssJsFile,
+				relative: relativePath || './src/components',
+				relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}_css.ts`,
+				name: `${relativePath || './src/components/'}${(GetCodeName(node) || '').toJavascriptName()}_css.ts`
+			}
 			: null,
 		cssFile
 			? {
-					template: cssFile,
-					relative: relativePath || './src/components',
-					relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}.scss`,
-					name: `${relativePath || './src/components/'}${(GetCodeName(node) || '').toJavascriptName()}.scss`
-				}
+				template: cssFile,
+				relative: relativePath || './src/components',
+				relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}.scss`,
+				name: `${relativePath || './src/components/'}${(GetCodeName(node) || '').toJavascriptName()}.scss`
+			}
 			: null,
 		...results
 	].filter((x) => x);
@@ -896,7 +897,7 @@ export function GenerateRNComponents(
 				}
 				template = bindTemplate(template, {
 					name: GetCodeName(node),
-					imports: [ cssImport ].join(NEW_LINE),
+					imports: [cssImport].join(NEW_LINE),
 					component_did_update,
 					screen_options: '',
 					elements: elements || GetDefaultElement()
@@ -909,21 +910,21 @@ export function GenerateRNComponents(
 				result.push(
 					cssFile
 						? {
-								template: cssFile,
-								relative: relative || './src/components',
-								relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}.scss`,
-								name: `${relative || './src/components/'}${(GetCodeName(node) || '')
-									.toJavascriptName()}.scss`
-							}
+							template: cssFile,
+							relative: relative || './src/components',
+							relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}.scss`,
+							name: `${relative || './src/components/'}${(GetCodeName(node) || '')
+								.toJavascriptName()}.scss`
+						}
 						: null,
 					cssJsFile
 						? {
-								template: cssJsFile,
-								relative: relative || './src/components',
-								relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}_css.ts`,
-								name: `${relative || './src/components/'}${(GetCodeName(node) || '')
-									.toJavascriptName()}_css.ts`
-							}
+							template: cssJsFile,
+							relative: relative || './src/components',
+							relativeFilePath: `./${(GetCodeName(node) || '').toJavascriptName()}_css.ts`,
+							name: `${relative || './src/components/'}${(GetCodeName(node) || '')
+								.toJavascriptName()}_css.ts`
+						}
 						: null,
 					{
 						relative: relative || './src/components',
@@ -961,7 +962,7 @@ export function GenerateCss(id: string, language: any) {
 	const screenOption = GetScreenOption(id, language);
 	if (screenOption) {
 		const imports: any = GetScreenImports(id, language);
-		const elements: any = [ GenerateMarkupTag(screenOption, language, screen) ];
+		const elements: any = [GenerateMarkupTag(screenOption, language, screen)];
 		let template = null;
 		switch (language) {
 			case UITypes.ElectronIO:
@@ -1274,8 +1275,8 @@ function WriteDescribedApiProperties(
 		listItem: boolean;
 		injections?: { node: GraphMethods.Node | string; code: string }[];
 	} = {
-		listItem: false
-	}
+			listItem: false
+		}
 ) {
 	let result: any = '';
 	if (typeof node === 'string') {
@@ -1361,7 +1362,7 @@ function WriteDescribedApiProperties(
 				} else if (options.listItem) {
 					const listItemAttribute = GetJSCodeName(externalConnection);
 					const notRequiredListItemAttribute =
-						[ 'value', 'separators', 'index' ].indexOf(listItemAttribute) === -1;
+						['value', 'separators', 'index'].indexOf(listItemAttribute) === -1;
 					innerValue =
 						notRequiredListItemAttribute && !GetNodeProp(externalConnection, NodeProperties.AsLocalContext)
 							? `this.state.${listItemAttribute}`
@@ -1462,13 +1463,13 @@ function WriteDescribedApiProperties(
 				let routeInjectionTemplate = `routeinj={(value: string) => {
         return [
           ${routes
-				.map((v) => v.code)
-				.map((v, index) => {
-					v = v.replace('value={this.state.value}', 'value={value} key={`' + index + '`}');
-					v = v.replace('model={this.state.model}', 'model={value} ');
-					return v;
-				})
-				.join(', ' + NEW_LINE)}
+						.map((v) => v.code)
+						.map((v, index) => {
+							v = v.replace('value={this.state.value}', 'value={value} key={`' + index + '`}');
+							v = v.replace('model={this.state.model}', 'model={value} ');
+							return v;
+						})
+						.join(', ' + NEW_LINE)}
         ].map((v, i) => {
           return v.el();
         })
@@ -1506,10 +1507,10 @@ function WriteDescribedApiProperties(
 						const addiontionalParams =
 							componentEventHandler && eventInstance
 								? getUpdateFunctionOption(
-										componentEventHandler.id,
-										eventInstance.id,
-										`, { update: true, value: this.state.value/*hard coded*/ }`
-									)
+									componentEventHandler.id,
+									eventInstance.id,
+									`, { update: true, value: this.state.value/*hard coded*/ }`
+								)
 								: '';
 
 						let method_call = null;
@@ -1688,7 +1689,7 @@ export function GetScreenImports(id: string, language: any) {
 	if (screenOptions && screenOptions.length) {
 		const reactScreenOption = screenOptions.find((x: any) => GetNodeProp(x, NodeProperties.UIType) === language);
 		if (reactScreenOption) {
-			return [ GenerateImport(reactScreenOption, screen, language) ];
+			return [GenerateImport(reactScreenOption, screen, language)];
 		}
 		return [];
 	}
@@ -1713,7 +1714,7 @@ export function getMethodInstancesForLifeCylcEvntType(node: any, evtType: string
 				id: method.id,
 				exist: true
 			}).filter((x) =>
-				[ NodeTypes.LifeCylceMethodInstance ].some((v) => v === GetNodeProp(x, NodeProperties.NODEType))
+				[NodeTypes.LifeCylceMethodInstance].some((v) => v === GetNodeProp(x, NodeProperties.NODEType))
 			)
 		);
 	});
@@ -1737,14 +1738,14 @@ export function getMethodInstancesForEvntType(node: any, evtType: any) {
 				id: method.id,
 				exist: true
 			}).filter((x) =>
-				[ NodeTypes.EventMethodInstance ].some((v) => v === GetNodeProp(x, NodeProperties.NODEType))
+				[NodeTypes.EventMethodInstance].some((v) => v === GetNodeProp(x, NodeProperties.NODEType))
 			)
 		);
 	});
 
 	return methodInstances;
 }
-export function getMethodInvocation(methodInstanceCall: { id: any }, callback: any = () => {}, options = {}) {
+export function getMethodInvocation(methodInstanceCall: { id: any }, callback: any = () => { }, options = {}) {
 	const graph = GetCurrentGraph(GetState());
 	const method = getNodesByLinkType(graph, {
 		id: methodInstanceCall.id,
@@ -1924,10 +1925,10 @@ export function getMethodInvocation(methodInstanceCall: { id: any }, callback: a
 			screenEffectsInput = `${parts.length || dataChainInput || preDataChainInput
 				? ','
 				: ''}screenEffects: [${screenEffects
-				.map((se: GraphMethods.Node) => {
-					return `DC.${GetCodeName(se, { includeNameSpace: true })}`;
-				})
-				.join(',' + NEW_LINE)}]`;
+					.map((se: GraphMethods.Node) => {
+						return `DC.${GetCodeName(se, { includeNameSpace: true })}`;
+					})
+					.join(',' + NEW_LINE)}]`;
 			let screenEffect = screenEffects[0];
 			let componentConnectedToScreenEffect = GetNodeLinkedTo(graph, {
 				id: screenEffect.id,
@@ -2177,6 +2178,95 @@ export function GetComponentDidUpdate(parent: any, options: any = {}) {
 
 	return componentDidUpdate;
 }
+
+export function GetAgentAccessLink(screen: any) {
+	const isDashboard = GetNodeProp(screen, NodeProperties.IsDashboard);
+	const agentAccesses = NodesByType(null, NodeTypes.AgentAccessDescription);
+	const graph = GetCurrentGraph();
+	let result: GraphMethods.GraphLink[] = [];
+	agentAccesses.filter((agentAccess: GraphMethods.Node, mindex: any) => {
+		let dashboard: any;
+		let model: any;
+		let agent: any;
+		if (isDashboard) {
+			dashboard = GetNodeLinkedTo(graph, {
+				id: agentAccess.id,
+				link: LinkType.DashboardAccess
+			});
+			if (!dashboard) {
+				return false;
+			}
+			let navigationScreen = GetNodeLinkedTo(graph, {
+				id: screen.id,
+				link: LinkType.NavigationScreenImplementation
+			});
+			if (!navigationScreen) {
+				return false;
+			}
+			let link = findLink(graph, {
+				source: agentAccess.id,
+				target: navigationScreen.id
+			});
+
+			if (link) {
+				let agent = GetNodeLinkedTo(graph, {
+					id: agentAccess.id,
+					link: LinkType.AgentAccess
+				});
+				let agentLink = findLink(graph, {
+					target: agentAccess.id,
+					source: agent.id
+				});
+				if (agentLink) {
+					result.push(agentLink);
+					return true;
+				}
+			}
+			return false;
+		}
+		else {
+			const screenModel = GetNodeProp(screen, NodeProperties.Model);
+			const screenAgent = GetNodeProp(screen, NodeProperties.Agent);
+			model = GetNodeLinkedTo(graph, {
+				id: agentAccess.id,
+				link: LinkType.ModelAccess
+			});
+			if (!model || model.id !== screenModel) {
+				return false;
+			}
+			agent = GetNodeLinkedTo(graph, {
+				id: agentAccess.id,
+				link: LinkType.AgentAccess
+			});
+
+			if (!agent || agent.id !== screenAgent) {
+				return false;
+			}
+		}
+		if (model && agent) {
+			let agentLink = findLink(graph, {
+				target: agentAccess.id,
+				source: agent.id
+			});
+			if (agentLink) {
+				result.push(agentLink);
+				return true;
+			}
+		}
+		else if (dashboard) {
+			let agentLink = findLink(graph, {
+				target: agentAccess.id,
+				source: agent.id
+			});
+			if (agentLink) {
+				result = agentLink;
+				return true;
+			}
+		}
+	});
+
+	return result;
+}
 export function GetComponentDidMount(screenOption: any, options: any = {}) {
 	const events = GetNodeProp(screenOption, NodeProperties.ComponentDidMountEvent);
 	let outOfBandCall = '';
@@ -2230,7 +2320,35 @@ export function GetComponentDidMount(screenOption: any, options: any = {}) {
 		})
 		.filter((x) => x)
 		.join('');
+	const screen = GetScreenForScreenOption(screenOption);
+	const isDashboard = GetNodeProp(screen, NodeProperties.IsDashboard);
+	const viewType = GetNodeProp(screen, NodeProperties.ViewType);
+	let accessLinks = GetAgentAccessLink(screen);
+	let accessComponentDidMountCommands: string[] = [];
+	accessLinks.forEach((accessLink) => {
+		if (isDashboard) {
+			let apiProps = GetLinkProperty(accessLink, LinkPropertyKeys.DashboardComponentDidMountApiProps)
+			if (apiProps) {
+				apiProps.forEach((cdme: ComponentDidMountEffect) => {
+					if (cdme && cdme.dataChain) {
+						accessComponentDidMountCommands.push(`DC.${GetCodeName(cdme.dataChain, { includeNameSpace: true })}({})`);
+					}
+				})
+			}
+		}
+		else {
+			let apiProps = GetLinkProperty(accessLink, LinkPropertyKeys.ComponentDidMountApiProps)
+			if (apiProps && apiProps[viewType]) {
+				apiProps[viewType].forEach((cdme: ComponentDidMountEffect) => {
+					if (cdme && cdme.dataChain) {
+						accessComponentDidMountCommands.push(`DC.${GetCodeName(cdme.dataChain, { includeNameSpace: true })}({})`);
+					}
+				})
+			}
+		}
+	})
 	const componentDidMount = `componentDidMount() {
+		${accessComponentDidMountCommands.join(NEW_LINE)}
     // here 3
         ${options.skipSetGetState ? '' : `this.props.setGetState();`}
         this.captureValues({});
@@ -2259,6 +2377,22 @@ export function GetComponentDidMount(screenOption: any, options: any = {}) {
 		}),
 		1
 	);
+
+}
+export function GetScreenForScreenOption(screenOption: any): GraphMethods.Node | null {
+	let result = null;
+	let id = screenOption;
+	if (screenOption && screenOption.id) {
+		id = screenOption.id;
+	}
+
+	result = GetNodeLinkedTo(GetCurrentGraph(), {
+		id: id,
+		link: LinkType.ScreenOptions
+	})
+
+	return result;
+
 }
 export function GetDataChainInputArgs(id: any) {
 	const inputs = GetNodesLinkedTo(null, {
@@ -2345,7 +2479,7 @@ function GenerateElectronIORoutes(screens: any[], language: string) {
 	}
 	//const import_ = `import {{name}} from './screens/{{jsname}}';`;
 	const import_ = `const {{name}} = lazy(() => import('./screens/{{jsname}}'));`;
-/// const About = lazy(() => import('./routes/About'));
+	/// const About = lazy(() => import('./routes/About'));
 	const routes: any[] = [];
 	const _screens: any[] = [];
 	screens.map((screen: GraphMethods.Node) => {
@@ -2453,7 +2587,7 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
 			moreresults.push(GenerateElectronIORoutes(screens, language));
 			break;
 	}
-	const all_nodes = NodesByType(GetState(), [ NodeTypes.ComponentNode ]);
+	const all_nodes = NodesByType(GetState(), [NodeTypes.ComponentNode]);
 	const sharedComponents = all_nodes.filter((x: any) => GetNodeProp(x, NodeProperties.SharedComponent));
 	const relPath = './src/shared';
 	sharedComponents.map((sharedComponent: any) => {
@@ -2465,7 +2599,7 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
 			`{{source}}
   `,
 			{
-				source: NodesByType(GetState(), [ NodeTypes.Screen, NodeTypes.ScreenOption, NodeTypes.ComponentNode ])
+				source: NodesByType(GetState(), [NodeTypes.Screen, NodeTypes.ScreenOption, NodeTypes.ComponentNode])
 					.filter((node: GraphMethods.Node) => {
 						switch (GetNodeProp(node, NodeProperties.NODEType)) {
 							case NodeTypes.ComponentNode:
@@ -2492,7 +2626,7 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
         {{update_viewmodels}}
     };`,
 			{
-				update_viewmodels: NodesByType(GetState(), [ NodeTypes.Screen ])
+				update_viewmodels: NodesByType(GetState(), [NodeTypes.Screen])
 					.filter((a: GraphMethods.Node) => {
 						return GetNodeProp(a, NodeProperties.ViewType) === ViewTypes.Update;
 					})
@@ -2500,7 +2634,7 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
 						return `${GetCodeName(t)}: '${GetCodeName(t)}'`;
 					})
 					.join(',' + NEW_LINE),
-				create_viewmodels: NodesByType(GetState(), [ NodeTypes.Screen ])
+				create_viewmodels: NodesByType(GetState(), [NodeTypes.Screen])
 					.filter((a: GraphMethods.Node) => {
 						return GetNodeProp(a, NodeProperties.ViewType) === ViewTypes.Create;
 					})
@@ -2515,7 +2649,7 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
 		name: `screenInfo.ts`
 	});
 
-	return [ ...result, ...moreresults ];
+	return [...result, ...moreresults];
 }
 
 /**
@@ -2524,7 +2658,7 @@ export function BindScreensToTemplate(language = UITypes.ReactNative) {
  */
 function extractApiJsCode(args: any = {}) {
 	let { node, graph } = args;
-	const { options, callback = () => {} } = args;
+	const { options, callback = () => { } } = args;
 	const requiredChanges: any[] = [];
 	const temp = (queryParameter: GraphMethods.Node) => {
 		const param = getNodesByLinkType(graph, {

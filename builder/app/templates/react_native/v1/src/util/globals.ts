@@ -47,7 +47,7 @@ var setDefaultWSPromise: any = null;
 export const getDefaultWS = () => {
 	return new Promise((resolve) => {
 		if (setDefaultWSPromise) {
-			resolve();
+			resolve(true);
 		}
 		setDefaultWSPromise = resolve;
 	}).then(() => {

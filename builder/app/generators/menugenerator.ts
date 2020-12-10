@@ -52,6 +52,7 @@ export interface MenuItem {
 	parent: string;
 	shouldBeDisabled: string | null;
 	shouldShowDataChain: string | null;
+	execute: string | null;
 }
 export interface MenuChildren {
 	[str: string]: MenuChildrenProperty;
@@ -76,6 +77,10 @@ function createMenuItem(node: Node, graph: Graph, parent: string): MenuItem {
 		id: node.id,
 		link: LinkType.DataChainIsDisabled
 	});
+	let execute = GraphMethods.GetNodeLinkedTo(graph, {
+		id: node.id,
+		link: LinkType.DataChainLogout
+	});
 	if (isScreen) {
 		screen = GetNodeByProperties({
 			[NodeProperties.Model]: GetNodeProp(node, NodeProperties.Model),
@@ -92,7 +97,8 @@ function createMenuItem(node: Node, graph: Graph, parent: string): MenuItem {
 		leaf: false,
 		parent,
 		shouldShowDataChain: shouldShowDataChain ? shouldShowDataChain.id : null,
-		shouldBeDisabled: shouldBeDisabled ? shouldBeDisabled.id : null
+		shouldBeDisabled: shouldBeDisabled ? shouldBeDisabled.id : null,
+		execute: execute ? execute.id : null
 	};
 }
 function createMenuChildren() {
@@ -114,7 +120,11 @@ export default class MenuGenerator {
 
 			menuObj.children[root.id] = menuObj.children[root.id] || createMenuChildren();
 			if (submenuItems.length) {
-				submenuItems.map((item: Node) => {
+				submenuItems.sort((a: Node, b: Node) => {
+					let a_ = GetNodeProp(a, NodeProperties.Priority) || 1;
+					let b_ = GetNodeProp(b, NodeProperties.Priority) || 1;
+					return a_ - b_;
+				}).map((item: Node) => {
 					menuObj.children[root.id][item.id] = {};
 					this.constructMenu(item, menuObj, graph, root.id);
 				});
@@ -154,6 +164,10 @@ export default class MenuGenerator {
 				}
 				let { parent } = menuObj.items[item];
 				let disabledFunc = `false`;
+				let execute = '';
+				if (menuItem.execute) {
+					execute = `execute: DC.${GetCodeName(menuItem.execute, { includeNameSpace: true })},`
+				}
 				if (menuItem.shouldBeDisabled) {
 					disabledFunc = `MA.${GetCodeName(menuItem.shouldBeDisabled)}({
 										context: {
@@ -180,6 +194,7 @@ export default class MenuGenerator {
 							result.push({
 							id: '${item}',
 							disabled: ${disabledFunc},
+							${execute}
 							title: titleService.get(\`${item}\`, \`${GetNodeTitle(item)}\`),
 							${screen ? `screen: Screens.${GetCodeName(screen)},` : ''}
 							parent: ${parent ? `'${parent}'` : 'null'}
@@ -221,7 +236,7 @@ export default class MenuGenerator {
           import * as navigate from '../${rel}actions/navigationActions';
           import * as $service from '../${rel}util/service';
           import routes from '../${rel}constants/routes';
-          import { titleService} from '../${rel}actions/util';
+          import { titleService, GUID} from '../${rel}actions/util';
           import * as RedLists from '../${rel}actions/lists';
           import StateKeys from '../${rel}state_keys';
 		  import ModelKeys from '../${rel}model_keys';
