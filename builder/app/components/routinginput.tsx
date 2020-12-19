@@ -2,59 +2,26 @@
 import React, { Component } from 'react';
 import * as UIA from '../actions/uiActions';
 import * as Titles from './titles';
-import CheckBox from './checkbox';
 import TreeViewMenu from './treeviewmenu';
-import { EnumerationConfig, RouteDescription, RouteSourceType } from '../interface/methodprops';
+import { RouteDescription, RouteSourceType } from '../interface/methodprops';
 import TreeViewItemContainer from './treeviewitemcontainer';
-import SelectInput from './selectinput';
-import DashboardLogo from './dashboardlogo';
-import DashboardNavBar from './dashboardnavbar';
-import { NodesByType, GetNodeProp } from '../methods/graph_methods';
-import MainSideBar from './mainsidebar';
-import SidebarToggle from './sidebartoggle';
-import SideBarMenu from './sidebarmenu';
-import SideBarHeader from './sidebarheader';
-import { NodeTypes, NodeProperties } from '../constants/nodetypes';
-import Header from './header';
-import Content from './content';
-import { UIConnect } from '../utils/utils';
-import NavBarMenu from './navbarmenu';
-import DashboardContainer from './dashboardcontainer';
-import Panel from './panel';
-import GridLayout from 'react-grid-layout';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import NodeViewer from './nodeview';
-import { Visual } from '../actions/uiActions';
-import { QuickAccess, GraphLink } from '../methods/graph_types';
-import NodeViewList from './nodeviewlist';
-import LinkViewList from './linkviewlist';
 import TextInput from './textinput';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import { ValidationColors } from '../interface/methodprops';
-import { GetNLMeaning, GetNaturalLanguageMeaning } from './validationcomponentitem';
+import { GetNaturalLanguageMeaning } from './validationcomponentitem';
 import { NLMeaning } from '../service/naturallang';
 import { ViewTypes } from '../constants/viewtypes';
 import { NEW_LINE } from '../constants/nodetypes';
-const ResponsiveGridLayout = WidthProvider(Responsive);
 
 export default class RoutingInput extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
 		this.state = { sentences: '' };
 	}
-	componentWillUpdate(prevProps: any) {
-		if (prevProps && prevProps.routing && prevProps.routing.routes) {
-			let routes: RouteDescription[] = prevProps.routing.routes;
-			let sentences = routes.map((route: RouteDescription) => route.name).filter((v) => v).join(NEW_LINE);
-			if (this.state.routes !== routes && sentences !== this.state.sentences) {
-				this.setState({ sentences, routes });
-			}
-		}
-	}
+
 	render() {
-		let props: any = this.props;
-		const { state } = this.props;
 
 		let valid = !!this.state.sentences;
 
@@ -71,11 +38,11 @@ export default class RoutingInput extends Component<any, any> {
 			>
 				<TreeViewItemContainer>
 					<TextInput
-						texteditor
 						active={this.state.open}
 						label={'Sentences'}
-            immediate
-            context={{
+						textarea
+						immediate
+						context={{
 							agent: this.props.agent,
 							model: this.props.model,
 							methodContext: []
@@ -175,15 +142,15 @@ export default class RoutingInput extends Component<any, any> {
 				.map((meaning: NLMeaning) => {
 					let source: any =
 						meaning.targetClause &&
-						meaning.targetClause.argument &&
-						meaning.targetClause.argument.as &&
-						meaning.targetClause.argument.useArgument
+							meaning.targetClause.argument &&
+							meaning.targetClause.argument.as &&
+							meaning.targetClause.argument.useArgument
 							? {
-									[meaning.targetClause.argument.as]: {
-										model: meaning.targetClause.argument.useArgument,
-										type: RouteSourceType.UrlParameter
-									}
+								[meaning.targetClause.argument.as]: {
+									model: meaning.targetClause.argument.useArgument,
+									type: RouteSourceType.UrlParameter
 								}
+							}
 							: null;
 					if (
 						!source &&

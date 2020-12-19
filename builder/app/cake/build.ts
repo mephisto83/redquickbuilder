@@ -99,6 +99,7 @@ function createReactWeb() {
 					'@types/react-router',
 					'react-router-dom',
 					'@types/react-redux',
+					'@types/googlemaps',
 					'typescript@4.1.2',
 					'node-sass',
 					'redux-thunk',
@@ -110,6 +111,7 @@ function createReactWeb() {
 					'react-router',
 					'redux-logger',
 					'tslint',
+					'red-react-payment-inputs',
 					'tslint-etc'
 				].map((dependency) => {
 					promise = promise.then(() =>

@@ -29,6 +29,15 @@ import SingleSelect from './components/singleselect';
 import CheckBox from './components/checkbox';
 import Form from './components/form';
 import PasswordField from './components/password';
+import Typeahead from './components/typeahead';
+import CarMakeInput from './components/carmakeinput';
+import CarModelInput from './components/carmodelinput';
+import CarYearInput from './components/caryearinput';
+import AddressInput from './components/addressinput';
+import StateProvinceInput from './components/stateinput';
+import CountryInput from './components/countryinput';
+import DictionaryInput from './components/dictionaryinput';
+
 export {
   Content,
   Container,
@@ -53,6 +62,14 @@ export {
   Icon,
   Text,
   CheckBox,
+  Typeahead,
+  CarMakeInput,
+  StateProvinceInput,
+  CountryInput,
+  CarYearInput,
+  CarModelInput,
+  DictionaryInput,
+  AddressInput,
   View,
   StyleProvider,
   Input,

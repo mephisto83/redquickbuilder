@@ -740,7 +740,9 @@ function generateElectronIO(workspace: string, state: any) {
 		Object.keys(temp).map((fileName) => {
 			let { relative } = temp[fileName];
 			relative = relative.replace('src', 'app');
-			ensureDirectory(path.join(workspace, relative));
+			let fullPath = path.join(workspace, relative, `${temp[fileName].relativeFilePath}`)
+			let fullDirPath = path.dirname(fullPath)
+			ensureDirectory(fullDirPath);
 			console.log(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`));
 			writeFileSync(
 				path.join(workspace, relative, `${temp[fileName].relativeFilePath}`),
@@ -817,7 +819,7 @@ function clearReactWebTheme(workspace: string, state?: any) {
 		deleteAll(dir);
 	});
 }
-function handleLinkStyles(result: { styleLink?: any }, workspace: string, srcpath = `./app/app.html`) {
+function handleLinkStyles(result: { styleLink?: any }, workspace: string, srcpath = `./src/index.html`) {
 	let appHtml = readFileSync(path.join(workspace, srcpath), 'utf8');
 	const linkInsert = '<!-- link-insert -->';
 	const linkInsertEnd = '<!-- link-insert-end -->';

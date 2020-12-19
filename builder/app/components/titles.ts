@@ -517,6 +517,7 @@ export const AddDataChainCollection = 'Add Data Chain Collection Parent';
 export const SelectAll = 'Select All';
 export const CreateComponents = 'Create Components';
 export const Register = 'Register';
+export const AnonymousRegisterandAuthenticate = `Anonymous Register and Authenticate`;
 export const AnonymousRegisterLogin = 'Anonymous Register and Login';
 export const CheckUserLoginStatus = 'Check User Login Status';
 export const IsLoggedIn = 'Is Logged In';

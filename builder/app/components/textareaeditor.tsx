@@ -34,7 +34,6 @@ export default class TextAreaEditor extends Component<any, any> {
 			value: ''
 		};
 	}
-	editorWillMount() {}
 
 	componentDidUpdate(prevProps: any) {
 		// Typical usage (don't forget to compare props):
@@ -48,7 +47,6 @@ export default class TextAreaEditor extends Component<any, any> {
 		}
 	}
 	componentDidMount() {
-		this.editorWillMount();
 	}
 	render() {
 		// if (!this.props.active) {
@@ -173,6 +171,7 @@ export default class TextAreaEditor extends Component<any, any> {
 		if (currentNode) {
 			result = `
 let $internalComponentState: ComponentState;
+
 interface ComponentState {
   ${[ ...screenEffectApis, ...contextParameters ]
 		.unique()
@@ -184,6 +183,182 @@ interface ComponentState {
   value: string,
   model: string
 }
+export declare const BATCH = "BATCH";
+export declare const UI_UPDATE = "UI_UPDATE";
+export declare const UISI_UPDATE = "UISI_UPDATE";
+export declare const UISMI_UPDATE = "UISMI_UPDATE";
+export declare const UISMI_UPDATE_OBJECT = "UISMI_UPDATE_OBJECT";
+export declare const UISP_UPDATE = "UISP_UPDATE";
+export declare const UIMI_UPDATE = "UIMI_UPDATE";
+export declare const UI_MODELS = "UI_MODELS";
+export declare const SITE = "SITE";
+export declare const RESET_ALL = "RESET_ALL";
+export declare const SCREEN_PROPERTIES = "SCREEN_PROPERTIES";
+export declare const MODEL_INSTANCE = "MODEL_INSTANCE";
+export declare const MODEL_INSTANCE_DIRTY = "MODEL_INSTANCE_DIRTY";
+export declare const MODEL_INSTANCE_ON_BLUR = "MODEL_INSTANCE_ON_BLUR";
+export declare const MODEL_INSTANCE_FOCUSED = "MODEL_INSTANCE_FOCUSED";
+export declare const MODEL_INSTANCE_ON_FOCUS = "MODEL_INSTANCE_ON_FOCUS";
+export declare const APP_STATE = "APP_STATE";
+export declare const SCREEN_INSTANCE = "SCREEN_INSTANCE";
+export declare const SCREEN_MODEL_INSTANCE = "SCREEN_MODEL_INSTANCE";
+export declare const SCREEN_MODEL_INSTANCE_OBJECT = "SCREEN_MODEL_INSTANCE_OBJECT";
+export declare const SCREEN_INSTANCE_DIRTY = "SCREEN_INSTANCE_DIRTY";
+export declare const SCREEN_INSTANCE_ON_BLUR = "SCREEN_INSTANCE_ON_BLUR";
+export declare const SCREEN_INSTANCE_FOCUSED = "SCREEN_INSTANCE_FOCUSED";
+export declare const SCREEN_INSTANCE_ON_FOCUS = "SCREEN_INSTANCE_ON_FOCUS";
+export declare const VISUAL = "VISUAL";
+export declare const UIKeys: {
+    HAS_CREDENTIALS: string;
+    CREDENTIALS: string;
+    USER_ID: string;
+};
+export declare function GetItems(modelType: any): unknown[];
+export declare function GetScreenProperties(screen: any): any;
+export declare function UISP(screen: any, property: any, value: any): {
+    type: string;
+    key: string;
+    screen: any;
+    property: any;
+    value: any;
+};
+export declare function GetItem(modelType: any, id: any): any;
+export declare function setGetState(): (dispatch: any, getState: any) => void;
+export declare function GetDispatch(): any;
+export declare function GetState(): any;
+export declare function setTestGetState(func: any): void;
+export declare function setDispatch(func: any): void;
+export declare function UIV(item: any, value: any): {
+    type: string;
+    item: any;
+    value: any;
+    section: any;
+};
+export declare function UIC(section: any, item: any, value: any): {
+    type: string;
+    item: any;
+    value: any;
+    section: any;
+};
+export declare function UIModels(model: any, value: any): {
+    type: string;
+    model: any;
+    value: any;
+};
+export declare function Chain(id: any, funcs: any): any;
+export declare function UISI(form: any, model: any, item: any, value: any): {
+    type: string;
+    key: string;
+    form: any;
+    model: any;
+    item: any;
+    value: any;
+};
+export declare function UISMI(form: any, model: any, instance: any, item: any, value: any): {
+    type: string;
+    key: string;
+    form: any;
+    model: any;
+    instance: any;
+    item: any;
+    value: any;
+};
+export declare function UISMIO(form: any, model: any, instance: any, value: any): {
+    type: string;
+    key: string;
+    form: any;
+    model: any;
+    instance: any;
+    value: any;
+};
+export declare function UIMI(form: any, model: any, instance: any, item: any, value: any): {
+    type: string;
+    key: string;
+    form: any;
+    model: any;
+    instance: any;
+    item: any;
+    value: any;
+};
+export declare function Batch(a: any, b?: any, c?: any, d?: any, e?: any, f?: any, g?: any, h?: any, i?: any): {
+    type: string;
+    batch: any[];
+};
+export declare function Visual(state: any, key: any): any;
+export declare function GetC(state: any, key: any, id: any): any;
+export declare function GetK(state: any, key: any, id: any, instance: any): any;
+export declare function Get(state: any, key: any): any;
+export declare function setNavigate(navigation: any): void;
+export declare function navigate(a: any, b: any, c: any): any;
+export declare function GetScreenParam(param: any): any;
+export declare function GetScreenInstance(key: any, id: any): any;
+export declare function GetModelInstance(key: any, instance: any, id: any): any;
+export declare function GetScreenInst(state: any): any;
+export declare function GetScreenModelInst(state: any, instance: any, id: any): any;
+export declare function GetScreenModelDirtyInst(state: any, instance: any, id: any): any;
+export declare function GetScreenModelFocusedInst(state: any, instance: any, id: any): any;
+export declare function GetScreenModelBlurInst(state: any, instance: any, id: any): any;
+export declare function GetScreenModelFocusInst(state: any, instance: any, id: any): any;
+export declare function GetAppState(state: any): any;
+export declare function GetModelInst(state: any, instance?: any, id?: any): any;
+export declare function GetScreenInstanceBlur(key: any, id: any): any;
+export declare function GetModelInstanceBlur(key: any, instance: any, id: any): any;
+export declare function GetScreenInstanceBlurObject(key: any): any;
+export declare function GetModelInstanceBlurObject(key: any, instance: any): any;
+export declare function GetScreenInstBlur(state: any): any;
+export declare function GetModelInstBlur(state: any, instance: any): any;
+export declare function GetScreenInstanceFocus(key: any, id: any): any;
+export declare function GetModelInstanceFocus(key: any, instance: any, id: any): any;
+export declare function GetScreenInstanceFocusObject(key: any): any;
+export declare function GetModelInstanceFocusObject(key: any, instance: any): any;
+export declare function GetScreenInstFocus(state: any): any;
+export declare function GetModelInstFocus(state: any, instance: any): any;
+export declare function GetScreenInstanceDirty(key: any, id: any): any;
+export declare function GetModelInstanceDirty(key: any, instance: any, id: any): any;
+export declare function GetScreenInstanceDirtyObject(key: any): any;
+export declare function GetModelInstanceDirtyObject(key: any, instance: any): any;
+export declare function GetScreenInstDirty(state: any): any;
+export declare function GetModelInstDirty(state: any, instance: any): any;
+export declare function GetScreenInstanceFocused(key: any, id: any): any;
+export declare function GetModelInstanceFocused(key: any, instance: any, id: any): any;
+export declare function GetScreenInstanceFocusedObject(key: any): any;
+export declare function GetModelInstanceFocusedObject(key: any, instance: any): any;
+export declare function GetScreenInstFocused(state: any): any;
+export declare function GetModelInstFocused(state: any, instance: any): any;
+export declare function GetScreenInstanceObject(key: any): any;
+export declare function GetScreenModelInstance(key: any, viewModel: any): any;
+export declare function GetScreenModelBlurInstance(key: any, viewModel: any): any;
+export declare function GetScreenModelDirtyInstance(key: any, viewModel: any): any;
+export declare function GetScreenModelFocusInstance(key: any, viewModel: any): any;
+export declare function GetScreenModelFocusedInstance(key: any, viewModel: any): any;
+export declare function GetAppStateObject(key: any): any;
+export declare function GetModelInstanceObject(key: any, instance: any): any;
+export declare function updateScreenInstance(model: any, id: any, value: any, options?: any): (dispatch: any, getState: any) => void;
+export declare function updateScreenInstanceObject(model: any, instance: any, value: any): (dispatch: any, getState: any) => void;
+export declare function clearScreenInstance(model: any, id: any, options?: any): (dispatch: any) => void;
+export declare function updateScreenInstanceBlur(model: any, id: any, options?: any): (dispatch: any, getState: any) => void;
+export declare function updateScreenInstanceFocus(model: any, id: any, options?: any): (dispatch: any, getState: any) => void;
+export declare function updateModelInstance(model: any, instance: any, id: any, value: any): (dispatch: any, getState: any) => void;
+export declare function clearModelInstance(model: any, instance: any, id: any): (dispatch: any, getState: any) => void;
+export declare function updateModelInstanceBlur(model: any, instance: any, id: any): (dispatch: any, getState: any) => void;
+export declare function updateModelInstanceFocus(model: any, instance: any, id: any): (dispatch: any, getState: any) => void;
+export declare function GetModelProperty($id: any, modelType: string, propertyName: string, fetchModel: Function): any;
+export declare function LoadModel(viewModelDefault: string, modelKey: string, retrieveParameters: Function): any;
+export declare function StoreInLake(a: any, modelKey: string): any;
+export declare function StoreModelArray(a: any[], modelType: string, stateKey: string): any[];
+export declare function GetMenuDataSource(GetMenuSource: any, RedGraph: any): any;
+export declare function StoreResultInReducer(x: any, modelType: string, navigate: any): void;
+export declare function NavigateToRoute(id: string, navigate: any, routes: any): void;
+export declare function NavigateToScreen($id?: any, $internalComponentState?: {
+    [str: string]: any;
+    label?: string | number | null;
+    viewModel?: string | number | null;
+    value?: string | number | null;
+    model?: string | number | null;
+} | null, route?: string, navigate?: any): {
+    value: any;
+};
+
       `;
 		}
 		return result;

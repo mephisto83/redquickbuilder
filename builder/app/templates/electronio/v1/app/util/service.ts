@@ -35,9 +35,11 @@ interface ServiceCredentials {
 	userName?: any;
 	userId?: string;
 	accessToken?: string;
+	rememberMe?: boolean;
 	accesstoken_nonce?: string;
 }
-export function setBearerAccessToken(access_token: string, _userId?: string, _accesstoken_nonce?: string) {
+
+export function setBearerAccessToken(access_token: string, _userId?: string, _accesstoken_nonce?: string, obj?: any) {
 	accessToken = access_token;
 	credentials = credentials || {};
 	credentials.accessToken = accessToken;
@@ -45,19 +47,30 @@ export function setBearerAccessToken(access_token: string, _userId?: string, _ac
 	credentials.userId = _userId || '';
 	accesstoken_nonce = _accesstoken_nonce || '';
 	credentials.accesstoken_nonce = accesstoken_nonce;
-	updateStoredCredentials();
+	if (obj && obj.rememberMe) {
+		credentials.rememberMe = obj.rememberMe
+		return updateStoredCredentials();
+	}
+	else {
+		if (!credentials.rememberMe)
+			return clearStoredCredentials()
+	}
 }
 
-export function clearCredentials(callback: Function) {
+export function clearCredentials(callback?: Function) {
 	setBearerAccessToken('', '', '')
+	return clearStoredCredentials().then(() => callback ? callback() : null);
+}
+export function clearStoredCredentials() {
 	storagePromise = storagePromise
 		.then(() => {
-			if (callback) {
-				callback();
-			}
+			return localStore.setItem(CREDENTIALS, JSON.stringify({}));
 		})
 		.catch((e) => console.warn(e));
+	return storagePromise;
 }
+
+
 export function getUser() {
 	return userId || (credentials ? credentials.userId : null);
 }
@@ -79,8 +92,15 @@ export function updateStoredCredentials() {
 		.catch((e) => console.warn(e));
 }
 
-export async function loadCredentials(callback: (arg0: {} | null) => void) {
+
+export async function loadCredentials(callback: Function) {
 	try {
+		if (credentials) {
+			if (credentials.accessToken) {
+				callback(credentials)
+				return;
+			}
+		}
 		var creds = await localStore.getItemJson(CREDENTIALS);
 		credentials = creds;
 		if (callback) {

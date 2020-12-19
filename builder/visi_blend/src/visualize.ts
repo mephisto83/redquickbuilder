@@ -2,11 +2,11 @@ import { LoadGraph } from '../../app/methods/storeGraph';
 import { Graph, Node, GraphLink } from '../../app/methods/graph_types';
 import { CityLayoutGrid, DistanceType } from './citylayoutgrid';
 import { Coordinate } from './coordinate';
-import { GetNodesLinkedTo, GetLinkBetween } from '../../app/methods/graph_methods';
-import { GetLinkProperty } from '../../app/actions/uiActions';
-import { LinkPropertyKeys } from '../../app/constants/nodetypes';
+import { GetNodesLinkedTo, GetLinkBetween, GetNode, GetNodesByProperties, NodesByType, GetNodeProp } from '../../app/methods/graph_methods';
+import { GetLinkProperty, GetNodeTitle } from '../../app/actions/uiActions';
+import { LinkPropertyKeys, NodeProperties, NodeTypes } from '../../app/constants/nodetypes';
 import Springy from './springy';
-
+import fs from 'fs';
 import unprune from '../../app/methods/unprune';
 const readline = require('readline');
 
@@ -15,33 +15,305 @@ export default async function Visualize(file: string) {
 	graph = unprune(graph);
 
 	console.log('loaded graph');
+	let cache = {};
+	let res = BuildSections(graph, cache);
+	console.log(res);
 	console.log(`graph.nodeCount: ${graph.nodeCount}`);
+	let types = {}
+	let others = {};
+	Object.keys(graph.nodeLib).filter((v) => !cache[v]).forEach((id) => {
+		types[GetNodeProp(graph.nodeLib[id], NodeProperties.NODEType)] = types[GetNodeProp(graph.nodeLib[id], NodeProperties.NODEType)] || 0
+		types[GetNodeProp(graph.nodeLib[id], NodeProperties.NODEType)]++;
+		others[id] = {
+			type: GetNodeProp(graph.nodeLib[id], NodeProperties.NODEType),
+			name: GetNodeTitle(graph.nodeLib[id])
+		}
+	});
+	let totalLeftOver = 0;
+	Object.entries(types).map((v: any) => {
+		console.log(`${v[0]}: ${v[1]}`)
+		totalLeftOver += v[1];
+	});
+	console.log(`totalLeftOver : ${totalLeftOver}`)
+	fs.writeFileSync('./vis_out.json', JSON.stringify({ sectioned: cache, others }, null, 4), 'utf-8')
+	// let sortedList = GetNodesWithMostConnection(graph, cache)
 
-	let cityLayoutGrid = CreateCityLayoutGrid(graph);
+	// let popularNodes = []
+	// let i = -1;
+	// do {
+	// 	i++;
+	// 	let node = GetNode(graph, sortedList[i]);
+	// 	console.log(`${GetNodeTitle(node)}: ${cache[sortedList[i]]}`)
+	// 	popularNodes.push(sortedList[i])
 
-	cityLayoutGrid = ApplyNodesToGrid(cityLayoutGrid, graph);
+	// }
+	// while (sortedList[i] && cache[sortedList[i]] > 1);
 
-	// let result = Anneal(cityLayoutGrid, graph, {
-	// 	T: 2,
-	// 	kMax: 100000,
-	// 	swap: graph.nodes.length / 2
-	// });
-	// console.log(Springy);
+	// let outsiderNodes = GetNodesNotLinkedTo(graph, popularNodes);
+	// console.log(`outsider nodes ${outsiderNodes.length}`)
+	// console.log('create city layout grid')
+	// let cityLayoutGrid = CreateCityLayoutGrid(graph);
 
-	ForceDirect(graph, 100000);
-	let forces = calculateForces(cityLayoutGrid, graph);
-	for (var i = 0; i < 1000; i++) {
-		forces = calculateForces(cityLayoutGrid, graph, forces);
-	}
+	// console.log('apply nodes to grid')
+	// cityLayoutGrid = ApplyNodesToGrid(cityLayoutGrid, graph);
+
+	// // let result = Anneal(cityLayoutGrid, graph, {
+	// // 	T: 2,
+	// // 	kMax: 100000,
+	// // 	swap: graph.nodes.length / 2
+	// // });
+	// // console.log(Springy);
+	// console.log('Force Direct')
+	// ForceDirect(graph, 100000);
+	// console.log('Calculate forces')
+	// let forces = calculateForces(cityLayoutGrid, graph);
+	// for (var i = 0; i < 1000; i++) {
+	// 	console.log(`${i}/${1000}  :  ${(i / 1000) * 100}`)
+	// 	forces = calculateForces(cityLayoutGrid, graph, forces);
+	// }
 
 	// let newstress: number = MeasureStress(result, graph);
 	// writeLine(`new stress : ${newstress}`);
 }
+interface SectionSearch {
+	type: string;
+	deep?: boolean
+	sub?: SectionSearch[]
+}
+function BuildSections(graph: Graph, cache) {
+	let sections: SectionSearch[] = [{
+		type: NodeTypes.Screen,
+		sub: [
+			{
+				type: NodeTypes.ScreenOption,
+				sub: [{ type: NodeTypes.ComponentApi },
+				{
+					type: NodeTypes.ComponentNode,
+					deep: true,
+					sub: [{
+						type: NodeTypes.EventMethod,
+						sub: [{
+							type: NodeTypes.EventMethodInstance,
+							sub: [{ type: NodeTypes.UIMethod },
+							{ type: NodeTypes.NavigationAction },
+							{ type: NodeTypes.EventHandler }]
+						}]
+					},
+					{ type: NodeTypes.ComponentApi },
+					{ type: NodeTypes.DataSource },
+					{ type: NodeTypes.MenuDataSource },
+					{ type: NodeTypes.ComponentExternalApi },
+					{ type: NodeTypes.Style },
+					{ type: NodeTypes.DataChainCollection },
+					{ type: NodeTypes.DataChain, deep: true }]
+				},
+				{ type: NodeTypes.ComponentExternalApi },
+				{ type: NodeTypes.ViewModel },
+				{
+					type: NodeTypes.DataChainCollection,
+					sub: [{ type: NodeTypes.DataChain, deep: true }]
+				},
+				{
+					type: NodeTypes.LifeCylceMethod,
+					sub: [{
+						type: NodeTypes.LifeCylceMethodInstance,
+						sub: [{
+							type: NodeTypes.ComponentApiConnector,
+							sub: [{
+								type: NodeTypes.MethodApiParameters,
+								sub: [{ type: NodeTypes.MethodApiParameters }]
+							}]
+						}]
+					}]
+				}]
+			},
+			{ type: NodeTypes.ComponentApi, sub: [{ type: NodeTypes.ComponentApiConnector }] },
+			{ type: NodeTypes.ComponentExternalApi },
+			{ type: NodeTypes.ViewModel },
+			{ type: NodeTypes.DataChainCollection }
+		]
+	}, {
+		type: NodeTypes.Model,
+		sub: [{
+			type: NodeTypes.Property,
+			sub: [{ type: NodeTypes.Attribute },
+			{ type: NodeTypes.DataChain, deep: true },
+			{ type: NodeTypes.Enumeration }]
+		}]
+	}, {
+		type: NodeTypes.Controller,
+		sub: [{
+			type: NodeTypes.Maestro,
+			sub: [{
+				type: NodeTypes.Method,
+				sub: [
+					{ type: NodeTypes.DataChain, deep: true },
+					{ type: NodeTypes.ModelItemFilter, sub: [{ deep: true, type: NodeTypes.DataChain }] },
+					{ type: NodeTypes.Permission, sub: [{ deep: true, type: NodeTypes.DataChain }] },
+					{
+						deep: true, type: NodeTypes.PermissionDataChain,
+						sub: [{ deep: true, type: NodeTypes.DataChain }
+						]
+					}, {
+						type: NodeTypes.Executor,
+						sub: [{
+							type: NodeTypes.ExecutionDataChain,
+							sub: [{ type: NodeTypes.DataChain }]
+						},
+						{ type: NodeTypes.DataChain }]
+					}, {
+						type: NodeTypes.MethodApiParameters
+					}]
+			}]
+		}]
+	}, {
+		type: NodeTypes.AgentAccessDescription,
+		sub: [{
+			type: NodeTypes.NavigationScreen,
+			sub: [{ type: NodeTypes.MenuDataSource, sub: [{ type: NodeTypes.DataChain }] }]
+		}, {
+			type: NodeTypes.ComponentDidMountEffectApi,
+			sub: [{ type: NodeTypes.DataChain, sub: [{ type: NodeTypes.ContextualParameters }] }]
+		}]
+	}, {
+		type: NodeTypes.ClaimService,
+		sub: [{ type: NodeTypes.Method }]
+	}, {
+		type: NodeTypes.NavigationScreen,
+		sub: [{ type: NodeTypes.MenuDataSource, sub: [{ type: NodeTypes.DataChain }] }]
+	}, {
+		type: NodeTypes.ComponentDidMountEffectApi,
+		sub: [{ type: NodeTypes.DataChain, sub: [{ type: NodeTypes.ContextualParameters }] }]
+	}, {
+		type: NodeTypes.ComponentNode,
+		deep: true,
+		sub: [{
+			type: NodeTypes.EventMethod,
+			sub: [{
+				type: NodeTypes.EventMethodInstance,
+				sub: [{ type: NodeTypes.UIMethod },
+				{ type: NodeTypes.NavigationAction },
+				{ type: NodeTypes.EventHandler }]
+			}]
+		},
+		{ type: NodeTypes.ComponentApi },
+		{ type: NodeTypes.DataSource },
+		{ type: NodeTypes.MenuDataSource },
+		{ type: NodeTypes.ComponentExternalApi },
+		{ type: NodeTypes.Style },
+		{ type: NodeTypes.DataChainCollection },
+		{ type: NodeTypes.DataChain, deep: true }]
+	}, {
+		type: NodeTypes.DataChain, deep: true
+	}];
 
+	return buildSections(sections, graph, cache);
+}
+function buildSections(sections: SectionSearch[], graph: Graph, bucket: {
+	[str: string]: {
+		type: string,
+		parent?: string,
+		sectionType?: string,
+		id: string,
+		count: number,
+		parentPath?: string[],
+		name: string,
+		connectionCount: number
+	}
+}, parentId?: string, parentPath?: string[], depth?: number) {
+	let sectionResults: any = {
+		parent: parentId || null,
+		children: [],
+		sections: [],
+		totals: {}
+	};
+	depth = depth || 0;
+	let total = 0;
+	depth++;
+	console.log(`depth: ${depth}`)
+
+
+	sections.forEach((section: SectionSearch, index: number) => {
+		let nodes = []
+		if (!parentId) {
+			parentPath = [section.type]
+			sectionResults.$sectionTypes = sectionResults.$sectionTypes || [];
+			sectionResults.$sectionTypes.push(section.type);
+		}
+		if (!parentId) {
+			nodes = NodesByType(graph, section.type,);
+		}
+		else {
+			nodes = GetNodesLinkedTo(graph, {
+				componentType: section.type,
+				id: parentId
+			});
+		}
+		nodes = nodes.filter(v => !bucket[v.id])
+		nodes.forEach((node: Node) => {
+			let childrenTotal = 0;
+
+			bucket[node.id] = {
+				id: node.id,
+				count: childrenTotal,
+				sectionType: !parentId ? section.type : null,
+				parent: parentId,
+				name: GetNodeTitle(node),
+				parentPath,
+				type: GetNodeProp(node, NodeProperties.NODEType),
+				connectionCount: GetNodesLinkedTo(graph, { id: node.id }).length
+			};
+			if (section.sub) {
+				let tempRes = buildSections(section.sub, graph, bucket, node.id, [...parentPath, node.id], depth);
+				if (tempRes.total) {
+					total += tempRes.total;
+					bucket[node.id].count += tempRes.total;
+					sectionResults.sections.push(tempRes);
+				}
+			}
+			if (section.deep) {
+				let tempRes = buildSections([section], graph, bucket, node.id, [...parentPath, node.id], depth);
+				if (tempRes.total) {
+					total += tempRes.total;
+					bucket[node.id].count += tempRes.total;
+					sectionResults.sections.push(tempRes);
+				}
+			}
+
+		})
+
+
+		total += nodes.length;
+	})
+	sectionResults.total = total;
+	return sectionResults;
+}
+
+function GetNodesNotLinkedTo(graph, popularNodes: string[]) {
+	let allNodes = Object.values(graph.nodeLib).map((v: Node) => v.id);
+	popularNodes.map((a: string) => {
+		let connectedNodes = GetNodesLinkedTo(graph, { id: a });
+		allNodes = allNodes.filter(v => {
+			return !connectedNodes.some(b => b.id === v)
+		})
+	});
+	return allNodes;
+}
+function GetNodesWithMostConnection(graph: Graph, cache: any) {
+
+	return Object.values(graph.nodeLib).map((a: Node) => {
+		let count = GetNodesLinkedTo(graph, { id: a.id }).length
+		cache[a.id] = count;
+		return a.id
+	}).sort((b, a) => {
+		return cache[a] - cache[b]
+	})
+}
 function ForceDirect(graph: Graph, loops: number) {
 	var sgraph = new Springy.Graph();
 	// make some nodes
 	let nodes = {};
+	console.log('create nodes')
 	graph.nodes.forEach((id: string) => {
 		var spruce = sgraph.newNode({
 			id,
@@ -52,12 +324,14 @@ function ForceDirect(graph: Graph, loops: number) {
 		});
 		nodes[id] = spruce;
 	});
+	console.log('creating edges')
 	graph.links.forEach((link: string) => {
 		let linkObj = graph.linkLib[link];
 		sgraph.newEdge(nodes[linkObj.source], nodes[linkObj.target]);
 	});
 
 	// connect them with an edge
+	console.log('init layout')
 	var layout = new Springy.Layout.ForceDirected(
 		sgraph,
 		3.0, // Spring stiffness
@@ -65,9 +339,10 @@ function ForceDirect(graph: Graph, loops: number) {
 		0.5 // Damping
 	);
 	for (var i = 0; i < loops; i++) {
+		console.log(`${i}/${loops}  :  ${(i / loops) * 100}`)
 		layout.tick(1 / 30);
 	}
-	layout.eachNode(function(node, point) {
+	layout.eachNode(function (node, point) {
 		// t.drawNode(node, point.p);
 		console.log(node);
 		console.log(point.p);

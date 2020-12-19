@@ -1,0 +1,42 @@
+.dictionary-input {
+    font-size: 14px;
+}
+
+.input-container {
+    display: flex;
+    flex: 1 0 auto;
+}
+
+.value-input,
+.key-input {
+    background-color: white;
+    border-radius: 4px;
+    border: solid 1px grey;
+    padding: 5px;
+    color: black;
+    margin-right: 5px;
+}
+
+.value-input input:focus,
+.value-input input,
+.key-input input:focus,
+.key-input input {
+    border: none;
+    outline: none;
+}
+
+.add-key-value-button {
+    border-radius: 4px;
+}
+
+.row {
+    display: flex;
+    flex: 1 0 auto;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.row .key-field {
+    font-weight: bold;
+    margin-right: 5px;
+}

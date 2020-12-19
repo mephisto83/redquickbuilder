@@ -167,8 +167,8 @@ class DashboardRoutingContextMenu extends Component<any, any> {
 															value !== modelPropertyOption.id ? (
 																'fa fa-square-o'
 															) : (
-																'fa fa-square'
-															)
+																	'fa fa-square'
+																)
 														}
 														title={UIA.GetNodeTitle(modelPropertyOption)}
 														onClick={() => {
@@ -214,8 +214,8 @@ class DashboardRoutingContextMenu extends Component<any, any> {
 															value !== agentPropertyOption.id ? (
 																'fa fa-square-o'
 															) : (
-																'fa fa-square'
-															)
+																	'fa fa-square'
+																)
 														}
 														onClick={() => {
 															// route.source = {
@@ -540,8 +540,8 @@ class DashboardRoutingContextMenu extends Component<any, any> {
 										<RoutingInput
 											agent={menuMode.agent}
 											viewType={menuMode.viewType}
-                      model={menuMode.model}
-                      routing={menuMode.routing}
+											model={menuMode.dashboard}
+											routing={menuMode.routing}
 											onNewRoutes={(newRoutes: RouteDescription[]) => {
 												let routing: Routing = menuMode.routing;
 												routing.routes.length = 0;

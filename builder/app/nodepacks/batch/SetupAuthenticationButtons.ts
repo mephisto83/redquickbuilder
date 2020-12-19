@@ -43,6 +43,7 @@ export default function SetupAuthenticationButtons() {
 	let screens = NodesByType(graph, NodeTypes.Screen);
 	graph = setupRegister(screens, graph);
 	graph = setupAuthentication(screens, graph);
+	graph = setupAnonymousLogin(screens, graph)
 }
 function setupRegister(screens: any, graph: any) {
 	let screen = screens.find((s: Node) => GetNodeProp(s, NodeProperties.UIText).trim() === Titles.Register);
@@ -61,6 +62,58 @@ function setupRegister(screens: any, graph: any) {
 	);
 
 	graph = setupAuthRelatedButton(screenOptions, screen, method, graph, `${Titles.Register} Button`);
+	return graph;
+}
+
+function setupAnonymousLogin(screens: any, graph: any) {
+	let screen = screens.find((s: Node) => GetNodeProp(s, NodeProperties.UIText).trim() === 'Anonymous Guest');
+
+	let screenOptions = GetNodesLinkedTo(graph, {
+		id: screen.id,
+		componentType: NodeTypes.ScreenOption
+	});
+
+
+	let method = GetNodeByProperties(
+		{
+			[NodeProperties.FunctionType]: FunctionTypes.Login,
+			[NodeProperties.NODEType]: NodeTypes.Method
+		},
+		graph
+	);
+	let targetNavigationScreen = GetNodeByProperties(
+		{
+			[NodeProperties.IsHomeLaunchView]: true,
+			[NodeProperties.NODEType]: NodeTypes.NavigationScreen
+		},
+		graph
+	);
+	let targetScreen: Node | null = null;
+	if (targetNavigationScreen) {
+		targetScreen = GetNodeLinkedTo(graph, {
+			id: targetNavigationScreen.id,
+			link: LinkType.NavigationScreenImplementation,
+			componentType: NodeTypes.Screen
+		});
+	}
+	graph = setupAuthRelatedButton(
+		screenOptions,
+		screen,
+		method,
+		graph,
+		`Anonymous ${Titles.Login} Button`,
+		({ screenOption, eventInstance, method }: { screenOption: Node; eventInstance: string; method: Node }) => {
+			let uiType = GetNodeProp(screenOption, NodeProperties.UIType);
+			PerformGraphOperation([
+				...PostAuthenticate({
+					screen: targetScreen ? targetScreen.id : null,
+					uiType,
+					functionName: Titles.AnonymousRegisterandAuthenticate,
+					pressInstance: eventInstance
+				})
+			])(GetDispatchFunc(), GetStateFunc());
+		}
+	);
 	return graph;
 }
 

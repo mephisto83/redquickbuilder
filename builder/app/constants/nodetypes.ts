@@ -1606,7 +1606,7 @@ export const LinkProperties = {
 		type: LinkType.MaestroLink
 	}
 };
-Object.keys(LinkProperties).map((propTypes) => {
+Object.keys(LinkProperties).map((propTypes: string) => {
 	if (LinkProperties[propTypes] && LinkProperties[propTypes].type) {
 		LinkProperties[propTypes][LinkProperties[propTypes].type] = {};
 	}
@@ -1696,6 +1696,7 @@ export const NodePropertyTypes = {
 	LISTOFSTRINGS: 'LISTOFSTRINGS',
 	DATETIME: 'DATETIME',
 	INT: 'INT',
+	ADDRESS: 'ADDRESS',
 	FLOAT: 'FLOAT',
 	DOUBLE: 'DOUBLE',
 	LONG: 'LONG',
@@ -1728,6 +1729,7 @@ export const NodePropertyTypesByLanguage = {
 		[NodePropertyTypes.STRING]: 'string',
 		[NodePropertyTypes.LISTOFSTRINGS]: 'IList<string>',
 		[NodePropertyTypes.DICTSTRING]: 'IDictionary<string, string>',
+		[NodePropertyTypes.ADDRESS]: 'GoogleAddress',
 		[NodePropertyTypes.INT]: 'int',
 		[NodePropertyTypes.FLOAT]: 'float',
 		[NodePropertyTypes.DOUBLE]: 'double',
@@ -1738,6 +1740,7 @@ export const NodePropertyTypesByLanguage = {
 	[ProgrammingLanguages.JavaScript]: {
 		[NodePropertyTypes.DATETIME]: 'any',
 		[NodePropertyTypes.STRING]: 'string',
+		[NodePropertyTypes.ADDRESS]: '{ [str:string]: any }',
 		[NodePropertyTypes.LISTOFSTRINGS]: 'IList<string>',
 		[NodePropertyTypes.DICTSTRING]: '{ [str: string]: string }',
 		[NodePropertyTypes.INT]: 'number',
@@ -1754,7 +1757,8 @@ export const RED_QUICK_ATTRIBUTES = 'RedQuick.Attributes';
 export const Usings = {
 	[ProgrammingLanguages.CSHARP]: {
 		[NodePropertyTypes.EMAIL]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES],
-		[NodePropertyTypes.PHONENUMBER]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES]
+		[NodePropertyTypes.PHONENUMBER]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES],
+		[NodePropertyTypes.ADDRESS]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES]
 	}
 };
 export const NodeAttributePropertyTypes = {

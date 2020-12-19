@@ -282,7 +282,7 @@ import * as Util from './util';
     var { dataChain, screenEffects, screenContext } = (parameters || {});
     let result: any = null;
     if (dataChain) {
-        result = dataChain(res);
+        result = dataChain(res, parameters);
     }
 
     if(screenEffects && Array.isArray(screenEffects)) {
@@ -295,7 +295,7 @@ import * as Util from './util';
 }, null, (result${anytypes}) => {
   var { preChain } = (parameters || {});
   if (preChain) {
-      return preChain();
+      return preChain(parameters);
   }
 })(dispatch, getState);`;
 				return bindTemplate(ControllerMethodTemplate, {

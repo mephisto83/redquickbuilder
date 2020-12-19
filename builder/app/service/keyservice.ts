@@ -64,7 +64,7 @@ export function GenerateModelKeys(options: any) {
 	return [
 		{
 			template: codeGenerator
-				? `const ModekKeys = { ${templates.join(`,${NEW_LINE}`)}
+				? `const ModelKeys = { ${templates.join(`,${NEW_LINE}`)}
     }`
 				: `export default <{ [index: string]: string }>{ ${templates.join(`,${NEW_LINE}`)}
   }`,

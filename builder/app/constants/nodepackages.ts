@@ -3395,6 +3395,7 @@ export const CreateDefaultView = {
 											};
 										});
 									} else {
+										console.warn(`componentType: ${componentType}`)
 										throw 'sharedComponent should be set';
 									}
 

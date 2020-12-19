@@ -1499,6 +1499,31 @@ class ContextMenu extends Component<any, any> {
 							this.props.toggleVisual('OPERATIONS');
 						}}
 					>
+						<TreeViewItemContainer>
+							<SelectInput
+								label={Titles.ComponentType}
+								options={Object.entries(ComponentTypeKeys).map((v: any) => {
+									return {
+										title: v[0],
+										value: v[1],
+										id: v[1]
+									}
+								})}
+								onChange={(value: any) => {
+									this.props.graphOperation([
+										{
+											operation: UIA.CHANGE_NODE_PROPERTY,
+											options: {
+												prop: UIA.NodeProperties.ComponentType,
+												id: currentNode.id,
+												value: value
+											}
+										}
+									]);
+								}}
+								value={GetNodeProp(currentNode, NodeProperties.ComponentType)}
+							/>
+						</TreeViewItemContainer>
 						{Object.keys(NodeAttributePropertyTypes).sort((a, b) => a.localeCompare(b)).map((key) => {
 							return (
 								<TreeViewMenu

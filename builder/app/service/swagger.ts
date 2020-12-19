@@ -30,7 +30,7 @@ export function SwaggerProcessData(nodeId: string, rawSwagger: SwaggerApi) {
 		});
 	});
 
-	Object.keys(rawSwagger.definitions).forEach((className: string) => {
+	Object.keys(rawSwagger.components.schemas).forEach((className: string) => {
 		let newNode: Node | null = null;
 		operations.push(
 			CreateNewNode(
@@ -51,9 +51,9 @@ export function SwaggerProcessData(nodeId: string, rawSwagger: SwaggerApi) {
 			}
 		);
 	});
-	Object.keys(rawSwagger.definitions).forEach((className: string) => {
+	Object.keys(rawSwagger.components.schemas).forEach((className: string) => {
 		operations.push(() => {
-			let newClassObject = rawSwagger.definitions[className];
+			let newClassObject = rawSwagger.components.schemas[className];
 			let result: any[] = [];
 			switch (newClassObject.type) {
 				case SwaggerType.Object:
@@ -265,22 +265,30 @@ export enum SwaggerType {
 }
 
 export interface SwaggerApi {
-	swagger: string;
+	components: SwaggerComponents;
 	info: SwaggerInfo;
-	host: string;
-	basePath: string;
-	tags: SwaggerTags[];
-	schemes: string[];
-	paths: SwaggerPaths;
-	securityDefinitions: SwaggerSecurityDefinitions;
-	definitions: SwaggerDefinitions;
-	externalDocs: SwaggerExternalDocuments;
+	openapi: string;
+	paths: SwaggerPaths
+}
+export interface SwaggerPaths {
+	[str: string]: SwaggerPathDescription
+}
+export interface SwaggerPath {
+	get?: SwaggerMethod
+}
+export interface SwaggerMethod {
+	parameters: SwaggerParameters
+}
+export interface SwaggerComponents {
+	schemas: {
+		[str: string]: SwaggerDefinition
+	}
 }
 export interface SwaggerDefinitions {
 	[className: string]: SwaggerDefinition;
 }
 export interface SwaggerDefinition {
-	type: string;
+	type: SwaggerType;
 	properties: SwaggerDefinitionProperties;
 }
 export interface SwaggerDefinitionProperties {
@@ -315,9 +323,6 @@ export enum SwaggerInOptions {
 	Path = 'path',
 	FormData = 'formData',
 	Header = 'header'
-}
-export interface SwaggerPaths {
-	[path: string]: SwaggerPathDescription;
 }
 export interface SwaggerPathDescription {
 	post?: SwaggerEndpointDescription;
@@ -362,12 +367,8 @@ export interface SwaggerTags {
 	externalDocs: SwaggerExternalDocuments;
 }
 export interface SwaggerInfo {
-	description: string;
-	version: string;
 	title: string;
-	termsOfService: string;
-	contact: SwaggerContact;
-	license: SwaggerLicense;
+	version: string;
 }
 export interface SwaggerContact {
 	email: string;

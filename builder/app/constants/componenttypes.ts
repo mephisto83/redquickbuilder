@@ -51,12 +51,12 @@ export const ON_BLUR = 'onBlur';
 export const ON_FOCUS = 'onFocus';
 export const ON_CHANGE = 'onChange';
 export const ON_CHANGE_TEXT = 'onChangeText';
-export const ARE_HANDLERS = [ ON_BLUR, ON_FOCUS, ON_CHANGE_TEXT, ON_CHANGE ];
+export const ARE_HANDLERS = [ON_BLUR, ON_FOCUS, ON_CHANGE_TEXT, ON_CHANGE];
 export const ARE_BOOLEANS = [];
-export const ARE_TEXT_CHANGE = [ ON_CHANGE_TEXT ];
+export const ARE_TEXT_CHANGE = [ON_CHANGE_TEXT];
 export const VALUE = 'value';
-export const SHARED_COMPONENT_API = [ VALUE ].map((x) => ({ property: x }));
-export const GENERAL_COMPONENT_API = [ VALUE ].map((x) => ({ property: x }));
+export const SHARED_COMPONENT_API = [VALUE].map((x) => ({ property: x }));
+export const GENERAL_COMPONENT_API = [VALUE].map((x) => ({ property: x }));
 export const ComponentApiTypes = {
 	ViewModel: 'viewModel',
 	Value: 'value'
@@ -84,7 +84,7 @@ export const SCREEN_COMPONENT_EVENTS = [
 	ComponentLifeCycleEvents.ComponentDidMount,
 	ComponentLifeCycleEvents.ComponentWillUnmount
 ];
-export const PropertyApiList = [ 'error', 'success', VALUE ].map((v) => ({
+export const PropertyApiList = ['error', 'success', VALUE].map((v) => ({
 	value: v
 }));
 export const ApiProperty = {
@@ -119,8 +119,8 @@ const BUTTON_DEFAULT_API = [
 	'small',
 	'active'
 ].map((x) => ({ property: x }));
-const LOCAL_STATE_PROPERTY = [ 'error' ].map((x) => ({ property: x }));
-const LABEL_DEFAULT_API = [ 'data' ].map((x) => ({ property: x }));
+const LOCAL_STATE_PROPERTY = ['error'].map((x) => ({ property: x }));
+const LABEL_DEFAULT_API = ['data'].map((x) => ({ property: x }));
 const DEFAULT_INPUT_API_PROPERTIES: any = {};
 const DEFAULT_BUTTON_API_PROPERTIES: any = {};
 
@@ -156,7 +156,7 @@ INPUT_DEFAULT_API.forEach((x) => {
 		ui: true
 	};
 });
-[ 'style_label', 'style_item', 'style_input' ].map((x) => ({ property: x })).forEach((x) => {
+['style_label', 'style_item', 'style_input'].map((x) => ({ property: x })).forEach((x) => {
 	DEFAULT_INPUT_API_PROPERTIES[x.property] = {
 		style: 'style'
 	};
@@ -172,11 +172,66 @@ export const ComponentTypeKeys = {
 	View: 'View',
 	Menu: 'Menu',
 	Input: 'Input',
+	Typeahead: 'Typeahead',
+	CarModel: 'CarModel',
+	CarMake: 'CarMake',
+	DictionaryString: 'DictionaryString',
+	CarYear: 'CarYear',
+	Year: 'Year',
+	StateProvince: 'StateProvince',
+	GoogleAddress: 'GoogleAddress',
+	Country: 'Country',
 	Dropdown: 'Dropdown',
 	Text: 'Text',
 	H1: 'H1',
 	InfiniteList: 'InfiniteList' // a list of items which maybe of unbounded length, create items and add to list, and remove and delete items, and update items
 };
+function BuildTypeahead(args: { template: string } = { template: 'typeahead.tpl' }) {
+	return {
+		template: './app/templates/components/' + args.template,
+		defaultApi: INPUT_DEFAULT_API,
+		eventApi: [ComponentEvents.onBlur, ComponentEvents.onFocus, ComponentEvents.onChangeText],
+		properties: {
+			item_attributes: {
+				nodeProperty: NodeProperties.TextType,
+				template: '{{value}}',
+				options: [
+					'fixedLabel',
+					'inlineLabel',
+					'floatingLabel',
+					'stackedLabel',
+					'regular',
+					'rounded',
+					'success',
+					'error',
+					'disabled'
+				],
+				ui: true
+			},
+			...DEFAULT_INPUT_API_PROPERTIES,
+			value: {
+				nodeProperty: NodeProperties.value,
+				template: true
+			},
+			label: {
+				nodeProperty: NodeProperties.Label,
+				template: true
+			},
+			placeholder: {
+				nodeProperty: NodeProperties.Placeholder,
+				template: true
+			},
+			error: {
+				nodeProperty: NodeProperties.Error,
+				template: true
+			},
+			success: {
+				nodeProperty: NodeProperties.Success,
+				template: true
+			}
+		}
+	}
+}
 export const ComponentTypes: any = {
 	ReactNative: {
 		Badge: {},
@@ -184,14 +239,14 @@ export const ComponentTypes: any = {
 		[ComponentTypeKeys.Button]: {
 			template: './app/templates/components/button.tpl',
 			defaultApi: BUTTON_DEFAULT_API,
-			eventApi: [ ComponentEvents.onPress ],
+			eventApi: [ComponentEvents.onPress],
 			properties: {
 				onPress: {
 					nodeProperty: 'onPress',
 					template: '() => { {{value}} }',
 					method: true,
 					nowrap: true,
-					options: [ NAVIGATION, APP_METHOD ],
+					options: [NAVIGATION, APP_METHOD],
 					ui: true
 				},
 				...DEFAULT_BUTTON_API_PROPERTIES
@@ -202,7 +257,7 @@ export const ComponentTypes: any = {
 		[ComponentTypeKeys.CheckBox]: {
 			template: './app/templates/components/checkbox.tpl',
 			defaultApi: INPUT_DEFAULT_API,
-			eventApi: [ ComponentEvents.onBlur, ComponentEvents.onFocus, ComponentEvents.onChangeText ],
+			eventApi: [ComponentEvents.onBlur, ComponentEvents.onFocus, ComponentEvents.onChangeText],
 			properties: {
 				item_attributes: {
 					nodeProperty: NodeProperties.TextType,
@@ -248,7 +303,7 @@ export const ComponentTypes: any = {
 		[ComponentTypeKeys.Dropdown]: {
 			template: './app/templates/components/dropdown.tpl',
 			defaultApi: INPUT_DEFAULT_API,
-			eventApi: [ ComponentEvents.onBlur, ComponentEvents.onFocus, ComponentEvents.onChangeText ],
+			eventApi: [ComponentEvents.onBlur, ComponentEvents.onFocus, ComponentEvents.onChangeText],
 			properties: {
 				item_attributes: {
 					nodeProperty: NodeProperties.TextType,
@@ -270,11 +325,11 @@ export const ComponentTypes: any = {
 				value: {
 					nodeProperty: NodeProperties.value,
 					template: true
-        },
-        options:{
+				},
+				options: {
 					nodeProperty: NodeProperties.Options,
 					template: true
-        },
+				},
 				label: {
 					nodeProperty: NodeProperties.Label,
 					template: true
@@ -352,19 +407,19 @@ export const ComponentTypes: any = {
 				left: {
 					nodeProperty: 'HeaderLeft',
 					template: '{{value}}',
-					options: [ true, false ],
+					options: [true, false],
 					ui: true
 				},
 				right: {
 					nodeProperty: 'HeaderRight',
 					template: '{{value}}',
-					options: [ true, false ],
+					options: [true, false],
 					ui: true
 				},
 				title: {
 					nodeProperty: 'HeaderTitle',
 					template: '{{value}}',
-					options: [ true, false ],
+					options: [true, false],
 					ui: true
 				}
 			}
@@ -377,7 +432,7 @@ export const ComponentTypes: any = {
 				data: {
 					ui: true,
 					nodeProperty: 'data',
-					nodeTypes: [ NodeTypes.DataChain ],
+					nodeTypes: [NodeTypes.DataChain],
 					nodeFilter: (item: any) => GetNodeProp(item, NodeProperties.EntryPoint),
 					template: (node: any) => {
 						const func = GetCodeName(GetNodeProp(node, 'data'), {
@@ -397,7 +452,7 @@ export const ComponentTypes: any = {
 		[ComponentTypeKeys.Input]: {
 			template: './app/templates/components/input.tpl',
 			defaultApi: INPUT_DEFAULT_API,
-			eventApi: [ ComponentEvents.onBlur, ComponentEvents.onFocus, ComponentEvents.onChangeText ],
+			eventApi: [ComponentEvents.onBlur, ComponentEvents.onFocus, ComponentEvents.onChangeText],
 			properties: {
 				item_attributes: {
 					nodeProperty: NodeProperties.TextType,
@@ -438,6 +493,14 @@ export const ComponentTypes: any = {
 				}
 			}
 		},
+		[ComponentTypeKeys.Typeahead]: BuildTypeahead({ template: 'typeahead.tpl' }),
+		[ComponentTypeKeys.CarModel]: BuildTypeahead({ template: 'carmodelinput.tpl' }),
+		[ComponentTypeKeys.CarMake]: BuildTypeahead({ template: 'carmakeinput.tpl' }),
+		[ComponentTypeKeys.CarYear]: BuildTypeahead({ template: 'caryearinput.tpl' }),
+		[ComponentTypeKeys.StateProvince]: BuildTypeahead({ template: 'stateinput.tpl' }),
+		[ComponentTypeKeys.GoogleAddress]: BuildTypeahead({ template: 'addressinput.tpl' }),
+		[ComponentTypeKeys.DictionaryString]: BuildTypeahead({ template: 'dictionaryinput.tpl' }),
+		[ComponentTypeKeys.Country]: BuildTypeahead({ template: 'countryinput.tpl' }),
 		Generic: {
 			properties: {
 				value: {
@@ -455,14 +518,14 @@ export const ComponentTypes: any = {
 			library: 'react-native',
 			layout: true,
 			specialLayout: true,
-			eventApi: [ 'onEndReachedThreshold', 'onEndReached' ],
+			eventApi: ['onEndReachedThreshold', 'onEndReached'],
 			template: './app/templates/components/list.tpl',
 			datasource: true,
 			properties: {
 				item_attributes: {
 					nodeProperty: NodeProperties.TextType,
 					template: '{{value}}',
-					component_options: [ NodeTypes.ComponentNode ],
+					component_options: [NodeTypes.ComponentNode],
 					ui: true
 				}
 			},
@@ -470,7 +533,7 @@ export const ComponentTypes: any = {
 		},
 		Menu: {
 			template: './app/templates/components/menu.tpl',
-			eventApi: [ ComponentEvents.onPress ],
+			eventApi: [ComponentEvents.onPress],
 			properties: {
 				value: {
 					nodeProperty: NodeProperties.value,
@@ -485,14 +548,14 @@ export const ComponentTypes: any = {
 		MultiViewList: {
 			layout: true,
 			specialLayout: true,
-			eventApi: [ 'onEndReachedThreshold', 'onEndReached' ],
+			eventApi: ['onEndReachedThreshold', 'onEndReached'],
 			template: './app/templates/components/multiviewlist.tpl',
 			datasource: true,
 			properties: {
 				item_attributes: {
 					nodeProperty: NodeProperties.TextType,
 					template: '{{value}}',
-					component_options: [ NodeTypes.ComponentNode ],
+					component_options: [NodeTypes.ComponentNode],
 					ui: true
 				}
 			},
@@ -501,7 +564,7 @@ export const ComponentTypes: any = {
 		[ComponentTypeKeys.MultiSelectList]: {
 			layout: true,
 			specialLayout: true,
-			eventApi: [ 'onEndReachedThreshold', 'onEndReached' ],
+			eventApi: ['onEndReachedThreshold', 'onEndReached'],
 			events: {
 				[ComponentEvents.onChange]: true
 			},
@@ -511,7 +574,7 @@ export const ComponentTypes: any = {
 				item_attributes: {
 					nodeProperty: NodeProperties.TextType,
 					template: '{{value}}',
-					component_options: [ NodeTypes.ComponentNode ],
+					component_options: [NodeTypes.ComponentNode],
 					ui: true
 				}
 			},
@@ -520,14 +583,14 @@ export const ComponentTypes: any = {
 		[ComponentTypeKeys.InfiniteList]: {
 			layout: true,
 			specialLayout: true,
-			eventApi: [ 'onEndReachedThreshold', 'onEndReached' ],
+			eventApi: ['onEndReachedThreshold', 'onEndReached'],
 			template: './app/templates/components/infinitelist.tpl',
 			datasource: true,
 			properties: {
 				item_attributes: {
 					nodeProperty: NodeProperties.TextType,
 					template: '{{value}}',
-					component_options: [ NodeTypes.ComponentNode ],
+					component_options: [NodeTypes.ComponentNode],
 					ui: true
 				}
 			},
@@ -536,7 +599,7 @@ export const ComponentTypes: any = {
 		[ComponentTypeKeys.SingleSelect]: {
 			layout: true,
 			specialLayout: true,
-			eventApi: [ 'onEndReachedThreshold', 'onEndReached' ],
+			eventApi: ['onEndReachedThreshold', 'onEndReached'],
 			events: {
 				[ComponentEvents.onChange]: true
 			},
@@ -546,7 +609,7 @@ export const ComponentTypes: any = {
 				item_attributes: {
 					nodeProperty: NodeProperties.TextType,
 					template: '{{value}}',
-					component_options: [ NodeTypes.ComponentNode ],
+					component_options: [NodeTypes.ComponentNode],
 					ui: true
 				}
 			},
@@ -562,7 +625,7 @@ export const ComponentTypes: any = {
 					nodeProperty: 'onPress',
 					template: '() => { {{value}} }',
 					method: true,
-					options: [ NAVIGATION, APP_METHOD ],
+					options: [NAVIGATION, APP_METHOD],
 					ui: true
 				}
 			}
@@ -593,7 +656,7 @@ export const ComponentTypes: any = {
 				data: {
 					ui: true,
 					nodeProperty: ComponentApiKeys.DATA,
-					nodeTypes: [ NodeTypes.DataChain ],
+					nodeTypes: [NodeTypes.DataChain],
 					nodeFilter: (item: any) => GetNodeProp(item, NodeProperties.EntryPoint),
 					template: (node: any) => {
 						const func = GetCodeName(GetNodeProp(node, ComponentApiKeys.DATA), {
@@ -620,7 +683,7 @@ export const ComponentTypes: any = {
 				data: {
 					ui: true,
 					nodeProperty: 'data',
-					nodeTypes: [ NodeTypes.DataChain ],
+					nodeTypes: [NodeTypes.DataChain],
 					nodeFilter: (item: any) => GetNodeProp(item, NodeProperties.EntryPoint),
 					template: (node: any) => {
 						const func = GetCodeName(GetNodeProp(node, 'data'), {
@@ -640,7 +703,7 @@ export const ComponentTypes: any = {
 		Title: {},
 		Toast: {},
 		View: {
-			eventApi: [ 'componentDidMount' ],
+			eventApi: ['componentDidMount'],
 			layout: true
 		},
 		LoginSelector: {
@@ -669,7 +732,7 @@ Object.keys(ComponentTypes.ReactNative).map((key) => {
 
 ComponentTypes[UITypes.ElectronIO][ComponentTypeKeys.Button] = {
 	...ComponentTypes[UITypes.ElectronIO][ComponentTypeKeys.Button],
-	eventApi: [ ComponentEvents.onClick ],
+	eventApi: [ComponentEvents.onClick],
 	properties: {
 		...ComponentTypes[UITypes.ElectronIO][ComponentTypeKeys.Button].properties,
 		onClick: {
@@ -677,14 +740,14 @@ ComponentTypes[UITypes.ElectronIO][ComponentTypeKeys.Button] = {
 			template: '() => { {{value}} }',
 			method: true,
 			nowrap: true,
-			options: [ NAVIGATION, APP_METHOD ],
+			options: [NAVIGATION, APP_METHOD],
 			ui: true
 		}
 	}
 };
 ComponentTypes[UITypes.ElectronIO].Menu = {
 	...ComponentTypes[UITypes.ElectronIO].Menu,
-	eventApi: [ ComponentEvents.onClick ],
+	eventApi: [ComponentEvents.onClick],
 	properties: {
 		...ComponentTypes[UITypes.ElectronIO].Menu.properties,
 		onClick: {
@@ -692,7 +755,7 @@ ComponentTypes[UITypes.ElectronIO].Menu = {
 			template: '() => { {{value}} }',
 			method: true,
 			nowrap: true,
-			options: [ NAVIGATION, APP_METHOD ],
+			options: [NAVIGATION, APP_METHOD],
 			ui: true
 		}
 	}
