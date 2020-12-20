@@ -1264,26 +1264,30 @@ function SetLambdaInsertArgumentValues(
 }
 function GetRelationTypeValuePropString(relationType: RelationType, simpleValidation: HalfRelation): string {
 	let valuePropString: string = '';
+	let _path: string = simpleValidation.path || '';
+	if (_path) {
+		_path = `.${_path}`
+	}
 	switch (relationType) {
 		case RelationType.Agent:
 			valuePropString = `agent.#{{"key":"agent.${GetCodeName(
 				simpleValidation.agentProperty
-			)}","type":"property","model":"agent"}}#`;
+			)}","type":"property","model":"agent"}}#${_path}`;
 			break;
 		case RelationType.Model:
 			valuePropString = `model.#{{"key":"model.${GetCodeName(
 				simpleValidation.modelProperty
-			)}","type":"property","model":"model"}}#`;
+			)}","type":"property","model":"model"}}#${_path}`;
 			break;
 		case RelationType.ModelOutput:
 			valuePropString = `model_output.#{{"key":"model_output.${GetCodeName(
 				simpleValidation.modelOutputProperty || simpleValidation.modelProperty
-			)}","type":"property","model":"model_output"}}#`;
+			)}","type":"property","model":"model_output"}}#${_path}`;
 			break;
 		case RelationType.Parent:
 			valuePropString = `parent.#{{"key":"parent.${GetCodeName(
 				simpleValidation.parentProperty
-			)}","type":"property","model":"parent"}}#`;
+			)}","type":"property","model":"parent"}}#${_path}`;
 			break;
 	}
 	return valuePropString;

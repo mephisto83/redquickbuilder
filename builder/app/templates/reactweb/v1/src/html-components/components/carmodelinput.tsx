@@ -14,10 +14,14 @@ export default class CarModelInput extends Typeahead {
     constructor(props: any) {
         super(props);
         this.promise = Promise.resolve();
+        this.onTextChange = this.onTextChange.bind(this);
         this.running = false;
+        this.runAgain = false;
+        this.showOnEmptyFilter = true;
     }
     promise: Promise<void>;
     running: boolean;
+    runAgain: boolean;
 
 
     componentDidMount() {
@@ -48,14 +52,25 @@ export default class CarModelInput extends Typeahead {
             let year = this.state.year;
             let make = this.state.make;
             if (year && make) {
-                return redservice().get(`/api/autoservice/models/${this.state.year}/${this.state.make}`).then((models: AutoModel[]) => {
-                    let suggestions = models.map((make: AutoModel) => ({ title: make.model_Name, value: make.model_ID }));
-                    if (year === this.state.year && make === this.state.make) {
-                        this.setState(() => ({
-                            suggestions
-                        }));
-                    }
-                });
+                if (!this.running) {
+                    this.running = true;
+                    return redservice().get(`/api/red/autoservice/models/${this.state.year}/${this.state.make}`).then((models: AutoModel[]) => {
+                        this.running = false;
+                        let suggestions = models.map((make: AutoModel) => ({ title: make.model_Name, value: make.model_ID }));
+                        if (this.runAgain || (year === this.state.year && make === this.state.make)) {
+                            this.setState(() => ({
+                                suggestions
+                            }));
+                        }
+                        if (this.runAgain) {
+                            this.runAgain = false;
+                            this.updateModels();
+                        }
+                    });
+                }
+                else {
+                    this.runAgain = true;
+                }
             }
             else {
                 this.setState({
@@ -65,7 +80,7 @@ export default class CarModelInput extends Typeahead {
         });
     }
     componentWillUnmount() {
-        
+
         CarMakeServiceRemove(this.state.id);
         CarYearServiceRemove(this.state.id);
     }
@@ -73,12 +88,14 @@ export default class CarModelInput extends Typeahead {
 
     onTextChange(e: any) {
         const value = e.target.value;
+        
+        this.setState({
+            valueTitle: null,
+            value: value
+        });
         if (value.length > 0) {
-
+            this.updateModels();
         }
-        this.setState(() => ({
-            text: value
-        }));
     }
 }
 

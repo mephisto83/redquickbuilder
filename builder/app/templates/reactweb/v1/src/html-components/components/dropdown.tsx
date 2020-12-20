@@ -54,6 +54,7 @@ export default class Dropdown extends React.Component<any, any> {
 					}}
 					placeholder={InputFunctions.placeholder(this)}
 				>
+					<option>Select Option</option>
 					{this.renderOptions()}
 				</select>
 				<Validation data={this.props.error} />

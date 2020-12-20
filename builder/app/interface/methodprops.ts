@@ -1235,6 +1235,7 @@ export enum SkipSettings {
 export interface ConfigItem {
 	name?: string;
 	enabled: boolean;
+	path?: string;
 	id: string;
 }
 export function CheckSimpleValidation(isvalidation: SimpleValidationConfig): boolean {

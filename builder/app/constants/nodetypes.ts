@@ -251,6 +251,7 @@ export const STANDARD_CONTROLLER_USING = [
 	'RedQuick.Validation',
 	'RedQuickCore.Identity',
 	'RedQuickCore.Validation.Rules',
+	'RedQuickCore.Data',
 	'RedQuick.Interfaces.Arbiter',
 	'RedQuick.Configuration',
 	'RedQuick.Util',

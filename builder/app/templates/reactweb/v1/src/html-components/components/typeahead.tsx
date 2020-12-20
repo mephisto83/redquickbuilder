@@ -11,10 +11,16 @@ export default class TypeAheadDropDown extends React.Component<any, any> {
         this.state = {
             id: `component_${uuidv4()}`,
             suggestions: [],
-            text: ''
+            immediate: false,
+            hasFocus: false,
+            tentativeIndex: null,
+            value: ''
         }
+        this.mounted = false;
+        this.showOnEmptyFilter = false;
     }
-
+    mounted: boolean;
+    showOnEmptyFilter: boolean;
     label() {
         return InputFunctions.label(this);
     }
@@ -31,50 +37,63 @@ export default class TypeAheadDropDown extends React.Component<any, any> {
         return InputFunctions.disabled(this);
     }
     componentDidMount() {
+        this.mounted = true;
         InputFunctions.componentDidMount(this);
     }
-    componentDidUpdate(prevProps: any) {
-        InputFunctions.componentDidUpdate(this, prevProps);
+    componentWillUnmount() {
+        this.mounted = false;
+    }
+    componentDidUpdate(prevProps: any, prevState: any, snapshot: any) {
+        InputFunctions.componentDidUpdateV2(this, prevProps);
     }
     cssClasses() {
         return '';
     }
     onTextChange(e: any) {
-        const { iteams } = this.props;
-        let suggestions: any = [];
         const value = e.target.value;
-        if (value.length > 0) {
-            const regex = new RegExp(`^${value}`, `i`);
-            suggestions = iteams.sort().filter((v: any) => regex.test(v));
-        }
 
 
-        this.setState(() => ({
-            suggestions,
-            text: value
-        }));
+        this.setState({
+            valueTitle: null,
+            value: value
+        });
     }
 
 
-    suggestionSelected(value: any) {
-        this.setState(() => ({
-            text: value,
-            suggestions: []
-        }))
+    suggestionSelected(value: any, title: any) {
+        this.setState({
+            value: value,
+            valueTitle: title,
+            hasFocus: false,
+            showSuggestions: false,
+            tentativeIndex: null
+        })
         InputFunctions.onChange(this)({ target: { checked: false, value: value } });
     }
 
     renderSuggestions = () => {
-        const { suggestions } = this.state;
-        if (suggestions.length === 0) {
+        const { suggestions, value } = this.state;
+        if (suggestions.length === 0 && !this.showOnEmptyFilter) {
             return null;
+        }
+        const regex = new RegExp(`^${value}`, `i`);
+        if (!this.state.showSuggestions) {
+            return <ul></ul>
         }
         return (
             <ul>
-                {suggestions.map((item: any) => <li
+                {suggestions.filter((v: { title: string }) => {
+                    if (this.showOnEmptyFilter && !value) {
+                        return true;
+                    }
+                    return regex.test(v.title)
+                }).map((item: any, index: number) => <li
                     key={`${item.title}-$-${item.value}`}
                     value={item.value}
-                    onClick={(e) => this.suggestionSelected(item.value)}>{item.title}</li>)}
+                    className={index === this.state.tentativeIndex ? 'selected-item' : ''}
+                    onClick={(e) => {
+                        return this.suggestionSelected(item.value, item.title)
+                    }}>{item.title}</li>)}
             </ul>
         )
     }
@@ -82,18 +101,68 @@ export default class TypeAheadDropDown extends React.Component<any, any> {
     render() {
         const { text } = this.state;
         var handleKeyPress = InputFunctions.handleKeyPress(this);
+        let onFocus = InputFunctions.onFocus(this);
         return (
-            <div className="form__group field">
+            <div className="form__group field" data-id={`fg-${this.state.id}`}>
                 <div className="TypeAheadDropDown">
                     <input
                         id={this.state.id}
                         disabled={this.disabled()}
                         className={`form-control ${this.cssClasses()}`}
                         onBlur={InputFunctions.onBlur(this)}
-                        onFocus={InputFunctions.onFocus(this)}
+                        onFocus={() => {
+                            onFocus();
+                            this.setState({ showSuggestions: true })
+                        }}
                         value={InputFunctions.value(this)}
-                        onKeyPress={handleKeyPress}
-                        onChange={this.onTextChange}
+                        onKeyDown={(e) => {
+                            console.log(e);
+                            if (e.keyCode) {
+                                let direction: number = 0;
+                                switch (`${e.keyCode}`) {
+                                    case '38':
+                                        direction = -1;
+                                        break;
+                                    case '40':
+                                        direction = 1;
+                                        break;
+                                }
+                                if (direction) {
+                                    let tentativeIndex = this.state.tentativeIndex;
+                                    if (tentativeIndex !== null) {
+                                        tentativeIndex += direction;
+                                    }
+                                    else {
+                                        tentativeIndex = 0;
+                                    }
+                                    this.setState({
+                                        tentativeIndex
+                                    });
+                                }
+                            }
+                        }}
+                        onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                                const { suggestions, value } = this.state;
+                                const regex = new RegExp(`^${value}`, `i`);
+                                const list = suggestions.filter((v: { title: string }) => {
+                                    if (this.showOnEmptyFilter) {
+                                        return true;
+                                    }
+                                    return regex.test(v.title)
+                                });
+                                let item: { title: string, value: string } = list[this.state.tentativeIndex];
+                                if (item) {
+                                    this.suggestionSelected(item.value, item.title);
+                                    return;
+                                }
+                            }
+                            handleKeyPress(e);
+                        }}
+                        onChange={(e) => {
+                            this.setState({ tentativeIndex: null })
+                            this.onTextChange(e);
+                        }}
                         placeholder={InputFunctions.placeholder(this)}
                         type="text"
                     />

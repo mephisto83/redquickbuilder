@@ -1,5 +1,8 @@
 export default class InputFunctions {
 	static immediate(arg0: any) {
+		if (arg0.state.hasOwnProperty('immediate')) {
+			return arg0.state.immediate;
+		}
 		return arg0.props.immediate || true;
 	}
 
@@ -7,7 +10,7 @@ export default class InputFunctions {
 		if (arg0.immediate()) {
 			return arg0.props.value || '';
 		}
-		return arg0.state.value || '';
+		return arg0.state.valueTitle || arg0.state.value || '';
 	}
 
 	static placeholder(arg0: any) {
@@ -33,6 +36,14 @@ export default class InputFunctions {
 		}
 	}
 
+	static componentDidUpdateV2(arg0: any, prevProps: any) {
+		if (!arg0.immediate()) {
+			if (!arg0.state.focused)
+				if (arg0.props.value !== prevProps.value) {
+					arg0.setState({ value: arg0.props.value });
+				}
+		}
+	}
 	static handleKeyPress(arg0: any) {
 		return (event: { key: string }) => {
 			if (!arg0.immediate()) {

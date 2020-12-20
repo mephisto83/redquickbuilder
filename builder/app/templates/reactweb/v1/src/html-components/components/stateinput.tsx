@@ -29,15 +29,15 @@ export default class StateInput extends Typeahead {
             redservice().get(`/api/red/states/get`).then((makers: StateProvince[]) => {
                 let suggestions = makers.map((make: StateProvince) => ({ title: make.name, value: make.abbreviation }))
                 StateInputContext.context = suggestions;
-                this.setState(() => ({
+                this.setState({
                     suggestions
-                }));
+                });
             });
         }
         else {
-            this.setState(() => ({
+            this.setState({
                 suggestions: [...StateInputContext.context]
-            }));
+            });
         }
     }
 }

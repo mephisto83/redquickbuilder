@@ -9,6 +9,7 @@ import {
 } from '../actions/uiActions';
 import { GetNodesLinkedTo } from '../methods/graph_methods';
 import { bindTemplate } from './functiontypes';
+import { ComponentType } from '../components/titles';
 
 export const StyleTags = {
 	style: 'style',
@@ -180,6 +181,9 @@ export const ComponentTypeKeys = {
 	Year: 'Year',
 	StateProvince: 'StateProvince',
 	GoogleAddress: 'GoogleAddress',
+	VIN: 'VIN',
+	CurrencyInput: 'CurrencyInput',
+	DateInput: 'DateInput',
 	Country: 'Country',
 	Dropdown: 'Dropdown',
 	Text: 'Text',
@@ -499,6 +503,9 @@ export const ComponentTypes: any = {
 		[ComponentTypeKeys.CarYear]: BuildTypeahead({ template: 'caryearinput.tpl' }),
 		[ComponentTypeKeys.StateProvince]: BuildTypeahead({ template: 'stateinput.tpl' }),
 		[ComponentTypeKeys.GoogleAddress]: BuildTypeahead({ template: 'addressinput.tpl' }),
+		[ComponentTypeKeys.VIN]: BuildTypeahead({ template: 'vininput.tpl' }),
+		[ComponentTypeKeys.CurrencyInput]: BuildTypeahead({ template: 'currencyinput.tpl' }),
+		[ComponentTypeKeys.DateInput]: BuildTypeahead({ template: 'dateinput.tpl' }),
 		[ComponentTypeKeys.DictionaryString]: BuildTypeahead({ template: 'dictionaryinput.tpl' }),
 		[ComponentTypeKeys.Country]: BuildTypeahead({ template: 'countryinput.tpl' }),
 		Generic: {

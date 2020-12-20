@@ -657,6 +657,7 @@ export function updateValidationMethod({
 
 	let { simpleValidations } = validationConfig.dataChainOptions;
 	if (simpleValidations) {
+		let supplementalValidations: any[] = [];
 		let newSimpleValidations: any[] = results.map((meaning: NLMeaning) => {
 			let simpleValidation = CreateSimpleValidation();
 			simpleValidation.enabled = true;
@@ -682,6 +683,26 @@ export function updateValidationMethod({
 					if (meaning.targetClause.propertyAttributeType) {
 						switch (meaning.targetClause.propertyAttributeType) {
 							case NodeAttributePropertyTypes.ADDRESS:
+								simpleValidation.isNotNull = CreateBoolean();
+								simpleValidation.isNotNull.enabled = true;
+								['StreetNumber', 'Route', 'AdministrativeAreaLevel1', 'PostalCode', 'Country'].forEach((_path) => {
+									let subValidation = CreateSimpleValidation();
+									if (meaning.actorClause.relationType) {
+										subValidation.relationType = meaning.actorClause.relationType;
+										setupRelation(subValidation, meaning.actorClause);
+									}
+									subValidation.path = _path;
+									subValidation.enabled = true;
+									subValidation.name = `check address's ${_path} property`;
+									subValidation.maxLength = CreateMaxLength('500');
+									subValidation.maxLength.enabled = true;
+									subValidation.minLength = CreateMinLength('1');
+									subValidation.minLength.enabled = true;
+									subValidation.isNotNull = CreateBoolean();
+									subValidation.isNotNull.enabled = true;
+									supplementalValidations.push(subValidation);
+								});
+								break;
 							case NodeAttributePropertyTypes.LONGSTRING:
 								simpleValidation.maxLength = CreateMaxLength('500');
 								simpleValidation.maxLength.enabled = true;
@@ -873,6 +894,7 @@ export function updateValidationMethod({
 			}
 			return simpleValidation;
 		});
+		newSimpleValidations.push(...supplementalValidations);
 		if (newSimpleValidations) {
 			validationConfig.dataChainOptions.simpleValidations =
 				validationConfig.dataChainOptions.simpleValidations || [];

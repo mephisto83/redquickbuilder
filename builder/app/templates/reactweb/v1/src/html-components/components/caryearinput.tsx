@@ -48,6 +48,7 @@ export default class CarYearInput extends Typeahead {
     constructor(props: any) {
         super(props);
         this.promise = Promise.resolve();
+        this.onTextChange = this.onTextChange.bind(this);
         this.running = false;
     }
     promise: Promise<void>;
@@ -55,13 +56,14 @@ export default class CarYearInput extends Typeahead {
 
     componentDidMount() {
         super.componentDidMount();
-
+        let list = this.getYearList();
         this.setState({
-            yearList: this.getYearList()
+            yearList: list,
+            suggestions: list
         })
     }
-    suggestionSelected(value: any) {
-        super.suggestionSelected(value);
+    suggestionSelected(value: any, title: any) {
+        super.suggestionSelected(value, title);
         SetCarYear(value, this.props.serviceContext);
     }
     getYearList() {
@@ -75,18 +77,12 @@ export default class CarYearInput extends Typeahead {
         })
     }
     onTextChange(e: any) {
-        const { yearList } = this.state;
-        let suggestions: any[] = [];
         const value = e.target.value;
-        if (value.length > 0) {
-            const regex = new RegExp(`^${value}`, `i`);
-            suggestions = yearList.map((v: { title: string }) => v.title).filter((v: any) => regex.test(v));
-        }
 
-        this.setState(() => ({
-            suggestions,
-            text: value
-        }));
+        this.setState({
+            valueTitle: null,
+            value: value
+        });
     }
 }
 

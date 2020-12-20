@@ -10,8 +10,8 @@ import {
 	ValidationConfig,
 	FilterConfig,
 	CreateFilterConfig,
-  ValidationColors,
-  CheckValidationConfigs
+	ValidationColors,
+	CheckValidationConfigs
 } from '../interface/methodprops';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
@@ -21,6 +21,7 @@ import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectC
 import { Node } from '../methods/graph_types';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import CheckBox from './checkbox';
+import { GetNode } from '../methods/graph_methods';
 
 export default class FilterItemsComponent extends Component<any, any> {
 	constructor(props: any) {
@@ -77,6 +78,14 @@ export default class FilterItemsComponent extends Component<any, any> {
 					})}
 				</TreeViewMenu>
 				{Object.keys(filterItem || {})
+					.filter((propertyKey: string) => {
+						let node = GetNode(UIA.GetCurrentGraph(), propertyKey);
+						if (!node) {
+							delete filterItem[propertyKey];
+						}
+
+						return node;
+					})
 					.filter((propertyKey: string) => {
 						return filterItem && filterItem[propertyKey] && filterItem[propertyKey].enabled;
 					})

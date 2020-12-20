@@ -55,37 +55,70 @@ export default class CarMakeInput extends Typeahead {
     constructor(props: any) {
         super(props);
         this.promise = Promise.resolve();
+        this.runAgain = false;
         this.running = false;
+        this.callId = 0;
+        this.onTextChange = this.onTextChange.bind(this);
     }
+    callId: number;
     promise: Promise<void>;
     running: boolean;
+    runAgain: boolean;
 
     componentDidMount() {
         super.componentDidMount();
     }
-    suggestionSelected(value: any) {
-        super.suggestionSelected(value);
+    suggestionSelected(value: any, title: any) {
+        super.suggestionSelected(value, title);
         SetCarMake(value, this.props.serviceContext);
     }
 
     onTextChange(e: any) {
         const value = e.target.value;
         if (value.length > 0) {
-            this.promise = this.promise.then(() => {
-                let currentValue = value;
-                return redservice().get(`/api/autoservice/makers/${value}`).then((makers: AutoMake[]) => {
-                    let suggestions = makers.map((make: AutoMake) => ({ title: make.make_Name, value: make.make_ID }))
-                    if (currentValue === this.state.text) {
-                        this.setState(() => ({
-                            suggestions
-                        }));
-                    }
-                });
-            });
+            if (!this.running) {
+                this.loadSuggestions(value);
+            }
+            else {
+                this.runAgain = true;
+            }
         }
-        this.setState(() => ({
-            text: value
-        }));
+        this.setState({
+            valueTitle: null,
+            value: value
+        });
+    }
+
+    private loadSuggestions(value: any) {
+        let currentValue = value;
+        let currentId = ++this.callId;
+        setTimeout(() => {
+            if (currentId < this.callId) {
+                return;
+            }
+            return redservice().get(`/api/red/autoservice/makers/${value}`).then((makers: AutoMake[]) => {
+                if (currentId < this.callId) {
+                    return;
+                }
+                let suggestions = makers.map((make: AutoMake) => ({ title: make.make_Name, value: make.make_ID }));
+                if (this.runAgain || currentValue === this.state.value) {
+                    let suggests = [...(this.state.suggestions || []), ...suggestions].unique((va: { value: string }) => va.value).sort((a: {
+                        title: string
+                    }, b: {
+                        title: string
+                    }) => {
+                        return `${a.title}`.localeCompare(`${b.title}`);
+                    });
+                    this.setState(() => ({
+                        suggestions: suggests
+                    }));
+                }
+                if (this.runAgain) {
+                    this.runAgain = false;
+                    this.loadSuggestions(this.state.value);
+                }
+            });
+        }, 300)
     }
 }
 

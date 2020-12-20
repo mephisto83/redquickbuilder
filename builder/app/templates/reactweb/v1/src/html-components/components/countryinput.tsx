@@ -17,7 +17,7 @@ export default class CountryInput extends Typeahead {
     constructor(props: any) {
         super(props);
         this.promise = Promise.resolve();
-        
+
         this.running = false;
     }
     promise: Promise<void>;
@@ -29,15 +29,15 @@ export default class CountryInput extends Typeahead {
             redservice().get(`/api/red/countries/get`).then((countries: Country[]) => {
                 let suggestions = countries.map((country: Country) => ({ title: country.name, value: country.code }))
                 CountryInputContext.context = suggestions;
-                this.setState(() => ({
+                this.setState({
                     suggestions
-                }));
+                });
             });
         }
         else {
-            this.setState(() => ({
+            this.setState({
                 suggestions: [...CountryInputContext.context]
-            }));
+            });
         }
     }
 }
