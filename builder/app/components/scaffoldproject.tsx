@@ -18,7 +18,10 @@ import {
 	LinkEvents,
 	LinkType,
 	LinkProperties,
-	GroupProperties
+	GroupProperties,
+	ReactNativeTypes,
+	UITypes,
+	GeneratedTypes
 } from '../constants/nodetypes';
 import {
 	addValidatator,
@@ -34,11 +37,28 @@ import SideBarMenu from './sidebarmenu';
 import { FunctionTypes, FunctionTemplateKeys } from '../constants/functiontypes';
 import { DataChainContextMethods } from '../constants/datachain';
 import { Node } from '../methods/graph_types';
+import Generator from '../generators/generator';
 
 class ScaffoldProject extends Component<any, any> {
 	render() {
 		var { state } = this.props;
+		const code_types = [...Object.values(ReactNativeTypes), ...Object.values(GeneratedTypes)];
+		let code_type_view = code_types.map((code_type) => {
+			return <TreeViewMenu
+				title={code_type}
+				key={code_type}
+				onClick={() => {
+					Generator.generate({
+						type: code_type,
+						language: UITypes.ReactNative,
+						state,
+						writer: (temp: any) => {
 
+						}
+					});
+				}}
+			/>
+		});
 		return (
 			<MainSideBar active={true} relative>
 				<SideBar relative style={{ paddingTop: 0 }}>
@@ -91,6 +111,15 @@ class ScaffoldProject extends Component<any, any> {
 									});
 								}}
 							/>
+						</TreeViewMenu>
+						<TreeViewMenu
+							open={UIA.Visual(state, 'generate-project')}
+							active={true}
+							title={Titles.Generate}
+							toggle={() => {
+								this.props.toggleVisual('generate-project');
+							}}>
+							{code_type_view}
 						</TreeViewMenu>
 					</SideBarMenu>
 				</SideBar>

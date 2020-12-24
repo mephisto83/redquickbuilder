@@ -2456,6 +2456,23 @@ export function GenerateDataChainMethod(id: string, options: { language: any }) 
 
         return a;
 	 }`;
+		case DataChainFunctionKeys.GetWindowSettings:
+			return `(a${anyType}) => {
+				  controller.getWindowSettings({
+					body: null,
+					dataChain: (res: any) => {
+					  console.log('Get window settings');
+					  console.log(res);
+					  if(res) {
+						(window as any).$windowSettings = (window as any).$windowSettings || {};
+						for(let i in res) {
+							(window as any).$windowSettings[i] = res[i];
+						}
+					  }
+					}
+				  })(GetDispatch(), GetState());
+			return a;
+		 }`;
 		case DataChainFunctionKeys.Logout:
 			let homeView = GetNodeByProperties({
 				[NodeProperties.IsHomeView]: true,
@@ -2980,13 +2997,24 @@ export function GetConditionsClauses(
 									clauseKey,
 									propertyName,
 									validator,
-									language //,
+									language,
+									modelId //,
 									// options
 								);
-								result.push({
-									clause: res,
-									id: validatorId
-								});
+								if (Array.isArray(res)) {
+									res.forEach((r: any) => {
+										result.push({
+											clause: r,
+											id: validatorId
+										});
+									})
+								}
+								else {
+									result.push({
+										clause: res,
+										id: validatorId
+									});
+								}
 							});
 						}
 					});
@@ -3013,237 +3041,252 @@ export function GetConditionClause(
 		many2many?: any;
 		many2manyMethod?: any;
 	},
-	language?: any
+	language?: any,
+	modelId?: any
 ) {
-	const method = GetNodesMethod(adjacentId);
-	const clauseKeyNodeId = GetMethodNodeProp(method, clauseKey);
-	let { type, template, templatejs, node, nodeProperty, many2manyProperty, many2many, many2manyMethod } = validator;
-	const nodeNodeId = GetMethodNodeProp(method, node);
-	let conditionTemplate = '';
-	let properties = {};
-	if (NodeConstants.FilterUI && NodeConstants.FilterUI[type] && NodeConstants.FilterUI[type].template && !template) {
-		template = NodeConstants.FilterUI[type].template;
-	}
-	if (
-		NodeConstants.FilterUI &&
-		NodeConstants.FilterUI[type] &&
-		NodeConstants.FilterUI[type].templatejs &&
-		!templatejs
-	) {
-		templatejs = NodeConstants.FilterUI[type].templatejs;
-	}
-	let isjavascript = false;
-	if (template) {
+	let componentType = GetNodeProp(modelId, NodeProperties.ComponentType);
+	let propNames = [propertyName];
+	if (componentType === 'GoogleAddress') {
 		switch (language) {
 			case NodeConstants.ProgrammingLanguages.JavaScript:
-				conditionTemplate = fs_readFileSync(templatejs, 'utf8');
-				isjavascript = true;
+				propNames = ['street_number', 'route', 'administrative_area_level_1', 'postal_code', 'country'].map(v => `${propertyName.toJavascriptName()}?.${v}`);
 				break;
 			default:
-				conditionTemplate = fs_readFileSync(template, 'utf8');
+				propNames = ['StreetNumber', 'Route', 'AdministrativeAreaLevel1', 'PostalCode', 'Country'].map(v => `${propertyName}?.${v}`);
 				break;
 		}
-	} else {
-		throw 'no template found: ' + type;
 	}
-	if (clauseKey === 'change_parameter') {
-		clauseKey = clauseKey + '.Data';
-	}
-	switch (type) {
-		case NodeConstants.FilterRules.IsInModelPropertyCollection:
-		case NodeConstants.FilterRules.EqualsModelProperty:
-		case NodeConstants.FilterRules.EqualsFalse:
-		case NodeConstants.FilterRules.EqualsTrue:
-		case NodeConstants.FilterRules.EqualsParent:
-		case NodeConstants.FilterRules.IsNotInModelPropertyCollection:
-			properties = {
-				agent: safeFormatTemplateProperty(clauseKey),
-				agent_property: isjavascript
-					? safeFormatTemplateProperty(propertyName).toJavascriptName()
-					: safeFormatTemplateProperty(propertyName),
-				model: node,
-				model_property: isjavascript ? GetJSCodeName(nodeProperty) : GetCodeName(nodeProperty)
-			};
-			break;
-		case NodeConstants.FilterRules.Many2ManyPropertyIsTrue:
-			properties = {
-				agent: safeFormatTemplateProperty(clauseKey),
-				agent_property: isjavascript
-					? safeFormatTemplateProperty(propertyName).toJavascriptName()
-					: safeFormatTemplateProperty(propertyName),
-				agent_type: GetCodeName(clauseKeyNodeId) || 'agent_type missing',
-				model_type: GetCodeName(nodeNodeId) || 'model_type missing',
-				model: node,
-				model_property: GetCodeName(nodeProperty),
-				connection_type: GetCodeName(many2many),
-				connection_is_true: GetConnectionClause({
-					many2manyProperty,
-					many2manyMethod
-				}) //
-			};
-			break;
-		case NodeConstants.ValidationRules.OneOf:
-			const listItems = GenerateConstantList(validator);
-			properties = {
-				agent: safeFormatTemplateProperty(clauseKey),
-				agent_property: isjavascript
-					? safeFormatTemplateProperty(propertyName).toJavascriptName()
-					: safeFormatTemplateProperty(propertyName),
-				agent_type: GetCodeName(clauseKeyNodeId) || 'agent_type missing',
-				list: listItems
-			};
-			break;
-		case NodeConstants.ValidationRules.AlphaOnlyWithSpaces:
-			properties = {
-				model: clauseKey,
-				model_property: propertyName,
-				validation_Func_name: 'AlphaOnlyWithSpacesAttribute'
-			};
-			break;
-		case NodeConstants.ValidationRules.AlphaNumericLike:
-			properties = {
-				model: clauseKey,
-				model_property: propertyName,
-				validation_Func_name: 'AlphaNumericLikeAttribute'
-			};
-			break;
-		case NodeConstants.ValidationRules.NumericInt:
-			properties = {
-				model: clauseKey,
-				model_property: propertyName,
-				validation_Func_name: 'NumericIntAttribute'
-			};
-			break;
-		case NodeConstants.ValidationRules.AlphaNumeric:
-			properties = {
-				model: clauseKey,
-				model_property: propertyName,
-				validation_Func_name: 'AlphaNumericAttribute'
-			};
-			break;
-		case NodeConstants.ValidationRules.AlphaOnly:
-			properties = {
-				model: clauseKey,
-				model_property: propertyName,
-				validation_Func_name: 'AlphaOnlyAttribute'
-			};
-			break;
-		case NodeConstants.ValidationRules.MaxLength:
-			properties = {
-				model: clauseKey,
-				model_property: propertyName,
-				parameters: `${validator ? validator.condition : null}`,
-				validation_Func_name: 'MaxLengthAttribute'
-			};
-			break;
-		case NodeConstants.ValidationRules.MaxLengthEqual:
-			properties = {
-				model: clauseKey,
-				model_property: propertyName,
-				parameters: `${validator ? validator.condition : null}, true`,
-				validation_Func_name: 'MaxLengthAttribute'
-			};
-			break;
-		case NodeConstants.ValidationRules.MinLength:
-			properties = {
-				model: clauseKey,
-				model_property: propertyName,
-				parameters: validator ? validator.condition : null,
-				validation_Func_name: 'MinLengthAttribute'
-			};
-			break;
-		case NodeConstants.ValidationRules.MinLengthEqual:
-			properties = {
-				model: clauseKey,
-				model_property: propertyName,
-				parameters: `${validator ? validator.condition : null}, true`,
-				validation_Func_name: 'MinLengthAttribute'
-			};
-			break;
+	return propNames.map((propertyName: string) => {
+		const method = GetNodesMethod(adjacentId);
+		const clauseKeyNodeId = GetMethodNodeProp(method, clauseKey);
+		let { type, template, templatejs, node, nodeProperty, many2manyProperty, many2many, many2manyMethod } = validator;
+		const nodeNodeId = GetMethodNodeProp(method, node);
+		let conditionTemplate = '';
+		let properties = {};
+		if (NodeConstants.FilterUI && NodeConstants.FilterUI[type] && NodeConstants.FilterUI[type].template && !template) {
+			template = NodeConstants.FilterUI[type].template;
+		}
+		if (
+			NodeConstants.FilterUI &&
+			NodeConstants.FilterUI[type] &&
+			NodeConstants.FilterUI[type].templatejs &&
+			!templatejs
+		) {
+			templatejs = NodeConstants.FilterUI[type].templatejs;
+		}
+		let isjavascript = false;
+		if (template) {
+			switch (language) {
+				case NodeConstants.ProgrammingLanguages.JavaScript:
+					conditionTemplate = fs_readFileSync(templatejs, 'utf8');
+					isjavascript = true;
+					break;
+				default:
+					conditionTemplate = fs_readFileSync(template, 'utf8');
+					break;
+			}
+		} else {
+			throw 'no template found: ' + type;
+		}
+		if (clauseKey === 'change_parameter') {
+			clauseKey = clauseKey + '.Data';
+		}
+		switch (type) {
+			case NodeConstants.FilterRules.IsInModelPropertyCollection:
+			case NodeConstants.FilterRules.EqualsModelProperty:
+			case NodeConstants.FilterRules.EqualsFalse:
+			case NodeConstants.FilterRules.EqualsTrue:
+			case NodeConstants.FilterRules.EqualsParent:
+			case NodeConstants.FilterRules.IsNotInModelPropertyCollection:
+				properties = {
+					agent: safeFormatTemplateProperty(clauseKey),
+					agent_property: isjavascript
+						? safeFormatTemplateProperty(propertyName).toJavascriptName()
+						: safeFormatTemplateProperty(propertyName),
+					model: node,
+					model_property: isjavascript ? GetJSCodeName(nodeProperty) : GetCodeName(nodeProperty)
+				};
+				break;
+			case NodeConstants.FilterRules.Many2ManyPropertyIsTrue:
+				properties = {
+					agent: safeFormatTemplateProperty(clauseKey),
+					agent_property: isjavascript
+						? safeFormatTemplateProperty(propertyName).toJavascriptName()
+						: safeFormatTemplateProperty(propertyName),
+					agent_type: GetCodeName(clauseKeyNodeId) || 'agent_type missing',
+					model_type: GetCodeName(nodeNodeId) || 'model_type missing',
+					model: node,
+					model_property: GetCodeName(nodeProperty),
+					connection_type: GetCodeName(many2many),
+					connection_is_true: GetConnectionClause({
+						many2manyProperty,
+						many2manyMethod
+					}) //
+				};
+				break;
+			case NodeConstants.ValidationRules.OneOf:
+				const listItems = GenerateConstantList(validator);
+				properties = {
+					agent: safeFormatTemplateProperty(clauseKey),
+					agent_property: isjavascript
+						? safeFormatTemplateProperty(propertyName).toJavascriptName()
+						: safeFormatTemplateProperty(propertyName),
+					agent_type: GetCodeName(clauseKeyNodeId) || 'agent_type missing',
+					list: listItems
+				};
+				break;
+			case NodeConstants.ValidationRules.AlphaOnlyWithSpaces:
+				properties = {
+					model: clauseKey,
+					model_property: propertyName,
+					validation_Func_name: 'AlphaOnlyWithSpacesAttribute'
+				};
+				break;
+			case NodeConstants.ValidationRules.AlphaNumericLike:
+				properties = {
+					model: clauseKey,
+					model_property: propertyName,
+					validation_Func_name: 'AlphaNumericLikeAttribute'
+				};
+				break;
+			case NodeConstants.ValidationRules.NumericInt:
+				properties = {
+					model: clauseKey,
+					model_property: propertyName,
+					validation_Func_name: 'NumericIntAttribute'
+				};
+				break;
+			case NodeConstants.ValidationRules.AlphaNumeric:
+				properties = {
+					model: clauseKey,
+					model_property: propertyName,
+					validation_Func_name: 'AlphaNumericAttribute'
+				};
+				break;
+			case NodeConstants.ValidationRules.AlphaOnly:
+				properties = {
+					model: clauseKey,
+					model_property: propertyName,
+					validation_Func_name: 'AlphaOnlyAttribute'
+				};
+				break;
+			case NodeConstants.ValidationRules.MaxLength:
+				properties = {
+					model: clauseKey,
+					model_property: propertyName,
+					parameters: `${validator ? validator.condition : null}`,
+					validation_Func_name: 'MaxLengthAttribute'
+				};
+				break;
+			case NodeConstants.ValidationRules.MaxLengthEqual:
+				properties = {
+					model: clauseKey,
+					model_property: propertyName,
+					parameters: `${validator ? validator.condition : null}, true`,
+					validation_Func_name: 'MaxLengthAttribute'
+				};
+				break;
+			case NodeConstants.ValidationRules.MinLength:
+				properties = {
+					model: clauseKey,
+					model_property: propertyName,
+					parameters: validator ? validator.condition : null,
+					validation_Func_name: 'MinLengthAttribute'
+				};
+				break;
+			case NodeConstants.ValidationRules.MinLengthEqual:
+				properties = {
+					model: clauseKey,
+					model_property: propertyName,
+					parameters: `${validator ? validator.condition : null}, true`,
+					validation_Func_name: 'MinLengthAttribute'
+				};
+				break;
 
-		case NodeConstants.ValidationRules.MaxValue:
-			properties = {
-				model: clauseKey,
-				model_property: propertyName,
-				parameters: `${validator ? validator.condition : null}`,
-				validation_Func_name: 'MaxAttribute'
-			};
-			break;
-		case NodeConstants.ValidationRules.MaxValueEqual:
-			properties = {
-				model: clauseKey,
-				model_property: propertyName,
-				parameters: `${validator ? validator.condition : null}, true`,
-				validation_Func_name: 'MaxAttribute'
-			};
-			break;
-		case NodeConstants.ValidationRules.MinValue:
-			properties = {
-				model: clauseKey,
-				model_property: propertyName,
-				parameters: validator ? validator.condition : null,
-				validation_Func_name: 'MinAttribute'
-			};
-			break;
-		case NodeConstants.ValidationRules.MinValueEqual:
-			properties = {
-				model: clauseKey,
-				model_property: propertyName,
-				parameters: `${validator ? validator.condition : null}, true`,
-				validation_Func_name: 'MinAttribute'
-			};
-			break;
-		case NodeConstants.ValidationRules.IsNull:
-			properties = {
-				model: clauseKey,
-				model_property: propertyName,
-				parameters: ``,
-				validation_Func_name: 'IsNullAttribute'
-			};
-			break;
-		case NodeConstants.ValidationRules.IsNotNull:
-			properties = {
-				model: clauseKey,
-				model_property: propertyName,
-				parameters: ``,
-				validation_Func_name: 'IsNotNullAttribute'
-			};
-			break;
-		case NodeConstants.ValidationRules.Email:
-			properties = {
-				model: clauseKey,
-				model_property: propertyName,
-				validation_Func_name: 'EmailAttribute'
-			};
-			break;
-		case NodeConstants.ValidationRules.EmailEmpty:
-			properties = {
-				model: clauseKey,
-				model_property: propertyName,
-				validation_Func_name: 'EmailEmptyAttribute'
-			};
-			break;
-		case NodeConstants.ValidationRules.Zip:
-			properties = {
-				model: clauseKey,
-				model_property: propertyName,
-				validation_Func_name: 'ZipAttribute'
-			};
-			break;
-		case NodeConstants.ValidationRules.ZipEmpty:
-			properties = {
-				model: clauseKey,
-				model_property: propertyName,
-				validation_Func_name: 'ZipEmptyAttribute'
-			};
-			break;
-		default:
-			throw 'Unhandled condition clause case: ' + type;
-	}
+			case NodeConstants.ValidationRules.MaxValue:
+				properties = {
+					model: clauseKey,
+					model_property: propertyName,
+					parameters: `${validator ? validator.condition : null}`,
+					validation_Func_name: 'MaxAttribute'
+				};
+				break;
+			case NodeConstants.ValidationRules.MaxValueEqual:
+				properties = {
+					model: clauseKey,
+					model_property: propertyName,
+					parameters: `${validator ? validator.condition : null}, true`,
+					validation_Func_name: 'MaxAttribute'
+				};
+				break;
+			case NodeConstants.ValidationRules.MinValue:
+				properties = {
+					model: clauseKey,
+					model_property: propertyName,
+					parameters: validator ? validator.condition : null,
+					validation_Func_name: 'MinAttribute'
+				};
+				break;
+			case NodeConstants.ValidationRules.MinValueEqual:
+				properties = {
+					model: clauseKey,
+					model_property: propertyName,
+					parameters: `${validator ? validator.condition : null}, true`,
+					validation_Func_name: 'MinAttribute'
+				};
+				break;
+			case NodeConstants.ValidationRules.IsNull:
+				properties = {
+					model: clauseKey,
+					model_property: propertyName,
+					parameters: ``,
+					validation_Func_name: 'IsNullAttribute'
+				};
+				break;
+			case NodeConstants.ValidationRules.IsNotNull:
+				properties = {
+					model: clauseKey,
+					model_property: propertyName,
+					parameters: ``,
+					validation_Func_name: 'IsNotNullAttribute'
+				};
+				break;
+			case NodeConstants.ValidationRules.Email:
+				properties = {
+					model: clauseKey,
+					model_property: propertyName,
+					validation_Func_name: 'EmailAttribute'
+				};
+				break;
+			case NodeConstants.ValidationRules.EmailEmpty:
+				properties = {
+					model: clauseKey,
+					model_property: propertyName,
+					validation_Func_name: 'EmailEmptyAttribute'
+				};
+				break;
+			case NodeConstants.ValidationRules.Zip:
+				properties = {
+					model: clauseKey,
+					model_property: propertyName,
+					validation_Func_name: 'ZipAttribute'
+				};
+				break;
+			case NodeConstants.ValidationRules.ZipEmpty:
+				properties = {
+					model: clauseKey,
+					model_property: propertyName,
+					validation_Func_name: 'ZipEmptyAttribute'
+				};
+				break;
+			default:
+				throw 'Unhandled condition clause case: ' + type;
+		}
 
-	return bindTemplate(conditionTemplate, {
-		parameters: '',
-		...properties
+		return bindTemplate(conditionTemplate, {
+			parameters: '',
+			...properties
+		});
 	});
 }
 function GenerateConstantList(validator: { node?: any; enumeration?: any }) {

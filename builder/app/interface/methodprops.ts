@@ -1,5 +1,5 @@
 import { Config } from 'electron';
-import { GetModelPropertyChildren, GUID, setRouteSource, GetModelCodeProperties } from '../actions/uiActions';
+import { GetModelPropertyChildren, GUID, setRouteSource, GetModelCodeProperties, GetNodeById } from '../actions/uiActions';
 import datachainactivitymenu from '../components/datachainactivitymenu';
 import SimpleValidationComponent from '../components/simplevalidationconfig';
 import { Graph } from '../methods/graph_types';
@@ -425,20 +425,20 @@ export function CheckConcatenateStringConfig(concatenateStringConfig: ValueOpera
 	return true;
 }
 export function CheckCopyConfig(copyConfig: CopyConfig): boolean {
-	return CheckHalfRelation(copyConfig) && (!copyConfig.enabled || !!copyConfig.targetProperty);
+	return CheckHalfRelation(copyConfig) && (!copyConfig.enabled || (!!copyConfig.targetProperty && !!GetNodeById(copyConfig.targetProperty)));
 }
 export function CheckHalfRelation(copyConfig: HalfRelation): boolean {
 	if (!copyConfig.enabled) {
 		return true;
 	}
 	if (copyConfig.agentProperty && copyConfig.relationType === RelationType.Agent) {
-		return true;
+		return !!GetNodeById(copyConfig.agentProperty);
 	}
 	if (copyConfig.modelProperty && copyConfig.relationType === RelationType.Model) {
-		return true;
+		return !!GetNodeById(copyConfig.modelProperty);
 	}
 	if (copyConfig.modelProperty && copyConfig.relationType === RelationType.Parent) {
-		return true;
+		return !!GetNodeById(copyConfig.modelProperty);
 	}
 	return false;
 }
@@ -1307,13 +1307,13 @@ export function CheckRelation(halfRelation: HalfRelation): boolean {
 	if (halfRelation.enabled) {
 		switch (halfRelation.relationType) {
 			case RelationType.Agent:
-				return !!halfRelation.agentProperty && !!halfRelation.agent;
+				return !!halfRelation.agentProperty && !!halfRelation.agent && !!GetNodeById(halfRelation.agentProperty) && !!GetNodeById(halfRelation.agent);
 			case RelationType.Model:
-				return !!halfRelation.modelProperty && !!halfRelation.model;
+				return !!halfRelation.modelProperty && !!halfRelation.model && !!GetNodeById(halfRelation.modelProperty) && !!GetNodeById(halfRelation.model);
 			case RelationType.ModelOutput:
-				return !!halfRelation.modelOutputProperty && !!halfRelation.modelOutput;
+				return !!halfRelation.modelOutputProperty && !!halfRelation.modelOutput && !!GetNodeById(halfRelation.modelOutput) && !!GetNodeById(halfRelation.modelOutputProperty);
 			case RelationType.Parent:
-				return !!halfRelation.parent && !!halfRelation.parentProperty;
+				return !!halfRelation.parent && !!halfRelation.parentProperty && !!GetNodeById(halfRelation.parent) && !!GetNodeById(halfRelation.parentProperty);
 			default:
 				return false;
 		}

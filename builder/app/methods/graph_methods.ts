@@ -42,12 +42,20 @@ import {
 } from './graph_types';
 
 const os = require('os');
-export function SetFlowModel(graph: Graph, flowModel: any) : Graph {
+export function SetFlowModel(graph: Graph, flowModel: any): Graph {
 	if (graph && flowModel && flowModel.name) {
 		graph.flowModels = graph.flowModels || {};
 		graph.flowModels[flowModel.name] = flowModel.model;
 	}
 	return graph;
+}
+export function applyDefaultAppSettings(graph: Graph) {
+	if (graph && graph.appConfig && graph.appConfig.AppSettings) {
+		graph.appConfig.AppSettings = {
+			'GoogleApiKey': 'AIzaSyCadw9tvscBUS4g3PTGe7P1i8qNfpLpsZc',
+			...graph.appConfig.AppSettings
+		};
+	}
 }
 export function createGraph(): Graph {
 	return {

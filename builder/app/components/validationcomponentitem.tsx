@@ -382,6 +382,7 @@ export default class ValidationComponentItem extends Component<any, any> {
 												...propertySentences
 											]
 												.filter((v) => v)
+												.filter((v) => v.indexOf(`check address's `) !== 0)
 												.unique()
 												.join(NEW_LINE)
 										});
@@ -696,13 +697,11 @@ export function updateValidationMethod({
 									subValidation.name = `check address's ${_path} property`;
 									subValidation.maxLength = CreateMaxLength('500');
 									subValidation.maxLength.enabled = true;
-									subValidation.minLength = CreateMinLength('1');
-									subValidation.minLength.enabled = true;
 									subValidation.isNotNull = CreateBoolean();
 									subValidation.isNotNull.enabled = true;
 									supplementalValidations.push(subValidation);
 								});
-								break;
+								return false;
 							case NodeAttributePropertyTypes.LONGSTRING:
 								simpleValidation.maxLength = CreateMaxLength('500');
 								simpleValidation.maxLength.enabled = true;
@@ -893,7 +892,7 @@ export function updateValidationMethod({
 					break;
 			}
 			return simpleValidation;
-		});
+		}).filter(x => x);
 		newSimpleValidations.push(...supplementalValidations);
 		if (newSimpleValidations) {
 			validationConfig.dataChainOptions.simpleValidations =

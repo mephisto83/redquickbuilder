@@ -26,22 +26,39 @@ export default function ContinueAsScreen(args: any) {
       }
     }])(GetDispatchFunc(), GetStateFunc());
 
-    PerformGraphOperation([
-      {
-        operation: ADD_NEW_NODE,
-        options: {
-          nodeType: NodeTypes.Model,
-          properties: {
-            ...viewPackage,
-            [NodeProperties.ExcludeFromController]: true,
-            [NodeProperties.Pinned]: false,
-            [NodeProperties.UIText]: `Red Check If Logged In`
-          },
-          callback: (newNode: any) => {
-            newStuff.anonymousCheckIfLoggedIn = newNode.id;
-          }
+  PerformGraphOperation([
+    {
+      operation: ADD_NEW_NODE,
+      options: {
+        nodeType: NodeTypes.Model,
+        properties: {
+          ...viewPackage,
+          [NodeProperties.ExcludeFromController]: true,
+          [NodeProperties.Pinned]: false,
+          [NodeProperties.UIText]: `Red Check If Logged In`
+        },
+        callback: (newNode: any) => {
+          newStuff.anonymousCheckIfLoggedIn = newNode.id;
         }
-      }])(GetDispatchFunc(), GetStateFunc());
+      }
+    }])(GetDispatchFunc(), GetStateFunc());
+
+  PerformGraphOperation([
+    {
+      operation: ADD_NEW_NODE,
+      options: {
+        nodeType: NodeTypes.Model,
+        properties: {
+          ...viewPackage,
+          [NodeProperties.ExcludeFromController]: true,
+          [NodeProperties.Pinned]: false,
+          [NodeProperties.UIText]: `Red Window Settings`
+        },
+        callback: (newNode: any) => {
+          newStuff.anonymousWindowSettings = newNode.id;
+        }
+      }
+    }])(GetDispatchFunc(), GetStateFunc());
 
   // change to a function to check that the current credentials are still good.
   const anonymousRegisterLogin = CreateAgentFunction({
@@ -51,7 +68,7 @@ export default function ContinueAsScreen(args: any) {
     maestro,
     nodePackageType: "register-login-anonymous-user",
     methodType: Methods.Create,
-    user: NodesByType(GetState(), NodeTypes.Model).find((x: any ) =>
+    user: NodesByType(GetState(), NodeTypes.Model).find((x: any) =>
       GetNodeProp(x, NodeProperties.IsUser)
     ),
     httpMethod: HTTP_METHODS.POST,
@@ -67,12 +84,27 @@ export default function ContinueAsScreen(args: any) {
     maestro,
     nodePackageType: "check-logged-in-status",
     methodType: Methods.Create,
-    user: NodesByType(GetState(), NodeTypes.Model).find((x: any ) =>
+    user: NodesByType(GetState(), NodeTypes.Model).find((x: any) =>
       GetNodeProp(x, NodeProperties.IsUser)
     ),
     httpMethod: HTTP_METHODS.POST,
     functionType: FunctionTypes.IsLoggedIn,
     functionName: `Is Logged In`
+  })({ dispatch: GetDispatchFunc(), getState: GetStateFunc() });
+  
+  CreateAgentFunction({
+    viewPackage,
+    model: GetNodeById(newStuff.anonymousWindowSettings, graph),
+    agent: {},
+    maestro,
+    nodePackageType: "window-settings",
+    methodType: Methods.Get,
+    user: NodesByType(GetState(), NodeTypes.Model).find((x: any) =>
+      GetNodeProp(x, NodeProperties.IsUser)
+    ),
+    httpMethod: HTTP_METHODS.GET,
+    functionType: FunctionTypes.GetWindowSettings,
+    functionName: `Get Window Settings`
   })({ dispatch: GetDispatchFunc(), getState: GetStateFunc() });
 
   const continueMethodResults = CreateDefaultView.method({

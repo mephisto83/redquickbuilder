@@ -37,9 +37,11 @@ import AddressInput from './components/addressinput';
 import StateProvinceInput from './components/stateinput';
 import CountryInput from './components/countryinput';
 import DictionaryInput from './components/dictionaryinput';
-
+import DateInput from './components/dateinput';
+import VINInput from './components/vininput';
 export {
   Content,
+  VINInput,
   Container,
   ListItem,
   Header,
@@ -77,5 +79,6 @@ export {
   MultiSelectList,
   MultiViewList,
   Image,
+  DateInput,
   SingleSelect
 };

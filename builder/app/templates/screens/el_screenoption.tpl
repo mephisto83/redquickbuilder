@@ -31,7 +31,7 @@ import {
   Dropdown,
   PasswordField,
   Input, Label, 
-  Typeahead, CarMakeInput, CarModelInput, CarYearInput, StateProvinceInput, CountryInput, DictionaryInput,AddressInput,
+  Typeahead, CarMakeInput, CarModelInput, CarYearInput, StateProvinceInput, CountryInput, DictionaryInput,AddressInput, DateInput, VINInput,
   Menu
 }  from '{{relative_depth}}html-components';
 

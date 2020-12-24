@@ -77,6 +77,7 @@ namespace {{namespace}}.Controllers
             return  base.LoginWithRecoveryCode(model,  returnUrl);
         }
 
+
         [HttpGet]
         [AllowAnonymous]
         public override  IActionResult Lockout()

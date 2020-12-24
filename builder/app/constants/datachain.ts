@@ -60,6 +60,7 @@ export const DataChainFunctionKeys = {
 	HasPreviousCredentials: 'HasPreviousCredentials',
 	StoreCredResults: 'StoreCredResults',
 	LoadUserCredentialsFromLocalStore: 'LoadUserCredentialsFromLocalStore',
+	GetWindowSettings: 'GetWindowSettings',
 	ReferenceDataChain: 'Data Chain Ref.',
 	Merge: 'Merge',
 	Map: 'Map',
@@ -421,7 +422,7 @@ export const DataChainFunctions: any = {
 		filter: {
 			[NodeProperties.NODEType]: true
 		},
-		value: DataChainFunctionKeys.LoadUserCredentialsFromLocalStore
+		value: DataChainFunctionKeys.HasPreviousCredentials
 	},
 	[DataChainFunctionKeys.LoadUserCredentialsFromLocalStore]: {
 		ui: {

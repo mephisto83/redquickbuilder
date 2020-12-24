@@ -3,11 +3,16 @@ import {
 	GetNodesByProperties,
 	graphOperation,
 	GetDispatchFunc,
-	GetStateFunc
+	GetStateFunc,
+	GetScreenOptions,
+	GetCurrentGraph
 } from '../../actions/uiActions';
 import { LinkType, NodeProperties, NodeTypes } from '../../constants/nodetypes';
 import { AuthorizedDashboard, SelectTargetScreen } from '../../components/titles';
 import AddChainToNavigateNextScreen from './AddChainToNavigateNextScreen';
+import { GetNodesLinkedTo } from '../../methods/graph_methods';
+import HomeViewGetWindowSettings from '../HomeViewGetWindowSettings'
+import { Node } from '../../methods/graph_types';
 export default async function AddChainToNavigateNextScreens(progresFunc: any) {
 	const screen =
 		GetNodeByProperties({
@@ -29,16 +34,16 @@ export default async function AddChainToNavigateNextScreens(progresFunc: any) {
 	if (!dataChains) {
 		throw new Error('No Target Screen Data chains found');
 	}
-	await dataChains.forEachAsync(async (dataChain: any, index: any, length: any) => {
-		const result = [];
-		const start = Date.now();
-		result.push(...AddChainToNavigateNextScreen({ dataChain: dataChain.id, screen: screen.id }));
-		graphOperation(result)(GetDispatchFunc(), GetStateFunc());
-		if (progresFunc) {
-			const total = Date.now() - start;
-			await progresFunc(index / length, total * (length - index));
-		}
+	let screenOptions = GetNodesLinkedTo(GetCurrentGraph(), {
+		id: screen.id,
+		link: LinkType.ScreenOptions
 	});
-
+	let result: any[] = [];
+	screenOptions.forEach(async (screenOption: Node) => {
+		result.push(HomeViewGetWindowSettings({ component: screenOption.id }));
+	});
+	graphOperation(result)(GetDispatchFunc(), GetStateFunc());
+	
+	
 	return [];
 }

@@ -3,7 +3,6 @@ import Validation from './validation';
 import Input from './input';
 import InputFunctions from './inputfunctions';
 export default class CurrencyInput extends Input {
-	inputType: string;
 	constructor(props: any) {
 		super(props);
 	}

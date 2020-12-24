@@ -99,6 +99,13 @@ namespace {{namespace}}.Web.Controllers
             return await base.AuthenticateUser(obj);
         }
 
+        [HttpGet]
+        [Route("get/window/settings/{type}")]
+        public override Task<IDictionary<string, object>> GetWindowSettings(string type = "")
+        {
+            return base.GetWindowSettings();
+        }
+        
         [AllowAnonymous]
         [Route("anonymous/register/and/authenticate")]
         [HttpPost]

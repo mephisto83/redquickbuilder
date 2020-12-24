@@ -26,6 +26,7 @@ import { AuthorizedDashboard } from '../../components/titles';
 import { CreateLoginModels, ListRequiredModels, addTitleService } from '../../constants/nodepackages';
 import { UITypes, MAIN_CONTENT, PROGRESS_VIEW } from '../../constants/nodetypes';
 import AddChainToNavigateNextScreens from './AddChainToNavigateNextScreens';
+import LoadWindowSettings from './LoadWindowSettings';
 import CreateConfiguration from '../CreateConfiguration';
 import CreateFetchServiceIdempotently from '../CreateFetchServiceIdempotently';
 import CreateClaimService from './CreateClaimService';
@@ -174,6 +175,7 @@ const Create_Login_Models = 'Create Login Models';
 const Add_UserRequirements = 'Add User Requirements';
 const ListRequiredModelTitles = 'ListRequiredModelTitles';
 const AddTitleService = 'AddTitleService';
+const Load_Window_Settings = 'Load_Window_Settings';
 const Add_Chain_To_Navigate_Next_Screens = 'Add Chain to Navigate Next Screens';
 const Create_Configuration = 'Create Configuration';
 const Create_Fetch_Service = 'Create Fetch Service';
@@ -390,6 +392,11 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		await run(buildAllProgress, Add_Chain_To_Navigate_Next_Screens, async (progresFunc: any) => {
 			await AddChainToNavigateNextScreens(progresFunc);
 		});
+		await run(buildAllProgress, Load_Window_Settings, async (progresFunc: any) => {
+			await LoadWindowSettings(progresFunc);
+		});
+
+		
 
 		await run(buildAllProgress, Create_Configuration, async (progresFunc: any) => {
 			graphOperation(CreateConfiguration())(GetDispatchFunc(), GetStateFunc());

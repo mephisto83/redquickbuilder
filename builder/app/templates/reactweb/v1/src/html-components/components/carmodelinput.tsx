@@ -1,7 +1,7 @@
 import Typeahead from './typeahead';
 import { createRedService } from '../../util/service';
 import * as Globals from '../../util/globals';
-import { CarMakeContextList, CarMakeService, CarMakeServiceRemove } from './carmakeinput';
+import { CarMakeContextList, CarMakeService, CarMakeServiceRemove, VIN_SET } from './carmakeinput';
 import { CarYearContextList, CarYearService, CarYearServiceRemove } from './caryearinput';
 
 let _redservice: any;
@@ -9,7 +9,33 @@ function redservice() {
     _redservice = _redservice || createRedService(Globals.DEFAULT_URL)
     return _redservice;
 }
+const CarModelServiceContext: ICarModelServiceContext = {
+    carModel: '',
+    listeners: [],
+    context: {}
+}
+export interface ICarModelServiceContext {
+    carModel: string;
+    listeners: { id: string, listener: Function, context: string, type?: string }[],
+    context: {
+        [str: string]: {
+            carModel: string
+        }
+    }
+}
 
+export function RaiseEvent(value: any, type?: string, context?: string) {
+    CarModelServiceContext.listeners.filter(v => v.context === type).forEach((arg: { id: string, listener: Function, context: string }) => {
+        if (context) {
+            if (arg.context === context) {
+                arg.listener(value);
+            }
+        }
+        else if (!arg.context) {
+            arg.listener(value);
+        }
+    })
+}
 export default class CarModelInput extends Typeahead {
     constructor(props: any) {
         super(props);
@@ -26,6 +52,14 @@ export default class CarModelInput extends Typeahead {
 
     componentDidMount() {
         super.componentDidMount();
+        CarModelServiceContext.listeners.push({
+            id: this.state.id,
+            context: this.props.context,
+            listener: (val: { value: string, valueTitle: string }) => {
+                this.setState({ ...val })
+            },
+            type: VIN_SET
+        });
         CarMakeContextList({
             id: this.state.id,
             listener: () => {
@@ -46,7 +80,7 @@ export default class CarModelInput extends Typeahead {
             },
             context: this.props.serviceContext || null
         });
-    }
+    } 
     updateModels() {
         this.promise = this.promise.then(() => {
             let year = this.state.year;
@@ -81,6 +115,7 @@ export default class CarModelInput extends Typeahead {
     }
     componentWillUnmount() {
 
+        CarModelServiceContext.listeners = CarModelServiceContext.listeners.filter(v => v.id === this.state.id);
         CarMakeServiceRemove(this.state.id);
         CarYearServiceRemove(this.state.id);
     }

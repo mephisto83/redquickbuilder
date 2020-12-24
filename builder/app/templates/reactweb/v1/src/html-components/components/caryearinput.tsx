@@ -1,3 +1,4 @@
+import { VIN_SET } from './carmakeinput';
 import Typeahead from './typeahead';
 const CarYearServiceContext: ICarYearServiceContext = {
     carYear: '',
@@ -6,7 +7,7 @@ const CarYearServiceContext: ICarYearServiceContext = {
 }
 export interface ICarYearServiceContext {
     carYear: string;
-    listeners: { id: string, listener: Function, context: string }[],
+    listeners: { id: string, listener: Function, type?: string, context: string }[],
     context: {
         [str: string]: {
             carMake: string
@@ -44,6 +45,18 @@ export function SetCarYear(value: string, context?: string) {
         }
     })
 }
+export function RaiseEvent(value: any, type?: string, context?: string) {
+    CarYearServiceContext.listeners.filter(v => v.context === type).forEach((arg: { id: string, listener: Function, context: string }) => {
+        if (context) {
+            if (arg.context === context) {
+                arg.listener(value);
+            }
+        }
+        else if (!arg.context) {
+            arg.listener(value);
+        }
+    })
+}
 export default class CarYearInput extends Typeahead {
     constructor(props: any) {
         super(props);
@@ -56,12 +69,24 @@ export default class CarYearInput extends Typeahead {
 
     componentDidMount() {
         super.componentDidMount();
+        CarYearServiceContext.listeners.push({
+            id: this.state.id,
+            context: this.props.context,
+            listener: (val: { value: string, valueTitle: string }) => {
+                this.setState({ ...val })
+            },
+            type: VIN_SET
+        });
         let list = this.getYearList();
         this.setState({
             yearList: list,
             suggestions: list
         })
     }
+    componentWillUnmount() {
+        CarYearServiceContext.listeners = CarYearServiceContext.listeners.filter(v => v.id === this.state.id);
+    }
+
     suggestionSelected(value: any, title: any) {
         super.suggestionSelected(value, title);
         SetCarYear(value, this.props.serviceContext);

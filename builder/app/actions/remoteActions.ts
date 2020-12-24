@@ -10,7 +10,7 @@ import {
 	SOURCE,
 	NodesByType,
 	GetLinkBetween,
-	GetNodesLinkedTo, GetNodeLinkedTo
+	GetNodesLinkedTo, GetNodeLinkedTo, applyDefaultAppSettings
 } from '../methods/graph_methods';
 import {
 	SaveApplication,
@@ -135,6 +135,7 @@ export function openRedQuickBuilderGraph(unpruneGraph?: boolean, unpinned?: bool
 					opened_graph = unprune(opened_graph);
 					const default_graph = createGraph();
 					opened_graph = { ...default_graph, ...opened_graph };
+					applyDefaultAppSettings(opened_graph)
 					SaveApplication(opened_graph.id, CURRENT_GRAPH, dispatch);
 					SaveGraph(opened_graph, dispatch, true);
 					setupCache(opened_graph);
