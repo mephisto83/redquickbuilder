@@ -257,6 +257,7 @@ const buildAllProgress = [
 	{ name: PruneDataChainCollections },
 	{ name: APPLY_PERMISSION_CHAINS },
 	{ name: APPLY_EXECUTION_CHAINS },
+	{ name: Load_Window_Settings },
 	{ name: APPLY_VALIDATION_CHAINS },
 	{ name: GETALL_LIST_ROUTES },
 	{ name: AUTHENTICATION_BUTTONS },
@@ -396,7 +397,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 			await LoadWindowSettings(progresFunc);
 		});
 
-		
+
 
 		await run(buildAllProgress, Create_Configuration, async (progresFunc: any) => {
 			graphOperation(CreateConfiguration())(GetDispatchFunc(), GetStateFunc());

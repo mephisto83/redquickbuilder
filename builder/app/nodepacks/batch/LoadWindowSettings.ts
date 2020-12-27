@@ -13,7 +13,7 @@ import AddChainToNavigateNextScreen from './AddChainToNavigateNextScreen';
 import { GetNodesLinkedTo } from '../../methods/graph_methods';
 import HomeViewGetWindowSettings from '../HomeViewGetWindowSettings'
 import { Node } from '../../methods/graph_types';
-export default async function AddChainToNavigateNextScreens(progresFunc: any) {
+export default async function LoadWindowSettings(progresFunc: any) {
 	const screen =
 		GetNodeByProperties({
 			[NodeProperties.IsHomeLaunchView]: true,

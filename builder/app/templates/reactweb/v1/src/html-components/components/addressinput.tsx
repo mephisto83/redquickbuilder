@@ -30,7 +30,7 @@ export default class AddressInput extends React.Component<any, any> {
         if (prevProps && prevProps.value && this.props.value) {
             let { value } = this.props;
             for (let i in value) {
-                if (value[i] !== prevProps.values[i]) {
+                if (value[i] !== prevProps.value[i]) {
                     this.setState({
                         componentForm: {
                             ...this.state.componentForm,
@@ -43,7 +43,13 @@ export default class AddressInput extends React.Component<any, any> {
     }
     static initialized: boolean = false;
     componentDidMount() {
-        let api = (window as any).googleMapsApi || this.props.apiKey;
+        let api: string = '';
+        if ((window as any).$windowSettings) {
+            api = (window as any).$windowSettings.GoogleApiKey;
+        }
+        if (this.props.apiKey) {
+            api = this.props.apiKey;
+        }
         if (this.props.value) {
             this.setState({
                 ...this.props.value
@@ -78,6 +84,7 @@ export default class AddressInput extends React.Component<any, any> {
         let { autocomplete, componentForm } = this.state;
         // Get the place details from the autocomplete object.
         const place = autocomplete.getPlace();
+        let updatedQuery = '';
         for (const component in componentForm) {
             let el: any = document.querySelector(`#${this.state.componentId} [data-field="${component}"]`);
             el.value = "";
@@ -93,17 +100,21 @@ export default class AddressInput extends React.Component<any, any> {
                 const val = component[componentForm[addressType]];
                 let el: any = document.querySelector(`#${this.state.componentId} [data-field="${addressType}"]`);
                 el.value = val;
+                updatedQuery += ` ${val}`;
             }
         }
         for (const component in componentForm) {
             let el: any = document.querySelector(`#${this.state.componentId} [data-field="${component}"]`);
             el.disabled = true;
         }
+        if (updatedQuery) {
+            this.setState({ query: updatedQuery })
+        }
         if (this.props.onChange) {
             this.props.onChange(componentForm);
         }
-        if (this.props.onTextChange) {
-            this.props.onTextChange(componentForm);
+        if (this.props.onChangeText) {
+            this.props.onChangeText(componentForm);
         }
     }
     // Bias the autocomplete object to the user's geographical location,

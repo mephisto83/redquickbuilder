@@ -165,7 +165,7 @@ export default function HomeViewGetWindowSettings(args: any = {}) {
 					operation: 'CHANGE_NODE_TEXT',
 					options: {
 						id: context.node4,
-						value: 'Try To Get Local Creds'
+						value: 'Get Window Settings'
 					}
 				}
 			];

@@ -49,8 +49,10 @@ export default class Dropdown extends React.Component<any, any> {
 					onChange={() => {
 						let { options } = this.props;
 						let el: any = document.querySelector(`#${this.state.id}`);
-						let { value } = options[el.selectedIndex];
-						InputFunctions.onChange(this)({ target: { checked: false, value: value } });
+						if (el.selectedIndex) {
+							let { value } = options[el.selectedIndex - 1];
+							InputFunctions.onChange(this)({ target: { checked: false, value: value } });
+						}
 					}}
 					placeholder={InputFunctions.placeholder(this)}
 				>

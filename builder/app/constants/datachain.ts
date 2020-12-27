@@ -99,6 +99,13 @@ export const DataChainFunctions: any = {
 		},
 		value: 'Not'
 	},
+	[DataChainFunctionKeys.GetWindowSettings]: {
+		ui: {},
+		filter: {
+			[NodeProperties.NODEType]: true
+		},
+		value: DataChainFunctionKeys.GetWindowSettings
+	},
 	[DataChainFunctionKeys.Logout]: {
 		ui: {},
 		filter: {

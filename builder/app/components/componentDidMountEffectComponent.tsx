@@ -89,10 +89,10 @@ export default class ComponentDidMountEffectComponent extends Component<any, any
 						onClick={() => {
 							if (this.props.onDelete) {
 								this.props.onDelete();
+							}
 								if (this.props.onChange) {
 									this.props.onChange();
 								}
-							}
 						}}
 						icon="fa fa-minus"
 					/>
