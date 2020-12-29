@@ -6,8 +6,8 @@ export function uuidv4() {
 	});
 }
 declare global {
-	export interface String {}
-	export interface Object {}
+	export interface String { }
+	export interface Object { }
 	export interface Array<T> {
 		relativeCompliment: any;
 		unique: any;
@@ -30,7 +30,7 @@ declare global {
 		chunkView: any;
 	}
 }
-export default function() {
+export default function () {
 	((array: Array<any>): void => {
 		if (!array.relativeCompliment) {
 			const extrasection_relativeCompliment = {
@@ -42,10 +42,10 @@ export default function() {
 					let result: any = [];
 					func =
 						func ||
-						function(x: any, y: any) {
+						function (x: any, y: any) {
 							return x === y;
 						};
-					for (let i = collection.length; i-- /**/; ) {
+					for (let i = collection.length; i-- /**/;) {
 						if (!othercollection.some(func.bind(null, collection[i]))) {
 							result.push(collection[i]);
 						} else if (output) {
@@ -70,11 +70,11 @@ export default function() {
 					const result = [];
 					func =
 						func ||
-						function(x: any, y: any) {
+						function (x: any, y: any) {
 							return x === y;
 						};
-					for (let i = collection.length; i-- /**/; ) {
-						for (let j = othercollection.length; j-- /**/; ) {
+					for (let i = collection.length; i-- /**/;) {
+						for (let j = othercollection.length; j-- /**/;) {
 							if (func(othercollection[j], collection[i])) {
 								result.push(collection[i]);
 								break;
@@ -91,7 +91,7 @@ export default function() {
 				enumerable: false,
 				writable: true,
 				configurable: true,
-				value: async function(func: Function) {
+				value: async function (func: Function) {
 					const collection = this;
 					let promise = Promise.resolve();
 					(<any>[]).interpolate(0, collection.length, (i: any) => {
@@ -114,7 +114,7 @@ export default function() {
 					const finalresult = [];
 					func =
 						func ||
-						function(x: any) {
+						function (x: any) {
 							return x;
 						};
 					const collection = this;
@@ -161,7 +161,7 @@ export default function() {
 					const collection = this;
 					func =
 						func ||
-						function(x: any) {
+						function (x: any) {
 							return x;
 						};
 					for (let i = start; i < stop; i++) {
@@ -182,7 +182,7 @@ export default function() {
 				configurable: true,
 				value() {
 					const input = this;
-					const stack = [ ...input ];
+					const stack = [...input];
 					const res = [];
 					while (stack.length) {
 						// pop value from stack
@@ -286,7 +286,7 @@ export default function() {
 					const collection = this;
 					func =
 						func ||
-						function(x: any) {
+						function (x: any) {
 							return x;
 						};
 					for (let i = 0; i < collection.length; i++) {
@@ -313,7 +313,7 @@ export default function() {
 					let val;
 					func =
 						func ||
-						function(x: any) {
+						function (x: any) {
 							return x;
 						};
 					for (let i = 0; i < collection.length; i++) {
@@ -343,18 +343,34 @@ export default function() {
 				}
 			});
 		}
-		array.tightenPs = function() {
+		array.tightenPs = function () {
 			const str = this || '';
 
 			return str.join(NEW_LINE).split(NEW_LINE).filter((x: string) => x.trim()).join(NEW_LINE);
 		};
 	})(Array.prototype);
 	console.log('defined array');
-	(function(strPrototype: any) {
-		strPrototype.toJavascriptName = function() {
+	(function (strPrototype: any) {
+		strPrototype.toJavascriptName = function () {
 			const str = this || '';
 			if (str[0]) {
 				try {
+					let foundUpperCase = false;
+					let foundLowerCase = false;
+					let upperCaseLetters = `ABCDEFGHIJKLMNOPQRSTUVWXYZ`;
+					str.split('').map((letter: string) => {
+						if (foundLowerCase) {
+							return letter;
+						}
+						if (!foundLowerCase && upperCaseLetters.indexOf(letter) !== -1) {
+							foundUpperCase = true;
+							return letter.toLocaleLowerCase();
+						}
+						else {
+							foundLowerCase = true;
+						}
+						return letter;
+					})
 					return str[0].toLowerCase() + str.split('').subset(1).join('');
 				} catch (e) {
 					console.log(str);
@@ -365,23 +381,23 @@ export default function() {
 		};
 	})(String.prototype);
 
-  (function(objectPrototype: any) {
-    if (!objectPrototype.entries) {
-      Object.defineProperty(objectPrototype, 'entries', {
-        enumerable: false,
-        writable: true,
-        configurable: true,
-        value(obj: any) {
-          var ownProps = Object.keys(obj),
-            i = ownProps.length,
-            resArray = new Array(i); // preallocate the Array
-          while (i--) resArray[i] = [ ownProps[i], obj[ownProps[i]] ];
+	(function (objectPrototype: any) {
+		if (!objectPrototype.entries) {
+			Object.defineProperty(objectPrototype, 'entries', {
+				enumerable: false,
+				writable: true,
+				configurable: true,
+				value(obj: any) {
+					var ownProps = Object.keys(obj),
+						i = ownProps.length,
+						resArray = new Array(i); // preallocate the Array
+					while (i--) resArray[i] = [ownProps[i], obj[ownProps[i]]];
 
-          return resArray;
-        }
-      });
-    }
-  })(Object.prototype);
+					return resArray;
+				}
+			});
+		}
+	})(Object.prototype);
 
 }
 const NEW_LINE = `

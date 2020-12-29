@@ -3,6 +3,9 @@ import { $CreateModels, $UpdateModels } from '../../actions/screenInfo';
 import './addressinput.css';
 import { uuidv4 } from './util';
 
+const AddresInputContext = {
+    promise: Promise.resolve()
+}
 export default class AddressInput extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
@@ -186,9 +189,18 @@ export default class AddressInput extends React.Component<any, any> {
     loadScript(url: string, callback: Function) {
         let existingScript = document.querySelector(`[src="${url}"]`);
         if (existingScript && callback) {
-            callback();
+            AddresInputContext.promise = AddresInputContext.promise.then(() => {
+                callback();
+            })
+
             return;
         }
+        let addressResolution: Function | null = null;
+        AddresInputContext.promise = AddresInputContext.promise.then(() => {
+            return new Promise((resolve: Function, fail) => {
+                addressResolution = resolve;
+            })
+        })
         let script: any = document.createElement("script");
         script.type = "text/javascript";
 
@@ -197,10 +209,18 @@ export default class AddressInput extends React.Component<any, any> {
                 if (script.readyState === "loaded" || script.readyState === "complete") {
                     script.onreadystatechange = null;
                     callback();
+                    if (addressResolution) {
+                        addressResolution();
+                    }
                 }
             };
         } else {
-            script.onload = () => callback();
+            script.onload = () => {
+                callback();
+                if (addressResolution) {
+                    addressResolution();
+                }
+            };
         }
 
         script.src = url;

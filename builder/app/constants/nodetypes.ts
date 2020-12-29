@@ -1716,12 +1716,14 @@ export const ProgrammingLanguages = {
 export const Languages = {
 	[`US-English`]: 'US-English',
 	[`NB-Norsk`]: 'NB-Norsk',
-	[`FR-Francais`]: 'FR-Francais'
+	[`FR-Francais`]: 'FR-Francais',
+	[`DE-Deutsch`]: 'DE-Deutsch'
 };
 export const LanguagesCode = {
 	[`US-English`]: 'en',
 	[`NB-Norsk`]: 'nb',
-	[`FR-Francais`]: 'fr'
+	[`FR-Francais`]: 'fr',
+	[`DE-Deutsch`]: 'de'
 };
 
 export const NodePropertyTypesByLanguage = {

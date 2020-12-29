@@ -56,9 +56,9 @@ class TranslationView extends Component<any, any> {
   render() {
     const active = this.active();
 
-		if (!active) {
-			return <div />;
-		}
+    if (!active) {
+      return <div />;
+    }
     const graph = GetCurrentGraph();
     if (!graph) {
       return <div />;
@@ -119,6 +119,7 @@ class TranslationView extends Component<any, any> {
                       <h5 style={{ margin: 0 }}>{this.getTranslation(item, Languages["US-English"])}</h5>
                       <h5 style={{ margin: 0 }}>{this.getTranslation(item, Languages["NB-Norsk"])}</h5>
                       <h5 style={{ margin: 0 }}>{this.getTranslation(item, Languages["FR-Francais"])}</h5>
+                      <h5 style={{ margin: 0 }}>{this.getTranslation(item, Languages["DE-Deutsch"])}</h5>
                     </div>
                     <div className="col-md-2">
                       {this.state.copied ? (<button className="btn btn-default btn-flat" onClick={(event) => {
@@ -168,7 +169,10 @@ class TranslationView extends Component<any, any> {
                               item.properties.languages[Languages["FR-Francais"]] = res;
                               return translationservice(value, Languages["US-English"], Languages["NB-Norsk"]).then(ress => {
                                 item.properties.languages[Languages["NB-Norsk"]] = ress;
-                                this.setState({ item: { ...item } })
+                                return translationservice(value, Languages["US-English"], Languages["DE-Deutsch"]).then(ress => {
+                                  item.properties.languages[Languages["DE-Deutsch"]] = ress;
+                                  this.setState({ item: { ...item } })
+                                })
                               })
                             });
                           }

@@ -52,6 +52,16 @@ export default class Input extends React.Component<any, any> {
 			if (this.inputType === 'checkbox') {
 				extra_objects.checked = InputFunctions.value(this);
 			}
+			else if (this.inputType === 'date') {
+				let temp = InputFunctions.value(this);
+				let date = Date.parse(temp)
+				if (!isNaN(date)) {
+					temp = new Date(date).toLocaleDateString()
+				}
+				return (<div className="form__group field">
+					<span>{temp}</span>
+				</div>);
+			}
 			return (<div className="form__group field">
 				<input
 					type={this.inputType || 'text'}

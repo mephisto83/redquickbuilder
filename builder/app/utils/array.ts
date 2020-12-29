@@ -44,10 +44,10 @@ declare global {
 
 				func =
 					func ||
-					function(x: any, y: any) {
+					function (x: any, y: any) {
 						return x === y;
 					};
-				for (let i = collection.length; i-- /**/; ) {
+				for (let i = collection.length; i-- /**/;) {
 					// function (x) { return x == collection[i]; }
 					if (!othercollection.some(func.bind(null, collection[i]))) {
 						result.push(collection[i]);
@@ -73,11 +73,11 @@ declare global {
 				const result = [];
 				func =
 					func ||
-					function(x: any, y: any) {
+					function (x: any, y: any) {
 						return x === y;
 					};
-				for (let i = collection.length; i-- /**/; ) {
-					for (let j = othercollection.length; j-- /**/; ) {
+				for (let i = collection.length; i-- /**/;) {
+					for (let j = othercollection.length; j-- /**/;) {
 						if (func(othercollection[j], collection[i])) {
 							result.push(collection[i]);
 							break;
@@ -94,7 +94,7 @@ declare global {
 			enumerable: false,
 			writable: true,
 			configurable: true,
-			value: async function(func: (arg0: any, arg1: any, arg2: any) => any) {
+			value: async function (func: (arg0: any, arg1: any, arg2: any) => any) {
 				const collection = this;
 				let promise = Promise.resolve();
 				[].interpolate(0, collection.length, (i: any) => {
@@ -117,7 +117,7 @@ declare global {
 				const finalresult = [];
 				func =
 					func ||
-					function(x: any) {
+					function (x: any) {
 						return x;
 					};
 				const collection = this;
@@ -163,7 +163,7 @@ declare global {
 				const collection = this;
 				func =
 					func ||
-					function(x: any) {
+					function (x: any) {
 						return x;
 					};
 				for (let i = start; i < stop; i++) {
@@ -184,7 +184,7 @@ declare global {
 			configurable: true,
 			value() {
 				const input = this;
-				const stack = [ ...input ];
+				const stack = [...input];
 				const res = [];
 				while (stack.length) {
 					// pop value from stack
@@ -220,7 +220,7 @@ declare global {
  */
 	if (!array.chunk) {
 		Object.defineProperty(array, 'chunk', {
-			value: function(chunkSize: any) {
+			value: function (chunkSize: any) {
 				var temporal = [];
 
 				for (var i = 0; i < this.length; i += chunkSize) {
@@ -233,7 +233,7 @@ declare global {
 	}
 	if (!array.chunkView) {
 		Object.defineProperty(array, 'chunkView', {
-			value: async function(func: (arg0: any, arg1: any, arg2: any) => {}, chunkSize: any) {
+			value: async function (func: (arg0: any, arg1: any, arg2: any) => {}, chunkSize: any) {
 				const collection = this;
 				const chunks = Math.ceil(collection.length / chunkSize);
 				let promise: any = Promise.resolve();
@@ -315,7 +315,7 @@ declare global {
 				const collection = this;
 				func =
 					func ||
-					function(x: any) {
+					function (x: any) {
 						return x;
 					};
 				for (let i = 0; i < collection.length; i++) {
@@ -342,7 +342,7 @@ declare global {
 				let val;
 				func =
 					func ||
-					function(x: any) {
+					function (x: any) {
 						return x;
 					};
 				for (let i = 0; i < collection.length; i++) {
@@ -374,10 +374,26 @@ declare global {
 	}
 })(Array.prototype);
 
-String.prototype.toJavascriptName = function() {
+String.prototype.toJavascriptName = function () {
 	const str = this || '';
 	if (str[0]) {
 		try {
+			let foundUpperCase = false;
+			let foundLowerCase = false;
+			let upperCaseLetters = `ABCDEFGHIJKLMNOPQRSTUVWXYZ`;
+			str.split('').map((letter: string) => {
+				if (foundLowerCase) {
+					return letter;
+				}
+				if (!foundLowerCase && upperCaseLetters.indexOf(letter) !== -1) {
+					foundUpperCase = true;
+					return letter.toLocaleLowerCase();
+				}
+				else {
+					foundLowerCase = true;
+				}
+				return letter;
+			})
 			return str[0].toLowerCase() + str.split('').subset(1).join('');
 		} catch (e) {
 			console.log(str);
@@ -389,7 +405,7 @@ String.prototype.toJavascriptName = function() {
 ((array) => {
 	if (!array.stringView) {
 		Object.defineProperty(array, 'stringView', {
-			value: async function(func: (arg0: any, arg1: any, arg2: any) => {}, chunkSize: any) {
+			value: async function (func: (arg0: any, arg1: any, arg2: any) => {}, chunkSize: any) {
 				const stringOfLetters = this;
 				const chunks = Math.ceil(stringOfLetters.length / chunkSize);
 				let promise: any = Promise.resolve();
@@ -404,7 +420,7 @@ String.prototype.toJavascriptName = function() {
 		});
 	}
 })(String.prototype);
-(function(objectPrototype: any) {
+(function (objectPrototype: any) {
 	if (!objectPrototype.entries) {
 		Object.defineProperty(objectPrototype, 'entries', {
 			enumerable: false,
@@ -414,7 +430,7 @@ String.prototype.toJavascriptName = function() {
 				var ownProps = Object.keys(obj),
 					i = ownProps.length,
 					resArray = new Array(i); // preallocate the Array
-				while (i--) resArray[i] = [ ownProps[i], obj[ownProps[i]] ];
+				while (i--) resArray[i] = [ownProps[i], obj[ownProps[i]]];
 
 				return resArray;
 			}
@@ -424,7 +440,7 @@ String.prototype.toJavascriptName = function() {
 
 const NEW_LINE = `
 `;
-Array.prototype.tightenPs = function() {
+Array.prototype.tightenPs = function () {
 	const str = this || '';
 
 	return str.join(NEW_LINE).split(NEW_LINE).filter((x) => x.trim()).join(NEW_LINE);

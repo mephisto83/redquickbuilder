@@ -16,9 +16,6 @@ function redservice() {
 
 
 export default class VINInput extends Input {
-	constructor(props: any) {
-		super(props);
-	}
 	changedText(a: { target: { checked: any; value: any } }) {
 		let value = a.target.value;
 		return redservice().get(`/api/red/autoservice/get/vin/${value}`).then((result: VehicleIdentificationNumberResult) => {
@@ -43,8 +40,22 @@ export default class VINInput extends Input {
 		}
 		return [];
 	}
+    componentDidUpdate(prevProps: any) {
+        InputFunctions.componentDidUpdateV2(this, prevProps);
+    }
 	render() {
 		var handleKeyPress = InputFunctions.handleKeyPress(this);
+		if (!this.isEditMode()) {
+			return (<div className="form__group field">
+				<input
+					type={this.inputType || 'text'}
+					disabled
+					className={`form-control ${this.cssClasses()}`}
+					value={InputFunctions.value(this)}
+				/>
+			</div>)
+		}
+
 		return (
 			<div className="form__group field">
 				<input
