@@ -1,4 +1,5 @@
 import React from 'react';
+import { $CreateModels, $UpdateModels } from '../../actions/screenInfo';
 import './addressinput.css';
 import { uuidv4 } from './util';
 
@@ -23,21 +24,57 @@ export default class AddressInput extends React.Component<any, any> {
             componentForm
         }
     }
-    // shouldComponentUpdate() {
-    //     return false;
-    // }
+    convertToNetCore(obj: GoogleAddress): GoogleAddressNetCore {
+        return {
+            administrativeAreaLevel1: obj.administrative_area_level_1,
+            country: obj.country,
+            postalCode: obj.postal_code,
+            locality: obj.locality,
+            route: obj.route,
+            streetNumber: obj.street_number,
+            id: obj.id
+        }
+    }
+
+    convertFromNetCore(obj: GoogleAddressNetCore): GoogleAddress {
+        return {
+            administrative_area_level_1: obj.administrativeAreaLevel1,
+            country: obj.country,
+            locality: obj.locality,
+            postal_code: obj.postalCode,
+            route: obj.route,
+            street_number: obj.streetNumber,
+            id: obj.id
+        }
+    }
+
     componentDidUpdate(prevProps: any, prevState: any, snapshot: any) {
         if (prevProps && prevProps.value && this.props.value) {
             let { value } = this.props;
-            for (let i in value) {
-                if (value[i] !== prevProps.value[i]) {
-                    this.setState({
-                        componentForm: {
-                            ...this.state.componentForm,
-                            [i]: value[i]
+            let tempCore: any = {}
+            let updated = false;
+            let coreItem: any = value ? this.convertFromNetCore(value) : {};
+            if (value) {
+                for (let i in value) {
+                    if (value[i] !== prevProps.value[i]) {
+                        if (this.state.componentForm) {
+                            tempCore = {
+                                ...this.state.componentForm,
+                                ...coreItem,
+                                [i]: value[i]
+                            };
+                            updated = true;
                         }
-                    })
+                    }
                 }
+            }
+            if (value && updated) {
+                this.setState({
+                    componentForm: {
+                        ...tempCore,
+                        ...coreItem
+                    }
+                });
             }
         }
     }
@@ -54,6 +91,15 @@ export default class AddressInput extends React.Component<any, any> {
             this.setState({
                 ...this.props.value
             });
+            let { value } = this.props;
+            if (value) {
+                let coreItem: any = this.convertFromNetCore(value);
+                this.setState({
+                    componentForm: {
+                        ...coreItem
+                    }
+                });
+            }
         }
         if (AddressInput.initialized) {
             this.initAutocomplete();
@@ -90,7 +136,7 @@ export default class AddressInput extends React.Component<any, any> {
             el.value = "";
             el.disabled = false;
         }
-
+        let output: any = {};
         // Get each component of the address from the place details,
         // and then fill-in the corresponding field on the form.
         for (const component of place.address_components) {
@@ -100,6 +146,7 @@ export default class AddressInput extends React.Component<any, any> {
                 const val = component[componentForm[addressType]];
                 let el: any = document.querySelector(`#${this.state.componentId} [data-field="${addressType}"]`);
                 el.value = val;
+                output[addressType] = component[componentForm[addressType]]
                 updatedQuery += ` ${val}`;
             }
         }
@@ -110,11 +157,12 @@ export default class AddressInput extends React.Component<any, any> {
         if (updatedQuery) {
             this.setState({ query: updatedQuery })
         }
+        output = this.convertToNetCore(output)
         if (this.props.onChange) {
-            this.props.onChange(componentForm);
+            this.props.onChange(output);
         }
         if (this.props.onChangeText) {
-            this.props.onChangeText(componentForm);
+            this.props.onChangeText(output);
         }
     }
     // Bias the autocomplete object to the user's geographical location,
@@ -136,6 +184,11 @@ export default class AddressInput extends React.Component<any, any> {
         }
     }
     loadScript(url: string, callback: Function) {
+        let existingScript = document.querySelector(`[src="${url}"]`);
+        if (existingScript && callback) {
+            callback();
+            return;
+        }
         let script: any = document.createElement("script");
         script.type = "text/javascript";
 
@@ -153,9 +206,44 @@ export default class AddressInput extends React.Component<any, any> {
         script.src = url;
         document.getElementsByTagName("head")[0].appendChild(script);
     };
+    isEditMode() {
+        let { viewModel } = this.props;
+
+        let editMode = false;
+        if ($CreateModels && $UpdateModels) {
+            if (($CreateModels as any)[viewModel] || ($UpdateModels as any)[viewModel]) {
+                editMode = true;
+            }
+        }
+        return editMode;
+    }
+    renderViewMode() {
+        let { value } = this.props;
+        if (!this.isEditMode()) {
+            let address: GoogleAddressNetCore = value;
+            if (!address) {
+                return (<div className="form__group field">None
+                </div>)
+            }
+            return (<div className="form__group field">
+                <div>
+                    {address.streetNumber} {address.route} {address.locality}
+                </div>
+                <div>
+                    {address.administrativeAreaLevel1} {address.postalCode} {address.country}
+                </div>
+            </div>)
+        }
+        else {
+            return false;
+        }
+    }
     render() {
         const { query } = this.state;
 
+        if (!this.isEditMode()) {
+            return this.renderViewMode();
+        }
         return (
             <div id={this.state.componentId} className="address-input">
                 <div className="search-location-input">
@@ -221,7 +309,17 @@ export interface GoogleAddress {
     street_number: string;
     route: string;
     administrative_area_level_1: string;
+    locality: string;
     postal_code: string;
     country: string;
+    id: string;
+}
+export interface GoogleAddressNetCore {
+    streetNumber: string;
+    route: string;
+    administrativeAreaLevel1: string;
+    postalCode: string;
+    locality: string;
+    country: string
     id: string;
 }

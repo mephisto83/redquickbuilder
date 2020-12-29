@@ -83,13 +83,14 @@ export default class CarYearInput extends Typeahead {
             suggestions: list
         })
     }
+    
     componentWillUnmount() {
         CarYearServiceContext.listeners = CarYearServiceContext.listeners.filter(v => v.id === this.state.id);
     }
 
     suggestionSelected(value: any, title: any) {
-        super.suggestionSelected(value, title);
-        SetCarYear(value, this.props.serviceContext);
+        super.suggestionSelected(`${value}`, title);
+        SetCarYear(`${value}`, this.props.serviceContext);
     }
     getYearList() {
         var d = new Date();
@@ -102,11 +103,11 @@ export default class CarYearInput extends Typeahead {
         })
     }
     onTextChange(e: any) {
-        const value = e.target.value;
+        const value = `${e.target.value}`;
 
         this.setState({
             valueTitle: null,
-            value: value
+            value: `${value}`
         });
     }
 }

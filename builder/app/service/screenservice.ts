@@ -135,7 +135,10 @@ export function GenerateScreenMarkup(id: string, language: string) {
 			component_did_update: GetComponentDidUpdate(screenOption, {
 				isScreen: true
 			}),
-			component_did_mount: GetComponentDidMount(screenOption)
+			component_did_mount: GetComponentDidMount(screenOption, {
+				isScreen: true,
+				skipSetGetState: true
+			})
 		});
 	}
 }
@@ -980,7 +983,11 @@ export function GenerateCss(id: string, language: any) {
 			imports: imports.join(NEW_LINE),
 			elements: elements.join(NEW_LINE),
 			component_did_update: GetComponentDidUpdate(screenOption),
-			component_did_mount: GetComponentDidMount(screenOption)
+			component_did_mount: GetComponentDidMount(screenOption, {
+				skipOutOfBand: true,
+				skipSetGetState: true,
+				isScreen: true
+			})
 		});
 	}
 }
@@ -2166,7 +2173,8 @@ export function GetComponentDidUpdate(parent: any, options: any = {}) {
 	}
 	const componentDidMount = GetComponentDidMount(parent, {
 		skipOutOfBand: true,
-		skipSetGetState: true
+		skipSetGetState: true,
+		isScreen: false
 	});
 	const componentDidUpdate = `componentDidUpdate(prevProps: any) {
         this.captureValues(prevProps);
@@ -2350,12 +2358,12 @@ export function GetComponentDidMount(screenOption: any, options: any = {}) {
 	const componentDidMount = `componentDidMount() {
 		${accessComponentDidMountCommands.join(NEW_LINE)}
     // here 3
-        ${options.skipSetGetState ? '' : `this.props.setGetState();`}
+        ${!options.isScreen ? '' : `this.props.setGetState();`}
         this.captureValues({});
         ${options.skipOutOfBand ? '' : outOfBandCall}
         ${invocations}
         //Chain invocations
-        ${chainInvocations}
+        ${options.isScreen ? chainInvocations : ''}
 {{handles}}
 }
 `;

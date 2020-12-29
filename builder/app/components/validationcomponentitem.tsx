@@ -686,7 +686,7 @@ export function updateValidationMethod({
 							case NodeAttributePropertyTypes.ADDRESS:
 								simpleValidation.isNotNull = CreateBoolean();
 								simpleValidation.isNotNull.enabled = true;
-								['StreetNumber', 'Route', 'AdministrativeAreaLevel1', 'PostalCode', 'Country'].forEach((_path) => {
+								['StreetNumber', 'Route', 'AdministrativeAreaLevel1', 'Locality', 'PostalCode', 'Country'].forEach((_path) => {
 									let subValidation = CreateSimpleValidation();
 									if (meaning.actorClause.relationType) {
 										subValidation.relationType = meaning.actorClause.relationType;
@@ -722,8 +722,10 @@ export function updateValidationMethod({
 							case NodeAttributePropertyTypes.CARYEAR:
 								simpleValidation.maxLength = CreateMaxLength('4');
 								simpleValidation.maxLength.enabled = true;
+								simpleValidation.maxLength.equal = true;
 								simpleValidation.minLength = CreateMinLength('4');
 								simpleValidation.minLength.enabled = true;
+								simpleValidation.minLength.equal = true;
 								simpleValidation.numericInt = CreateBoolean();
 								simpleValidation.numericInt.enabled = true;
 								simpleValidation.isNotNull = CreateBoolean();
@@ -792,8 +794,10 @@ export function updateValidationMethod({
 							case NodeAttributePropertyTypes.VIN:
 								simpleValidation.minLength = CreateMinLength('17');
 								simpleValidation.minLength.enabled = true;
+								simpleValidation.minLength.equal = true;
 								simpleValidation.maxLength = CreateMaxLength('17');
 								simpleValidation.maxLength.enabled = true;
+								simpleValidation.maxLength.equal = true;
 								simpleValidation.isNotNull = CreateBoolean();
 								simpleValidation.isNotNull.enabled = true;
 								simpleValidation.alphaNumeric = CreateBoolean();
@@ -802,8 +806,10 @@ export function updateValidationMethod({
 							case NodeAttributePropertyTypes.YEAR:
 								simpleValidation.minLength = CreateMinLength('4');
 								simpleValidation.minLength.enabled = true;
+								simpleValidation.minLength.equal = true;
 								simpleValidation.maxLength = CreateMaxLength('4');
 								simpleValidation.maxLength.enabled = true;
+								simpleValidation.maxLength.equal = true;
 								simpleValidation.isNotNull = CreateBoolean();
 								simpleValidation.isNotNull.enabled = true;
 								simpleValidation.numericInt = CreateBoolean();

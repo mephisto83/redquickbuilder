@@ -3049,10 +3049,10 @@ export function GetConditionClause(
 	if (componentType === 'GoogleAddress') {
 		switch (language) {
 			case NodeConstants.ProgrammingLanguages.JavaScript:
-				propNames = ['street_number', 'route', 'administrative_area_level_1', 'postal_code', 'country'].map(v => `${propertyName.toJavascriptName()}?.${v}`);
+				propNames = ['StreetNumber', 'Route', 'AdministrativeAreaLevel1', 'Locality', 'PostalCode', 'Country'].map(v => `${propertyName.toJavascriptName()}?.${v.toJavascriptName()}`);
 				break;
 			default:
-				propNames = ['StreetNumber', 'Route', 'AdministrativeAreaLevel1', 'PostalCode', 'Country'].map(v => `${propertyName}?.${v}`);
+				propNames = ['StreetNumber', 'Route', 'AdministrativeAreaLevel1', 'Locality', 'PostalCode', 'Country'].map(v => `${propertyName}?.${v}`);
 				break;
 		}
 	}

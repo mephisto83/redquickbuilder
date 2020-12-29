@@ -152,231 +152,129 @@ export default function ConnectComponentDidMount(args: {
 					//Returns a MODEL and an instanceType[IS edit]
 					...(!returnsAList && instanceType
 						? [
-								() => {
-									return [
-										() => {
-											let uiMethodNode: Node = GetNodeByProperties({
-												[NodeProperties.UIActionMethod]: UIActionMethods.LoadModel,
-												[NodeProperties.NODEType]: NodeTypes.UIMethod
-											});
-											let res: any[] = [];
-											if (!uiMethodNode) {
-												res.push(() => {
-													return CreateNewNode(
-														{
-															[NodeProperties.UIActionMethod]: UIActionMethods.LoadModel,
-															[NodeProperties.UIText]: UIActionMethods.LoadModel,
-															[NodeProperties.NODEType]: NodeTypes.UIMethod
-														},
-														(node: Node) => {
-															uiMethodNode = node;
-														}
-													);
-												});
-											}
+							() => {
+								return [
+									() => {
+										let uiMethodNode: Node = GetNodeByProperties({
+											[NodeProperties.UIActionMethod]: UIActionMethods.LoadModel,
+											[NodeProperties.NODEType]: NodeTypes.UIMethod
+										});
+										let res: any[] = [];
+										if (!uiMethodNode) {
 											res.push(() => {
-												return AddLinkBetweenNodes(
-													cycleInstance ? cycleInstance.id : '',
-													uiMethodNode.id,
+												return CreateNewNode(
 													{
-														...LinkProperties.UIMethod,
-														[LinkPropertyKeys.ModelKey]: GetNodeProp(
-															screen,
-															NodeProperties.Model
-														),
-														[LinkPropertyKeys.ViewModelKey]: screen,
-														parameters: [
-															{
-																type: UIActionMethodParameterTypes.ViewModelKey,
-																value: screen
-															},
-															{
-																type: UIActionMethodParameterTypes.ModelKey,
-																value: GetNodeProp(screen, NodeProperties.Model)
-															},
-															{ type: UIActionMethodParameterTypes.RetrieveParameters }
-														]
+														[NodeProperties.UIActionMethod]: UIActionMethods.LoadModel,
+														[NodeProperties.UIText]: UIActionMethods.LoadModel,
+														[NodeProperties.NODEType]: NodeTypes.UIMethod
+													},
+													(node: Node) => {
+														uiMethodNode = node;
 													}
 												);
 											});
-
-											return res;
 										}
-									];
-								}
-								// LoadModel({
-								// 	screen: screen,
-								// 	viewPackages,
-								// 	model_view_name: `Load ${GetCodeName(
-								// 		GetNodeProp(screen, NodeProperties.Model)
-								// 	)} into state`,
-								// 	model_item: `Models.${GetCodeName(GetNodeProp(screen, NodeProperties.Model))}`,
-								// 	callback: (context: { entry: any }) => {
-								// 		dataChainForLoading = context.entry;
-								// 	}
-								// }),
-								// {
-								// 	operation: ADD_LINK_BETWEEN_NODES,
-								// 	options() {
-								// 		return {
-								// 			target: dataChainForLoading,
-								// 			source: cycleInstance ? cycleInstance.id : null,
-								// 			properties: {
-								// 				...LinkProperties.DataChainLink
-								// 			}
-								// 		};
-								// 	}
-								// }
-							]
+										res.push(() => {
+											return AddLinkBetweenNodes(
+												cycleInstance ? cycleInstance.id : '',
+												uiMethodNode.id,
+												{
+													...LinkProperties.UIMethod,
+													[LinkPropertyKeys.ModelKey]: GetNodeProp(
+														screen,
+														NodeProperties.Model
+													),
+													[LinkPropertyKeys.ViewModelKey]: screen,
+													parameters: [
+														{
+															type: UIActionMethodParameterTypes.ViewModelKey,
+															value: screen
+														},
+														{
+															type: UIActionMethodParameterTypes.ModelKey,
+															value: GetNodeProp(screen, NodeProperties.Model)
+														},
+														{ type: UIActionMethodParameterTypes.RetrieveParameters }
+													]
+												}
+											);
+										});
+
+										return res;
+									}
+								];
+							}
+							// LoadModel({
+							// 	screen: screen,
+							// 	viewPackages,
+							// 	model_view_name: `Load ${GetCodeName(
+							// 		GetNodeProp(screen, NodeProperties.Model)
+							// 	)} into state`,
+							// 	model_item: `Models.${GetCodeName(GetNodeProp(screen, NodeProperties.Model))}`,
+							// 	callback: (context: { entry: any }) => {
+							// 		dataChainForLoading = context.entry;
+							// 	}
+							// }),
+							// {
+							// 	operation: ADD_LINK_BETWEEN_NODES,
+							// 	options() {
+							// 		return {
+							// 			target: dataChainForLoading,
+							// 			source: cycleInstance ? cycleInstance.id : null,
+							// 			properties: {
+							// 				...LinkProperties.DataChainLink
+							// 			}
+							// 		};
+							// 	}
+							// }
+						]
 						: []),
 					//Returns a LIST and is an instanceType[IS edit]
 					//Assuming these are helper models, that will be used to fill in the form.
 					...(returnsAList && instanceType
 						? [
-								!(methodProperties && (methodProperties.model || methodProperties.model_output))
-									? []
-									: () => {
-											return [
-												() => {
-													let uiMethodNode: Node = GetNodeByProperties({
-														[NodeProperties.UIActionMethod]: UIActionMethods.StoreModelArray,
-														[NodeProperties.NODEType]: NodeTypes.UIMethod
-													});
-													let stateKey: Node = GetNodeByProperties({
-														[NodeProperties.NODEType]: NodeTypes.StateKey,
-														[NodeProperties.StateKey]: GetNodeProp(screen, NodeProperties.Model)
-													});
-													let res: any[] = [];
-													if (!stateKey) {
-														res.push(() => {
-															return CreateNewNode(
-																{
-																	[NodeProperties.StateKey]: GetNodeProp(
-																		screen,
-																		NodeProperties.Model
-																	),
-																	[NodeProperties.UIText]: `${GetNodeTitle(
-																		GetNodeProp(screen, NodeProperties.Model)
-																	)} State`,
-																	[NodeProperties.NODEType]: NodeTypes.StateKey
-																},
-																(node: Node) => {
-																	stateKey = node;
-																}
-															);
-														});
-													}
-
-													if (!uiMethodNode) {
-														res.push(() => {
-															return CreateNewNode(
-																{
-																	[NodeProperties.UIActionMethod]:
-																		UIActionMethods.StoreModelArray,
-																	[NodeProperties.UIText]:
-																		UIActionMethods.StoreModelArray,
-																	[NodeProperties.NODEType]: NodeTypes.UIMethod
-																},
-																(node: Node) => {
-																	uiMethodNode = node;
-																}
-															);
-														});
-													}
-													res.push(() => {
-														return AddLinkBetweenNodes(
-															cycleInstance ? cycleInstance.id : '',
-															uiMethodNode.id,
-															{
-																...LinkProperties.UIMethod,
-																[LinkPropertyKeys.ModelKey]: GetNodeProp(
-																	screen,
-																	NodeProperties.Model
-																),
-																parameters: [
-																	{
-																		type:
-																			UIActionMethodParameterTypes.FunctionParameter,
-																		value: 'a'
-																	},
-																	{
-																		type: UIActionMethodParameterTypes.ModelKey,
-																		value: GetNodeProp(screen, NodeProperties.Model)
-																	},
-																	{
-																		type: UIActionMethodParameterTypes.StateKey,
-																		value: stateKey.id
-																	}
-																]
-															}
-														);
-													});
-													res.push(() => {
-														return AddLinkBetweenNodes(
-															cycleInstance ? cycleInstance.id : '',
-															uiMethodNode.id,
-															{
-																...LinkProperties.StateKey,
-																stateKey: stateKey.id
-															}
-														);
-													});
-													return res;
-												}
-											];
-										},
-								// StoreModelArrayStandard({
-								// 		viewPackages,
-								// 		model: methodProperties.model_output || methodProperties.model,
-								// 		modelText: GetNodeTitle(
-								// 			methodProperties.model_output || methodProperties.model
-								// 		),
-								// 		state_key: `${GetNodeTitle(
-								// 			GetNodeProp(screen, NodeProperties.Model)
-								// 		)} ${GetNodeTitle(
-								// 			methodProperties.model_output || methodProperties.model
-								// 		)} State`,
-								// 		callback: (context: { entry: any }) => {
-								// 			storeModelDataChain = context.entry;
-								// 		}
-								//   })
-								() => {
-									return [
-										// {
-										// 	operation: ADD_LINK_BETWEEN_NODES,
-										// 	options() {
-										// 		return {
-										// 			target: storeModelDataChain,
-										// 			source: cycleInstance ? cycleInstance.id : null,
-										// 			properties: {
-										// 				...LinkProperties.DataChainLink,
-										// 				singleLink: true,
-										// 				nodeTypes: [ NodeTypes.DataChain ]
-										// 			}
-										// 		};
-										// 	}
-										// }
-									];
-								}
-							]
-						: []),
-					//Returns a model and not an instanceType[not edit]
-					...(!returnsAList && !instanceType
-						? [
-								() => {
+							!(methodProperties && (methodProperties.model || methodProperties.model_output))
+								? []
+								: () => {
 									return [
 										() => {
 											let uiMethodNode: Node = GetNodeByProperties({
-												[NodeProperties.UIActionMethod]: UIActionMethods.StoreInLake,
+												[NodeProperties.UIActionMethod]: UIActionMethods.StoreModelArray,
 												[NodeProperties.NODEType]: NodeTypes.UIMethod
 											});
+											let stateKey: Node = GetNodeByProperties({
+												[NodeProperties.NODEType]: NodeTypes.StateKey,
+												[NodeProperties.StateKey]: (methodProperties ? (methodProperties.model_output || methodProperties.model) : null) || GetNodeProp(screen, NodeProperties.Model)
+											});
 											let res: any[] = [];
+											if (!stateKey) {
+												res.push(() => {
+													return CreateNewNode(
+														{
+															[NodeProperties.StateKey]: (methodProperties ? (methodProperties.model_output || methodProperties.model) : null) || GetNodeProp(
+																screen,
+																NodeProperties.Model
+															),
+															[NodeProperties.UIText]: `${GetNodeTitle(
+																(methodProperties ? (methodProperties.model_output || methodProperties.model) : null) || GetNodeProp(screen, NodeProperties.Model)
+															)} State`,
+															[NodeProperties.NODEType]: NodeTypes.StateKey
+														},
+														(node: Node) => {
+															stateKey = node;
+														}
+													);
+												});
+											}
+
 											if (!uiMethodNode) {
 												res.push(() => {
 													return CreateNewNode(
 														{
-															[NodeProperties.UIActionMethod]: UIActionMethods.StoreInLake,
-															[NodeProperties.UIText]: UIActionMethods.StoreInLake,
+															[NodeProperties.UIActionMethod]:
+																UIActionMethods.StoreModelArray,
+															[NodeProperties.UIText]:
+																UIActionMethods.StoreModelArray,
 															[NodeProperties.NODEType]: NodeTypes.UIMethod
 														},
 														(node: Node) => {
@@ -391,185 +289,287 @@ export default function ConnectComponentDidMount(args: {
 													uiMethodNode.id,
 													{
 														...LinkProperties.UIMethod,
-														[LinkPropertyKeys.ModelKey]: GetNodeProp(
+														[LinkPropertyKeys.ModelKey]: (methodProperties ? (methodProperties.model_output || methodProperties.model) : null) || GetNodeProp(
 															screen,
 															NodeProperties.Model
 														),
 														parameters: [
 															{
-																type: UIActionMethodParameterTypes.FunctionParameter,
+																type:
+																	UIActionMethodParameterTypes.FunctionParameter,
 																value: 'a'
 															},
 															{
 																type: UIActionMethodParameterTypes.ModelKey,
-																value: GetNodeProp(screen, NodeProperties.Model)
+																value: (methodProperties ? (methodProperties.model_output || methodProperties.model) : null) || GetNodeProp(screen, NodeProperties.Model)
+															},
+															{
+																type: UIActionMethodParameterTypes.StateKey,
+																value: stateKey.id
 															}
 														]
 													}
 												);
 											});
-
+											res.push(() => {
+												return AddLinkBetweenNodes(
+													cycleInstance ? cycleInstance.id : '',
+													uiMethodNode.id,
+													{
+														...LinkProperties.StateKey,
+														stateKey: stateKey.id
+													}
+												);
+											});
 											return res;
 										}
 									];
-								}
-								// (graph: Graph) => {
-								// 	let model = GetNodeProp(screen, NodeProperties.Model, graph);
-								// 	if (model) {
-								// 		return StoreModelInLake({
-								// 			modelId: model,
-								// 			modelInsertName: GetLambdaVariableTitle(model, false, true),
-								// 			model: GetNodeTitle(model),
-								// 			viewPackages,
-								// 			callback: (dcontext: { entry: string }) => {
-								// 				datachain = dcontext.entry;
-								// 			}
-								// 		});
-								// 	}
-								// 	return [];
-								// },
-								// () => {
-								// 	if (datachain) {
-								// 		return [
-								// 			{
-								// 				operation: ADD_LINK_BETWEEN_NODES,
-								// 				options() {
-								// 					return {
-								// 						properties: { ...LinkProperties.DataChainLink },
-								// 						target: datachain,
-								// 						source: cycleInstance ? cycleInstance.id : null
-								// 					};
-								// 				}
-								// 			}
-								// 		];
-								// 	}
-								// 	return [];
-								// }
-							]
+								},
+							// StoreModelArrayStandard({
+							// 		viewPackages,
+							// 		model: methodProperties.model_output || methodProperties.model,
+							// 		modelText: GetNodeTitle(
+							// 			methodProperties.model_output || methodProperties.model
+							// 		),
+							// 		state_key: `${GetNodeTitle(
+							// 			GetNodeProp(screen, NodeProperties.Model)
+							// 		)} ${GetNodeTitle(
+							// 			methodProperties.model_output || methodProperties.model
+							// 		)} State`,
+							// 		callback: (context: { entry: any }) => {
+							// 			storeModelDataChain = context.entry;
+							// 		}
+							//   })
+							() => {
+								return [
+									// {
+									// 	operation: ADD_LINK_BETWEEN_NODES,
+									// 	options() {
+									// 		return {
+									// 			target: storeModelDataChain,
+									// 			source: cycleInstance ? cycleInstance.id : null,
+									// 			properties: {
+									// 				...LinkProperties.DataChainLink,
+									// 				singleLink: true,
+									// 				nodeTypes: [ NodeTypes.DataChain ]
+									// 			}
+									// 		};
+									// 	}
+									// }
+								];
+							}
+						]
+						: []),
+					//Returns a model and not an instanceType[not edit]
+					...(!returnsAList && !instanceType
+						? [
+							() => {
+								return [
+									() => {
+										let uiMethodNode: Node = GetNodeByProperties({
+											[NodeProperties.UIActionMethod]: UIActionMethods.StoreInLake,
+											[NodeProperties.NODEType]: NodeTypes.UIMethod
+										});
+										let res: any[] = [];
+										if (!uiMethodNode) {
+											res.push(() => {
+												return CreateNewNode(
+													{
+														[NodeProperties.UIActionMethod]: UIActionMethods.StoreInLake,
+														[NodeProperties.UIText]: UIActionMethods.StoreInLake,
+														[NodeProperties.NODEType]: NodeTypes.UIMethod
+													},
+													(node: Node) => {
+														uiMethodNode = node;
+													}
+												);
+											});
+										}
+										res.push(() => {
+											return AddLinkBetweenNodes(
+												cycleInstance ? cycleInstance.id : '',
+												uiMethodNode.id,
+												{
+													...LinkProperties.UIMethod,
+													[LinkPropertyKeys.ModelKey]: (methodProperties ? (methodProperties.model_output || methodProperties.model) : null) || GetNodeProp(
+														screen,
+														NodeProperties.Model
+													),
+													parameters: [
+														{
+															type: UIActionMethodParameterTypes.FunctionParameter,
+															value: 'a'
+														},
+														{
+															type: UIActionMethodParameterTypes.ModelKey,
+															value: (methodProperties ? (methodProperties.model_output || methodProperties.model) : null) || GetNodeProp(screen, NodeProperties.Model)
+														}
+													]
+												}
+											);
+										});
+
+										return res;
+									}
+								];
+							}
+							// (graph: Graph) => {
+							// 	let model = GetNodeProp(screen, NodeProperties.Model, graph);
+							// 	if (model) {
+							// 		return StoreModelInLake({
+							// 			modelId: model,
+							// 			modelInsertName: GetLambdaVariableTitle(model, false, true),
+							// 			model: GetNodeTitle(model),
+							// 			viewPackages,
+							// 			callback: (dcontext: { entry: string }) => {
+							// 				datachain = dcontext.entry;
+							// 			}
+							// 		});
+							// 	}
+							// 	return [];
+							// },
+							// () => {
+							// 	if (datachain) {
+							// 		return [
+							// 			{
+							// 				operation: ADD_LINK_BETWEEN_NODES,
+							// 				options() {
+							// 					return {
+							// 						properties: { ...LinkProperties.DataChainLink },
+							// 						target: datachain,
+							// 						source: cycleInstance ? cycleInstance.id : null
+							// 					};
+							// 				}
+							// 			}
+							// 		];
+							// 	}
+							// 	return [];
+							// }
+						]
 						: []),
 					//Returns a LIST and not an instanceType[not edit]
 					...(returnsAList && !instanceType
 						? [
-								!GetNodeProp(screen, NodeProperties.Model)
-									? []
-									: () => {
-											return [
-												() => {
-													let uiMethodNode: Node = GetNodeByProperties({
-														[NodeProperties.UIActionMethod]: UIActionMethods.StoreModelArray,
-														[NodeProperties.NODEType]: NodeTypes.UIMethod
-													});
-													let stateKey: Node = GetNodeByProperties({
-														[NodeProperties.NODEType]: NodeTypes.StateKey,
-														[NodeProperties.StateKey]: GetNodeProp(screen, NodeProperties.Model)
-													});
-													let res: any[] = [];
-													if (!stateKey) {
-														res.push(() => {
-															return CreateNewNode(
-																{
-																	[NodeProperties.StateKey]: GetNodeProp(
-																		screen,
-																		NodeProperties.Model
-																	),
-																	[NodeProperties.UIText]: `${GetNodeTitle(
-																		GetNodeProp(screen, NodeProperties.Model)
-																	)} State`,
-																	[NodeProperties.NODEType]: NodeTypes.StateKey
-																},
-																(node: Node) => {
-																	stateKey = node;
-																}
-															);
-														});
-													}
-
-													if (!uiMethodNode) {
-														res.push(() => {
-															return CreateNewNode(
-																{
-																	[NodeProperties.UIActionMethod]:
-																		UIActionMethods.StoreModelArray,
-																	[NodeProperties.UIText]:
-																		UIActionMethods.StoreModelArray,
-																	[NodeProperties.NODEType]: NodeTypes.UIMethod
-																},
-																(node: Node) => {
-																	uiMethodNode = node;
-																}
-															);
-														});
-													}
-													res.push(() => {
-														return AddLinkBetweenNodes(
-															cycleInstance ? cycleInstance.id : '',
-															uiMethodNode.id,
-															{
-																...LinkProperties.UIMethod,
-																[LinkPropertyKeys.ModelKey]: GetNodeProp(
-																	screen,
-																	NodeProperties.Model
-																),
-																parameters: [
-																	{
-																		type:
-																			UIActionMethodParameterTypes.FunctionParameter,
-																		value: 'a'
-																	},
-																	{
-																		type: UIActionMethodParameterTypes.ModelKey,
-																		value: GetNodeProp(screen, NodeProperties.Model)
-																	},
-																	{
-																		type: UIActionMethodParameterTypes.StateKey,
-																		value: stateKey.id
-																	}
-																]
-															}
-														);
-													});
-													res.push(() => {
-														return AddLinkBetweenNodes(
-															cycleInstance ? cycleInstance.id : '',
-															uiMethodNode.id,
-															{
-																...LinkProperties.StateKey,
-																stateKey: stateKey.id
-															}
-														);
-													});
-													return res;
-												}
-											];
-										},
-								//  StoreModelArrayStandard({
-								// 		viewPackages,
-								// 		model: GetNodeProp(screen, NodeProperties.Model),
-								// 		modelText: GetNodeTitle(screen),
-								// 		state_key: `${GetNodeTitle(GetNodeProp(screen, NodeProperties.Model))} State`,
-								// 		callback: (context: { entry: any }) => {
-								// 			storeModelDataChain = context.entry;
-								// 		}
-								//   })
-								() => {
+							!GetNodeProp(screen, NodeProperties.Model)
+								? []
+								: () => {
 									return [
-										{
-											operation: ADD_LINK_BETWEEN_NODES,
-											options() {
-												return {
-													target: storeModelDataChain,
-													source: cycleInstance ? cycleInstance.id : null,
-													properties: {
-														...LinkProperties.DataChainLink,
-														singleLink: true,
-														nodeTypes: [ NodeTypes.DataChain ]
-													}
-												};
+										() => {
+											let uiMethodNode: Node = GetNodeByProperties({
+												[NodeProperties.UIActionMethod]: UIActionMethods.StoreModelArray,
+												[NodeProperties.NODEType]: NodeTypes.UIMethod
+											});
+											let stateKey: Node = GetNodeByProperties({
+												[NodeProperties.NODEType]: NodeTypes.StateKey,
+												[NodeProperties.StateKey]: (methodProperties ? (methodProperties.model_output || methodProperties.model) : null) || GetNodeProp(screen, NodeProperties.Model)
+											});
+											let res: any[] = [];
+											if (!stateKey) {
+												res.push(() => {
+													return CreateNewNode(
+														{
+															[NodeProperties.StateKey]: (methodProperties ? (methodProperties.model_output || methodProperties.model) : null) || GetNodeProp(
+																screen,
+																NodeProperties.Model
+															),
+															[NodeProperties.UIText]: `${GetNodeTitle(
+																(methodProperties ? (methodProperties.model_output || methodProperties.model) : null) || GetNodeProp(screen, NodeProperties.Model)
+															)} State`,
+															[NodeProperties.NODEType]: NodeTypes.StateKey
+														},
+														(node: Node) => {
+															stateKey = node;
+														}
+													);
+												});
 											}
+
+											if (!uiMethodNode) {
+												res.push(() => {
+													return CreateNewNode(
+														{
+															[NodeProperties.UIActionMethod]:
+																UIActionMethods.StoreModelArray,
+															[NodeProperties.UIText]:
+																UIActionMethods.StoreModelArray,
+															[NodeProperties.NODEType]: NodeTypes.UIMethod
+														},
+														(node: Node) => {
+															uiMethodNode = node;
+														}
+													);
+												});
+											}
+											res.push(() => {
+												return AddLinkBetweenNodes(
+													cycleInstance ? cycleInstance.id : '',
+													uiMethodNode.id,
+													{
+														...LinkProperties.UIMethod,
+														[LinkPropertyKeys.ModelKey]: (methodProperties ? (methodProperties.model_output || methodProperties.model) : null) || GetNodeProp(
+															screen,
+															NodeProperties.Model
+														),
+														parameters: [
+															{
+																type:
+																	UIActionMethodParameterTypes.FunctionParameter,
+																value: 'a'
+															},
+															{
+																type: UIActionMethodParameterTypes.ModelKey,
+																value: (methodProperties ? (methodProperties.model_output || methodProperties.model) : null) || GetNodeProp(screen, NodeProperties.Model)
+															},
+															{
+																type: UIActionMethodParameterTypes.StateKey,
+																value: stateKey.id
+															}
+														]
+													}
+												);
+											});
+											res.push(() => {
+												return AddLinkBetweenNodes(
+													cycleInstance ? cycleInstance.id : '',
+													uiMethodNode.id,
+													{
+														...LinkProperties.StateKey,
+														stateKey: stateKey.id
+													}
+												);
+											});
+											return res;
 										}
 									];
-								}
-							]
+								},
+							//  StoreModelArrayStandard({
+							// 		viewPackages,
+							// 		model: GetNodeProp(screen, NodeProperties.Model),
+							// 		modelText: GetNodeTitle(screen),
+							// 		state_key: `${GetNodeTitle(GetNodeProp(screen, NodeProperties.Model))} State`,
+							// 		callback: (context: { entry: any }) => {
+							// 			storeModelDataChain = context.entry;
+							// 		}
+							//   })
+							() => {
+								return [
+									{
+										operation: ADD_LINK_BETWEEN_NODES,
+										options() {
+											return {
+												target: storeModelDataChain,
+												source: cycleInstance ? cycleInstance.id : null,
+												properties: {
+													...LinkProperties.DataChainLink,
+													singleLink: true,
+													nodeTypes: [NodeTypes.DataChain]
+												}
+											};
+										}
+									}
+								];
+							}
+						]
 						: []),
 					() => {
 						if (apiEndpoints) {

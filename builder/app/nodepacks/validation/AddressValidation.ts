@@ -70,7 +70,7 @@ function AddressValidation(args: any = { condition: null, property: null }) {
 																defaultValue: 0
 															}
 														},
-														condition: context.minLength || '3'
+														condition: context.minLength || '0'
 													},
 													[context.node3]: {
 														type: 'maxlengthEqual',
@@ -90,7 +90,7 @@ function AddressValidation(args: any = { condition: null, property: null }) {
 																defaultValue: 0
 															}
 														},
-														condition: context.maxLength || '50'
+														condition: context.maxLength || '500'
 													},
 													[context.node5]: {
 														type: 'isNotNull',
@@ -135,6 +135,6 @@ function AddressValidation(args: any = { condition: null, property: null }) {
 
 AddressValidation.title = 'Address Validation';
 
-AddressValidation.description = 'Minimum length 3, Max length 50';
+AddressValidation.description = 'Minimum length 1, Max length 500';
 
 export default AddressValidation;

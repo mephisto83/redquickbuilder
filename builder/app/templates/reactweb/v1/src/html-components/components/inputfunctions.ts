@@ -78,9 +78,9 @@ export default class InputFunctions {
 			}
 		};
 	}
-	static onChange(arg0: any) {
+	static onChange(arg0: any, force?: boolean) {
 		return (v: { target: { checked: any; value: any } }) => {
-			if (arg0.immediate()) {
+			if (arg0.immediate() || force) {
 				if (arg0.changedText) {
 					arg0.changedText(v);
 				}

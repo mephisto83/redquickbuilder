@@ -1,6 +1,7 @@
 import React from 'react';
 import Validation from './validation';
 import InputFunctions from './inputfunctions';
+import { $CreateModels, $UpdateModels } from '../../actions/screenInfo';
 export default class Input extends React.Component<any, any> {
 	inputType: string;
 	constructor(props: any) {
@@ -32,8 +33,36 @@ export default class Input extends React.Component<any, any> {
 	cssClasses() {
 		return '';
 	}
+
+	isEditMode() {
+		let { viewModel } = this.props;
+
+		let editMode = false;
+		if ($CreateModels && $UpdateModels) {
+			if (($CreateModels as any)[viewModel] || ($UpdateModels as any)[viewModel]) {
+				editMode = true;
+			}
+		}
+		return editMode;
+	}
 	render() {
 		var handleKeyPress = InputFunctions.handleKeyPress(this);
+		if (!this.isEditMode()) {
+			let extra_objects: any = {};
+			if (this.inputType === 'checkbox') {
+				extra_objects.checked = InputFunctions.value(this);
+			}
+			return (<div className="form__group field">
+				<input
+					type={this.inputType || 'text'}
+					disabled
+					className={`form-control ${this.cssClasses()}`}
+					{...extra_objects}
+					value={InputFunctions.value(this)}
+				/>
+			</div>)
+		}
+
 		return (
 			<div className="form__group field">
 				<input

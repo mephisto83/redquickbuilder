@@ -2,6 +2,7 @@ import React from 'react';
 import Validation from './validation';
 import InputFunctions from './inputfunctions';
 import { uuidv4 } from './util';
+import { $CreateModels, $UpdateModels } from '../../actions/screenInfo';
 
 export default class Dropdown extends React.Component<any, any> {
 	inputType: string;
@@ -34,8 +35,34 @@ export default class Dropdown extends React.Component<any, any> {
 	cssClasses() {
 		return '';
 	}
+	isEditMode() {
+		let { viewModel } = this.props;
+
+		let editMode = false;
+		if ($CreateModels && $UpdateModels) {
+			if (($CreateModels as any)[viewModel] || ($UpdateModels as any)[viewModel]) {
+				editMode = true;
+			}
+		}
+		return editMode;
+	}
+	renderViewMode() {
+		if (!this.isEditMode()) {
+			return (<div className="form__group field">
+				{InputFunctions.value(this)}
+			</div>)
+		}
+		else {
+			return false;
+		}
+	}
 	render() {
 		var handleKeyPress = InputFunctions.handleKeyPress(this);
+
+		if (!this.isEditMode()) {
+			return this.renderViewMode();
+		}
+
 		return (
 			<div className="form__group field">
 				<select

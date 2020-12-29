@@ -4,6 +4,7 @@ import './typeahead.css';
 import InputFunctions from './inputfunctions';
 import Validation from './validation';
 import { uuidv4 } from './util';
+import { $CreateModels, $UpdateModels } from '../../actions/screenInfo';
 
 export default class TypeAheadDropDown extends React.Component<any, any> {
     constructor(props: any) {
@@ -68,7 +69,7 @@ export default class TypeAheadDropDown extends React.Component<any, any> {
             showSuggestions: false,
             tentativeIndex: null
         })
-        InputFunctions.onChange(this)({ target: { checked: false, value: value } });
+        InputFunctions.onChange(this, true)({ target: { checked: false, value: value } });
     }
 
     renderSuggestions = () => {
@@ -97,11 +98,36 @@ export default class TypeAheadDropDown extends React.Component<any, any> {
             </ul>
         )
     }
+    isEditMode() {
+		let { viewModel } = this.props;
 
+		let editMode = false;
+		if ($CreateModels && $UpdateModels) {
+			if (($CreateModels as any)[viewModel] || ($UpdateModels as any)[viewModel]) {
+				editMode = true;
+			}
+		}
+		return editMode;
+	}
+	renderViewMode() {
+		if (!this.isEditMode()) {
+			return (<div className="form__group field">
+				{InputFunctions.value(this)}
+			</div>)
+		}
+		else {
+			return false;
+		}
+	}
     render() {
         const { text } = this.state;
         var handleKeyPress = InputFunctions.handleKeyPress(this);
         let onFocus = InputFunctions.onFocus(this);
+
+		if (!this.isEditMode()) {
+			return this.renderViewMode();
+		}
+
         return (
             <div className="form__group field" data-id={`fg-${this.state.id}`}>
                 <div className="TypeAheadDropDown">

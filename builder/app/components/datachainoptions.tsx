@@ -15,15 +15,12 @@ import CheckExistanceConfig from './checkexistenceconfig';
 import GetExistanceConfig from './getexistenceconfig';
 import SetPropertiesConfig from './setpropertiesconfig';
 import SwaggerCallConfig from './swaggercallconfig';
-import SimpleValidationComponent from './simplevalidationconfig';
 import CopyConfigComponent from './copyconfig';
 import SetIntegerComponent from './setinteger';
 import SetBooleanComponent from './setbooleancomponent';
 import IncrementIntegerComponent from './incrementinteger';
 import IncrementDoubleComponent from './incrementdouble';
-import CompareEnumeration from './compareenumeration';
 import CopyEnumeration from './copyenumeration';
-import CompareEnumerations from './compareenumerations';
 import SimpleValidationsComponent from './simplevalidationsconfig';
 import ConcatenateStringConfigComponent from './concatenatstringconfigcomponent';
 import PropertyOperation from './propertyoperation';
@@ -93,8 +90,8 @@ export default class DataChainOptions extends Component<any, any> {
 				<PropertyOperation
 					getOperationConfig={(dataChainOptions: DataChainConfiguration) => {
 						return dataChainOptions.concatenateCollection;
-          }}
-          title={Titles.ConcatenateCollection}
+					}}
+					title={Titles.ConcatenateCollection}
 					dataChainType={this.props.dataChainType}
 					methodDescription={methodDescription}
 					dataChainOptions={dataChainOptions}

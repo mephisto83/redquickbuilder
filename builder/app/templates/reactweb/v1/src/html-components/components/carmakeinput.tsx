@@ -56,11 +56,11 @@ export function RaiseEvent(value: any, type?: string, context?: string) {
     CarMakeServiceContext.listeners.filter(v => v.context === type).forEach((arg: { id: string, listener: Function, context: string }) => {
         if (context) {
             if (arg.context === context) {
-                arg.listener(value);
+                arg.listener(`${value}`);
             }
         }
         else if (!arg.context) {
-            arg.listener(value);
+            arg.listener(`${value}`);
         }
     })
 }
@@ -96,12 +96,12 @@ export default class CarMakeInput extends Typeahead {
         CarMakeServiceContext.listeners = CarMakeServiceContext.listeners.filter(v => v.id === this.state.id);
     }
     suggestionSelected(value: any, title: any) {
-        super.suggestionSelected(value, title);
-        SetCarMake(value, this.props.serviceContext);
+        super.suggestionSelected(`${value}`, title);
+        SetCarMake(`${value}`, this.props.serviceContext);
     }
 
     onTextChange(e: any) {
-        const value = e.target.value;
+        const value = `${e.target.value}`;
         if (value.length > 0) {
             if (!this.running) {
                 this.loadSuggestions(value);

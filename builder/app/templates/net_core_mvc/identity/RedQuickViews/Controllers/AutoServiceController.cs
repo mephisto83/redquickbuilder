@@ -29,6 +29,10 @@ namespace {{namespace}}.Web.Controllers
         {
             return base.GetModelsForMakeYear(year, make);
         }
-
+        [HttpGet("make/{make}")]
+        public override Task<AutoMake> GetAutoMake(int makeId)
+        {
+            return base.GetAutoMake(makeId);
+        }
     }
 }

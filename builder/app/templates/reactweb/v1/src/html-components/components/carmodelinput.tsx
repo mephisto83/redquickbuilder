@@ -3,6 +3,7 @@ import { createRedService } from '../../util/service';
 import * as Globals from '../../util/globals';
 import { CarMakeContextList, CarMakeService, CarMakeServiceRemove, VIN_SET } from './carmakeinput';
 import { CarYearContextList, CarYearService, CarYearServiceRemove } from './caryearinput';
+import InputFunctions from './inputfunctions';
 
 let _redservice: any;
 function redservice() {
@@ -81,6 +82,16 @@ export default class CarModelInput extends Typeahead {
             context: this.props.serviceContext || null
         });
     } 
+    suggestionSelected(value: any, title: any) {
+        this.setState({
+            value: value,
+            valueTitle: title,
+            hasFocus: false,
+            showSuggestions: false,
+            tentativeIndex: null
+        })
+        InputFunctions.onChange(this, true)({ target: { checked: false, value: `${value}` } });
+    }
     updateModels() {
         this.promise = this.promise.then(() => {
             let year = this.state.year;
@@ -122,7 +133,7 @@ export default class CarModelInput extends Typeahead {
 
 
     onTextChange(e: any) {
-        const value = e.target.value;
+        const value = `${e.target.value}`;
         
         this.setState({
             valueTitle: null,

@@ -163,7 +163,7 @@ class ContextMenu extends Component<any, any> {
 									let value = UIA.ensureRouteSource(mountingItem, urlParameter);
 
 									let options = [
-										...[ urlParameter ]
+										...[urlParameter]
 											.filter(
 												methodDescription
 													? this.filterFunctionParameters(methodDescription)
@@ -212,8 +212,8 @@ class ContextMenu extends Component<any, any> {
 															value !== modelPropertyOption.id ? (
 																'fa fa-square-o'
 															) : (
-																'fa fa-square'
-															)
+																	'fa fa-square'
+																)
 														}
 														title={UIA.GetNodeTitle(modelPropertyOption)}
 														onClick={() => {
@@ -262,8 +262,8 @@ class ContextMenu extends Component<any, any> {
 															value !== agentPropertyOption.id ? (
 																'fa fa-square-o'
 															) : (
-																'fa fa-square'
-															)
+																	'fa fa-square'
+																)
 														}
 														onClick={() => {
 															UIA.setRouteSource(
@@ -374,8 +374,8 @@ class ContextMenu extends Component<any, any> {
 												mountingItem.name = `${MethodFunctions[
 													methodDescription.functionType
 												].titleTemplate(
-													UIA.GetNodeTitle(model),
-													UIA.GetNodeTitle(agent)
+													UIA.GetNodeTitle(methodDescription.properties.model || model),
+													UIA.GetNodeTitle(methodDescription.properties.agent || agent)
 												)} For ${viewType} Mounting`;
 
 												this.setState({ turn: UIA.GUID() });
@@ -589,12 +589,12 @@ class ContextMenu extends Component<any, any> {
 		const display = UIA.Visual(state, UIA.MOUNTING_CONTEXT_MENU) ? 'block' : 'none';
 		if (display === 'none')
 			return <div></div>
-		
+
 		const exit = () => {
 			this.props.setVisual(UIA.MOUNTING_CONTEXT_MENU, null);
 		};
 		const currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-		
+
 		const nodeType = UIA.Visual(state, UIA.MOUNTING_CONTEXT_MENU)
 			? UIA.GetNodeProp(currentNode, NodeProperties.NODEType)
 			: null;

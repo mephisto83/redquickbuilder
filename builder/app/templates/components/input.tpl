@@ -1,6 +1,7 @@
 <Item  style={props.style || {}} {{inlineLabel}} {{floatingLabel}}  {{style_item}} {{stackedLabel}} {{fixedLabel}} success={{{success}}} error={{{error}}} >
     <Label {{style_label}}>{{{label}}}</Label>
     <Input value={{{value}}}  {{style_input}} success={{{success}}} error={{{error}}} placeholder={{{placeholder}}}
+        viewModel={this.state.viewModel}
         onBlur={()=>{
             if(this.props.onBlur) {
                 this.props.onBlur();

@@ -32,6 +32,7 @@ export default class Button extends React.Component<any, any> {
 		};
 		let attributes = this.getAttributes();
 		delete props.children;
+		delete props.viewModel;
 		return (
 			<button className={'btn btn-primary'} {...props} {...attributes} type="button">
 				{this.props.children}
