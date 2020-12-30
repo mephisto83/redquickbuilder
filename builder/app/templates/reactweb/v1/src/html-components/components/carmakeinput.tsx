@@ -9,7 +9,8 @@ function redservice() {
 const CarMakeServiceContext: ICarMakeServiceContext = {
     carMake: '',
     listeners: [],
-    context: {}
+    context: {},
+    makes: []
 }
 export interface ICarMakeServiceContext {
     carMake: string;
@@ -18,7 +19,8 @@ export interface ICarMakeServiceContext {
         [str: string]: {
             carMake: string
         }
-    }
+    },
+    makes: AutoMake[]
 }
 export function CarMakeContextList(args: { id: string, listener: Function, type?: string, context: string }) {
     CarMakeServiceContext.listeners.push(args);
@@ -40,7 +42,7 @@ export function SetCarMake(value: string, context?: string) {
         CarMakeServiceContext.carMake = value;
     }
 
-    CarMakeServiceContext.listeners.forEach((arg: { id: string, listener: Function, context: string }) => {
+    CarMakeServiceContext.listeners.filter(v => !v.type).forEach((arg: { id: string, listener: Function, context: string }) => {
         if (context) {
             if (arg.context === context) {
                 arg.listener();
@@ -53,20 +55,20 @@ export function SetCarMake(value: string, context?: string) {
 }
 
 export function RaiseEvent(value: any, type?: string, context?: string) {
-    CarMakeServiceContext.listeners.filter(v => v.context === type).forEach((arg: { id: string, listener: Function, context: string }) => {
+    CarMakeServiceContext.listeners.filter(v => v.context === type || !context).forEach((arg: { id: string, listener: Function, context: string }) => {
         if (context) {
             if (arg.context === context) {
-                arg.listener(`${value}`);
+                arg.listener({ value: `${value}` });
             }
         }
         else if (!arg.context) {
-            arg.listener(`${value}`);
+            arg.listener({ value: `${value}` });
         }
     })
 }
 
 export const VIN_SET = 'VIN_SET';
-
+export const MAKE_INPUT_CHANGE = 'MAKE_INPUT_CHANGE';
 export default class CarMakeInput extends Typeahead {
     constructor(props: any) {
         super(props);
@@ -86,7 +88,9 @@ export default class CarMakeInput extends Typeahead {
             id: this.state.id,
             context: this.props.context,
             listener: (val: { value: string, valueTitle: string }) => {
-                this.setState({ ...val })
+                if (val) {
+                    this.setState({ ...val })
+                }
             },
             type: VIN_SET
         });
@@ -94,6 +98,34 @@ export default class CarMakeInput extends Typeahead {
     }
     componentWillUnmount() {
         CarMakeServiceContext.listeners = CarMakeServiceContext.listeners.filter(v => v.id === this.state.id);
+    }
+    componentDidUpdate(prevProps: any, prevState: any, snapshot: any) {
+        let suggestions = (this.state.suggestions || []);
+        let value: { value: string, title: string } = suggestions.find((v: { value: string }) => `${v.value}` === this.props.value);
+        if (!value) {
+            this.promise = this.promise.then(() => {
+                let suggestions = (this.state.suggestions || []);
+                let value: { value: string, title: string } = suggestions.find((v: { value: string }) => `${v.value}` === this.props.value);
+                if (!value) {
+                    return redservice().get(`/api/red/autoservice/make/${this.props.value}`).then((make: AutoMake) => {
+                        let suggests = this.mergeSuggestions([({ title: make.make_Name, value: make.make_ID })]);
+                        let optional: any = {};
+                        if (this.state.value === `${make.make_ID}`) {
+                            optional.valueTitle = make.make_Name;
+                            SetCarMake(`${this.state.value}`, this.props.serviceContext);
+                        }
+                        this.setState({
+                            ...optional,
+                            suggestions: suggests
+                        });
+                    });
+                }
+            });
+        }
+        if (prevProps.value !== this.props.value) {
+            RaiseEvent(this.props.value, MAKE_INPUT_CHANGE, this.props.serviceContext);
+        }
+        super.componentDidUpdate(prevProps, prevState, snapshot);
     }
     suggestionSelected(value: any, title: any) {
         super.suggestionSelected(`${value}`, title);
@@ -123,19 +155,20 @@ export default class CarMakeInput extends Typeahead {
             if (currentId < this.callId) {
                 return;
             }
+            if (CarMakeServiceContext.makes && CarMakeServiceContext.makes.length) {
+                this.setState(() => ({
+                    suggestions: CarMakeServiceContext.makes
+                }));
+            }
             return redservice().get(`/api/red/autoservice/makers/${value}`).then((makers: AutoMake[]) => {
                 if (currentId < this.callId) {
                     return;
                 }
                 let suggestions = makers.map((make: AutoMake) => ({ title: make.make_Name, value: make.make_ID }));
+
                 if (this.runAgain || currentValue === this.state.value) {
-                    let suggests = [...(this.state.suggestions || []), ...suggestions].unique((va: { value: string }) => va.value).sort((a: {
-                        title: string
-                    }, b: {
-                        title: string
-                    }) => {
-                        return `${a.title}`.localeCompare(`${b.title}`);
-                    });
+                    let suggests = this.mergeSuggestions(suggestions);
+                    CarMakeServiceContext.makes = suggests;
                     this.setState(() => ({
                         suggestions: suggests
                     }));
@@ -146,6 +179,16 @@ export default class CarMakeInput extends Typeahead {
                 }
             });
         }, 300)
+    }
+
+    private mergeSuggestions(suggestions: { title: string; value: number; }[]) {
+        return [...(this.state.suggestions || []), ...suggestions].unique((va: { value: string; }) => va.value).sort((a: {
+            title: string;
+        }, b: {
+            title: string;
+        }) => {
+            return `${a.title}`.localeCompare(`${b.title}`);
+        });
     }
 }
 

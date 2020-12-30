@@ -30,9 +30,14 @@ namespace {{namespace}}.Web.Controllers
             return base.GetModelsForMakeYear(year, make);
         }
         [HttpGet("make/{make}")]
-        public override Task<AutoMake> GetAutoMake(int makeId)
+        public override Task<AutoMake> GetAutoMake(int make)
         {
-            return base.GetAutoMake(makeId);
+            return base.GetAutoMake(make);
+        }
+        [HttpGet("model/{make}/{model}/{year}")]
+        public override Task<AutoModel> GetAutoModel(int make, int model, string year)
+        {
+            return base.GetAutoModel(make, model, year);
         }
     }
 }

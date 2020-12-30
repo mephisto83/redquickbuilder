@@ -14,7 +14,7 @@ export interface ICarYearServiceContext {
         }
     }
 }
-export function CarYearContextList(args: { id: string, listener: Function, context: string }) {
+export function CarYearContextList(args: { type?: string, id: string, listener: Function, context: string }) {
     CarYearServiceContext.listeners.push(args);
 }
 export function CarYearServiceRemove(id: string) {
@@ -49,14 +49,15 @@ export function RaiseEvent(value: any, type?: string, context?: string) {
     CarYearServiceContext.listeners.filter(v => v.context === type).forEach((arg: { id: string, listener: Function, context: string }) => {
         if (context) {
             if (arg.context === context) {
-                arg.listener(value);
+                arg.listener({ value: value });
             }
         }
         else if (!arg.context) {
-            arg.listener(value);
+            arg.listener({ value: value });
         }
     })
 }
+export const YEAR_INPUT_CHANGE = 'YEAR_INPUT_CHANGE';
 export default class CarYearInput extends Typeahead {
     constructor(props: any) {
         super(props);
@@ -83,7 +84,16 @@ export default class CarYearInput extends Typeahead {
             suggestions: list
         })
     }
-    
+    componentDidUpdate(prevProps: any, prevState: any, snapshot: any) {
+        super.componentDidUpdate(prevProps, prevState, snapshot);
+        if (prevProps.value !== this.props.value || this.props.serviceContext !== prevProps.serviceContext) {
+            SetCarYear(`${this.props.value}`, this.props.serviceContext);
+
+            if (prevProps.value === this.props.value) {
+                RaiseEvent(this.props.value, YEAR_INPUT_CHANGE, this.props.serviceContext);
+            }
+        }
+    }
     componentWillUnmount() {
         CarYearServiceContext.listeners = CarYearServiceContext.listeners.filter(v => v.id === this.state.id);
     }

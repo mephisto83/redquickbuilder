@@ -18,7 +18,7 @@ export default class InputFunctions {
 	}
 
 	static disabled(arg0: any) {
-		return arg0.props.disabled ? 'disabled' : '';
+		return arg0.props.disabled ? true : false;
 	}
 
 	static componentDidMount(arg0: any) {

@@ -1,8 +1,8 @@
 import Typeahead from './typeahead';
 import { createRedService } from '../../util/service';
 import * as Globals from '../../util/globals';
-import { CarMakeContextList, CarMakeService, CarMakeServiceRemove, VIN_SET } from './carmakeinput';
-import { CarYearContextList, CarYearService, CarYearServiceRemove } from './caryearinput';
+import { CarMakeContextList, CarMakeService, CarMakeServiceRemove, MAKE_INPUT_CHANGE, VIN_SET } from './carmakeinput';
+import { CarYearContextList, CarYearService, CarYearServiceRemove, YEAR_INPUT_CHANGE } from './caryearinput';
 import InputFunctions from './inputfunctions';
 
 let _redservice: any;
@@ -63,25 +63,40 @@ export default class CarModelInput extends Typeahead {
         });
         CarMakeContextList({
             id: this.state.id,
+            type: MAKE_INPUT_CHANGE,
             listener: () => {
                 this.setState({
                     make: CarMakeService(this.props.serviceContext || '')
+                }, () => {
+                    if (!this.isEditMode()) {
+                        this.updateTitleValue()
+                    }
+                    else {
+                        this.updateModels();
+                    }
                 });
-                this.updateModels();
+
             },
             context: this.props.serviceContext || null
         });
         CarYearContextList({
             id: this.state.id,
+            type: YEAR_INPUT_CHANGE,
             listener: () => {
                 this.setState({
                     year: CarYearService(this.props.serviceContext || '')
+                }, () => {
+                    if (!this.isEditMode()) {
+                        this.updateTitleValue()
+                    }
+                    else {
+                        this.updateModels();
+                    }
                 });
-                this.updateModels();
             },
             context: this.props.serviceContext || null
         });
-    } 
+    }
     suggestionSelected(value: any, title: any) {
         this.setState({
             value: value,
@@ -91,6 +106,51 @@ export default class CarModelInput extends Typeahead {
             tentativeIndex: null
         })
         InputFunctions.onChange(this, true)({ target: { checked: false, value: `${value}` } });
+    }
+    componentDidUpdate(prevProps: any, prevState: any, snapshot: any) {
+        super.componentDidUpdate(prevProps, prevState, snapshot);
+        if (prevProps.value !== this.props.value) {
+            if (this.props.value !== this.state.value) {
+                if (!this.state.valueTitle) {
+                    this.updateTitleValue()
+                }
+                // this.onTextChange({ target: { value: this.props.value } });
+            }
+        }
+    }
+    updateTitleValue() {
+        this.promise = this.promise.then(() => {
+            let year = this.state.year;
+            let make = this.state.make;
+            let value = this.isEditMode() ? false : this.props.value;
+            if (year && make && value) {
+                if (!this.running) {
+                    this.running = true;
+                    return redservice().get(`/api/red/autoservice/model/${this.state.make}/${this.props.value}/${this.state.year}`).then((model: AutoModel) => {
+                        this.running = false;
+                        if (model) {
+                            if ((year === this.state.year && make === this.state.make && this.props.value === value)) {
+                                this.setState(() => ({
+                                    valueTitle: model.model_Name
+                                }));
+                            }
+                        }
+                        if (this.runAgain) {
+                            this.runAgain = false;
+                            this.updateTitleValue();
+                        }
+                    });
+                }
+                else {
+                    this.runAgain = true;
+                }
+            }
+            else {
+                this.setState({
+                    suggestions: []
+                });
+            }
+        });
     }
     updateModels() {
         this.promise = this.promise.then(() => {
@@ -134,7 +194,7 @@ export default class CarModelInput extends Typeahead {
 
     onTextChange(e: any) {
         const value = `${e.target.value}`;
-        
+
         this.setState({
             valueTitle: null,
             value: value
