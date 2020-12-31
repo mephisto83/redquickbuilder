@@ -49,6 +49,7 @@ export default class Dropdown extends React.Component<any, any> {
 	renderViewMode() {
 		if (!this.isEditMode()) {
 			return (<div className="form__group field">
+				{InputFunctions.placeholder(this)}
 				{InputFunctions.value(this)}
 			</div>)
 		}

@@ -3,6 +3,18 @@ import RedGraph from '../../actions/redgraph';
 import './menu.css';
 import { redConnect, titleService } from '../../actions/util';
 
+interface MenuItem {
+	id: string,
+	properties: {
+		disabled: boolean | Function,
+		id: string,
+		parent: string | null,
+		title: string,
+		screen: string,
+		execute?: Function
+	}
+}
+
 export default class Menu extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
@@ -23,7 +35,7 @@ export default class Menu extends Component<any, any> {
 					}}
 					className={` nav nav  ${this.props.open ? 'nav-open' : ''} nav-treeview  flex-column `}
 				>
-					{children.map((child: any, index: any) => this.renderItem(child, index))}
+					{children.map((child: MenuItem, index: any) => this.renderItem(child, index))}
 				</ul>
 			);
 		}
@@ -33,21 +45,21 @@ export default class Menu extends Component<any, any> {
 				<ul
 					className={` nav  nav-pills   nav-sidebar   flex-column `}
 				>
-					{children.map((child: any, index: any) => this.renderItem(child, index))}
+					{children.map((child: MenuItem, index: any) => this.renderItem(child, index))}
 				</ul>
 			</nav>
 		);
 	}
-	isParent(child: any, index: any) {
+	isParent(child: MenuItem, index: any) {
 		const id = RedGraph.getId(child);
 		const children = RedGraph.getChildren(this.props.value, id);
 		return children && children.length;
 	}
-	isActive(child: any, index: any) {
+	isActive(child: MenuItem, index: any) {
 		let id = RedGraph.getId(child);
 		return this.state.openMenu === id;
 	}
-	getIcon(child: any, index: any) {
+	getIcon(child: MenuItem, index: any) {
 		let isActive = this.isActive(child, index);
 		let isParent = this.isParent(child, index);
 		return ` nav-icon  ${isParent ? 'fas fa-angle-right' : 'far fa-circle'} ${isActive
@@ -80,7 +92,12 @@ export default class Menu extends Component<any, any> {
 						child.properties.execute()
 					}
 					else if (this.props.onClick) {
-						this.props.onClick(id);
+						if (child && child.properties && child.properties.screen) {
+							this.props.onClick(child.properties.screen)
+						}
+						else {
+							this.props.onClick(id);
+						}
 					}
 				}}
 			>

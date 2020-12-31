@@ -13,7 +13,9 @@ function redservice() {
 const CarModelServiceContext: ICarModelServiceContext = {
     carModel: '',
     listeners: [],
-    context: {}
+    context: {},
+    cache: {},
+    cacheIndividual: {}
 }
 export interface ICarModelServiceContext {
     carModel: string;
@@ -22,7 +24,9 @@ export interface ICarModelServiceContext {
         [str: string]: {
             carModel: string
         }
-    }
+    },
+    cache: { [key: string]: AutoModel[] },
+    cacheIndividual: { [key: string]: AutoModel }
 }
 
 export function RaiseEvent(value: any, type?: string, context?: string) {
@@ -66,7 +70,8 @@ export default class CarModelInput extends Typeahead {
             type: MAKE_INPUT_CHANGE,
             listener: () => {
                 this.setState({
-                    make: CarMakeService(this.props.serviceContext || '')
+                    make: CarMakeService(this.props.serviceContext || ''),
+                    year: CarYearService(this.props.serviceContext || '')
                 }, () => {
                     if (!this.isEditMode()) {
                         this.updateTitleValue()
@@ -84,6 +89,7 @@ export default class CarModelInput extends Typeahead {
             type: YEAR_INPUT_CHANGE,
             listener: () => {
                 this.setState({
+                    make: CarMakeService(this.props.serviceContext || ''),
                     year: CarYearService(this.props.serviceContext || '')
                 }, () => {
                     if (!this.isEditMode()) {
@@ -126,7 +132,7 @@ export default class CarModelInput extends Typeahead {
             if (year && make && value) {
                 if (!this.running) {
                     this.running = true;
-                    return redservice().get(`/api/red/autoservice/model/${this.state.make}/${this.props.value}/${this.state.year}`).then((model: AutoModel) => {
+                    let handleModel = (model: AutoModel) => {
                         this.running = false;
                         if (model) {
                             if ((year === this.state.year && make === this.state.make && this.props.value === value)) {
@@ -139,7 +145,14 @@ export default class CarModelInput extends Typeahead {
                             this.runAgain = false;
                             this.updateTitleValue();
                         }
-                    });
+                    };
+                    if (CarModelServiceContext.cacheIndividual[`${this.state.make}/${this.props.value}/${this.state.year}`]) { 
+                        handleModel(CarModelServiceContext.cacheIndividual[`${this.state.make}/${this.props.value}/${this.state.year}`]);
+                        return;
+                    }
+                    else {
+                        return redservice().get(`/api/red/autoservice/model/${this.state.make}/${this.props.value}/${this.state.year}`).then(handleModel);
+                    }
                 }
                 else {
                     this.runAgain = true;
@@ -159,7 +172,7 @@ export default class CarModelInput extends Typeahead {
             if (year && make) {
                 if (!this.running) {
                     this.running = true;
-                    return redservice().get(`/api/red/autoservice/models/${this.state.year}/${this.state.make}`).then((models: AutoModel[]) => {
+                    let handleModels = (models: AutoModel[]) => {
                         this.running = false;
                         let suggestions = models.map((make: AutoModel) => ({ title: make.model_Name, value: make.model_ID }));
                         if (this.runAgain || (year === this.state.year && make === this.state.make)) {
@@ -171,7 +184,14 @@ export default class CarModelInput extends Typeahead {
                             this.runAgain = false;
                             this.updateModels();
                         }
-                    });
+                    }
+                    if (CarModelServiceContext.cache[`${this.state.year}/${this.state.make}`]) {
+                        handleModels(CarModelServiceContext.cache[`${this.state.year}/${this.state.make}`]);
+                        return;
+                    }
+                    else {
+                        return redservice().get(`/api/red/autoservice/models/${this.state.year}/${this.state.make}`).then(handleModels);
+                    }
                 }
                 else {
                     this.runAgain = true;

@@ -43,37 +43,40 @@ export default class VINInput extends Input {
     componentDidUpdate(prevProps: any) {
         InputFunctions.componentDidUpdateV2(this, prevProps);
     }
-	render() {
-		var handleKeyPress = InputFunctions.handleKeyPress(this);
-		if (!this.isEditMode()) {
-			return (<div className="form__group field">
-				<input
-					type={this.inputType || 'text'}
-					disabled
-					className={`form-control ${this.cssClasses()}`}
-					value={InputFunctions.value(this)}
-				/>
-			</div>)
-		}
-
-		return (
-			<div className="form__group field">
-				<input
-					type={this.inputType || 'text'}
-					disabled={this.disabled()}
-					className={`form-control ${this.cssClasses()}`}
-					onBlur={InputFunctions.onBlur(this)}
-					onFocus={InputFunctions.onFocus(this)}
-					value={InputFunctions.value(this)}
-					onKeyPress={handleKeyPress}
-					onChange={InputFunctions.onChange(this)}
-					placeholder={InputFunctions.placeholder(this)}
-				/>
-				{this.renderVINs()}
-				<Validation data={this.props.error} />
-			</div>
-		);
+	renderBeforValidation() {
+		return this.renderVINs();
 	}
+	// render() {
+	// 	var handleKeyPress = InputFunctions.handleKeyPress(this);
+	// 	if (!this.isEditMode()) {
+	// 		return (<div className="form__group field">
+	// 			<input
+	// 				type={this.inputType || 'text'}
+	// 				disabled
+	// 				className={`form-control ${this.cssClasses()}`}
+	// 				value={InputFunctions.value(this)}
+	// 			/>
+	// 		</div>)
+	// 	}
+
+	// 	return (
+	// 		<div className="form__group field">
+	// 			<input
+	// 				type={this.inputType || 'text'}
+	// 				disabled={this.disabled()}
+	// 				className={`form-control ${this.cssClasses()}`}
+	// 				onBlur={InputFunctions.onBlur(this)}
+	// 				onFocus={InputFunctions.onFocus(this)}
+	// 				value={InputFunctions.value(this)}
+	// 				onKeyPress={handleKeyPress}
+	// 				onChange={InputFunctions.onChange(this)}
+	// 				placeholder={InputFunctions.placeholder(this)}
+	// 			/>
+	// 			{this.renderVINs()}
+	// 			<Validation data={this.props.error} />
+	// 		</div>
+	// 	);
+	// }
 }
 export interface VehicleIdentificationNumber {
 	vIN: string;

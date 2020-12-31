@@ -6,6 +6,7 @@ import { uuidv4 } from './util';
 const AddresInputContext = {
     promise: Promise.resolve()
 }
+const address_view_order = ['street_number', 'route', 'locality', 'administrative_area_level_1', 'country', 'postal_code'];
 export default class AddressInput extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
@@ -52,11 +53,11 @@ export default class AddressInput extends React.Component<any, any> {
     }
 
     componentDidUpdate(prevProps: any, prevState: any, snapshot: any) {
+        let tempCore: any = {}
+        let { value } = this.props;
+        let coreItem: any = value ? this.convertFromNetCore(value) : {};
         if (prevProps && prevProps.value && this.props.value) {
-            let { value } = this.props;
-            let tempCore: any = {}
             let updated = false;
-            let coreItem: any = value ? this.convertFromNetCore(value) : {};
             if (value) {
                 for (let i in value) {
                     if (value[i] !== prevProps.value[i]) {
@@ -78,6 +79,29 @@ export default class AddressInput extends React.Component<any, any> {
                         ...coreItem
                     }
                 });
+            }
+        }
+
+        this.updateAddressHtml(coreItem);
+    }
+    updateAddressHtml(tempCore: any) {
+        let updatedQuery = '';
+        address_view_order.forEach((addressType: string) => {
+            if (tempCore[addressType]) {
+                const val = tempCore[addressType];
+                let el: any = document.querySelector(`#${this.state.componentId} [data-field="${addressType}"]`);
+                if (el) {
+                    el.value = val;
+                    updatedQuery += ` ${val}`;
+                }
+            }
+        });
+        if (this.state.query !== updatedQuery) {
+
+            let el: any = document.querySelector(`#${this.state.componentId} .search-location-input input`);
+            if (el) {
+                el.value = updatedQuery;
+                // this.setState({ query: updatedQuery });
             }
         }
     }
@@ -136,8 +160,10 @@ export default class AddressInput extends React.Component<any, any> {
         let updatedQuery = '';
         for (const component in componentForm) {
             let el: any = document.querySelector(`#${this.state.componentId} [data-field="${component}"]`);
-            el.value = "";
-            el.disabled = false;
+            if (el) {
+                el.value = "";
+                el.disabled = false;
+            }
         }
         let output: any = {};
         // Get each component of the address from the place details,
@@ -148,14 +174,16 @@ export default class AddressInput extends React.Component<any, any> {
             if (componentForm[addressType]) {
                 const val = component[componentForm[addressType]];
                 let el: any = document.querySelector(`#${this.state.componentId} [data-field="${addressType}"]`);
-                el.value = val;
-                output[addressType] = component[componentForm[addressType]]
-                updatedQuery += ` ${val}`;
+                if (el) {
+                    el.value = val;
+                    output[addressType] = component[componentForm[addressType]]
+                    updatedQuery += ` ${val}`;
+                }
             }
         }
         for (const component in componentForm) {
             let el: any = document.querySelector(`#${this.state.componentId} [data-field="${component}"]`);
-            el.disabled = true;
+            if (el) { el.disabled = true; }
         }
         if (updatedQuery) {
             this.setState({ query: updatedQuery })

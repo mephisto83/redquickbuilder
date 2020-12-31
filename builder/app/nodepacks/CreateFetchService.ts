@@ -1,7 +1,7 @@
 
 import { uuidv4 } from "../utils/array";
 import { NodeProperties } from "../constants/nodetypes";
-export default function (args: any = {}) {
+export default function CreateFetchService(args: any = {}) {
   //
 
   //

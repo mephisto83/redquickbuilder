@@ -381,7 +381,7 @@ String.prototype.toJavascriptName = function () {
 			let foundUpperCase = false;
 			let foundLowerCase = false;
 			let upperCaseLetters = `ABCDEFGHIJKLMNOPQRSTUVWXYZ`;
-			str.split('').map((letter: string) => {
+			return str.split('').map((letter: string) => {
 				if (foundLowerCase) {
 					return letter;
 				}
@@ -393,8 +393,8 @@ String.prototype.toJavascriptName = function () {
 					foundLowerCase = true;
 				}
 				return letter;
-			})
-			return str[0].toLowerCase() + str.split('').subset(1).join('');
+			}).join('')
+			// return str[0].toLowerCase() + str.split('').subset(1).join('');
 		} catch (e) {
 			console.log(str);
 			console.log(str.length);

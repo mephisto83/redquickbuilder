@@ -17,6 +17,7 @@ export default class SelectorGenerator {
 		let temps = [
 			{
         template: `import * as UIA from './uiActions';
+        import { fetchModel } from './redutils';
 
     import { $UpdateModels, $CreateModels } from './screenInfo';
 ${funcs.join(NEW_LINE)}`,
@@ -101,7 +102,7 @@ export function ${GetJSCodeName(node)}(value, viewModel = '${GetNodeProp(node, N
             ? UIA.GetModelInstanceFocusedObject(value, viewModel)
             : UIA.GetScreenInstanceFocusedObject(viewModel),
         object: value
-            ? UIA.GetModelInstanceObject(value, viewModel)
+            ? UIA.GetModelInstanceObject(value, viewModel, fetchModel)
             : UIA.GetScreenInstanceObject(viewModel)
     }
 }

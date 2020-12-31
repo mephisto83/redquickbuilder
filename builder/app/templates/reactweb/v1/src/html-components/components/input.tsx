@@ -45,6 +45,18 @@ export default class Input extends React.Component<any, any> {
 		}
 		return editMode;
 	}
+	renderBeforeValidation() {
+		return null;
+	}
+	renderAfterValidation() {
+		return null;
+	}
+	renderBeforeInput() {
+		return null;
+	}
+	renderAfterInput() {
+		return null;
+	}
 	render() {
 		var handleKeyPress = InputFunctions.handleKeyPress(this);
 		if (!this.isEditMode()) {
@@ -59,10 +71,13 @@ export default class Input extends React.Component<any, any> {
 					temp = new Date(date).toLocaleDateString()
 				}
 				return (<div className="form__group field">
+					{this.renderBeforeInput()}
 					<span>{temp}</span>
+					{this.renderAfterInput()}
 				</div>);
 			}
 			return (<div className="form__group field">
+				{this.renderBeforeInput()}
 				<input
 					type={this.inputType || 'text'}
 					disabled
@@ -70,11 +85,13 @@ export default class Input extends React.Component<any, any> {
 					{...extra_objects}
 					value={InputFunctions.value(this)}
 				/>
+				{this.renderAfterInput()}
 			</div>)
 		}
 
 		return (
 			<div className="form__group field">
+				{this.renderBeforeInput()}
 				<input
 					type={this.inputType || 'text'}
 					disabled={this.disabled()}
@@ -86,7 +103,10 @@ export default class Input extends React.Component<any, any> {
 					onChange={InputFunctions.onChange(this)}
 					placeholder={InputFunctions.placeholder(this)}
 				/>
+				{this.renderAfterInput()}
+				{this.renderBeforeValidation()}
 				<Validation data={this.props.error} />
+				{this.renderAfterValidation()}
 			</div>
 		);
 	}

@@ -332,7 +332,7 @@ export declare function GetScreenModelDirtyInstance(key: any, viewModel: any): a
 export declare function GetScreenModelFocusInstance(key: any, viewModel: any): any;
 export declare function GetScreenModelFocusedInstance(key: any, viewModel: any): any;
 export declare function GetAppStateObject(key: any): any;
-export declare function GetModelInstanceObject(key: any, instance: any): any;
+export declare function GetModelInstanceObject(key: any, instance: any, fetchModel?: Function): any;
 export declare function updateScreenInstance(model: any, id: any, value: any, options?: any): (dispatch: any, getState: any) => void;
 export declare function updateScreenInstanceObject(model: any, instance: any, value: any): (dispatch: any, getState: any) => void;
 export declare function clearScreenInstance(model: any, id: any, options?: any): (dispatch: any) => void;

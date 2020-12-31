@@ -2226,6 +2226,9 @@ export function GenerateDataChainMethod(id: string, options: { language: any }) 
 		case DataChainFunctionKeys.ModelProperty:
 			if (property) {
 				lastpart = `if(item) {
+					if(item.object) {
+						return item.object.${GetJSCodeName(property) || property};				
+					}
         return item.${GetJSCodeName(property) || property};
     }
     return null;`;

@@ -158,7 +158,7 @@ class ThemeView extends Component<any, any> {
 		return selector;
 	}
 
-	getSpaceFields(formType, mediaSize, formTheme, themeColors = {}, themeVariables, filterFunc) {
+	getSpaceFields(formType: any, mediaSize: any, formTheme: any, themeColors: any = {}, themeVariables: any, filterFunc: any) {
 		// ComponentTags
 		if (formType && mediaSize) {
 			return Object.values(StyleLib.css)
@@ -171,12 +171,12 @@ class ThemeView extends Component<any, any> {
 						filterFunc(`${v.label}`)
 				)
 				.map((field) => {
-					const { placeholder, key, type } = field;
-					let { label } = field;
+					const { placeholder, key, type }: any = field;
+					let { label }: any = field;
 					label = `${label}`;
 					formType = `${formType}${this.getAttrSelector()}`;
 
-					const onChange = (value) => {
+					const onChange = (value: any) => {
 						value = `${value || ''}`;
 
 						if (!formTheme[formType]) {
@@ -342,7 +342,7 @@ class ThemeView extends Component<any, any> {
 		const otherUses = Object.keys(OtherUses)
 			.map((use) => {
 				if (themeOtherUses) {
-					const variableNameParts = [ 'font', 'size' ];
+					const variableNameParts = ['font', 'size'];
 					if (!variableNameParts.some((v) => use.toLowerCase().indexOf(v) === -1)) {
 						return (
 							<Typeahead
@@ -570,38 +570,38 @@ class ThemeView extends Component<any, any> {
 															</div>
 														</div>
 														{this.state.font &&
-														this.state.fontCss &&
-														this.state.fontName &&
-														this.state.fontCssVar ? (
-															<button
-																className="btn btn-primary"
-																onClick={(event) => {
-																	if (
-																		this.state.font &&
-																		this.state.fontCss &&
-																		this.state.fontCssVar
-																	) {
-																		themeFonts.fonts = [
-																			{
-																				font: this.state.font,
-																				fontCss: this.state.fontCss,
-																				fontCssVar: this.state.fontCssVar,
-																				fontName: this.state.fontName
-																			},
-																			...themeFonts.fonts
-																		].unique((v) => v.font + v.fontName);
-																		this.props.updateGraph('themeFonts', {
-																			...themeFonts
-																		});
-																		this.setState({ font: '' });
-																	}
-																	event.stopPropagation();
-																	return false;
-																}}
-															>
-																Ok
-															</button>
-														) : null}
+															this.state.fontCss &&
+															this.state.fontName &&
+															this.state.fontCssVar ? (
+																<button
+																	className="btn btn-primary"
+																	onClick={(event) => {
+																		if (
+																			this.state.font &&
+																			this.state.fontCss &&
+																			this.state.fontCssVar
+																		) {
+																			themeFonts.fonts = [
+																				{
+																					font: this.state.font,
+																					fontCss: this.state.fontCss,
+																					fontCssVar: this.state.fontCssVar,
+																					fontName: this.state.fontName
+																				},
+																				...themeFonts.fonts
+																			].unique((v) => v.font + v.fontName);
+																			this.props.updateGraph('themeFonts', {
+																				...themeFonts
+																			});
+																			this.setState({ font: '' });
+																		}
+																		event.stopPropagation();
+																		return false;
+																	}}
+																>
+																	Ok
+																</button>
+															) : null}
 														<ButtonList
 															active
 															items={themeFonts.fonts.map((v) => ({
@@ -739,7 +739,7 @@ class ThemeView extends Component<any, any> {
 																	</div>
 																</div>
 															)}
-															onClick={() => {}}
+															onClick={() => { }}
 														/>
 													</FormControl>
 												</Box>
@@ -878,11 +878,16 @@ class ThemeView extends Component<any, any> {
 											>
 												<FormControl>
 													<Typeahead
-														options={Object.keys(ComponentTags).map((v) => ({
+														options={[...Object.keys(ComponentTags).map((v) => ({
 															title: v,
 															value: v,
 															id: v
-														}))}
+														})), ...(themeGridPlacements ? themeGridPlacements.grids || [] : []).map((v: any) => ({
+															...v,
+															title: v.name,
+															value: v.name,
+															id: v.name
+														}))]}
 														label="Spaces"
 														onChange={(value) => {
 															this.setState({ componentTag: value });
@@ -896,10 +901,9 @@ class ThemeView extends Component<any, any> {
 														spaceTheme,
 														themeColors,
 														themeVariables,
-														(f) =>
+														(f: string) =>
 															this.state.spaceSearch &&
-															f
-																.toLowerCase()
+															f.toLowerCase()
 																.indexOf(this.state.spaceSearch.toLowerCase()) !== -1
 													)}
 													<div style={{ height: 300 }} />

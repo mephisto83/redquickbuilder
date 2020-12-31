@@ -602,15 +602,22 @@ export function GetAppStateObject(key) {
   }
 }
 
-export function GetModelInstanceObject(key, instance) {
-  if (_getState) {
-    let state = _getState();
-    let modelInstance = GetModelInst(state, instance, key);
-    if (modelInstance) {
-      return modelInstance;
-    }
-  }
-  return null;
+function isGuid(stringToTest: any) {
+	var regexGuid = /^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$/gi;
+	return regexGuid.test(stringToTest);
+}
+export function GetModelInstanceObject(key: any, instance: any, fetchModel?: Function) {
+	if (_getState) {
+		let state = _getState();
+		let modelInstance = GetModelInst(state, instance, key);
+		if (modelInstance) {
+			return modelInstance;
+		}
+		else if (fetchModel && instance && key && isGuid(key)) {
+			fetchModel(instance, key);
+		}
+	}
+	return null;
 }
 
 export function updateScreenInstance(model, id, value, options = {}) {

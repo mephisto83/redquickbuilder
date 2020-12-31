@@ -123,6 +123,7 @@ export default class CarMakeInput extends Typeahead {
             });
         }
         if (prevProps.value !== this.props.value) {
+            SetCarMake(`${this.props.value}`, this.props.serviceContext);
             RaiseEvent(this.props.value, MAKE_INPUT_CHANGE, this.props.serviceContext);
         }
         super.componentDidUpdate(prevProps, prevState, snapshot);

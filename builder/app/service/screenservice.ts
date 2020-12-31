@@ -1652,7 +1652,7 @@ export function writeApiProperties(apiConfig: { [x: string]: any }) {
 									modelProperty
 								)}')`;
 							} else {
-								property = `GetModelInstanceObject(this.state.viewModel, this.props.value)`;
+								property = `GetModelInstanceObject(this.state.viewModel, this.props.value, fetchModel)`;
 							}
 							break;
 					}
@@ -2090,7 +2090,12 @@ function createInternalApiArgumentsCode(
                 let model = GetC(this.props.state, SITE, Models.${GetCodeName(routeSource.model)});
                 if(model) {
                   return model.${GetJSCodeName(routeSource.property)};
-                }
+				}
+
+				model = GetModelInstanceObject(this.state.value, this.state.viewModel, fetchModel);
+				if(model) { 
+					return model.${GetJSCodeName(routeSource.property)};;
+				}
                 return null;
               })()`;
 						case RouteSourceType.Item:
@@ -2127,7 +2132,7 @@ function createInternalApiArgumentsCode(
 										node,
 										NodeProperties.ParameterName
 									).toJavascriptName()}: (()=>{
-                    let model = UIA.GetModelInstanceObject(this.state.value, this.state.viewModel);
+                    let model = UIA.GetModelInstanceObject(this.state.value, this.state.viewModel, fetchModel);
                     return model;
                   })()`;
 							}
