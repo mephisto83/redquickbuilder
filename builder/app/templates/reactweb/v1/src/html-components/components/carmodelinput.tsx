@@ -49,10 +49,12 @@ export default class CarModelInput extends Typeahead {
         this.running = false;
         this.runAgain = false;
         this.showOnEmptyFilter = true;
+        this.pendingIndividual = {};
     }
     promise: Promise<void>;
     running: boolean;
     runAgain: boolean;
+    pendingIndividual: { [key: string]: boolean };
 
 
     componentDidMount() {
@@ -73,8 +75,8 @@ export default class CarModelInput extends Typeahead {
                     make: CarMakeService(this.props.serviceContext || ''),
                     year: CarYearService(this.props.serviceContext || '')
                 }, () => {
+                    this.updateTitleValue()
                     if (!this.isEditMode()) {
-                        this.updateTitleValue()
                     }
                     else {
                         this.updateModels();
@@ -92,8 +94,9 @@ export default class CarModelInput extends Typeahead {
                     make: CarMakeService(this.props.serviceContext || ''),
                     year: CarYearService(this.props.serviceContext || '')
                 }, () => {
+                    this.updateTitleValue()
                     if (!this.isEditMode()) {
-                        this.updateTitleValue()
+
                     }
                     else {
                         this.updateModels();
@@ -124,38 +127,43 @@ export default class CarModelInput extends Typeahead {
             }
         }
     }
+    runningTitle: boolean = false;
+    runTitleAgain: boolean = false;
     updateTitleValue() {
         this.promise = this.promise.then(() => {
             let year = this.state.year;
             let make = this.state.make;
-            let value = this.isEditMode() ? false : this.props.value;
+            let value = this.props.value;
             if (year && make && value) {
-                if (!this.running) {
-                    this.running = true;
+                if (!this.runningTitle) {
+                    this.runningTitle = true;
                     let handleModel = (model: AutoModel) => {
-                        this.running = false;
+                        this.runningTitle = false;
                         if (model) {
                             if ((year === this.state.year && make === this.state.make && this.props.value === value)) {
-                                this.setState(() => ({
-                                    valueTitle: model.model_Name
-                                }));
+                                if (!this.state.valueTitle) {
+                                    this.setState(() => ({
+                                        valueTitle: model.model_Name
+                                    }));
+                                }
                             }
                         }
-                        if (this.runAgain) {
-                            this.runAgain = false;
+                        if (this.runTitleAgain) {
+                            this.runTitleAgain = false;
                             this.updateTitleValue();
                         }
                     };
-                    if (CarModelServiceContext.cacheIndividual[`${this.state.make}/${this.props.value}/${this.state.year}`]) { 
+                    if (CarModelServiceContext.cacheIndividual[`${this.state.make}/${this.props.value}/${this.state.year}`]) {
                         handleModel(CarModelServiceContext.cacheIndividual[`${this.state.make}/${this.props.value}/${this.state.year}`]);
                         return;
                     }
-                    else {
+                    else if (!this.pendingIndividual[`${this.state.make}/${this.props.value}/${this.state.year}`]) {
+                        this.pendingIndividual[`${this.state.make}/${this.props.value}/${this.state.year}`] = true;
                         return redservice().get(`/api/red/autoservice/model/${this.state.make}/${this.props.value}/${this.state.year}`).then(handleModel);
                     }
                 }
                 else {
-                    this.runAgain = true;
+                    this.runTitleAgain = true;
                 }
             }
             else {

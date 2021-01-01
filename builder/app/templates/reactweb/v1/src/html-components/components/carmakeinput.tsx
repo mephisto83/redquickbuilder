@@ -2,6 +2,7 @@ import Typeahead from './typeahead';
 import { createRedService } from '../../util/service';
 import * as Globals from '../../util/globals';
 let _redservice: any;
+
 function redservice() {
     _redservice = _redservice || createRedService(Globals.DEFAULT_URL)
     return _redservice;

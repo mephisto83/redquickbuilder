@@ -1950,6 +1950,16 @@ class Dashboard extends Component<any, any> {
 									) : null}
 									{rootGraph ? (
 										<NavBarButton
+											title={`${Titles.BuildThemes}`}
+											icon="fab fa-ethereum"
+											onClick={() => {
+												if (confirm('Are you sure you want to scaffold the project'))
+													this.props.scaffoldThemes();
+											}}
+										/>
+									) : null}
+									{rootGraph ? (
+										<NavBarButton
 											title={Titles.PublishFiles}
 											icon="fa fa-building-o"
 											onClick={() => {

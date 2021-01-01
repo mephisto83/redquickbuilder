@@ -819,12 +819,12 @@ export function GetLambdaVariableTitle(node: any, escape?: boolean, shortKey?: b
 	}
 	return `#{${title.split(' ').filter((x) => x).map((f: string) => f.toLocaleLowerCase()).join('-')}}`;
 }
-export function GetCssName(node: any): string {
+export function GetCssName(node: any, prefix?: string): string {
 	const graph = GetCurrentGraph(GetState());
 	if (typeof node === 'string') {
 		node = GraphMethods.GetNode(graph, node);
 	}
-	return GetNodeProp(node, NodeProperties.CssName) || GetJSCodeName(node);
+	return `${prefix || ''}${GetNodeProp(node, NodeProperties.CssName) || GetJSCodeName(node)}`;
 }
 export function GetCodeNamespace(node: any): string {
 	return `${GetCodeName(node)}NS`;

@@ -635,6 +635,41 @@ ${interfaceFunctions.join(NEW_LINE)}
 			});
 	};
 }
+
+export function scaffoldThemes(options: any = {}) {
+	return (dispatch: any, getState: () => any) => {
+		const state = GetState();
+		const root = GetCurrentGraph();
+		const workspace = root.workspaces ? root.workspaces[platform()] || root.workspace : root.workspace;
+		ensureDirectory(path.join(workspace));
+		ensureDirectory(path.join(workspace, root.title));
+
+		return Promise.resolve().then(() => {
+			console.log('generating election io');
+			if (options.exclusive && !options.electrionio) {
+				return Promise.resolve();
+			}
+			console.log('Write electron theme');
+			return generateElectronIOTheme(
+				path.join(workspace, root.title, 'electronio', root[GraphKeys.PROJECTNAME]),
+				state
+			);
+		})
+		.then(() => {
+			console.log('generating react web');
+			if (options.exclusive && !options.reactweb) {
+				return Promise.resolve();
+			}
+			return generateReactWebTheme(
+				path.join(workspace, root.title, 'reactweb', root[GraphKeys.PROJECTNAME]),
+				state
+			);
+		})
+		.then(() => {
+			console.log('Scaffold complete');
+		});
+	};
+}
 function errorHandler(): ((value: unknown) => void | PromiseLike<void>) | null | undefined {
 	return (res: any) => {
 		if (res && res.error) {

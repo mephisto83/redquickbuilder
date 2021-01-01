@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="utf-8" />
     <title>Red Quick Builder</title>
     <script>
-      (() => {
-        if (
-          typeof process !== 'object' ||
-          (typeof process === 'object' && !process.env.START_HOT)
-        ) {
-          const link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.href = './dist/style.css';
-          // HACK: Writing the script path should be done with webpack
-          document.getElementsByTagName('head')[0].appendChild(link);
-        }
+        (() => {
+            if (
+                typeof process !== 'object' ||
+                (typeof process === 'object' && !process.env.START_HOT)
+            ) {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = './dist/style.css';
+                // HACK: Writing the script path should be done with webpack
+                document.getElementsByTagName('head')[0].appendChild(link);
+            }
 
-      })();
+        })();
     </script>
     <link rel="stylesheet" href="./bower_components/bootstrap/dist/css/bootstrap.min.css">
     <!-- <link rel="stylesheet" href="./bower_components/font-awesome/css/font-awesome.min.css"> -->
@@ -27,40 +28,42 @@
     <link rel="stylesheet" href="./css/app.css">
     <link rel="stylesheet" href="./app.global.css" />
     <link href="https://fonts.googleapis.com/css?family=Asset&display=swap" rel="stylesheet">
-    <script src="https://use.fontawesome.com/ba15904901.js"></script>
+    <script src="https://kit.fontawesome.com/84589ad5a6.js" crossorigin="anonymous"></script>
     <style>
-      a {
-        cursor: pointer;
-      }
+        a {
+            cursor: pointer;
+        }
     </style>
-  </head>
-  <body>
+</head>
+
+<body>
     <div id="root"></div>
     <script>
-      if (typeof process === 'object') {
-        const scripts = [];
+        if (typeof process === 'object') {
+            const scripts = [];
 
-        if (process.env.NODE_ENV === 'development') {
-          // Dynamically insert the DLL script in development env in the
-          // renderer process
-          scripts.push('../dll/renderer.dev.dll.js');
-        }
-        if (process.env.START_HOT) {
-          // Dynamically insert the bundled app script in the renderer process
-          const port = process.env.PORT || 1231;
-          scripts.push(`http://localhost:${port}/dist/renderer.dev.js`);
-        } else {
-          scripts.push('./dist/renderer.prod.js');
-        }
+            if (process.env.NODE_ENV === 'development') {
+                // Dynamically insert the DLL script in development env in the
+                // renderer process
+                scripts.push('../dll/renderer.dev.dll.js');
+            }
+            if (process.env.START_HOT) {
+                // Dynamically insert the bundled app script in the renderer process
+                const port = process.env.PORT || 1231;
+                scripts.push(`http://localhost:${port}/dist/renderer.dev.js`);
+            } else {
+                scripts.push('./dist/renderer.prod.js');
+            }
 
-        if (scripts.length) {
-          document.write(
-            scripts
-              .map(script => `<script defer src="${script}"><\/script>`)
-              .join('')
-          );
+            if (scripts.length) {
+                document.write(
+                    scripts
+                    .map(script => `<script defer src="${script}"><\/script>`)
+                    .join('')
+                );
+            }
         }
-      }
     </script>
-  </body>
+</body>
+
 </html>

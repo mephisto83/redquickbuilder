@@ -24,7 +24,8 @@ import {
 	GetNodeById,
 	AddLinkBetweenNodes,
 	CreateNewNode,
-	GetModelCodeProperties
+	GetModelCodeProperties,
+	addComponentTags
 } from '../../../actions/uiActions';
 import { GetNodesLinkedTo, GetNodeLinkedTo, GetCellProperties, SOURCE } from '../../../methods/graph_methods';
 import {
@@ -54,6 +55,7 @@ import { GetScreenOption } from '../../../service/screenservice';
 import { ViewTypes } from '../../../constants/viewtypes';
 import { LinkPropertyKeys } from '../../../constants/nodetypes';
 import { TARGET } from '../../../methods/graph_methods';
+import { ComponentTags } from '../../../constants/componenttypes';
 
 export default function SetupRoute(
 	screen: Node,
@@ -62,8 +64,8 @@ export default function SetupRoute(
 	onlyGetAll?: boolean
 ) {
 	console.log('setup route');
-	routing.routes.forEach((routeDescription: RouteDescription) => {
-		SetupRouteDescription(routeDescription, screen, information, onlyGetAll);
+	routing.routes.forEach((routeDescription: RouteDescription, routeIndex: number) => {
+		SetupRouteDescription(routeDescription, screen, information, onlyGetAll, routeIndex);
 	});
 }
 
@@ -122,7 +124,7 @@ function SetupRouteDescription(
 	routeDescription: RouteDescription,
 	screen: Node,
 	information: SetupInformation,
-	onlyGetAll?: boolean
+	onlyGetAll?: boolean, routeIndex?: number
 ) {
 	console.log('setup route description');
 	let graph = GetCurrentGraph();
@@ -190,7 +192,7 @@ function SetupRouteDescription(
 								subcomponent,
 								temp.property ? temp.property : ''
 							);
-							[ propertyComponents ].forEach((pc: Node | null) => {
+							[propertyComponents].forEach((pc: Node | null) => {
 								if (pc) {
 									let res: SetupApiResult = SetupApi(GetNodeById(subcomponent), 'routeinj', pc, true);
 									res.internal.forEach((internal: string) => {
@@ -244,6 +246,11 @@ function SetupRouteDescription(
 													layout.properties[newCell].injections = {
 														route: 'routeinj'
 													};
+													const childId = newCell;
+													const cellProperties = GetCellProperties(layout, childId);
+													addComponentTags(ComponentTags.Field, cellProperties);
+													addComponentTags(ComponentTags.RouteButton, cellProperties);
+													addComponentTags(ComponentTags.RouteButtonNum + (routeIndex || 0), cellProperties);
 													updateComponentProperty(ccnChild.id, NodeProperties.Layout, layout);
 												}
 											});
@@ -266,7 +273,7 @@ function GetPropertyComponentInLayout(parent: string, property: string): Node | 
 		let { properties } = layout;
 		if (properties) {
 			Object.entries(properties).find((item: any[]) => {
-				let [ key, value ] = item;
+				let [key, value] = item;
 				if (value) {
 					let { children } = value;
 					if (children && children[key]) {

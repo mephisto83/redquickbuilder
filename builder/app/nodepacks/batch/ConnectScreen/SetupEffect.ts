@@ -1,4 +1,4 @@
-import { Node, Graph } from '../../../methods/graph_types';
+import { Node, Graph, ComponentLayoutContainer } from '../../../methods/graph_types';
 import { Effect, EffectProps, EffectDescription } from '../../../interface/methodprops';
 import { SetupInformation } from './SetupInformation';
 import {
@@ -7,7 +7,8 @@ import {
 	getLinkInstance,
 	GetCellCount,
 	SetCellsLayout,
-	GetLastCell
+	GetLastCell,
+	GetCellProperties
 } from '../../../methods/graph_methods';
 import {
 	GetCurrentGraph,
@@ -19,13 +20,15 @@ import {
 	NodeTypes,
 	GetNodeByProperties,
 	UPDATE_LINK_PROPERTY,
-	updateComponentProperty
+	updateComponentProperty,
+	addComponentTags,
+	GetCssName
 } from '../../../actions/uiActions';
 import { LinkType, NodeProperties, LinkPropertyKeys } from '../../../constants/nodetypes';
 import AddButtonToComponent from '../../AddButtonToComponent';
 import GetModelObjectFromSelector from '../../GetModelObjectFromSelector';
 import ConnectLifecycleMethod from '../../../components/ConnectLifecycleMethod';
-import { InstanceTypes } from '../../../constants/componenttypes';
+import { ComponentTags, InstanceTypes } from '../../../constants/componenttypes';
 import AppendPostMethod from '../../screens/AppendPostMethod';
 import AppendValidations from '../../screens/AppendValidations';
 import { AddButtonToSubComponent, AddButtonToComponentLayout, AddApiToButton, AddComponentAutoStyles } from './Shared';
@@ -35,11 +38,11 @@ import CreateHideComponentStyle from '../../screens/CreateHideComponentStyle';
 export default function SetupEffect(screen: Node, effect: Effect, information: SetupInformation) {
 	console.log('setup effect');
 
-	effect.effects.forEach((effectDescription: EffectDescription) => {
-		SetupEffectDescription(effectDescription, screen, information);
+	effect.effects.forEach((effectDescription: EffectDescription, effectIndex: number) => {
+		SetupEffectDescription(effectDescription, screen, information, effectIndex);
 	});
 }
-function SetupEffectDescription(effectDescription: EffectDescription, screen: Node, information: SetupInformation) {
+function SetupEffectDescription(effectDescription: EffectDescription, screen: Node, information: SetupInformation, effectIndex: number) {
 	console.log('setup effect description');
 	let graph = GetCurrentGraph();
 	let setup_options = GetNodesLinkedTo(graph, {
@@ -93,6 +96,16 @@ function SetupEffectDescription(effectDescription: EffectDescription, screen: No
 			}
 		}
 		let cellId = AddButtonToComponentLayout({ button, component: subcomponent });
+
+		let layout: ComponentLayoutContainer = GetNodeProp(subcomponent, NodeProperties.Layout);
+
+		const childId = cellId;
+		const cellProperties = GetCellProperties(layout, childId);
+		addComponentTags(ComponentTags.Field, cellProperties);
+		addComponentTags(ComponentTags.MainButton, cellProperties);
+		addComponentTags(ComponentTags.ButtonNum + effectIndex, cellProperties);
+		updateComponentProperty(subcomponent, NodeProperties.Layout, layout);
+
 		AddComponentAutoStyles(subcomponent, effectDescription, cellId);
 	});
 }

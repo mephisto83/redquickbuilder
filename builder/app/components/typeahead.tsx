@@ -54,12 +54,12 @@ export default class Typeahead extends Component<any, any> {
 	render() {
 		let options = this.props.options
 			? this.props.options
-					.filter((v: any) => this.value() && (this.state.focus || this.state.hovering))
-					.filter((v: any) => {
-						const res =
-							`${v.title}  ${v.value}`.toLowerCase().indexOf(`${this.value()}`.toLowerCase()) !== -1;
-						return res;
-					})
+				.filter((v: any) => this.value() && (this.state.focus || this.state.hovering))
+				.filter((v: any) => {
+					const res =
+						`${v.title}  ${v.value}`.toLowerCase().indexOf(`${this.value()}`.toLowerCase()) !== -1;
+					return res;
+				})
 			: [];
 		let emp: any = {
 			['--container-height']: `${Math.max(5, Math.min(10, options.length ? options.length : 0)) * 30}px`
@@ -109,6 +109,9 @@ export default class Typeahead extends Component<any, any> {
 							if (this.props.onChange) {
 								this.props.onChange(value);
 							}
+						}
+						if (this.props.onChangeText) {
+							this.props.onChangeText(value);
 						}
 						this.setState({ value });
 					}}

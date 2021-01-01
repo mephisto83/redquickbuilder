@@ -17,16 +17,22 @@ import SelectInput from "./selectinput";
 import TextInput from "./textinput";
 import Typeahead from "./typeahead";
 import CheckBox from "./checkbox";
+import TreeViewMenu from "./treeviewmenu";
+import TreeViewItemContainer from "./treeviewitemcontainer";
 
 export default class GridPlacementField extends Component<any, any> {
   constructor(props: any) {
     super(props);
     this.state = {};
   }
-
+  componentDidUpdate(prevProps: any) {
+    if (this.props.gridSetup !== prevProps.gridSetup) {
+      this.setState({ gridSetup: this.props.gridSetup })
+    }
+  }
   render() {
     const tags = this.props.tags || [];
-    const gridSetup = this.props.gridSetup || {};
+    const gridSetup = this.state.gridSetup || {};
     const {
       gridTemplateColumns = "",
       gridTemplateRows = "",
@@ -92,16 +98,16 @@ export default class GridPlacementField extends Component<any, any> {
                 gridTemplateColumnGap: value
               })
             }} />
-            <TextInput
-              label={Titles.GridRowGap}
-              title={Titles.GridRowGap}
-              value={gridTemplateRowGap}
-              onChange={(value: any) => {
-                this.props.onChange({
-                  ...gridSetup,
-                  gridTemplateRowGap: value
-                })
-              }} />
+          <TextInput
+            label={Titles.GridRowGap}
+            title={Titles.GridRowGap}
+            value={gridTemplateRowGap}
+            onChange={(value: any) => {
+              this.props.onChange({
+                ...gridSetup,
+                gridTemplateRowGap: value
+              })
+            }} />
           <Typeahead
             label={Titles.GridAreas}
             title={Titles.GridAreas}
@@ -148,11 +154,14 @@ export default class GridPlacementField extends Component<any, any> {
                         } else {
                           gridplacement[row * columns.length + col] = "";
                         }
-                        this.props.onChange({
-                          ...gridSetup,
-                          gridTemplateColumns,
-                          gridTemplateRows,
-                          gridPlacement: gridplacement
+
+                        this.setState({
+                          gridSetup: {
+                            ...gridSetup,
+                            gridTemplateColumns,
+                            gridTemplateRows,
+                            gridPlacement: gridplacement
+                          }
                         });
                       }
                     }}
@@ -163,22 +172,35 @@ export default class GridPlacementField extends Component<any, any> {
           </div>
         </div>
         <div className="col-md-3">
-          {Object.keys(MediaQueries).map(mediaSize => (<CheckBox
-            label={mediaSize}
-            title={mediaSize}
-            key={`mediasize-${mediaSize}`}
-            value={mediaSizes[mediaSize]}
-            onChange={(value: any) => {
+          <TreeViewMenu open active>
+            <TreeViewItemContainer>
+              {Object.keys(MediaQueries).map(mediaSize => (<CheckBox
+                label={mediaSize}
+                title={mediaSize}
+                key={`mediasize-${mediaSize}`}
+                value={mediaSizes[mediaSize]}
+                onChange={(value: any) => {
+                  this.props.onChange({
+                    ...gridSetup,
+                    mediaSizes: {
+                      ...mediaSizes,
+                      [mediaSize]: value
+                    }
+                  })
+                }} />))}
+            </TreeViewItemContainer>
+            <TreeViewMenu title={Titles.Save} onClick={() => {
+
               this.props.onChange({
                 ...gridSetup,
-                mediaSizes: {
-                  ...mediaSizes,
-                  [mediaSize]: value
-                }
-              })
-            }} />))}
+                gridTemplateColumns,
+                gridTemplateRows,
+                gridPlacement: gridplacement
+              });
+            }} />
+          </TreeViewMenu>
         </div>
-      </div>
+      </div >
     );
   }
 }

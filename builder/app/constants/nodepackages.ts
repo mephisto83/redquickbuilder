@@ -71,7 +71,8 @@ import {
 	ValidationPropName,
 	GetGraphNode,
 	CreateNewNode,
-	AddLinkBetweenNodes
+	AddLinkBetweenNodes,
+	GetCssName
 } from '../actions/uiActions';
 import {
 	CreateLayout,
@@ -2455,7 +2456,7 @@ export const CreateDefaultView = {
 									...cellProperties.style,
 									flexDirection: 'column'
 								};
-								const propertyCount = modelProperties.length + 2; //TODO: // THIS NEEDS TO CHANGE.
+								const propertyCount = modelProperties.length + 1; //TODO: // THIS NEEDS TO CHANGE.
 								const componentProps = null;
 								if (isList) {
 									addComponentTags(ComponentTags.List, cellProperties);
@@ -2490,22 +2491,22 @@ export const CreateDefaultView = {
 													uiType
 												});
 											},
-											[
-												'value',
-												ApiNodeKeys.ViewModel
-											].map(
-												(v) =>
-													function () {
-														const graph = GetCurrentGraph(GetStateFunc()());
-														return addComponentApiToForm({
-															newItems,
-															text: v,
-															parent: ct.id,
-															isSingular: true,
-															graph
-														});
-													}
-											));
+												[
+													'value',
+													ApiNodeKeys.ViewModel
+												].map(
+													(v) =>
+														function () {
+															const graph = GetCurrentGraph(GetStateFunc()());
+															return addComponentApiToForm({
+																newItems,
+																text: v,
+																parent: ct.id,
+																isSingular: true,
+																graph
+															});
+														}
+												));
 										});
 									},
 									parent: isList ? listComponentId : screenNodeOptionId,
@@ -3276,6 +3277,8 @@ export const CreateDefaultView = {
 									cellProperties.style.height = null;
 									addComponentTags(ComponentTags.SecondaryButton, cellProperties);
 									addComponentTags(ComponentTags.CancelButton, cellProperties);
+									addComponentTags(`${ComponentTags.CancelButton}${GetCssName(currentNode, '-')}`, cellProperties);
+									addComponentTags(`${ComponentTags.SecondaryButton}${GetCssName(currentNode, '-')}`, cellProperties);
 									return {
 										prop: NodeProperties.Layout,
 										id: screenComponentId,
@@ -3334,6 +3337,9 @@ export const CreateDefaultView = {
 									cellProperties.style.flex = null;
 									cellProperties.style.height = null;
 									addComponentTags(ComponentTags.Field, cellProperties);
+									addComponentTags(GetCssName(modelProperty, 'mp-'), cellProperties);
+									addComponentTags(GetCssName(currentNode, 'cls-'), cellProperties);
+									addComponentTags(`${GetCssName(modelProperty, 'mpcls-')}${GetCssName(currentNode, '-')}`, cellProperties);
 
 									return {
 										prop: NodeProperties.Layout,
@@ -3975,15 +3981,12 @@ export const CreateDefaultView = {
 						},
 						function () {
 							return [
-								...[]
-									.interpolate(0, modelProperties.length + 1, (modelIndex: string | number) => {
-										return applyDefaultComponentProperties(
-											GetNodeById(childComponents[modelIndex]),
-											uiType
-										);
-									})
-									.flatten(),
-
+								...[].interpolate(0, modelProperties.length + 1, (modelIndex: string | number) => {
+									return applyDefaultComponentProperties(
+										GetNodeById(childComponents[modelIndex]),
+										uiType
+									);
+								}).flatten(),
 								applyDefaultComponentProperties(GetNodeById(screenComponentId), uiType),
 								applyDefaultComponentProperties(GetNodeById(screenNodeOptionId), uiType)
 							];
@@ -4011,6 +4014,7 @@ export const CreateDefaultView = {
 									}
 								}
 							}
+							return false;
 						},
 						function () {
 							if (isList) {
@@ -4036,6 +4040,7 @@ export const CreateDefaultView = {
 									viewPackage: viewPackage[NodeProperties.ViewPackage]
 								});
 							}
+							return false;
 						},
 						function () {
 							const steps = [];

@@ -29,6 +29,17 @@ export const ComponentTags = {
 	SideContainer: 'SideContainer',
 	MainHeader: 'MainHeader',
 	TopMenu: 'TopMenu',
+	ButtonNum: 'ButtonNum',
+	ButtonNum0: 'ButtonNum0',
+	ButtonNum1: 'ButtonNum1',
+	ButtonNum2: 'ButtonNum2',
+	ButtonNum3: 'ButtonNum3',
+	RouteButton: 'RouteButton',
+	RouteButtonNum: 'RouteButtonNum',
+	RouteButtonNum0: 'RouteButtonNum0',
+	RouteButtonNum1: 'RouteButtonNum1',
+	RouteButtonNum2: 'RouteButtonNum2',
+	RouteButtonNum3: 'RouteButtonNum3',
 	Field: 'Field',
 	LeftContainer: 'LeftContainer',
 	Screen: 'Screen',
@@ -43,6 +54,10 @@ export const ComponentTags = {
 	SecondaryButton: 'SecondaryButton',
 	Bottom: 'Bottom',
 	ListItem: 'ListItem',
+	register: 'register',
+	'anonymous-guest': 'anonymous-guest',
+	'continue-as': 'continue-as',
+	authenticate: 'authenticate',
 	Footer: 'Footer'
 };
 

@@ -17,7 +17,7 @@ import {
 	OtherUses,
 	CssPseudoSelectors
 } from '../constants/themes';
-import { GetCurrentGraph, GUID, VisualEq } from '../actions/uiActions';
+import { GetCssName, GetCurrentGraph, GUID, NodesByType, NodeTypes, VisualEq } from '../actions/uiActions';
 import TextInput from './textinput';
 import ColorInput from './colorinput';
 import Box from './box';
@@ -28,31 +28,33 @@ import { ComponentTags } from '../constants/componenttypes';
 import CheckBox from './checkbox';
 import ButtonList from './buttonlist';
 import Typeahead from './typeahead';
-import { MediaQueries } from '../constants/nodetypes';
+import { MediaQueries, NodeProperties } from '../constants/nodetypes';
 import GridPlacementField from './gridplacementfield';
 import TabContainer from './tabcontainer';
 import Tabs from './tabs';
 import TabContent from './tabcontent';
 import TabPane from './tabpane';
 import Tab from './tab';
+import { Node } from '../methods/graph_types';
+import { GetNodeLinkedTo, GetNodeProp, GetNodesLinkedTo } from '../methods/graph_methods';
 const THEME_VIEW_TAB = 'theme-view-tab';
 
 class ThemeView extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
-		this.state = { quickColor: '', bindAll: true, mediaSize: MediaQueries['Extra devices'] };
+		this.state = { quickColor: '', bindAll: true, mediaSize: MediaQueries['Extra devices'], modelPropertyClasses: [] };
 	}
 
 	active() {
 		return !!this.props.active;
 	}
 
-	getEditBoxes(formType, mediaSize, formTheme, themeColors, config, themeVariables, filterFunc) {
+	getEditBoxes(formType: any, mediaSize: any, formTheme: any, themeColors: any, config: any, themeVariables: any, filterFunc: any) {
 		// ComponentTags
 		if (formType && mediaSize) {
 			return Object.values(StyleLib.css)
 				.filter(
-					(v) =>
+					(v: any) =>
 						(formTheme &&
 							formTheme[formType] &&
 							formTheme[formType][mediaSize] &&
@@ -60,12 +62,12 @@ class ThemeView extends Component<any, any> {
 						filterFunc(`${v.label}`)
 				)
 				.map((field) => {
-					const { placeholder, key, type } = field;
-					let { label } = field;
+					const { placeholder, key, type }: any = field;
+					let { label }: any = field;
 					label = `${label}`;
 					formType = `${formType}${this.getAttrSelector()}`;
 
-					const onChange = (value) => {
+					const onChange = (value: any) => {
 						if (!formTheme[formType]) {
 							formTheme[formType] = {};
 						}
@@ -123,10 +125,10 @@ class ThemeView extends Component<any, any> {
 								onChange={onChange}
 								options={themeVariables.variables
 									.filter(
-										(t) =>
+										(t: any) =>
 											!variableNameParts.some((v) => t.variable.toLowerCase().indexOf(v) === -1)
 									)
-									.map((d) => ({
+									.map((d: any) => ({
 										title: d.variable,
 										value: d.variable
 									}))}
@@ -163,7 +165,7 @@ class ThemeView extends Component<any, any> {
 		if (formType && mediaSize) {
 			return Object.values(StyleLib.css)
 				.filter(
-					(v) =>
+					(v: any) =>
 						(formTheme &&
 							formTheme[formType] &&
 							formTheme[formType][mediaSize] &&
@@ -211,15 +213,17 @@ class ThemeView extends Component<any, any> {
 							? formTheme[formType][mediaSize][key]
 							: null;
 					if (type === 'color') {
+						let options = Object.keys(ThemeColors).map((d) => ({ title: d, value: `--${d}` }));
 						return (
 							<SelectInput
 								key={`field-color-${key}`}
 								value={fieldValue}
 								label={label}
 								title={label}
+								immediate={!options.length}
 								color={themeColors ? themeColors[`${fieldValue}`.split('--').join('')] : null}
 								onChange={onChange}
-								options={Object.keys(ThemeColors).map((d) => ({ title: d, value: `--${d}` }))}
+								options={options}
 							/>
 						);
 					}
@@ -227,6 +231,21 @@ class ThemeView extends Component<any, any> {
 					const use = key;
 					const variableNameParts = `${label.split(':')[0]}`.split('-').map((v) => v.toLowerCase());
 					if (!variableNameParts.some((v) => use.toLowerCase().indexOf(v) === -1)) {
+						let options = [...themeVariables.variables
+							.filter(
+								(t: any) =>
+									!variableNameParts.some((v) => t.variable.toLowerCase().indexOf(v) === -1)
+							)
+							.map((d: any) => ({
+								title: d.variable,
+								value: d.variable
+							}))];
+						if (this.state.currentFieldValue) {
+							options.push({
+								title: this.state.currentFieldValue,
+								value: this.state.currentFieldValue
+							})
+						}
 						return (
 							<Typeahead
 								key={`field-font-family-${use}`}
@@ -234,15 +253,12 @@ class ThemeView extends Component<any, any> {
 								label={use}
 								title={use}
 								onChange={onChange}
-								options={themeVariables.variables
-									.filter(
-										(t) =>
-											!variableNameParts.some((v) => t.variable.toLowerCase().indexOf(v) === -1)
-									)
-									.map((d) => ({
-										title: d.variable,
-										value: d.variable
-									}))}
+								onChangeText={(value: string) => {
+									this.setState({
+										currentFieldValue: value
+									});
+								}}
+								options={options}
 							/>
 						);
 					}
@@ -398,7 +414,7 @@ class ThemeView extends Component<any, any> {
 		const htmlElementGroup = this.state.sectionType
 			? HTMLElementGroups.find((f) => f.name === this.state.sectionType)
 			: null;
-		let sectionTypeOptions = [];
+		let sectionTypeOptions: any = [];
 		if (htmlElementGroup) {
 			sectionTypeOptions = Object.keys(htmlElementGroup.type).map((v) => ({ title: v, value: v, id: v }));
 		}
@@ -409,6 +425,29 @@ class ThemeView extends Component<any, any> {
 						<div className="col-md-1">
 							<Box maxheight={600} title={Titles.Style}>
 								<FormControl>
+									<button
+										className="btn btn-default btn-flat"
+										onClick={() => {
+											let models = NodesByType(this.props.state, NodeTypes.Model);
+											let modelPropertyClasses: any = [];
+											models.forEach((model: Node) => {
+												let properties = GetNodesLinkedTo(GetCurrentGraph(), {
+													id: model.id,
+													componentType: NodeTypes.Property
+												});
+												properties.filter(v => !GetNodeProp(v, NodeProperties.IsDefaultProperty)).forEach((property: Node) => {
+													modelPropertyClasses.push(`mp-${GetCssName(property)}.cls-${GetCssName(model)}`);
+													modelPropertyClasses.push(`mp-${GetCssName(property)}`);
+												})
+											});
+											this.setState({
+												modelPropertyClasses
+											})
+											return false;
+										}}
+									>
+										Load Model Property Classes
+									</button>
 									<SelectInput
 										options={Object.keys(MediaQueries).map((v) => ({ title: v, value: v, id: v }))}
 										label={Titles.MediaSizes}
@@ -433,10 +472,10 @@ class ThemeView extends Component<any, any> {
 												const pcolors = value.split('-');
 												if (pcolors && pcolors.length === 5) {
 													if (
-														!pcolors.some((v) =>
+														!pcolors.some((v: any) =>
 															v
 																.split('')
-																.some((y) => `0123456789abcdef`.indexOf(y) === -1)
+																.some((y: any) => `0123456789abcdef`.indexOf(y) === -1)
 														)
 													) {
 														const newTheme = { ...themeColors };
@@ -527,7 +566,7 @@ class ThemeView extends Component<any, any> {
 															label={`${Titles.Font} ${Titles.Name}`}
 															title={`${Titles.Font} ${Titles.Name}`}
 															immediate
-															onChange={(value) => {
+															onChange={(value: any) => {
 																this.setState({ fontName: value });
 															}}
 														/>
@@ -537,7 +576,7 @@ class ThemeView extends Component<any, any> {
 															label={Titles.Font}
 															title={Titles.Font}
 															immediate
-															onChange={(value) => {
+															onChange={(value: any) => {
 																this.setState({ font: value });
 															}}
 														/>
@@ -549,7 +588,7 @@ class ThemeView extends Component<any, any> {
 																	label={Titles.FontCss}
 																	title={Titles.FontCss}
 																	immediate
-																	onChange={(value) => {
+																	onChange={(value: any) => {
 																		this.setState({ fontCss: value });
 																	}}
 																/>
@@ -560,7 +599,7 @@ class ThemeView extends Component<any, any> {
 																	label={Titles.FontCssVar}
 																	immediate
 																	title={Titles.FontCssVar}
-																	onChange={(value) => {
+																	onChange={(value: any) => {
 																		if (value && value.indexOf('--') === -1) {
 																			value = `--${value}`;
 																		}
@@ -604,12 +643,12 @@ class ThemeView extends Component<any, any> {
 															) : null}
 														<ButtonList
 															active
-															items={themeFonts.fonts.map((v) => ({
+															items={themeFonts.fonts.map((v: any) => ({
 																title: v.font,
 																id: v.font,
 																...v
 															}))}
-															renderItem={(item) => (
+															renderItem={(item: any) => (
 																<div
 																	className="col-md-12"
 																	style={{
@@ -832,18 +871,20 @@ class ThemeView extends Component<any, any> {
 													gridSetup={themeGridPlacements.grids.find(
 														(x) => x.id === this.state.currentGrid
 													)}
-													onChange={(setup) => {
+													onChange={(setup: any) => {
 														this.props.updateGraph('themeGridPlacements', {
 															...themeGridPlacements,
 															grids: [
 																setup,
 																...themeGridPlacements.grids.filter(
-																	(x) => x.id !== setup.id
+																	(x: any) => x.id !== setup.id
 																)
 															]
 														});
 													}}
-													tags={Object.keys(ComponentTags)}
+													tags={[...Object.keys(ComponentTags), ...this.state.modelPropertyClasses.map((v: string) => {
+														return v;
+													})]}
 												/>
 											</Box>
 										</div>
@@ -870,7 +911,7 @@ class ThemeView extends Component<any, any> {
 											<Box
 												maxheight={500}
 												title={Titles.SpaceTheme}
-												onSearch={(search) => {
+												onSearch={(search: string) => {
 													this.setState({
 														spaceSearch: search
 													});
@@ -887,9 +928,15 @@ class ThemeView extends Component<any, any> {
 															title: v.name,
 															value: v.name,
 															id: v.name
-														}))]}
+														})), ...this.state.modelPropertyClasses.map((v: string) => {
+															return {
+																title: v,
+																value: v,
+																id: v
+															}
+														})]}
 														label="Spaces"
-														onChange={(value) => {
+														onChange={(value: string) => {
 															this.setState({ componentTag: value });
 														}}
 														value={this.state.componentTag}

@@ -565,7 +565,7 @@ export const ExcludeFromController = 'Exclude from controller';
 export const UserModel = 'User Model';
 
 export const PropertyGeneratedType = 'Generated Type';
-
+export const BuildThemes = 'Build Themes';
 export const ManyToManyNexus = 'Many to many';
 export const ManyToManyExists = 'Many to many item must exists';
 export const ManyToManyNexusModel = 'Many to Many model';
