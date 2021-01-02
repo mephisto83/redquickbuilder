@@ -440,11 +440,19 @@ String.prototype.toJavascriptName = function () {
 
 const NEW_LINE = `
 `;
-Array.prototype.tightenPs = function () {
-	const str = this || '';
-
-	return str.join(NEW_LINE).split(NEW_LINE).filter((x) => x.trim()).join(NEW_LINE);
-};
+((array) => {
+	if (!array.tightenPs) {
+		Object.defineProperty(array, 'tightenPs', {
+			enumerable: false,
+			writable: true,
+			configurable: true,
+			value() {
+				const str = this || '';
+				return str.join(NEW_LINE).split(NEW_LINE).filter((x: any) => x.trim()).join(NEW_LINE);
+			}
+		})
+	}
+})(Array.prototype);
 
 export function addNewLine(str?: string, count?: number) {
 	const spaces = [].interpolate(0, count || 1, () => `    `).join('');

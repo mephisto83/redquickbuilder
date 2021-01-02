@@ -83,6 +83,7 @@ export const StyleLib: any = {
 		'list-style-type': 'listStyleType',
 		margin: 'margin',
 		'margin-bottom': 'marginBottom',
+		opacity: 'opacity',
 		'margin-left': 'marginLeft',
 		'margin-right': 'marginRight',
 		'margin-top': 'marginTop',
@@ -117,7 +118,7 @@ export const StyleLib: any = {
 	js: {},
 	css: {}
 };
-(function() {
+(function () {
 	Object.keys(StyleLib.style).forEach((v) => {
 		StyleLib.js[StyleLib.style[v]] = v;
 		let type = null;

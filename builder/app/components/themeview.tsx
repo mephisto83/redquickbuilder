@@ -31,12 +31,15 @@ import Typeahead from './typeahead';
 import { MediaQueries, NodeProperties } from '../constants/nodetypes';
 import GridPlacementField from './gridplacementfield';
 import TabContainer from './tabcontainer';
+import GenericPropertyContainer from './genericpropertycontainer';
 import Tabs from './tabs';
 import TabContent from './tabcontent';
 import TabPane from './tabpane';
 import Tab from './tab';
+import { cssToJson, JSONNode, Children } from '../methods/cssToJSON';
 import { Node } from '../methods/graph_types';
 import { GetNodeLinkedTo, GetNodeProp, GetNodesLinkedTo } from '../methods/graph_methods';
+import TreeViewMenu from './treeviewmenu';
 const THEME_VIEW_TAB = 'theme-view-tab';
 
 class ThemeView extends Component<any, any> {
@@ -427,7 +430,7 @@ class ThemeView extends Component<any, any> {
 								<FormControl>
 									<button
 										className="btn btn-default btn-flat"
-										onClick={() => {
+										onClick={(evt: any) => {
 											let models = NodesByType(this.props.state, NodeTypes.Model);
 											let modelPropertyClasses: any = [];
 											models.forEach((model: Node) => {
@@ -435,14 +438,17 @@ class ThemeView extends Component<any, any> {
 													id: model.id,
 													componentType: NodeTypes.Property
 												});
-												properties.filter(v => !GetNodeProp(v, NodeProperties.IsDefaultProperty)).forEach((property: Node) => {
+												properties.filter((v: Node) => !GetNodeProp(v, NodeProperties.IsDefaultProperty)).forEach((property: Node) => {
 													modelPropertyClasses.push(`mp-${GetCssName(property)}.cls-${GetCssName(model)}`);
 													modelPropertyClasses.push(`mp-${GetCssName(property)}`);
 												})
 											});
 											this.setState({
 												modelPropertyClasses
-											})
+											});
+
+											evt.stopPropagation();
+											evt.preventDefault();
 											return false;
 										}}
 									>
@@ -934,7 +940,15 @@ class ThemeView extends Component<any, any> {
 																value: v,
 																id: v
 															}
-														})]}
+														}), this.state.currentFieldValue ? {
+															title: this.state.currentFieldValue,
+															value: this.state.currentFieldValue
+														} : null].filter(v => v)}
+														onChangeText={(value: string) => {
+															this.setState({
+																currentFieldValue: value
+															});
+														}}
 														label="Spaces"
 														onChange={(value: string) => {
 															this.setState({ componentTag: value });
@@ -1010,6 +1024,60 @@ class ThemeView extends Component<any, any> {
 																) !== -1
 													)}
 												</FormControl>
+											</Box>
+										</div>
+									</div>
+									<div className="row">
+										<div className="col-md-4">
+											<Box maxheight={500} title={Titles.ColorUse}>
+												<FormControl>
+													<TextInput
+														value={this.state.cssString}
+														textarea
+														onChangeText={(val: string) => {
+															// this.setState({ cssString: val })
+														}}
+														onChanged={(val: string) => {
+															this.setState({ cssString: val })
+														}} />
+													<button
+														className="btn btn-default btn-flat"
+														onClick={(e) => {
+															let res: JSONNode = cssToJson(this.state.cssString);
+															this.setState({ cssJson: res });
+															e.preventDefault();
+															e.stopPropagation()
+														}}
+													>View</button>
+												</FormControl>
+											</Box>
+										</div>
+										<div className="col-md-4">
+											<Box maxheight={500} title={Titles.ColorUse}>
+												<GenericPropertyContainer
+													active
+													title="CSS"
+													subTitle="afaf"
+												>
+													<TreeViewMenu active open={this.state.cssJsonOpen} toggle={() => {
+														this.setState({
+															cssJsonOpen: !this.state.cssJsonOpen
+														});
+													}} >
+														{
+															this.state.cssJson && this.state.cssJson.children && this.state.cssJson.children ? Object.entries(this.state.cssJson.children).map((item: any) => {
+																let [key, children]: [string, Children] = item;
+																
+																return <TreeViewMenu open={this.state['asdf-' + key]} toggle={() => {
+																	this.setState({
+																		['asdf-' + key]: !this.state['asdf-' + key]
+																	});
+																}}>
+																</TreeViewMenu>
+															}) : []
+														}
+													</TreeViewMenu>
+												</GenericPropertyContainer>
 											</Box>
 										</div>
 									</div>

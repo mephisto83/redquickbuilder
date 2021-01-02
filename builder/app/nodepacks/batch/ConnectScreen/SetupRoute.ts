@@ -178,6 +178,13 @@ function SetupRouteDescription(
 		}
 		if (!isArrayProperty) {
 			let cellId = AddButtonToComponentLayout({ button, component: subcomponent });
+			let layout: ComponentLayoutContainer = GetNodeProp(subcomponent, NodeProperties.Layout);
+			const childId = cellId;
+			const cellProperties = GetCellProperties(layout, childId);
+			addComponentTags(ComponentTags.Field, cellProperties);
+			addComponentTags(ComponentTags.RouteButton, cellProperties);
+			addComponentTags(ComponentTags.RouteButtonNum + (routeIndex || 0), cellProperties);
+			updateComponentProperty(subcomponent, NodeProperties.Layout, layout);
 			AddComponentAutoStyles(subcomponent, routeDescription, cellId);
 		} else {
 			updateComponentProperty(button, NodeProperties.IsPropertyCentric, true);

@@ -617,6 +617,12 @@ export default function (args: any = {}) {
                   children: {
                     [context.node7]: context.node4
                   },
+                  properties: {
+                    "tags": [
+                      "Field",
+                      "register-button"
+                    ]
+                  },
                   cellModel: {},
                   cellModelProperty: {},
                   cellRoot: {},
@@ -628,6 +634,12 @@ export default function (args: any = {}) {
                   },
                   children: {
                     [context.node8]: context.node5
+                  },
+                  properties: {
+                    "tags": [
+                      "Field",
+                      "authenticate-button"
+                    ]
                   },
                   cellModel: {},
                   cellModelProperty: {},
@@ -641,6 +653,12 @@ export default function (args: any = {}) {
                   children: {
                     [context.node20]: context.node21
                   },
+                  properties: {
+                    "tags": [
+                      "Field",
+                      "anonymous-login-button"
+                    ]
+                  },
                   cellModel: {},
                   cellModelProperty: {},
                   cellRoot: {},
@@ -653,6 +671,12 @@ export default function (args: any = {}) {
                   children: {
                     [context.node23]: context.node22
                   },
+                  properties: {
+                    "tags": [
+                      "Field",
+                      "continue-as-button"
+                    ]
+                  },
                   cellModel: {},
                   cellModelProperty: {},
                   cellRoot: {},
@@ -664,6 +688,12 @@ export default function (args: any = {}) {
                   },
                   children: {
                     [context.node25]: context.node24
+                  },
+                  properties: {
+                    "tags": [
+                      "Field",
+                      "forgot-login-button"
+                    ]
                   },
                   cellModel: {},
                   cellModelProperty: {},
@@ -1084,8 +1114,13 @@ export default function (args: any = {}) {
           if (args.callback) {
             args.callback({
               anonymousButton: context.node21,
+              anonymousButtonContainer: context.node20,
               continueAsButton: context.node22,
+              continueAsButtonContainer: context.node23,
               forgotLoginButton: context.node24,
+              forgotLoginButtonContainer: context.node25,
+              registerButtonContainer: context.node7,
+              authenticateContainer: context.node8,
               ...context
             })
           }

@@ -54,7 +54,13 @@ export default class GridPlacementField extends Component<any, any> {
     };
 
     const gridplacement = gridPlacement || [].interpolate(0, Math.max(columns * gridRowCount, 100), () => "");
-
+    let options = tags.map((x: any) => ({ title: x, id: x, value: x }));
+    if (this.state.currentFieldValue) {
+      options.push({
+        title: this.state.currentFieldValue,
+        value: this.state.currentFieldValue
+      })
+    }
     return (
       <div className="row">
         <div className="col-md-3">
@@ -111,8 +117,13 @@ export default class GridPlacementField extends Component<any, any> {
           <Typeahead
             label={Titles.GridAreas}
             title={Titles.GridAreas}
-            options={tags.map(x => ({ title: x, id: x, value: x }))}
+            options={options}
             value={this.state.currentSection}
+            onChangeText={(value: string) => {
+              this.setState({
+                currentFieldValue: value
+              });
+            }}
             onChange={(value: any) => {
               this.setState({ currentSection: value });
             }}
