@@ -1145,6 +1145,8 @@ export const LinkPropertyKeys = {
 	MountingProps: 'mountingProps',
 	ScreenEffectApiProps: 'screenEffectApiProps',
 	DashboardScreenEffectApiProps: 'dashboardScreenEffectApiProps',
+	ScreenVisualInsertApiProps: 'screenVisualInsertApiProps',
+	DashboardScreenVisualInsertApiProps: 'dashboardScreenVisualInsertApiProps',
 	ComponentDidMountApiProps: 'componentDidMountApiProps',
 	DashboardComponentDidMountApiProps: 'dashboardComponentDidMountApiProps',
 	RoutingProps: 'routingProps',

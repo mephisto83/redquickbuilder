@@ -63,6 +63,14 @@ export interface ComponentDidMountEffectApiProps {
 	Delete?: ComponentDidMountEffect[];
 	Update?: ComponentDidMountEffect[];
 }
+
+export interface ScreenVisualInsertApiProps {
+	GetAll?: ScreenVisualInsert[];
+	Get?: ScreenVisualInsert[];
+	Create?: ScreenVisualInsert[];
+	Delete?: ScreenVisualInsert[];
+	Update?: ScreenVisualInsert[];
+}
 export interface DashboardScreenEffectApiProps {
 	apis: ScreenEffectApi[];
 }
@@ -1428,6 +1436,19 @@ export interface ComponentDidMountEffect {
 	id: string;
 	name: string;
 	dataChain: string;
+}
+export interface ScreenVisualInsert {
+	id: string;
+	name: string;
+	visualInsert: VisualInsert
+}
+export interface VisualInsert {
+	where: VisualInsertWhere,
+	template: string;
+}
+export enum VisualInsertWhere {
+	Start = 'Start',
+	End = 'End'
 }
 export interface ScreenEffectApi extends ScreenEffect { }
 export interface Routing {

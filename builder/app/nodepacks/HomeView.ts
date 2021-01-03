@@ -620,7 +620,8 @@ export default function (args: any = {}) {
                   properties: {
                     "tags": [
                       "Field",
-                      "register-button"
+                      "register-button",
+                      "home-view-button"
                     ]
                   },
                   cellModel: {},
@@ -638,7 +639,8 @@ export default function (args: any = {}) {
                   properties: {
                     "tags": [
                       "Field",
-                      "authenticate-button"
+                      "authenticate-button",
+                      "home-view-button"
                     ]
                   },
                   cellModel: {},
@@ -656,7 +658,8 @@ export default function (args: any = {}) {
                   properties: {
                     "tags": [
                       "Field",
-                      "anonymous-login-button"
+                      "anonymous-login-button",
+                      "home-view-button"
                     ]
                   },
                   cellModel: {},
@@ -674,7 +677,8 @@ export default function (args: any = {}) {
                   properties: {
                     "tags": [
                       "Field",
-                      "continue-as-button"
+                      "continue-as-button",
+                      "home-view-button"
                     ]
                   },
                   cellModel: {},
@@ -692,7 +696,8 @@ export default function (args: any = {}) {
                   properties: {
                     "tags": [
                       "Field",
-                      "forgot-login-button"
+                      "forgot-login-button",
+                      "home-view-button"
                     ]
                   },
                   cellModel: {},

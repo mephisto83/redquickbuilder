@@ -30,7 +30,8 @@ import {
 	ScreenEffectApi,
 	AfterEffect,
 	ComponentDidMountEffectApiProps,
-	ComponentDidMountEffect
+	ComponentDidMountEffect,
+	ScreenVisualInsert
 } from '../interface/methodprops';
 import SelectInput from './selectinput';
 import { ViewTypes } from '../constants/viewtypes';
@@ -42,6 +43,7 @@ import CheckBox from './checkbox';
 import ScreenEffectsComponent from './screenEffectsComponent';
 import AfterEffectsComponent from './aftereffectscomponent';
 import ComponentDidMountEffectsComponent from './componentDidMountEffectsComponent';
+import ScreenVisualInsertsComponent from './screenVisualInsertsComponent';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ScreenEffectContextMenu extends Component<any, any> {
@@ -57,7 +59,7 @@ class ScreenEffectContextMenu extends Component<any, any> {
 		let { agent } = mode;
 		let screenEffectApis: ScreenEffectApi[] = mode.screenEffectApis;
 		if (screenEffectApis) {
-			
+
 			switch (mode) {
 				default:
 					result.push(
@@ -75,7 +77,7 @@ class ScreenEffectContextMenu extends Component<any, any> {
 			}
 		}
 		let componentMountEffects: ComponentDidMountEffect[] = mode.componentMountEffects;
-		if (componentMountEffects) { 
+		if (componentMountEffects) {
 			switch (mode) {
 				default:
 					result.push(
@@ -92,7 +94,25 @@ class ScreenEffectContextMenu extends Component<any, any> {
 					break;
 			}
 		}
-		
+
+		let screenVisualInserts: ScreenVisualInsert[] = mode.screenVisualInserts;
+		if (screenVisualInserts) {
+			switch (mode) {
+				default:
+					result.push(
+						<ScreenVisualInsertsComponent
+							onChange={() => {
+								if (mode && mode.callback) {
+									mode.callback();
+								}
+							}}
+							api
+							inserts={screenVisualInserts}
+						/>
+					);
+					break;
+			}
+		}
 		return result;
 	}
 

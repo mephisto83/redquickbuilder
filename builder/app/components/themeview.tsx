@@ -30,16 +30,20 @@ import ButtonList from './buttonlist';
 import Typeahead from './typeahead';
 import { MediaQueries, NodeProperties } from '../constants/nodetypes';
 import GridPlacementField from './gridplacementfield';
+import ThemeStyleSection from './themestylesection';
 import TabContainer from './tabcontainer';
 import GenericPropertyContainer from './genericpropertycontainer';
 import Tabs from './tabs';
 import TabContent from './tabcontent';
 import TabPane from './tabpane';
 import Tab from './tab';
-import { cssToJson, JSONNode, Children } from '../methods/cssToJSON';
+import { cssToJson, GetColors, JSONNode, Children } from '../methods/cssToJSON';
 import { Node } from '../methods/graph_types';
 import { GetNodeLinkedTo, GetNodeProp, GetNodesLinkedTo } from '../methods/graph_methods';
 import TreeViewMenu from './treeviewmenu';
+import TreeViewItemContainer from './treeviewitemcontainer';
+import TreeViewGroupButton from './treeviewgroupbutton';
+import TreeViewButtonGroup from './treeviewbuttongroup';
 const THEME_VIEW_TAB = 'theme-view-tab';
 
 class ThemeView extends Component<any, any> {
@@ -641,6 +645,7 @@ class ThemeView extends Component<any, any> {
 																			this.setState({ font: '' });
 																		}
 																		event.stopPropagation();
+																		event.preventDefault();
 																		return false;
 																	}}
 																>
@@ -671,13 +676,15 @@ class ThemeView extends Component<any, any> {
 																	<div className="col-md-2">
 																		<button
 																			className="btn btn-default btn-flat"
-																			onClick={() => {
+																			onClick={(event) => {
 																				themeFonts.fonts = themeFonts.fonts.filter(
 																					(x) => x.font !== item.id
 																				);
 																				this.props.updateGraph('themeFonts', {
 																					...themeFonts
 																				});
+																				event.stopPropagation();
+																				event.preventDefault();
 																			}}
 																		>
 																			<i className="fa fa-times" />
@@ -769,7 +776,7 @@ class ThemeView extends Component<any, any> {
 																	<div className="col-md-2">
 																		<button
 																			className="btn btn-default btn-flat"
-																			onClick={() => {
+																			onClick={(event) => {
 																				themeVariables.variables = themeVariables.variables.filter(
 																					(x) => x.variable !== item.id
 																				);
@@ -777,6 +784,8 @@ class ThemeView extends Component<any, any> {
 																					'themeVariables',
 																					{ ...themeVariables }
 																				);
+																				event.stopPropagation();
+																				event.preventDefault();
 																			}}
 																		>
 																			<i className="fa fa-times" />
@@ -849,7 +858,7 @@ class ThemeView extends Component<any, any> {
 															<div className="col-md-2">
 																<button
 																	className="btn btn-default btn-flat"
-																	onClick={() => {
+																	onClick={(event) => {
 																		themeGridPlacements.grids = themeGridPlacements.grids.filter(
 																			(x) => x.id !== item.id
 																		);
@@ -857,6 +866,8 @@ class ThemeView extends Component<any, any> {
 																			...themeGridPlacements,
 																			grids: themeGridPlacements.grids
 																		});
+																		event.stopPropagation();
+																		event.preventDefault();
 																	}}
 																>
 																	<i className="fa fa-times" />
@@ -1029,7 +1040,7 @@ class ThemeView extends Component<any, any> {
 									</div>
 									<div className="row">
 										<div className="col-md-4">
-											<Box maxheight={500} title={Titles.ColorUse}>
+											<Box title={Titles.ColorUse}>
 												<FormControl>
 													<TextInput
 														value={this.state.cssString}
@@ -1044,7 +1055,8 @@ class ThemeView extends Component<any, any> {
 														className="btn btn-default btn-flat"
 														onClick={(e) => {
 															let res: JSONNode = cssToJson(this.state.cssString);
-															this.setState({ cssJson: res });
+															let colors = GetColors(this.state.cssString)
+															this.setState({ cssJson: res, cssColors: colors });
 															e.preventDefault();
 															e.stopPropagation()
 														}}
@@ -1053,8 +1065,9 @@ class ThemeView extends Component<any, any> {
 											</Box>
 										</div>
 										<div className="col-md-4">
-											<Box maxheight={500} title={Titles.ColorUse}>
+											<Box title={Titles.ColorUse}>
 												<GenericPropertyContainer
+													sideBarStyle={{ right: 0 }}
 													active
 													title="CSS"
 													subTitle="afaf"
@@ -1067,15 +1080,106 @@ class ThemeView extends Component<any, any> {
 														{
 															this.state.cssJson && this.state.cssJson.children && this.state.cssJson.children ? Object.entries(this.state.cssJson.children).map((item: any) => {
 																let [key, children]: [string, Children] = item;
-																
-																return <TreeViewMenu open={this.state['asdf-' + key]} toggle={() => {
+																let attributes: any = [];
+																if (children.attributes) {
+																	attributes = Object.entries(children.attributes).map((item: any) => {
+																		return <ThemeStyleSection child={children} key={item[0]} title={item[0]} item={item[1]} />;
+																	});
+																}
+																return <TreeViewMenu active key={key} title={key} description={key} open={this.state['asdff-' + key]} toggle={() => {
 																	this.setState({
-																		['asdf-' + key]: !this.state['asdf-' + key]
+																		['asdff-' + key]: !this.state['asdff-' + key]
 																	});
 																}}>
+																	<TreeViewItemContainer>
+																		<TextInput label="target name" value={this.state[`target_name` + key] || key} onChangeText={(val: string) => {
+																			this.setState({
+																				[`target_name` + key]: val
+																			});
+																		}} />
+																	</TreeViewItemContainer>
+																	<TreeViewButtonGroup>
+																		<TreeViewGroupButton
+																			icon="fa fa-star"
+																			onClick={() => {
+																				let formTheme = spaceTheme;
+																				let formType = this.state[`target_name` + key] || key;
+																				formTheme[formType] = formTheme[formType] || {};
+																				['@media only screen and (min-width: 1200px)', ...Object.keys(MediaQueries)].map((ms: string) => {
+																					formTheme[formType][ms] = {};
+																					Object.entries(children.attributes).forEach((item: any) => {
+																						let key = item[0];
+																						let value = item[1];
+																						formTheme[formType][ms][key] = value;
+																					})
+																				});
+																				this.setState({
+																					turn: Date.now()
+																				})
+																				// spaceTheme,
+																				// themeColors,
+																				// themeVariables
+																			}}
+																		/>
+																	</TreeViewButtonGroup>
+																	{attributes}
 																</TreeViewMenu>
 															}) : []
 														}
+													</TreeViewMenu>
+												</GenericPropertyContainer>
+											</Box>
+										</div>
+										<div className="col-md-2">
+											<Box title="CSS Colors">
+												{(this.state.cssColors || [])
+													.map((color: string) => {
+														if (color) {
+															return [
+																<ColorInput
+																	value={color}
+																	immediate
+																	label={`${color} : ${color}`}
+																	key={`css-color-${color}`}
+																	onChange={(value: any) => {
+																	}}
+																	placeholder={color}
+																/>
+															];
+														}
+														return null;
+													})
+													.filter((x: any) => x)}
+											</Box>
+										</div>
+										<div className="col-md-2">
+											<Box title="CSS Selectors">
+												<GenericPropertyContainer
+													sideBarStyle={{ right: 0 }}
+													active
+													title="Css Selectors"
+													subTitle="Css Selectors"
+												>
+													<TreeViewMenu active title={'CSS Selectors'} open={this.state.cssSelectors} toggle={() => {
+														this.setState({
+															cssSelectors: !this.state.cssSelectors
+														});
+													}}>
+														{(spaceTheme ? Object.keys(spaceTheme) : []).map((v: any) => {
+															return (<TreeViewMenu title={v} active open={this.state[`selecto-${v}`]} onClick={() => {
+																this.setState({
+																	[`selecto-${v}`]: !this.state[`selecto-${v}`]
+																})
+															}}>
+																<TreeViewMenu description={'select'} title={'select'} onClick={() => {
+																	this.setState({ componentTag: v });
+																}} />
+																<TreeViewMenu description={'delete'} title={'delete'} onClick={() => {
+																	delete spaceTheme[v];
+																	this.setState({ turn: Date.now() })
+																}} />
+															</TreeViewMenu>);
+														})}
 													</TreeViewMenu>
 												</GenericPropertyContainer>
 											</Box>

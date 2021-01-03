@@ -85,7 +85,9 @@ import MethodProps, {
 	ValidationConfig,
 	PermissionConfig,
 	ComponentDidMountEffect,
-	ComponentDidMountEffectApiProps
+	ComponentDidMountEffectApiProps,
+	ScreenVisualInsert,
+	ScreenVisualInsertApiProps
 } from '../interface/methodprops';
 import { Node, GraphLink } from '../methods/graph_types';
 import ContentInfo from './contentinfo';
@@ -111,6 +113,8 @@ class AgentAccessView extends Component<any, any> {
 			agentEffect: [],
 			agentScreenEffect: {},
 			componentDidMountEffects: {},
+			screenVisualInsertEffect: {},
+			dashboardScreenVisualInsertEffect: {},
 			dashboardScreenEffect: {},
 			dashboardComponentDidMountEffects: {}
 		};
@@ -143,6 +147,8 @@ class AgentAccessView extends Component<any, any> {
 				dashboardRouting,
 				agentScreenEffect,
 				componentDidMountEffects,
+				screenVisualInsertEffect,
+				dashboardScreenVisualInsertEffect,
 				dashboardScreenEffect,
 				dashboardComponentDidMountEffects
 			} = this.state;
@@ -185,6 +191,30 @@ class AgentAccessView extends Component<any, any> {
 					});
 				});
 			}
+
+			if (screenVisualInsertEffect) {
+				Object.keys(screenVisualInsertEffect).forEach((agentId: string) => {
+					Object.keys(screenVisualInsertEffect[agentId]).forEach((modelId: string) => {
+						Object.keys(screenVisualInsertEffect[agentId][modelId]).forEach((key: string) => {
+							let componentDidMountEffect: ScreenVisualInsert[] = screenVisualInsertEffect[agentId][modelId][key];
+							validateScreenVisualInsert(
+								componentDidMountEffect,
+								result,
+								`${GetNodeTitle(agentId)}/${GetNodeTitle(modelId)}/${key}`
+							);
+						});
+					});
+				});
+			}
+			if (dashboardScreenVisualInsertEffect) {
+				Object.keys(dashboardScreenVisualInsertEffect).forEach((agentId: string) => {
+					Object.keys(dashboardScreenVisualInsertEffect[agentId]).forEach((modelId: string) => {
+						let screenEffect: ScreenVisualInsert[] = dashboardScreenVisualInsertEffect[agentId][modelId];
+						validateScreenVisualInsert(screenEffect, result, `${GetNodeTitle(agentId)}/${GetNodeTitle(modelId)}`);
+					});
+				});
+			}
+
 			if (componentDidMountEffects) {
 				Object.keys(componentDidMountEffects).forEach((agentId: string) => {
 					Object.keys(componentDidMountEffects[agentId]).forEach((modelId: string) => {
@@ -482,7 +512,7 @@ class AgentAccessView extends Component<any, any> {
 		// 	},
 		// 	graph
 		// ).filter((x) => !GetNodeProp(x, NodeProperties.IsUser));
-		let table_height = '550px';
+		let table_height = '750px';
 		return (
 			<TopViewer active={active}>
 				<section className="content">
@@ -525,6 +555,16 @@ class AgentAccessView extends Component<any, any> {
 												agentMethod: loadAgentMethods(onlyAgents, accessDescriptions, graph),
 												agentRouting: loadAgentRouting(onlyAgents, accessDescriptions, graph),
 												dashboardRouting: loadAgentDashboardRouting(
+													onlyAgents,
+													accessDescriptions,
+													graph
+												),
+												screenVisualInsertEffect: loadAgentScreenVisualInsertEffect(
+													onlyAgents,
+													accessDescriptions,
+													graph
+												),
+												dashboardScreenVisualInsertEffect: loadDashboardScreenVisualInsertEffect(
 													onlyAgents,
 													accessDescriptions,
 													graph
@@ -648,7 +688,7 @@ class AgentAccessView extends Component<any, any> {
 							<TabContent>
 								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agentaccessview')}>
 									<Box title={'Agent Access'} maxheight={500}>
-										<div className="tableFixHead" style={{ ['--tableheight']: table_height }}>
+										<div className="tableFixHead" style={({ ['--tableheight']: table_height } as any)}>
 											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 												<thead>
 													<tr>
@@ -858,7 +898,7 @@ class AgentAccessView extends Component<any, any> {
 									<Box title={'Dashboard Access'} maxheight={500}>
 										<div
 											className="tableFixHead dashboard"
-											style={{ ['--tableheight']: table_height }}
+											style={({ ['--tableheight']: table_height } as any)}
 										>
 											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 												<thead>
@@ -955,7 +995,7 @@ class AgentAccessView extends Component<any, any> {
 								</TabPane>
 								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agentmethoduse')}>
 									<Box maxheight={500} title={'Agent Mounting Methods'}>
-										<div className="tableFixHead" style={{ ['--tableheight']: table_height }}>
+										<div className="tableFixHead" style={({ ['--tableheight']: table_height } as any)}>
 											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 												<thead>
 													<tr>
@@ -1066,7 +1106,7 @@ class AgentAccessView extends Component<any, any> {
 									<Box maxheight={500} title={'Dashboard Mounting Methods'}>
 										<div
 											className="tableFixHead dashboard"
-											style={{ ['--tableheight']: table_height }}
+											style={({ ['--tableheight']: table_height } as any)}
 										>
 											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 												<thead>
@@ -1154,7 +1194,7 @@ class AgentAccessView extends Component<any, any> {
 								</TabPane>
 								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'agenteffects')}>
 									<Box maxheight={500} title={'Agent Effect Methods'}>
-										<div className="tableFixHead" style={{ ['--tableheight']: table_height }}>
+										<div className="tableFixHead" style={({ ['--tableheight']: table_height } as any)}>
 											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 												<thead>
 													<tr>
@@ -1264,7 +1304,7 @@ class AgentAccessView extends Component<any, any> {
 									<Box maxheight={500} title={'Dashboard Effect Methods'}>
 										<div
 											className="tableFixHead dashboard"
-											style={{ ['--tableheight']: table_height }}
+											style={({ ['--tableheight']: table_height } as any)}
 										>
 											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 												<thead>
@@ -1355,7 +1395,7 @@ class AgentAccessView extends Component<any, any> {
 								</TabPane>
 								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'button_routes')}>
 									<Box title={'Agent Routing'} maxheight={700}>
-										<div className="tableFixHead" style={{ ['--tableheight']: table_height }}>
+										<div className="tableFixHead" style={({ ['--tableheight']: table_height } as any)}>
 											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 												<thead>
 													<tr>
@@ -1491,7 +1531,7 @@ class AgentAccessView extends Component<any, any> {
 									<Box title={'Dashboard Routing'} maxheight={500}>
 										<div
 											className="tableFixHead dashboard"
-											style={{ ['--tableheight']: table_height }}
+											style={({ ['--tableheight']: table_height } as any)}
 										>
 											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 												<thead>
@@ -1599,7 +1639,7 @@ class AgentAccessView extends Component<any, any> {
 								</TabPane>
 								<TabPane active={VisualEq(state, AGENT_ACCESS_VIEW_TAB, 'screen_effects')}>
 									<Box title={'Agent Screen Effects'} maxheight={500}>
-										<div className="tableFixHead" style={{ ['--tableheight']: table_height }}>
+										<div className="tableFixHead" style={({ ['--tableheight']: table_height } as any)}>
 											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 												<thead>
 													<tr>
@@ -1646,6 +1686,7 @@ class AgentAccessView extends Component<any, any> {
 
 																			let screenEffectApis: ScreenEffectApi[] = [];
 																			let componentMountEffects: ComponentDidMountEffect[] = [];
+																			let screenVisualInserts: ScreenVisualInsert[] = [];
 																			if (this.hasComponentDidMountEffect(agent, model, v)) {
 																				componentMountEffects =
 																					this.getComponentDidMountEffects(
@@ -1659,6 +1700,21 @@ class AgentAccessView extends Component<any, any> {
 																					model,
 																					v,
 																					componentMountEffects
+																				);
+																			}
+																			if (this.hasScreenVisualInsertEffect(agent, model, v)) {
+																				screenVisualInserts =
+																					this.getScreenVisualInsert(
+																						agent,
+																						model,
+																						v
+																					) || screenVisualInserts;
+																			} else {
+																				this.setScreenVisualInsertEffects(
+																					agent,
+																					model,
+																					v,
+																					screenVisualInserts
 																				);
 																			}
 																			if (
@@ -1684,7 +1740,8 @@ class AgentAccessView extends Component<any, any> {
 																				model,
 																				v,
 																				screenEffectApis,
-																				componentMountEffects
+																				componentMountEffects,
+																				screenVisualInserts
 																			);
 																			return (
 																				<td key={tdkey}>
@@ -1713,7 +1770,7 @@ class AgentAccessView extends Component<any, any> {
 									<Box title={'Dashboard Screen Effects'} maxheight={500}>
 										<div
 											className="tableFixHead dashboard"
-											style={{ ['--tableheight']: table_height }}
+											style={({ ['--tableheight']: table_height } as any)}
 										>
 											<table className="fixheader" style={{ width: '100%', display: 'table' }}>
 												<thead>
@@ -1752,12 +1809,20 @@ class AgentAccessView extends Component<any, any> {
 
 																		let screenEffects: ScreenEffectApi[] = [];
 																		let componentMountEffects: ComponentDidMountEffect[] = [];
+																		let screenVisualInserts: ScreenVisualInsert[] = [];
 																		if (this.hasDashboardComponentDidMountEffect(agent, dashboard)) {
 																			componentMountEffects =
 																				this.getDashboardComponentDidMountEffects(
 																					agent,
 																					dashboard
 																				) || componentMountEffects;
+																		}
+																		if (this.hasDashboardScreenVisualInsertEffect(agent, dashboard)) {
+																			screenVisualInserts =
+																				this.getDashboardScreenVisualInsertEffects(
+																					agent,
+																					dashboard
+																				) || screenVisualInserts;
 																		}
 
 																		if (
@@ -1777,7 +1842,8 @@ class AgentAccessView extends Component<any, any> {
 																			agent,
 																			dashboard,
 																			screenEffects,
-																			componentMountEffects
+																			componentMountEffects,
+																			screenVisualInserts
 																		);
 
 																		return (
@@ -1813,11 +1879,17 @@ class AgentAccessView extends Component<any, any> {
 			</TopViewer>
 		);
 	}
-	private createScreenEffectButton(agent: string, model: string, v: string, screenEffectApis: ScreenEffectApi[], componentMountEffects: ComponentDidMountEffect[]) {
+	private createScreenEffectButton(
+		agent: string,
+		model: string,
+		v: string,
+		screenEffectApis: ScreenEffectApi[],
+		componentMountEffects: ComponentDidMountEffect[],
+		screenVisualInserts: ScreenVisualInsert[]) {
 		return (
 			<div className="btn-group">
 				<button
-					className={(screenEffectApis && screenEffectApis.length) || (componentMountEffects && componentMountEffects.length) ? 'btn btn-info' : 'btn btn-default'}
+					className={(screenVisualInserts && screenVisualInserts.length) || (screenEffectApis && screenEffectApis.length) || (componentMountEffects && componentMountEffects.length) ? 'btn btn-info' : 'btn btn-default'}
 					type="button"
 					onClick={() => {
 						this.props.setVisual(AGENT_SCREENEFFECT_CONTEXT_MENU, {
@@ -1826,6 +1898,7 @@ class AgentAccessView extends Component<any, any> {
 							viewType: v,
 							screenEffectApis,
 							componentMountEffects,
+							screenVisualInserts,
 							callback: () => {
 								this.setState({
 									turn: GUID()
@@ -1843,12 +1916,15 @@ class AgentAccessView extends Component<any, any> {
 		agent: string,
 		dashboard: string,
 		screenEffectApis: ScreenEffectApi[],
-		componentMountEffects: ComponentDidMountEffect[]
+		componentMountEffects: ComponentDidMountEffect[],
+		screenVisualInserts: ScreenVisualInsert[]
 	) {
 		return (
 			<div className="btn-group">
 				<button
-					className={(screenEffectApis && screenEffectApis.length || (componentMountEffects && componentMountEffects.length)) ? 'btn btn-info' : 'btn btn-default'}
+					className={(screenVisualInserts && screenVisualInserts.length) ||
+						(screenEffectApis && screenEffectApis.length ||
+							(componentMountEffects && componentMountEffects.length)) ? 'btn btn-info' : 'btn btn-default'}
 					type="button"
 					onClick={() => {
 						this.props.setVisual(DASHBOARD_SCREENEFFECT_CONTEXT_MENU, {
@@ -1856,6 +1932,7 @@ class AgentAccessView extends Component<any, any> {
 							dashboard,
 							screenEffectApis,
 							componentMountEffects,
+							screenVisualInserts,
 							callback: () => {
 								this.setState({
 									turn: GUID()
@@ -2434,6 +2511,32 @@ class AgentAccessView extends Component<any, any> {
 			this.state.componentDidMountEffects[agent][model][v]
 		);
 	}
+	private hasScreenVisualInsertEffect(agent: string, model: string, v: string) {
+		return (
+			this.state.componentDidMountEffects &&
+			this.state.componentDidMountEffects[agent] &&
+			this.state.componentDidMountEffects[agent][model] &&
+			this.state.componentDidMountEffects[agent][model][v]
+		);
+	}
+	private setScreenVisualInsertEffects(agent: string, model: string, v: string, value: ScreenVisualInsert[]) {
+
+		if (this.state.screenVisualInsertEffect && !this.state.screenVisualInsertEffect[agent]) {
+			this.state.screenVisualInsertEffect[agent] = {};
+		}
+		if (
+			this.state.screenVisualInsertEffect &&
+			this.state.screenVisualInsertEffect[agent] &&
+			!this.state.screenVisualInsertEffect[agent][model]
+		) {
+			this.state.screenVisualInsertEffect[agent][model] = {};
+		}
+		if (this.state.screenVisualInsertEffect)
+			if (this.state.screenVisualInsertEffect[agent] && this.state.screenVisualInsertEffect[agent][model]) {
+				this.state.screenVisualInsertEffect[agent][model][v] = value;
+				this.setState({ screenVisualInsertEffect: this.state.screenVisualInsertEffect });
+			}
+	}
 	private setComponentDidMountEffects(agent: string, model: string, v: string, value: ComponentDidMountEffect[]) {
 
 		if (this.state.componentDidMountEffects && !this.state.componentDidMountEffects[agent]) {
@@ -2454,9 +2557,6 @@ class AgentAccessView extends Component<any, any> {
 	}
 
 	private setScreenEffects(agent: string, model: string, v: string, value: ScreenEffectApi[]) {
-		if (!this.state.agentScreenEffect) {
-			this.state.agentScreenEffect = {};
-		}
 		if (this.state.agentScreenEffect && !this.state.agentScreenEffect[agent]) {
 			this.state.agentScreenEffect[agent] = {};
 		}
@@ -2476,6 +2576,10 @@ class AgentAccessView extends Component<any, any> {
 	private getScreenEffects(agent: string, model: string, v: string): ScreenEffectApi[] {
 		this.state.agentScreenEffect[agent][model][v] = this.state.agentScreenEffect[agent][model][v] || [];
 		return this.state.agentScreenEffect[agent][model][v];
+	}
+	private getScreenVisualInsert(agent: string, model: string, v: string): ScreenVisualInsert[] {
+		this.state.componentDidMountEffects[agent][model][v] = this.state.componentDidMountEffects[agent][model][v] || [];
+		return this.state.componentDidMountEffects[agent][model][v];
 	}
 	private getComponentDidMountEffects(agent: string, model: string, v: string): ComponentDidMountEffect[] {
 		this.state.componentDidMountEffects[agent][model][v] = this.state.componentDidMountEffects[agent][model][v] || [];
@@ -2502,6 +2606,13 @@ class AgentAccessView extends Component<any, any> {
 			this.state.dashboardComponentDidMountEffects[agent][dashboard]
 		);
 	}
+	private hasDashboardScreenVisualInsertEffect(agent: string, dashboard: string): boolean {
+		return (
+			this.state.dashboardScreenVisualInsertEffect &&
+			this.state.dashboardScreenVisualInsertEffect[agent] &&
+			this.state.dashboardScreenVisualInsertEffect[agent][dashboard]
+		);
+	}
 	private getDashboardScreenEffects(agent: string, dashboard: string): ScreenEffectApi[] {
 		this.state.dashboardScreenEffect[agent][dashboard] = this.state.dashboardScreenEffect[agent][dashboard] || [];
 		return this.state.dashboardScreenEffect[agent][dashboard];
@@ -2510,6 +2621,11 @@ class AgentAccessView extends Component<any, any> {
 	private getDashboardComponentDidMountEffects(agent: string, dashboard: string): ComponentDidMountEffect[] {
 		this.state.dashboardComponentDidMountEffects[agent][dashboard] = this.state.dashboardComponentDidMountEffects[agent][dashboard] || [];
 		return this.state.dashboardComponentDidMountEffects[agent][dashboard];
+	}
+
+	private getDashboardScreenVisualInsertEffects(agent: string, dashboard: string): ScreenVisualInsert[] {
+		this.state.dashboardScreenVisualInsertEffect[agent][dashboard] = this.state.dashboardScreenVisualInsertEffect[agent][dashboard] || [];
+		return this.state.dashboardScreenVisualInsertEffect[agent][dashboard];
 	}
 
 	private hasFunctionKeyValue(agentIndex: number, modelIndex: number, v: string, functionKey: string) {
@@ -2657,6 +2773,37 @@ function validateComponentDidMountEffect(componentDidMounts: ComponentDidMountEf
 			if (!componentDidMount.dataChain) {
 				messages.push('no datachain selected.');
 			}
+			if (messages.length) {
+				result.push(
+					<ContentInfo
+						type={'danger'}
+						description={`${title}`}
+						title={componentDidMount.name}
+						messages={messages}
+					/>
+				);
+			}
+		});
+	}
+}
+function validateScreenVisualInsert(componentDidMounts: ScreenVisualInsert[], result: any[], title: string) {
+	if (componentDidMounts) {
+		componentDidMounts.forEach((componentDidMount: ScreenVisualInsert) => {
+			let messages: string[] = [];
+			ValidName(componentDidMount.name, messages, { lowerCase: false });
+
+			if (!componentDidMount.visualInsert) {
+				messages.push('no visual insert.');
+			}
+
+			if (!componentDidMount.visualInsert.template) {
+				messages.push('no visual insert template.');
+			}
+
+			if (!componentDidMount.visualInsert.where) {
+				messages.push('no visual insert where.');
+			}
+
 			if (messages.length) {
 				result.push(
 					<ContentInfo
@@ -2959,12 +3106,33 @@ function loadAgentComponentDidMountEffect(onlyAgents: any[], accessDescriptions:
 
 	return res;
 }
+function loadAgentScreenVisualInsertEffect(onlyAgents: any[], accessDescriptions: any[], graph: any) {
+	let res: any = loadAgentObj<ScreenVisualInsertApiProps>(
+		onlyAgents,
+		accessDescriptions,
+		graph,
+		LinkPropertyKeys.ScreenVisualInsertApiProps
+	);
+
+	return res;
+}
 function loadDashboardScreenEffect(onlyAgents: any[], accessDescriptions: any[], graph: any) {
 	let res: any = loadDashboard<ScreenEffectApi[]>(
 		onlyAgents,
 		accessDescriptions,
 		graph,
 		LinkPropertyKeys.DashboardScreenEffectApiProps,
+		true
+	);
+
+	return res;
+}
+function loadDashboardScreenVisualInsertEffect(onlyAgents: any[], accessDescriptions: any[], graph: any) {
+	let res: any = loadDashboard<ComponentDidMountEffect[]>(
+		onlyAgents,
+		accessDescriptions,
+		graph,
+		LinkPropertyKeys.DashboardScreenVisualInsertApiProps,
 		true
 	);
 
@@ -3048,9 +3216,9 @@ function loadAgentRouting(onlyAgents: any[], accessDescriptions: any[], graph: a
 					if (result[screenAgentIndex] && result[screenAgentIndex][modelIndex]) {
 						let routingProps: RoutingProps = result[screenAgentIndex][modelIndex];
 						Object.keys(routingProps)
-							.filter((v: string) => viewType === v && routingProps[v])
+							.filter((v: string) => viewType === v && (routingProps as any)[v])
 							.forEach((v) => {
-								let routing: Routing = routingProps[v];
+								let routing: Routing = (routingProps as any)[v];
 								if (routing && routing.routes) {
 									routing.routes = routing.routes.filter((v: RouteDescription) => {
 										return !(v.linkId && !getLink(graph, { id: v.linkId }));
