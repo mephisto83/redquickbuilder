@@ -1,4 +1,4 @@
-import { UITypes, NEW_LINE, NodeTypes } from '../constants/nodetypes';
+import { UITypes, NEW_LINE, NodeTypes, StandardVisuals } from '../constants/nodetypes';
 import {
 	GetNodeById,
 	NodeProperties,
@@ -6,7 +6,9 @@ import {
 	GetCodeName,
 	GetJSCodeName,
 	GetCssName,
-	GetCurrentGraph
+	GetCurrentGraph,
+	NodesByType,
+	GetNodesByProperties
 } from '../actions/uiActions';
 import { GenerateMarkupTag, ConvertViewTypeToComponentNode, GetStylesFor } from './screenservice';
 import { GetCellProperties, getComponentProperty } from '../methods/graph_methods';
@@ -15,6 +17,7 @@ import { addNewLine } from '../utils/array';
 import * as GraphMethods from '../methods/graph_methods';
 import { ComponentLayoutContainer, Node } from '../methods/graph_types';
 import { constructCellStyles } from './sharedservice';
+import { VisualInsert, VisualInsertWhere } from '../interface/methodprops';
 
 export function GetPropertyConsts(id: string, language = UITypes.ReactNative) {
 	const node = GetNodeById(id);
@@ -131,7 +134,7 @@ export function GetNodeComponents(layoutObj: any, item?: any, currentRoot?: any)
 		currentRoot = layout;
 	}
 	Object.keys(currentRoot).map((item) => {
-		imports = [ ...imports, ...GetNodeComponents(layoutObj, item, currentRoot[item]) ];
+		imports = [...imports, ...GetNodeComponents(layoutObj, item, currentRoot[item])];
 		if (properties[item]) {
 			const children = properties[item].children || {};
 			if (children[item]) {
@@ -154,7 +157,7 @@ export function GetNodeComponentsKeys(layoutObj: any, item?: any, currentRoot?: 
 	}
 
 	Object.keys(currentRoot).map((item) => {
-		imports = [ ...imports, ...GetNodeComponentsKeys(layoutObj, item, currentRoot[item]) ];
+		imports = [...imports, ...GetNodeComponentsKeys(layoutObj, item, currentRoot[item])];
 		if (properties[item]) {
 			const children = properties[item].children || {};
 			if (children[item]) imports.push(item);
@@ -204,6 +207,60 @@ export function buildLayoutTree(args: {
 	}
 	return result;
 }
+function getInserts(node: Node) {
+	let result = { startInsert: '', endInsert: '' };
+	if (GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.ScreenOption) {
+		let viewPackageTitle = GetNodeProp(node, NodeProperties.ViewPackageTitle);
+		let visuals: Node[] = [];
+		switch (viewPackageTitle) {
+			case 'Anonymous Guest':
+				visuals = GetNodesByProperties({
+					[NodeProperties.NODEType]: NodeTypes.VisualInsert,
+					[NodeProperties.Screen]: StandardVisuals.AnonymousGuest
+				});
+				break;
+			case 'Forgot Login':
+				visuals = GetNodesByProperties({
+					[NodeProperties.NODEType]: NodeTypes.VisualInsert,
+					[NodeProperties.Screen]: StandardVisuals.ForgotLogin
+				});
+				break;
+			case 'Continue As':
+				visuals = GetNodesByProperties({
+					[NodeProperties.NODEType]: NodeTypes.VisualInsert,
+					[NodeProperties.Screen]: StandardVisuals.ContinueAs
+				});
+				break;
+			case 'Authenticate':
+				visuals = GetNodesByProperties({
+					[NodeProperties.NODEType]: NodeTypes.VisualInsert,
+					[NodeProperties.Screen]: StandardVisuals.Authenticate
+				});
+				break;
+			case 'Register':
+				visuals = GetNodesByProperties({
+					[NodeProperties.NODEType]: NodeTypes.VisualInsert,
+					[NodeProperties.Screen]: StandardVisuals.Register
+				});
+				break;
+		}
+		let visualInserObj: any = visuals
+			.map((node: Node) => { return GetNodeProp(node, NodeProperties.VisualInsert) })
+			.filter(v => v && v.where)
+			.groupBy((v: VisualInsert) => {
+				return v.where;
+			});
+		if (visualInserObj) {
+			if (visualInserObj[VisualInsertWhere.Start]) {
+				result.startInsert = visualInserObj[VisualInsertWhere.Start].map((v: VisualInsert) => v.template).join(NEW_LINE);
+			}
+			if (visualInserObj[VisualInsertWhere.End]) {
+				result.endInsert = visualInserObj[VisualInsertWhere.End].map((v: VisualInsert) => v.template).join(NEW_LINE);
+			}
+		}
+	}
+	return result;
+}
 export function createSection(args: {
 	layoutObj: ComponentLayoutContainer;
 	item: any;
@@ -228,15 +285,15 @@ export function createSection(args: {
 	let root = GraphMethods.GetFirstCell(layoutObj);
 	let tree = Object.keys(currentRoot).length
 		? buildLayoutTree({
-				layoutObj,
-				currentRoot,
-				language,
-				imports,
-				node,
-				section,
-				css,
-				injections
-			})
+			layoutObj,
+			currentRoot,
+			language,
+			imports,
+			node,
+			section,
+			css,
+			injections
+		})
 		: [];
 	if (children && children[item]) {
 		if (!imports.some((v: any) => v === children[item])) imports.push(children[item]);
@@ -264,9 +321,9 @@ export function createSection(args: {
 		let { injections } = properties[item];
 		if (injections) {
 			if (injections.route) {
-        className ='route-injections'
-        tree.push(`{this.props.${injections.route} ? this.props.${injections.route}(this.state.value) : null}`)
-      }
+				className = 'route-injections'
+				tree.push(`{this.props.${injections.route} ? this.props.${injections.route}(this.state.value) : null}`)
+			}
 		}
 	}
 	const _style = {
@@ -276,7 +333,7 @@ export function createSection(args: {
 		'borderStyle',
 		'borderWidth',
 		'borderColor',
-		...(language === UITypes.ReactNative ? [] : [ 'display', 'flex' ])
+		...(language === UITypes.ReactNative ? [] : ['display', 'flex'])
 	].forEach((t) => {
 		delete _style[t];
 	});
@@ -291,7 +348,12 @@ export function createSection(args: {
 	css[section] = { style: { ..._style } };
 	let control = 'View';
 	let toplevelCls = '';
+	let startInsert = '';
+	let endInsert = '';
 	if (root === item) {
+		let temp = getInserts(node);
+		startInsert = temp.startInsert;
+		endInsert = temp.endInsert;
 		toplevelCls = GetCssName(node) || GetCodeName(node);
 	}
 	let tagclasses = '';
@@ -347,7 +409,9 @@ export function createSection(args: {
 
 			return `
 <${control} ${className} >
+${startInsert}
 ${addNewLine(tree.tightenPs())}
+${endInsert}
 </${control}>
             `;
 		default:

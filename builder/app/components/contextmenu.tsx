@@ -24,7 +24,8 @@ import {
 	SelectorType,
 	DefaultPropertyValueType,
 	NodeAttributePropertyTypes,
-	MenuDataSourcePurpose
+	MenuDataSourcePurpose,
+	StandardVisuals
 } from '../constants/nodetypes';
 import AddNameDescription from '../nodepacks/AddNameDescription';
 import GenericPropertyContainer from './genericpropertycontainer';
@@ -132,6 +133,8 @@ import { ClearApiBetweenComponents } from '../nodepacks/ClearApiBetweenComponent
 import ConnectScreens from '../nodepacks/batch/ConnectScreens';
 import AddComponentsToScreenOptions from '../nodepacks/batch/AddComponentsToScreenOptions';
 import { updateComponentProperty } from '../actions/uiActions';
+import VisualInsertComponent from './visualInsertComponent';
+import { VisualInsert, VisualInsertWhere } from '../interface/methodprops';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -1436,6 +1439,107 @@ class ContextMenu extends Component<any, any> {
 			/>
 		);
 		switch (currentNodeType) {
+			case NodeTypes.VisualInsert:
+				let insert: VisualInsert = GetNodeProp(currentNode, NodeProperties.VisualInsert) || {
+					template: '',
+					where: VisualInsertWhere.Start
+				};
+				return [<TreeViewMenu
+					open={UIA.Visual(state, 'OPERATIONS')}
+					active
+					title={Titles.Operations}
+					innerStyle={{ maxHeight: MAX_CONTENT_MENU_HEIGHT, overflowY: 'auto' }}
+					toggle={() => {
+						this.props.toggleVisual('OPERATIONS');
+					}}
+				>
+					<TreeViewItemContainer>
+						<SelectInput
+							label={Titles.Screen}
+							options={Object.entries(StandardVisuals).map((v: any) => ({ title: v[0], value: v[1] }))}
+							onChange={(value: any) => {
+								this.props.graphOperation([
+									{
+										operation: UIA.CHANGE_NODE_PROPERTY,
+										options: {
+											prop: UIA.NodeProperties.Screen,
+											id: currentNode.id,
+											value: value
+										}
+									}
+								]);
+							}}
+							value={GetNodeProp(currentNode, NodeProperties.Screen)}
+						/>
+					</TreeViewItemContainer>
+					<VisualInsertComponent
+						label={Titles.Insert}
+						visualInsert={insert}
+						onChange={() => {
+							this.setState({
+								turn: UIA.GUID()
+							});
+							updateComponentProperty(currentNode.id, NodeProperties.VisualInsert, insert);
+						}} />
+					<TreeViewMenu onClick={() => {
+						let labels = GetNodesLinkedTo(UIA.GetCurrentGraph(), {
+							id: currentNode.id,
+							componentType: NodeTypes.VisualInsertLabel
+						});
+						(labels.map((v: Node) => {
+							return UIA.removeNodeById(v.id);
+						}))
+						if (insert.template) {
+							function readTemplate(str: string) {
+								let m;
+								const regex = /titleService\.get\('[a-zA-Z0-9]*'\)/gm;
+								let result: any = [];
+								while ((m = regex.exec(str)) !== null) {
+									// This is necessary to avoid infinite loops with zero-width matches
+									if (m.index === regex.lastIndex) {
+										regex.lastIndex++;
+									}
+
+									// The result can be accessed through the `m`-variable.
+									m.forEach((match, groupIndex) => {
+										console.log(`Found match, group ${groupIndex}: ${match}`);
+										result.push({ groupIndex, match })
+									});
+								}
+								return result.map((v: any) => {
+									try {
+										let end = v.match.lastIndexOf(`'`);
+										let start = `titleService.get('`.length;
+										let t = v.match.substring(start, end);
+										return t;
+
+									} catch (e) {
+										return false;
+									}
+								}).filter(v => v);
+							}
+							let temp = readTemplate(insert.template);
+							let newNodes: any = [];
+							temp = temp.map((word: string) => {
+								return UIA.CreateNewNode(
+									{
+										[NodeProperties.UIText]: word,
+										[NodeProperties.NODEType]: NodeTypes.VisualInsertLabel
+									},
+									(node: Node) => {
+										newNodes.push(node);
+									}
+								)
+							})
+							this.props.graphOperation(temp);
+							this.props.graphOperation(newNodes.map((nn: Node) => {
+								return UIA.AddLinkBetweenNodes(currentNode.id, nn.id, {
+									...LinkProperties.VisualInsertLabel
+								})
+							}));
+						}
+					}} />
+				</TreeViewMenu>];
 			case NodeTypes.DefaultValue:
 				return [
 					<TreeViewMenu

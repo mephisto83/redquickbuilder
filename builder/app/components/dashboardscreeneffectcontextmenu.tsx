@@ -28,7 +28,8 @@ import {
 	Effect,
 	EffectDescription,
 	ScreenEffectApi,
-	ComponentDidMountEffect
+	ComponentDidMountEffect,
+	ScreenVisualInsert
 } from '../interface/methodprops';
 import SelectInput from './selectinput';
 import { ViewTypes } from '../constants/viewtypes';
@@ -39,6 +40,7 @@ import { MethodFunctions, FunctionTemplateKeys, GetFunctionTypeOptions } from '.
 import CheckBox from './checkbox';
 import ScreenEffectsComponent from './screenEffectsComponent';
 import ComponentDidMountEffectsComponent from './componentDidMountEffectsComponent';
+import ScreenVisualInsertsComponent from './screenVisualInsertsComponent';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class DashboardScreenEffectContextMenu extends Component<any, any> {
@@ -86,6 +88,25 @@ class DashboardScreenEffectContextMenu extends Component<any, any> {
 							}}
 							api
 							effects={componentMountEffects}
+						/>
+					);
+					break;
+			}
+		}
+		
+		let screenVisualInserts: ScreenVisualInsert[] = mode.screenVisualInserts;
+		if (screenVisualInserts) {
+			switch (mode) {
+				default:
+					result.push(
+						<ScreenVisualInsertsComponent
+							onChange={() => {
+								if (mode && mode.callback) {
+									mode.callback();
+								}
+							}}
+							api
+							inserts={screenVisualInserts}
 						/>
 					);
 					break;

@@ -44,10 +44,10 @@ export default class VisualInsertComponent extends Component<any, any> {
 				<TreeViewItemContainer>
 					<SelectInput
 						label={Titles.Where}
-						options={Object.keys(VisualInsertWhere).map((v: string) => {
+						options={Object.entries(VisualInsertWhere).map((v: [string, VisualInsertWhere]) => {
 							return ({
-								title: v,
-								value: VisualInsertWhere[v]
+								title: v[0],
+								value: v[1]
 							});
 						})}
 						value={visualInsert.where}
@@ -64,6 +64,7 @@ export default class VisualInsertComponent extends Component<any, any> {
 				</TreeViewItemContainer>
 				<TreeViewItemContainer>
 					<TextInput
+						textarea
 						label={Titles.Name}
 						value={visualInsert.template}
 						onChange={(value: string) => {

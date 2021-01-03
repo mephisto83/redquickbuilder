@@ -4,7 +4,6 @@
 /* eslint-disable no-case-declarations */
 /* eslint-disable no-param-reassign */
 /* eslint-disable default-case */
-import fs from 'fs';
 import path from 'path';
 import {
 	GetScreenNodes,
@@ -19,13 +18,8 @@ import {
 	GetDataSourceNode,
 	GetMethodParameters,
 	GetComponentNodeProperties,
-	GetLinkChainItem,
 	GetCurrentGraph,
-	GetNodeByProperties,
-	GetNodes,
 	GetLinkProperty,
-	GetDataChainArgs,
-	GetComponentInternalApiNode,
 	GetComponentInternalApiNodes,
 	GetComponentApiNodes,
 	GetEventArguments,
@@ -39,11 +33,9 @@ import {
 	NEW_LINE,
 	NodeTypes,
 	LinkType,
-	ProgrammingLanguages,
 	LinkPropertyKeys,
 	MediaQueries,
 	StyleNodeProperties,
-	LinkProperties,
 	EventArgumentTypes,
 	PropertyCentricTypes,
 	UIActionMethods,
@@ -54,8 +46,6 @@ import {
 	GetNodeComponents,
 	GetRNConsts,
 	GetRNModelInstances,
-	GetRNModelConst,
-	GetRNModelConstValue,
 	GetPropertyCentricComponents
 } from './layoutservice';
 import {
@@ -73,23 +63,18 @@ import {
 	ComponentTags
 } from '../constants/componenttypes';
 import {
-	getComponentProperty,
 	getClientMethod,
 	TARGET,
 	SOURCE,
-	GetConnectedNodeByType,
 	GetNodesLinkedTo,
-	GetConnectedNodesByType,
-	GetLinkByNodes,
 	getNodesByLinkType,
 	getNodesLinkedTo,
-	getNodesLinkedFrom,
 	GetLinkBetween,
 	existsLinkBetween,
 	GetNodeLinkedTo,
 	findLink
 } from '../methods/graph_methods';
-import { HandlerType } from '../components/titles';
+
 import { addNewLine } from '../utils/array';
 import { StyleLib } from '../constants/styles';
 import { ViewTypes } from '../constants/viewtypes';

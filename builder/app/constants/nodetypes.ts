@@ -33,6 +33,7 @@ export const NodeTypes = {
 	ContextualParameters: 'ContextualParameters',
 	Screen: 'screen',
 	EventMethod: 'EventMethod',
+	VisualInsertLabel: 'VisualInsertLabel',
 	NavigationAction: 'NavigationAction',
 	NavigationScreen: 'NavigationScreen',
 	Lists: 'Lists',
@@ -94,8 +95,10 @@ export const NodeTypes = {
 	Theme: 'Theme',
 	DataChainCollection: 'DataChainCollection',
 	PermissionTemplate: 'PermissionTemplate',
-	ConditionTemplate: 'ConditionTemplate'
+	ConditionTemplate: 'ConditionTemplate',
+	VisualInsert: 'VisualInsert'
 };
+
 export const ConditionTypes = {
 	Enumeration: 'Enumeration'
 };
@@ -467,13 +470,25 @@ export const UIActionMethodParameterTypes = {
 	RedGraph: 'RedGraph',
 	RetrieveParameters: 'RetrieveParameters'
 };
+
+export enum StandardVisuals {
+	Register = 'Register',
+	ContinueAs = 'ContinueAs',
+	Authenticate = 'Authenticate',
+	ForgotLogin = 'ForgotLogin',
+	AnonymousGuest = 'AnonymousGuest',
+	HomeView = 'HomeView'
+}
+
 export const NodeProperties = {
 	ViewPackage: 'view-package',
 	DataChainCollectionChildrenCount: 'DataChainCollectionChildrenCount',
+	Screen: 'Screen',
 	MenuRootNode: 'MenuRootNode',
 	IsFetchOutput: 'IsFetchOutput',
 	UIActionMethod: 'UIActionMethod',
 	HideStyle: 'HideStyle',
+	VisualInsert: 'VisualInsert',
 	IsPropertyCentric: 'IsPropertyCentric',
 	RouteInjection: 'RouteInjection',
 	PropertyCentricType: 'PropertyCentricType',
@@ -875,6 +890,7 @@ export const LinkType = {
 	DataChainIsDisabled: 'DataChainIsDisabled',
 	Composition: 'Composition',
 	DataChainLogout: 'DataChainLogout',
+	VisualInsertLabel: 'VisualInsertLabel',
 	SwaggerClass: 'SwaggerClass',
 	UIMethod: 'UIMethod',
 	SwaggerMethodDescription: 'SwaggerMethodDescription',
@@ -1173,6 +1189,9 @@ export const LinkProperties = {
 	},
 	SwaggerClass: {
 		type: LinkType.SwaggerClass
+	},
+	VisualInsertLabel: {
+		type: LinkType.VisualInsertLabel
 	},
 	UIMethod: {
 		type: LinkType.UIMethod

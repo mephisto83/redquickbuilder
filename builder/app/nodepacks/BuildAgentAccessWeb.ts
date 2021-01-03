@@ -57,6 +57,8 @@ export default function BuildAgentAccessWeb(args: any) {
 		dashboardScreenEffect,
 		dashboardEffect,
 		dashboards,
+		screenVisualInsertEffect,
+		dashboardScreenVisualInsertEffect,
 		agents,
 		models,
 		agentViewMount,
@@ -134,6 +136,10 @@ export default function BuildAgentAccessWeb(args: any) {
 					dashboardComponentDidMountEffects[agent] && dashboardComponentDidMountEffects[agent][dashboard]
 						? dashboardComponentDidMountEffects[agent][dashboard] || []
 						: [];
+				const screenVisualInsertEffect =
+					dashboardScreenVisualInsertEffect[agent] && dashboardScreenVisualInsertEffect[agent][dashboard]
+						? dashboardScreenVisualInsertEffect[agent][dashboard] || []
+						: [];
 
 				if (values && values.access) {
 					let agentAccessContext: any = null;
@@ -143,6 +149,7 @@ export default function BuildAgentAccessWeb(args: any) {
 						linkProps: {},
 						[LinkPropertyKeys.DashboardScreenEffectApiProps]: screenEffect,
 						[LinkPropertyKeys.DashboardComponentDidMountApiProps]: componentDidMounts,
+						[LinkPropertyKeys.DashboardScreenVisualInsertApiProps]: screenVisualInsertEffect,
 						[LinkPropertyKeys.DashboardAccessProps]: values,
 						[LinkPropertyKeys.DashboardRoutingProps]: { ...routing || {} },
 						[LinkPropertyKeys.DashboardViewMountProps]: { ...mounting },
@@ -185,6 +192,10 @@ export default function BuildAgentAccessWeb(args: any) {
 					agentScreenEffect[agent] && agentScreenEffect[agent][model]
 						? agentScreenEffect[agent][model] || {}
 						: {};
+				const visualInsertEffect =
+					screenVisualInsertEffect[agent] && screenVisualInsertEffect[agent][model]
+						? screenVisualInsertEffect[agent][model] || {}
+						: {};
 				const componentDidMountEffect =
 					componentDidMountEffects[agent] && componentDidMountEffects[agent][model]
 						? componentDidMountEffects[agent][model] || {}
@@ -206,6 +217,7 @@ export default function BuildAgentAccessWeb(args: any) {
 							agentId: agent,
 							linkProps: { ...values },
 							[LinkPropertyKeys.ScreenEffectApiProps]: { ...screenEffect },
+							[LinkPropertyKeys.ScreenVisualInsertApiProps]: { ...visualInsertEffect },
 							[LinkPropertyKeys.ComponentDidMountApiProps]: { ...componentDidMountEffect },
 							[LinkPropertyKeys.MethodProps]: { ...methods },
 							[LinkPropertyKeys.RoutingProps]: { ...routing },

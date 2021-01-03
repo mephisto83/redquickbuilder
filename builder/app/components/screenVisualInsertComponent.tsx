@@ -56,22 +56,19 @@ export default class ScreenVisualInsertComponent extends Component<any, any> {
 						}}
 					/>
 				</TreeViewItemContainer>
-				<TreeViewItemContainer>
-					<VisualInsertComponent
-						label={Titles.DataChain}
-						options={UIA.NodesByType(null, NodeTypes.DataChain).toNodeSelect()}
-						value={insert.visualInsert}
-						onChange={(value: VisualInsert) => {
-							insert.visualInsert = value;
-							this.setState({
-								turn: UIA.GUID()
-							});
-							if (this.props.onChange) {
-								this.props.onChange();
-							}
-						}}
-					/>
-				</TreeViewItemContainer>
+				<VisualInsertComponent
+					label={Titles.Insert}
+					options={UIA.NodesByType(null, NodeTypes.DataChain).toNodeSelect()}
+					visualInsert={insert.visualInsert}
+					onChange={() => {
+						this.setState({
+							turn: UIA.GUID()
+						});
+						if (this.props.onChange) {
+							this.props.onChange(insert);
+						}
+					}}
+				/>
 				<TreeViewButtonGroup>
 					<TreeViewGroupButton
 						title={`${Titles.RemoveVisualInsert}`}
@@ -79,9 +76,9 @@ export default class ScreenVisualInsertComponent extends Component<any, any> {
 							if (this.props.onDelete) {
 								this.props.onDelete();
 							}
-								if (this.props.onChange) {
-									this.props.onChange();
-								}
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
 						}}
 						icon="fa fa-minus"
 					/>

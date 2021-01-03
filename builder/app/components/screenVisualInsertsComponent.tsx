@@ -15,7 +15,6 @@ import { ComponentDidMountEffect, ScreenEffect, ScreenVisualInsert, VisualInsert
 import ScreenEffectComponent from './screenEffectComponent';
 import TreeViewButtonGroup from './treeviewbuttongroup';
 import TreeViewGroupButton from './treeviewgroupbutton';
-import ComponentDidMountEffectComponent from './componentDidMountEffectComponent';
 import ScreenVisualInsertComponent from './screenVisualInsertComponent';
 
 export default class ScreenVisualInsertsComponent extends Component<any, any> {
@@ -32,11 +31,11 @@ export default class ScreenVisualInsertsComponent extends Component<any, any> {
 				onClick={() => {
 					this.setState({ open: !this.state.open });
 				}}
-				title={Titles.ComponentDidMount}
+				title={'Screen Visual Inserts'}
 			>
 				<TreeViewButtonGroup>
 					<TreeViewGroupButton
-						title={`${Titles.AddComponentDidMountEffect}`}
+						title={`Screen Visual Insert Effects`}
 						onClick={() => {
 							screenVisualInserts.push({
 								id: UIA.GUID(),

@@ -35,6 +35,7 @@ import Typeahead from "./typeahead";
 import { MediaQueries, Languages, NodeTypes } from "../constants/nodetypes";
 import translationservice from '../service/translationservice';
 import GridPlacementField from "./gridplacementfield";
+import { Node } from "../methods/graph_types";
 
 class TranslationView extends Component<any, any> {
   constructor(props: any) {
@@ -70,9 +71,11 @@ class TranslationView extends Component<any, any> {
       NodeTypes.Model,
       NodeTypes.ComponentNode,
       NodeTypes.Screen,
+      NodeTypes.VisualInsertLabel,
       NodeTypes.ScreenOption].filter(x => !this.state[x]))
-      .filter(x => this.state.OnlyUntranslated ? !languageTitles.titles[x.id] : true)
-      .filter(x => this.state.titleSearch && `${GetNodeProp(x, NodeProperties.Label)} ${x.id} ${GetNodeTitle(x)}`.toLowerCase().indexOf(this.state.titleSearch.toLowerCase()) !== -1);
+      .filter((x: Node) => this.state.OnlyUntranslated ? !languageTitles.titles[x.id] : true)
+      .filter((x: Node) => this.state.titleSearch &&
+        `${GetNodeProp(x, NodeProperties.Label)} ${x.id} ${GetNodeTitle(x)}`.toLowerCase().indexOf(this.state.titleSearch.toLowerCase()) !== -1);
     return (
       <TopViewer active={active} >
         <section className="content">

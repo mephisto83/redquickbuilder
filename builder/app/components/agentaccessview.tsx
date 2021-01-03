@@ -2578,8 +2578,8 @@ class AgentAccessView extends Component<any, any> {
 		return this.state.agentScreenEffect[agent][model][v];
 	}
 	private getScreenVisualInsert(agent: string, model: string, v: string): ScreenVisualInsert[] {
-		this.state.componentDidMountEffects[agent][model][v] = this.state.componentDidMountEffects[agent][model][v] || [];
-		return this.state.componentDidMountEffects[agent][model][v];
+		this.state.screenVisualInsertEffect[agent][model][v] = this.state.screenVisualInsertEffect[agent][model][v] || [];
+		return this.state.screenVisualInsertEffect[agent][model][v];
 	}
 	private getComponentDidMountEffects(agent: string, model: string, v: string): ComponentDidMountEffect[] {
 		this.state.componentDidMountEffects[agent][model][v] = this.state.componentDidMountEffects[agent][model][v] || [];
@@ -2790,8 +2790,7 @@ function validateScreenVisualInsert(componentDidMounts: ScreenVisualInsert[], re
 	if (componentDidMounts) {
 		componentDidMounts.forEach((componentDidMount: ScreenVisualInsert) => {
 			let messages: string[] = [];
-			ValidName(componentDidMount.name, messages, { lowerCase: false });
-
+			
 			if (!componentDidMount.visualInsert) {
 				messages.push('no visual insert.');
 			}
