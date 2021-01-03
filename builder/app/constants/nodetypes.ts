@@ -483,7 +483,7 @@ export enum StandardVisuals {
 export const NodeProperties = {
 	ViewPackage: 'view-package',
 	DataChainCollectionChildrenCount: 'DataChainCollectionChildrenCount',
-	Screen: 'Screen',
+	Screen: 'screen',
 	MenuRootNode: 'MenuRootNode',
 	IsFetchOutput: 'IsFetchOutput',
 	UIActionMethod: 'UIActionMethod',
@@ -769,7 +769,6 @@ export const NodeProperties = {
 	Model: 'Model',
 	NavigationScreen: 'NavigationScreen',
 	Agent: 'Agent',
-	Screen: 'Screen',
 	ChainNodeInput1: 'ChainNodeInput1',
 	List: 'List',
 	UIModelType: 'uiModelType',

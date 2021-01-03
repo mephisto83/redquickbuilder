@@ -44,12 +44,27 @@ import TreeViewMenu from './treeviewmenu';
 import TreeViewItemContainer from './treeviewitemcontainer';
 import TreeViewGroupButton from './treeviewgroupbutton';
 import TreeViewButtonGroup from './treeviewbuttongroup';
+import { Responsive, WidthProvider } from 'react-grid-layout';
+import Panel from './panel';
 const THEME_VIEW_TAB = 'theme-view-tab';
+const ResponsiveGridLayout = WidthProvider(Responsive);
 
 class ThemeView extends Component<any, any> {
 	constructor(props: any) {
 		super(props);
-		this.state = { quickColor: '', bindAll: true, mediaSize: MediaQueries['Extra devices'], modelPropertyClasses: [] };
+		const Deflayout = [
+			{ i: 'a', x: 3, y: 0, w: 9, h: 3 },
+			{ i: 'b', x: 3, y: 3, w: 7, h: 4 },
+			{ i: 'c', x: 0, y: 4, w: 3, h: 4 }
+		];
+		const layout = {
+			lg: Deflayout
+		};
+		this.state = {
+			quickColor: '', bindAll: true, mediaSize: MediaQueries['Extra devices'], modelPropertyClasses: [],
+			layout,
+			otherLayout: JSON.parse(JSON.stringify(Deflayout))
+		};
 	}
 
 	active() {
@@ -566,240 +581,249 @@ class ThemeView extends Component<any, any> {
 							</TabContainer>
 							<TabContent>
 								<TabPane active={VisualEq(state, THEME_VIEW_TAB, 'Variables')}>
-									<div className="col-md-12">
-										<div className="row">
-											<div className="col-md-6">
-												<Box maxheight={350} title={Titles.Fonts}>
-													<FormControl>
-														<TextInput
-															value={this.state.fontName}
-															label={`${Titles.Font} ${Titles.Name}`}
-															title={`${Titles.Font} ${Titles.Name}`}
-															immediate
-															onChange={(value: any) => {
-																this.setState({ fontName: value });
-															}}
-														/>
+									<ResponsiveGridLayout
+										className="layout"
+										draggableHandle={'.box-header'}
+										layout={this.state.layout}
+										onLayoutChange={(l: any) => {
+											this.setState({ layout: l })
+										}}
+										measureBeforeMount={false}
+										breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+										cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+									>
+										<div key="a" >
+											<Panel stretch title={Titles.Fonts}>
+												<FormControl>
+													<TextInput
+														value={this.state.fontName}
+														label={`${Titles.Font} ${Titles.Name}`}
+														title={`${Titles.Font} ${Titles.Name}`}
+														immediate
+														onChange={(value: any) => {
+															this.setState({ fontName: value });
+														}}
+													/>
 
-														<TextInput
-															value={this.state.font}
-															label={Titles.Font}
-															title={Titles.Font}
-															immediate
-															onChange={(value: any) => {
-																this.setState({ font: value });
-															}}
-														/>
+													<TextInput
+														value={this.state.font}
+														label={Titles.Font}
+														title={Titles.Font}
+														immediate
+														onChange={(value: any) => {
+															this.setState({ font: value });
+														}}
+													/>
 
-														<div className="row">
-															<div className="col-md-6">
-																<TextInput
-																	value={this.state.fontCss}
-																	label={Titles.FontCss}
-																	title={Titles.FontCss}
-																	immediate
-																	onChange={(value: any) => {
-																		this.setState({ fontCss: value });
-																	}}
-																/>
-															</div>
-															<div className="col-md-6">
-																<TextInput
-																	value={this.state.fontCssVar}
-																	label={Titles.FontCssVar}
-																	immediate
-																	title={Titles.FontCssVar}
-																	onChange={(value: any) => {
-																		if (value && value.indexOf('--') === -1) {
-																			value = `--${value}`;
-																		}
-																		this.setState({ fontCssVar: value });
-																	}}
-																/>
-															</div>
+													<div className="row">
+														<div className="col-md-6">
+															<TextInput
+																value={this.state.fontCss}
+																label={Titles.FontCss}
+																title={Titles.FontCss}
+																immediate
+																onChange={(value: any) => {
+																	this.setState({ fontCss: value });
+																}}
+															/>
 														</div>
-														{this.state.font &&
-															this.state.fontCss &&
-															this.state.fontName &&
-															this.state.fontCssVar ? (
-																<button
-																	className="btn btn-primary"
-																	onClick={(event) => {
-																		if (
-																			this.state.font &&
-																			this.state.fontCss &&
-																			this.state.fontCssVar
-																		) {
-																			themeFonts.fonts = [
-																				{
-																					font: this.state.font,
-																					fontCss: this.state.fontCss,
-																					fontCssVar: this.state.fontCssVar,
-																					fontName: this.state.fontName
-																				},
-																				...themeFonts.fonts
-																			].unique((v) => v.font + v.fontName);
-																			this.props.updateGraph('themeFonts', {
-																				...themeFonts
-																			});
-																			this.setState({ font: '' });
-																		}
-																		event.stopPropagation();
-																		event.preventDefault();
-																		return false;
-																	}}
-																>
-																	Ok
-																</button>
-															) : null}
-														<ButtonList
-															active
-															items={themeFonts.fonts.map((v: any) => ({
-																title: v.font,
-																id: v.font,
-																...v
-															}))}
-															renderItem={(item: any) => (
-																<div
-																	className="col-md-12"
-																	style={{
-																		display: 'flex',
-																		alignItems: 'center'
-																	}}
-																>
-																	<div className="col-md-10">
-																		<h5 style={{ margin: 0 }}>{item.font}</h5>
-																		<h5 style={{ margin: 0 }}>{item.fontCss}</h5>
-																		<h6 style={{ margin: 0 }}>{item.fontCssVar}</h6>
-																		<h6 style={{ margin: 0 }}>{item.fontName}</h6>
-																	</div>
-																	<div className="col-md-2">
-																		<button
-																			className="btn btn-default btn-flat"
-																			onClick={(event) => {
-																				themeFonts.fonts = themeFonts.fonts.filter(
-																					(x) => x.font !== item.id
-																				);
-																				this.props.updateGraph('themeFonts', {
-																					...themeFonts
-																				});
-																				event.stopPropagation();
-																				event.preventDefault();
-																			}}
-																		>
-																			<i className="fa fa-times" />
-																		</button>
-																	</div>
-																</div>
-															)}
-															onClick={(item) => {
-																this.setState({
-																	...item
-																});
-															}}
-														/>
-													</FormControl>
-												</Box>
-											</div>
-											<div className="col-md-6">
-												<Box maxheight={350} title="Variables">
-													<FormControl>
-														<TextInput
-															value={this.state.variable}
-															label={Titles.Variable}
-															title={Titles.Variable}
-															immediate
-															onChange={(value) => {
-																if (value && value.indexOf('--') === -1) {
-																	value = `--${value}`;
-																}
-																this.setState({ variable: value });
-															}}
-														/>
-														<TextInput
-															value={this.state.variableValue}
-															label={Titles.Value}
-															title={Titles.Value}
-															immediate
-															onChange={(value) => {
-																this.setState({ variableValue: value });
-															}}
-														/>
-														{this.state.variable && this.state.variableValue ? (
+														<div className="col-md-6">
+															<TextInput
+																value={this.state.fontCssVar}
+																label={Titles.FontCssVar}
+																immediate
+																title={Titles.FontCssVar}
+																onChange={(value: any) => {
+																	if (value && value.indexOf('--') === -1) {
+																		value = `--${value}`;
+																	}
+																	this.setState({ fontCssVar: value });
+																}}
+															/>
+														</div>
+													</div>
+													{this.state.font &&
+														this.state.fontCss &&
+														this.state.fontName &&
+														this.state.fontCssVar ? (
 															<button
-																className={'btn btn-primary'}
+																className="btn btn-primary"
 																onClick={(event) => {
+																	if (
+																		this.state.font &&
+																		this.state.fontCss &&
+																		this.state.fontCssVar
+																	) {
+																		themeFonts.fonts = [
+																			{
+																				font: this.state.font,
+																				fontCss: this.state.fontCss,
+																				fontCssVar: this.state.fontCssVar,
+																				fontName: this.state.fontName
+																			},
+																			...themeFonts.fonts
+																		].unique((v) => v.font + v.fontName);
+																		this.props.updateGraph('themeFonts', {
+																			...themeFonts
+																		});
+																		this.setState({ font: '' });
+																	}
 																	event.stopPropagation();
 																	event.preventDefault();
-																	if (
-																		this.state.variable &&
-																		this.state.variableValue
-																	) {
-																		themeVariables.variables = [
-																			{
-																				variable: this.state.variable,
-																				variableValue: this.state.variableValue
-																			},
-																			...themeVariables.variables
-																		].unique((v) => v.variable);
-																		this.props.updateGraph('themeVariables', {
-																			...themeVariables
-																		});
-																	}
 																	return false;
 																}}
 															>
 																Ok
 															</button>
 														) : null}
-														<ButtonList
-															active
-															items={themeVariables.variables.map((v) => ({
-																title: v.variable,
-																id: v.variable,
-																...v
-															}))}
-															renderItem={(item) => (
-																<div
-																	className="col-md-12"
-																	style={{
-																		display: 'flex',
-																		alignItems: 'center'
-																	}}
-																>
-																	<div className="col-md-10">
-																		<h5 style={{ margin: 0 }}>{item.variable}</h5>
-																		<h6 style={{ margin: 0 }}>
-																			{item.variableValue}
-																		</h6>
-																	</div>
-																	<div className="col-md-2">
-																		<button
-																			className="btn btn-default btn-flat"
-																			onClick={(event) => {
-																				themeVariables.variables = themeVariables.variables.filter(
-																					(x) => x.variable !== item.id
-																				);
-																				this.props.updateGraph(
-																					'themeVariables',
-																					{ ...themeVariables }
-																				);
-																				event.stopPropagation();
-																				event.preventDefault();
-																			}}
-																		>
-																			<i className="fa fa-times" />
-																		</button>
-																	</div>
+													<ButtonList
+														active
+														items={themeFonts.fonts.map((v: any) => ({
+															title: v.font,
+															id: v.font,
+															...v
+														}))}
+														renderItem={(item: any) => (
+															<div
+																className="col-md-12"
+																style={{
+																	display: 'flex',
+																	alignItems: 'center'
+																}}
+															>
+																<div className="col-md-10">
+																	<h5 style={{ margin: 0 }}>{item.font}</h5>
+																	<h5 style={{ margin: 0 }}>{item.fontCss}</h5>
+																	<h6 style={{ margin: 0 }}>{item.fontCssVar}</h6>
+																	<h6 style={{ margin: 0 }}>{item.fontName}</h6>
 																</div>
-															)}
-															onClick={() => { }}
-														/>
-													</FormControl>
-												</Box>
-											</div>
+																<div className="col-md-2">
+																	<button
+																		className="btn btn-default btn-flat"
+																		onClick={(event) => {
+																			themeFonts.fonts = themeFonts.fonts.filter(
+																				(x) => x.font !== item.id
+																			);
+																			this.props.updateGraph('themeFonts', {
+																				...themeFonts
+																			});
+																			event.stopPropagation();
+																			event.preventDefault();
+																		}}
+																	>
+																		<i className="fa fa-times" />
+																	</button>
+																</div>
+															</div>
+														)}
+														onClick={(item) => {
+															this.setState({
+																...item
+															});
+														}}
+													/>
+												</FormControl>
+											</Panel>
 										</div>
-									</div>
+										<div key="b">
+											<Panel stretch title="Variables">
+												<FormControl>
+													<TextInput
+														value={this.state.variable}
+														label={Titles.Variable}
+														title={Titles.Variable}
+														immediate
+														onChange={(value) => {
+															if (value && value.indexOf('--') === -1) {
+																value = `--${value}`;
+															}
+															this.setState({ variable: value });
+														}}
+													/>
+													<TextInput
+														value={this.state.variableValue}
+														label={Titles.Value}
+														title={Titles.Value}
+														immediate
+														onChange={(value) => {
+															this.setState({ variableValue: value });
+														}}
+													/>
+													{this.state.variable && this.state.variableValue ? (
+														<button
+															className={'btn btn-primary'}
+															onClick={(event) => {
+																event.stopPropagation();
+																event.preventDefault();
+																if (
+																	this.state.variable &&
+																	this.state.variableValue
+																) {
+																	themeVariables.variables = [
+																		{
+																			variable: this.state.variable,
+																			variableValue: this.state.variableValue
+																		},
+																		...themeVariables.variables
+																	].unique((v) => v.variable);
+																	this.props.updateGraph('themeVariables', {
+																		...themeVariables
+																	});
+																}
+																return false;
+															}}
+														>
+															Ok
+														</button>
+													) : null}
+													<ButtonList
+														active
+														items={themeVariables.variables.map((v) => ({
+															title: v.variable,
+															id: v.variable,
+															...v
+														}))}
+														renderItem={(item) => (
+															<div
+																className="col-md-12"
+																style={{
+																	display: 'flex',
+																	alignItems: 'center'
+																}}
+															>
+																<div className="col-md-10">
+																	<h5 style={{ margin: 0 }}>{item.variable}</h5>
+																	<h6 style={{ margin: 0 }}>
+																		{item.variableValue}
+																	</h6>
+																</div>
+																<div className="col-md-2">
+																	<button
+																		className="btn btn-default btn-flat"
+																		onClick={(event) => {
+																			themeVariables.variables = themeVariables.variables.filter(
+																				(x) => x.variable !== item.id
+																			);
+																			this.props.updateGraph(
+																				'themeVariables',
+																				{ ...themeVariables }
+																			);
+																			event.stopPropagation();
+																			event.preventDefault();
+																		}}
+																	>
+																		<i className="fa fa-times" />
+																	</button>
+																</div>
+															</div>
+														)}
+														onClick={() => { }}
+													/>
+												</FormControl>
+
+											</Panel>
+										</div>
+									</ResponsiveGridLayout>
 								</TabPane>
 								<TabPane active={VisualEq(state, THEME_VIEW_TAB, 'Grid Placement')}>
 									<div className="row">
@@ -908,289 +932,310 @@ class ThemeView extends Component<any, any> {
 									</div>
 								</TabPane>
 								<TabPane active={VisualEq(state, THEME_VIEW_TAB, 'Others')}>
-									<div className="row">
-										<div className="col-md-2">
-											<Box maxheight={500} title={Titles.Style}>
+									<ResponsiveGridLayout
+										className="layout"
+										draggableHandle={'.box-header'}
+										layout={this.state.otherLayout}
+										onLayoutChange={(l: any) => {
+											this.setState({ otherLayout: l })
+										}}
+										measureBeforeMount={false}
+										breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+										cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+									>
+										<div key="a" data-grid={{ x: 0, y: 0, w: 3, h: 4 }}>
+											<Panel stretch title={Titles.Fonts}>
 												<FormControl>{colors}</FormControl>
-											</Box>
+											</Panel>
 										</div>
-										<div className="col-md-3">
-											<Box maxheight={500} title={Titles.ColorUse}>
+										<div key="b" data-grid={{ x: 3, y: 0, w: 3, h: 4 }}>
+											<Panel stretch title={Titles.Fonts}>
 												<FormControl>{colorUses}</FormControl>
-											</Box>
+											</Panel>
 										</div>
-										<div className="col-md-2">
-											<Box maxheight={500} title={Titles.OtherUses}>
+										<div key="c" data-grid={{ x: 6, y: 0, w: 3, h: 4 }}>
+											<Panel stretch title={Titles.Fonts}>
 												<FormControl>{otherUses}</FormControl>
-											</Box>
+											</Panel>
 										</div>
-										<div className="col-md-2">
-											<Box
-												maxheight={500}
-												title={Titles.SpaceTheme}
-												onSearch={(search: string) => {
-													this.setState({
-														spaceSearch: search
-													});
-												}}
-											>
-												<FormControl>
-													<Typeahead
-														options={[...Object.keys(ComponentTags).map((v) => ({
-															title: v,
-															value: v,
-															id: v
-														})), ...(themeGridPlacements ? themeGridPlacements.grids || [] : []).map((v: any) => ({
-															...v,
-															title: v.name,
-															value: v.name,
-															id: v.name
-														})), ...this.state.modelPropertyClasses.map((v: string) => {
-															return {
+										<div key="d" data-grid={{ x: 9, y: 0, w: 3, h: 4 }}>
+											<Panel stretch title={Titles.Fonts}>
+												<Box
+													maxheight={500}
+													title={Titles.SpaceTheme}
+													onSearch={(search: string) => {
+														this.setState({
+															spaceSearch: search
+														});
+													}}
+												>
+													<FormControl>
+														<Typeahead
+															options={[...Object.keys(ComponentTags).map((v) => ({
 																title: v,
 																value: v,
 																id: v
-															}
-														}), this.state.currentFieldValue ? {
-															title: this.state.currentFieldValue,
-															value: this.state.currentFieldValue
-														} : null].filter(v => v)}
-														onChangeText={(value: string) => {
-															this.setState({
-																currentFieldValue: value
-															});
-														}}
-														label="Spaces"
-														onChange={(value: string) => {
-															this.setState({ componentTag: value });
-														}}
-														value={this.state.componentTag}
-													/>
-
-													{this.getSpaceFields(
-														this.state.componentTag,
-														this.state.mediaSize,
-														spaceTheme,
-														themeColors,
-														themeVariables,
-														(f: string) =>
-															this.state.spaceSearch &&
-															f.toLowerCase()
-																.indexOf(this.state.spaceSearch.toLowerCase()) !== -1
-													)}
-													<div style={{ height: 300 }} />
-												</FormControl>
-											</Box>
-										</div>
-										<div className="col-md-2">
-											<Box
-												maxheight={500}
-												title={this.state.sectionType || 'Search'}
-												onSearch={(search) => {
-													this.setState({
-														[`search-${this.state.sectionType || 'search'}`]: search
-													});
-												}}
-											>
-												<FormControl>
-													<SelectInput
-														options={HTMLElementGroups.map((v) => ({
-															title: v.name,
-															value: v.name,
-															id: v.name
-														}))}
-														label="Section Types"
-														onChange={(value) => {
-															this.setState({ sectionType: value });
-														}}
-														value={this.state.sectionType}
-													/>
-													{this.state.sectionType ? (
-														<SelectInput
-															options={sectionTypeOptions}
-															label={this.state.sectionType}
-															onChange={(value) => {
-																this.setState({ [this.state.sectionType]: value });
-															}}
-															value={this.state[this.state.sectionType]}
-														/>
-													) : null}
-													{this.getEditBoxes(
-														this.state[this.state.sectionType],
-														this.state.mediaSize,
-														spaceTheme,
-														themeColors,
-														HTMLElementGroups.find(
-															(f) => f.name === this.state.sectionType
-														),
-														themeVariables,
-														(f) =>
-															this.state[`search-${this.state.sectionType}`] &&
-															f
-																.toLowerCase()
-																.indexOf(
-																	`${this.state[
-																		`search-${this.state.sectionType}`
-																	]}`.toLowerCase()
-																) !== -1
-													)}
-												</FormControl>
-											</Box>
-										</div>
-									</div>
-									<div className="row">
-										<div className="col-md-4">
-											<Box title={Titles.ColorUse}>
-												<FormControl>
-													<TextInput
-														value={this.state.cssString}
-														textarea
-														onChangeText={(val: string) => {
-															// this.setState({ cssString: val })
-														}}
-														onChanged={(val: string) => {
-															this.setState({ cssString: val })
-														}} />
-													<button
-														className="btn btn-default btn-flat"
-														onClick={(e) => {
-															let res: JSONNode = cssToJson(this.state.cssString);
-															let colors = GetColors(this.state.cssString)
-															this.setState({ cssJson: res, cssColors: colors });
-															e.preventDefault();
-															e.stopPropagation()
-														}}
-													>View</button>
-												</FormControl>
-											</Box>
-										</div>
-										<div className="col-md-4">
-											<Box title={Titles.ColorUse}>
-												<GenericPropertyContainer
-													sideBarStyle={{ right: 0 }}
-													active
-													title="CSS"
-													subTitle="afaf"
-												>
-													<TreeViewMenu active open={this.state.cssJsonOpen} toggle={() => {
-														this.setState({
-															cssJsonOpen: !this.state.cssJsonOpen
-														});
-													}} >
-														{
-															this.state.cssJson && this.state.cssJson.children && this.state.cssJson.children ? Object.entries(this.state.cssJson.children).map((item: any) => {
-																let [key, children]: [string, Children] = item;
-																let attributes: any = [];
-																if (children.attributes) {
-																	attributes = Object.entries(children.attributes).map((item: any) => {
-																		return <ThemeStyleSection child={children} key={item[0]} title={item[0]} item={item[1]} />;
-																	});
+															})), ...(themeGridPlacements ? themeGridPlacements.grids || [] : []).map((v: any) => ({
+																...v,
+																title: v.name,
+																value: v.name,
+																id: v.name
+															})), ...this.state.modelPropertyClasses.map((v: string) => {
+																return {
+																	title: v,
+																	value: v,
+																	id: v
 																}
-																return <TreeViewMenu active key={key} title={key} description={key} open={this.state['asdff-' + key]} toggle={() => {
-																	this.setState({
-																		['asdff-' + key]: !this.state['asdff-' + key]
-																	});
-																}}>
-																	<TreeViewItemContainer>
-																		<TextInput label="target name" value={this.state[`target_name` + key] || key} onChangeText={(val: string) => {
-																			this.setState({
-																				[`target_name` + key]: val
-																			});
-																		}} />
-																	</TreeViewItemContainer>
-																	<TreeViewButtonGroup>
-																		<TreeViewGroupButton
-																			icon="fa fa-star"
-																			onClick={() => {
-																				let formTheme = spaceTheme;
-																				let formType = this.state[`target_name` + key] || key;
-																				formTheme[formType] = formTheme[formType] || {};
-																				['@media only screen and (min-width: 1200px)', ...Object.keys(MediaQueries)].map((ms: string) => {
-																					formTheme[formType][ms] = {};
-																					Object.entries(children.attributes).forEach((item: any) => {
-																						let key = item[0];
-																						let value = item[1];
-																						formTheme[formType][ms][key] = value;
-																					})
-																				});
-																				this.setState({
-																					turn: Date.now()
-																				})
-																				// spaceTheme,
-																				// themeColors,
-																				// themeVariables
-																			}}
-																		/>
-																	</TreeViewButtonGroup>
-																	{attributes}
-																</TreeViewMenu>
-															}) : []
-														}
-													</TreeViewMenu>
-												</GenericPropertyContainer>
-											</Box>
-										</div>
-										<div className="col-md-2">
-											<Box title="CSS Colors">
-												{(this.state.cssColors || [])
-													.map((color: string) => {
-														if (color) {
-															return [
-																<ColorInput
-																	value={color}
-																	immediate
-																	label={`${color} : ${color}`}
-																	key={`css-color-${color}`}
-																	onChange={(value: any) => {
-																	}}
-																	placeholder={color}
-																/>
-															];
-														}
-														return null;
-													})
-													.filter((x: any) => x)}
-											</Box>
-										</div>
-										<div className="col-md-2">
-											<Box title="CSS Selectors">
-												<GenericPropertyContainer
-													sideBarStyle={{ right: 0 }}
-													active
-													title="Css Selectors"
-													subTitle="Css Selectors"
-												>
-													<TreeViewMenu active title={'CSS Selectors'} open={this.state.cssSelectors} toggle={() => {
-														this.setState({
-															cssSelectors: !this.state.cssSelectors
-														});
-													}}>
-														{(spaceTheme ? Object.keys(spaceTheme) : []).map((v: any) => {
-															return (<TreeViewMenu title={v} active open={this.state[`selecto-${v}`]} onClick={() => {
+															}), this.state.currentFieldValue ? {
+																title: this.state.currentFieldValue,
+																value: this.state.currentFieldValue
+															} : null].filter(v => v)}
+															onChangeText={(value: string) => {
 																this.setState({
-																	[`selecto-${v}`]: !this.state[`selecto-${v}`]
-																})
-															}}>
-																<TreeViewMenu description={'select'} title={'select'} onClick={() => {
-																	this.setState({ componentTag: v });
-																}} />
-																<TreeViewMenu description={'delete'} title={'delete'} onClick={() => {
-																	delete spaceTheme[v];
-																	this.setState({ turn: Date.now() })
-																}} />
-															</TreeViewMenu>);
-														})}
-													</TreeViewMenu>
-												</GenericPropertyContainer>
-											</Box>
+																	currentFieldValue: value
+																});
+															}}
+															label="Spaces"
+															onChange={(value: string) => {
+																this.setState({ componentTag: value });
+															}}
+															value={this.state.componentTag}
+														/>
+
+														{this.getSpaceFields(
+															this.state.componentTag,
+															this.state.mediaSize,
+															spaceTheme,
+															themeColors,
+															themeVariables,
+															(f: string) =>
+																this.state.spaceSearch &&
+																f.toLowerCase()
+																	.indexOf(this.state.spaceSearch.toLowerCase()) !== -1
+														)}
+														<div style={{ height: 300 }} />
+													</FormControl>
+												</Box>
+											</Panel>
 										</div>
-									</div>
+										<div key="e" data-grid={{ x: 0, y: 4, w: 3, h: 4 }} >
+											<Panel stretch title={this.state.sectionType || 'Search'}>
+												<Box
+													maxheight={500}
+													title={this.state.sectionType || 'Search'}
+													onSearch={(search) => {
+														this.setState({
+															[`search-${this.state.sectionType || 'search'}`]: search
+														});
+													}}
+												>
+													<FormControl>
+														<SelectInput
+															options={HTMLElementGroups.map((v) => ({
+																title: v.name,
+																value: v.name,
+																id: v.name
+															}))}
+															label="Section Types"
+															onChange={(value) => {
+																this.setState({ sectionType: value });
+															}}
+															value={this.state.sectionType}
+														/>
+														{this.state.sectionType ? (
+															<SelectInput
+																options={sectionTypeOptions}
+																label={this.state.sectionType}
+																onChange={(value) => {
+																	this.setState({ [this.state.sectionType]: value });
+																}}
+																value={this.state[this.state.sectionType]}
+															/>
+														) : null}
+														{this.getEditBoxes(
+															this.state[this.state.sectionType],
+															this.state.mediaSize,
+															spaceTheme,
+															themeColors,
+															HTMLElementGroups.find(
+																(f) => f.name === this.state.sectionType
+															),
+															themeVariables,
+															(f) =>
+																this.state[`search-${this.state.sectionType}`] &&
+																f
+																	.toLowerCase()
+																	.indexOf(
+																		`${this.state[
+																			`search-${this.state.sectionType}`
+																		]}`.toLowerCase()
+																	) !== -1
+														)}
+													</FormControl>
+												</Box>
+											</Panel>
+										</div>
+
+										<div key="f" data-grid={{ x: 2, y: 4, w: 3, h: 4 }}  >
+											<Panel stretch title={Titles.ColorUse}>
+												<Box title={Titles.ColorUse}>
+													<FormControl>
+														<TextInput
+															value={this.state.cssString}
+															textarea
+															onChangeText={(val: string) => {
+																// this.setState({ cssString: val })
+															}}
+															onChanged={(val: string) => {
+																this.setState({ cssString: val })
+															}} />
+														<button
+															className="btn btn-default btn-flat"
+															onClick={(e) => {
+																let res: JSONNode = cssToJson(this.state.cssString);
+																let colors = GetColors(this.state.cssString)
+																this.setState({ cssJson: res, cssColors: colors });
+																e.preventDefault();
+																e.stopPropagation()
+															}}
+														>View</button>
+													</FormControl>
+												</Box>
+											</Panel>
+										</div>
+										<div key="g" data-grid={{ x: 4, y: 4, w: 3, h: 4 }}  >
+											<Panel stretch title={Titles.ColorUse}>
+												<Box title={Titles.ColorUse}>
+													<GenericPropertyContainer
+														sideBarStyle={{ right: 0 }}
+														active
+														title="CSS"
+														subTitle="afaf"
+													>
+														<TreeViewMenu active open={this.state.cssJsonOpen} toggle={() => {
+															this.setState({
+																cssJsonOpen: !this.state.cssJsonOpen
+															});
+														}} >
+															{
+																this.state.cssJson && this.state.cssJson.children && this.state.cssJson.children ? Object.entries(this.state.cssJson.children).map((item: any) => {
+																	let [key, children]: [string, Children] = item;
+																	let attributes: any = [];
+																	if (children.attributes) {
+																		attributes = Object.entries(children.attributes).map((item: any) => {
+																			return <ThemeStyleSection child={children} key={item[0]} title={item[0]} item={item[1]} />;
+																		});
+																	}
+																	return <TreeViewMenu active key={key} title={key} description={key} open={this.state['asdff-' + key]} toggle={() => {
+																		this.setState({
+																			['asdff-' + key]: !this.state['asdff-' + key]
+																		});
+																	}}>
+																		<TreeViewItemContainer>
+																			<TextInput label="target name" value={this.state[`target_name` + key] || key} onChangeText={(val: string) => {
+																				this.setState({
+																					[`target_name` + key]: val
+																				});
+																			}} />
+																		</TreeViewItemContainer>
+																		<TreeViewButtonGroup>
+																			<TreeViewGroupButton
+																				icon="fa fa-star"
+																				onClick={() => {
+																					let formTheme = spaceTheme;
+																					let formType = this.state[`target_name` + key] || key;
+																					formTheme[formType] = formTheme[formType] || {};
+																					['@media only screen and (min-width: 1200px)', ...Object.keys(MediaQueries)].map((ms: string) => {
+																						formTheme[formType][ms] = {};
+																						Object.entries(children.attributes).forEach((item: any) => {
+																							let key = item[0];
+																							let value = item[1];
+																							formTheme[formType][ms][key] = value;
+																						})
+																					});
+																					this.setState({
+																						turn: Date.now()
+																					})
+																					// spaceTheme,
+																					// themeColors,
+																					// themeVariables
+																				}}
+																			/>
+																		</TreeViewButtonGroup>
+																		{attributes}
+																	</TreeViewMenu>
+																}) : []
+															}
+														</TreeViewMenu>
+													</GenericPropertyContainer>
+												</Box>
+											</Panel>
+										</div>
+										<div key="h" data-grid={{ x: 6, y: 4, w: 3, h: 4 }} >
+											<Panel stretch title={"CSS Colors"}>
+												<Box title="CSS Colors">
+													{(this.state.cssColors || [])
+														.map((color: string) => {
+															if (color) {
+																return [
+																	<ColorInput
+																		value={color}
+																		immediate
+																		label={`${color} : ${color}`}
+																		key={`css-color-${color}`}
+																		onChange={(value: any) => {
+																		}}
+																		placeholder={color}
+																	/>
+																];
+															}
+															return null;
+														})
+														.filter((x: any) => x)}
+												</Box>
+											</Panel>
+										</div>
+										<div key="i" data-grid={{ x: 10, y: 4, w: 3, h: 4 }} >
+											<Panel stretch title={"CSS Selectors"}>
+												<Box title="CSS Selectors">
+													<GenericPropertyContainer
+														sideBarStyle={{ right: 0 }}
+														active
+														title="Css Selectors"
+														subTitle="Css Selectors"
+													>
+														<TreeViewMenu active title={'CSS Selectors'} open={this.state.cssSelectors} toggle={() => {
+															this.setState({
+																cssSelectors: !this.state.cssSelectors
+															});
+														}}>
+															{(spaceTheme ? Object.keys(spaceTheme) : []).map((v: any) => {
+																return (<TreeViewMenu title={v} active open={this.state[`selecto-${v}`]} onClick={() => {
+																	this.setState({
+																		[`selecto-${v}`]: !this.state[`selecto-${v}`]
+																	})
+																}}>
+																	<TreeViewMenu description={'select'} title={'select'} onClick={() => {
+																		this.setState({ componentTag: v });
+																	}} />
+																	<TreeViewMenu description={'delete'} title={'delete'} onClick={() => {
+																		delete spaceTheme[v];
+																		this.setState({ turn: Date.now() })
+																	}} />
+																</TreeViewMenu>);
+															})}
+														</TreeViewMenu>
+													</GenericPropertyContainer>
+												</Box>
+											</Panel>
+										</div>
+									</ResponsiveGridLayout>
 								</TabPane>
 							</TabContent>
 						</div>
 					</div>
 				</section>
-			</TopViewer>
+			</TopViewer >
 		);
 	}
 }

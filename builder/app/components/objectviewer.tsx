@@ -75,8 +75,8 @@ class ObjectViewer extends Component<any, any> {
 		}
 		let currentViewNode: string | null = Visual(state, UIA.CURRENT_VIEW_NODE);
 		let currentViewLink: string | null = Visual(state, UIA.CURRENT_VIEW_LINK);
-    let node: Node = UIA.GetNodeForView(state, currentViewNode);
-    let link: GraphLink = UIA.GetLinkForView(state, currentViewLink);
+		let node: Node = UIA.GetNodeForView(state, currentViewNode);
+		let link: GraphLink = UIA.GetLinkForView(state, currentViewLink);
 		let connections: QuickAccess<string> = UIA.GetNodeConnectionsForView(state, currentViewNode);
 		let links: GraphLink[] = [];
 		let linkConnections: QuickAccess<string> = UIA.GetNodeLinksForView(state, currentViewNode);
@@ -97,18 +97,18 @@ class ObjectViewer extends Component<any, any> {
 					breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
 					cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
 				>
-					<div key="a" data-grid={{x: 0, y: 0, w: 12, h: 2}} >
+					<div key="a" data-grid={{ x: 0, y: 0, w: 12, h: 2 }} >
 						<Panel stretch title={node ? UIA.GetNodeTitle(node) : 'Current Node'}>
 							<NodeViewer node={node} />
 						</Panel>
 					</div>
-					<div key="b" data-grid={{x: 0, y: 2, w: 6, h: 2}}>
+					<div key="b" data-grid={{ x: 0, y: 2, w: 6, h: 2 }}>
 						<Panel stretch title={'Connecting Nodes'}>
 							{' '}
 							<NodeViewList nodes={connectedNodes} />
 						</Panel>
 					</div>
-					<div key="c" data-grid={{x: 7, y: 2, w: 6, h: 2}}>
+					<div key="c" data-grid={{ x: 7, y: 2, w: 6, h: 2 }}>
 						<Panel stretch title={'Links Nodes'}>
 							<LinkViewList
 								state={state}
@@ -119,13 +119,13 @@ class ObjectViewer extends Component<any, any> {
 							/>
 						</Panel>
 					</div>
-					<div key="d" data-grid={{x: 7, y: 0, w: 12, h: 2}}>
+					<div key="d" data-grid={{ x: 7, y: 0, w: 12, h: 2 }}>
 						<Panel stretch title={'Current Link'}>
 							<LinkViewer
 								state={state}
 								link={link}
 								onSelectNode={(item: any) => {
-									this.props.remoteSelectNode|(item);
+									this.props.remoteSelectNode | (item);
 								}}
 							/>
 						</Panel>

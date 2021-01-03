@@ -211,6 +211,7 @@ function getInserts(node: Node) {
 	let result = { startInsert: '', endInsert: '' };
 	if (GetNodeProp(node, NodeProperties.NODEType) === NodeTypes.ScreenOption) {
 		let viewPackageTitle = GetNodeProp(node, NodeProperties.ViewPackageTitle);
+		let isHomeView = GetNodeProp(node, NodeProperties.IsHomeView) || false;
 		let visuals: Node[] = [];
 		switch (viewPackageTitle) {
 			case 'Anonymous Guest':
@@ -243,6 +244,20 @@ function getInserts(node: Node) {
 					[NodeProperties.Screen]: StandardVisuals.Register
 				});
 				break;
+			default:
+				if (isHomeView) {
+					visuals = GetNodesByProperties({
+						[NodeProperties.NODEType]: NodeTypes.VisualInsert,
+						[NodeProperties.Screen]: StandardVisuals.HomeView
+					});
+				}
+				else {
+					visuals = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
+						id: node.id,
+						componentType: NodeTypes.VisualInsert
+					})
+				}
+				break
 		}
 		let visualInserObj: any = visuals
 			.map((node: Node) => { return GetNodeProp(node, NodeProperties.VisualInsert) })
