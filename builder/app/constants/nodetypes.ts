@@ -483,7 +483,7 @@ export enum StandardVisuals {
 export const NodeProperties = {
 	ViewPackage: 'view-package',
 	DataChainCollectionChildrenCount: 'DataChainCollectionChildrenCount',
-	Screen: 'screen',
+	Screen: 'Screen',
 	MenuRootNode: 'MenuRootNode',
 	IsFetchOutput: 'IsFetchOutput',
 	UIActionMethod: 'UIActionMethod',
@@ -874,6 +874,7 @@ export const LinkType = {
 	ScreenEffectApi: 'ScreenEffectApi', // Screen effects api link to a datachain ,with the assumption that they will be an
 	ComponentDidMountEffectApi: 'ComponentDidMountEffectApi',
 	// internal component api
+	ScreenVisualInsert: 'ScreenVisualInsert',
 	LambdaInsertArguments: 'LambdaInsertArguments',
 	ClaimServiceAuthorizationMethod: 'ClaimServiceAuthorizationMethod',
 	ClaimServiceUpdateUserMethod: 'ClaimServiceUpdateUserMethod',
@@ -1224,6 +1225,9 @@ export const LinkProperties = {
 	},
 	ScreenEffectApi: {
 		type: LinkType.ScreenEffectApi
+	},
+	ScreenVisualInsert: {
+		type: LinkType.ScreenVisualInsert
 	},
 	ComponentDidMountEffectApi: {
 		type: LinkType.ComponentDidMountEffectApi

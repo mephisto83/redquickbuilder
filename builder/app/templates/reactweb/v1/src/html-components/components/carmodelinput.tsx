@@ -4,6 +4,7 @@ import * as Globals from '../../util/globals';
 import { CarMakeContextList, CarMakeService, CarMakeServiceRemove, MAKE_INPUT_CHANGE, VIN_SET } from './carmakeinput';
 import { CarYearContextList, CarYearService, CarYearServiceRemove, YEAR_INPUT_CHANGE } from './caryearinput';
 import InputFunctions from './inputfunctions';
+import Observe from './observe';
 
 let _redservice: any;
 function redservice() {
@@ -25,7 +26,7 @@ export interface ICarModelServiceContext {
             carModel: string
         }
     },
-    cache: { [key: string]: AutoModel[] },
+    cache: { [key: string]: Observe<AutoModel[]> },
     cacheIndividual: { [key: string]: AutoModel }
 }
 
@@ -181,24 +182,28 @@ export default class CarModelInput extends Typeahead {
                 if (!this.running) {
                     this.running = true;
                     let handleModels = (models: AutoModel[]) => {
-                        this.running = false;
-                        let suggestions = models.map((make: AutoModel) => ({ title: make.model_Name, value: make.model_ID }));
-                        if (this.runAgain || (year === this.state.year && make === this.state.make)) {
-                            this.setState(() => ({
-                                suggestions
-                            }));
-                        }
-                        if (this.runAgain) {
-                            this.runAgain = false;
-                            this.updateModels();
+                        if (models) {
+                            this.running = false;
+                            let suggestions = models.map((make: AutoModel) => ({ title: make.model_Name, value: make.model_ID }));
+                            if (this.runAgain || (year === this.state.year && make === this.state.make)) {
+                                this.setState(() => ({
+                                    suggestions
+                                }));
+                            }
+                            if (this.runAgain) {
+                                this.runAgain = false;
+                                this.updateModels();
+                            }
                         }
                     }
+
                     if (CarModelServiceContext.cache[`${this.state.year}/${this.state.make}`]) {
-                        handleModels(CarModelServiceContext.cache[`${this.state.year}/${this.state.make}`]);
-                        return;
+                        CarModelServiceContext.cache[`${this.state.year}/${this.state.make}`] = CarModelServiceContext.cache[`${this.state.year}/${this.state.make}`].then(handleModels);
                     }
                     else {
-                        return redservice().get(`/api/red/autoservice/models/${this.state.year}/${this.state.make}`).then(handleModels);
+                        CarModelServiceContext.cache[`${this.state.year}/${this.state.make}`] = Observe.observe(redservice().get(`/api/red/autoservice/models/${this.state.year}/${this.state.make}`).then(handleModels).catch(() => {
+                            delete CarModelServiceContext.cache[`${this.state.year}/${this.state.make}`];
+                        }));
                     }
                 }
                 else {

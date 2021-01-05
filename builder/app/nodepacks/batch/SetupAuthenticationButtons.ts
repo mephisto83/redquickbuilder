@@ -43,8 +43,9 @@ export default function SetupAuthenticationButtons() {
 	let screens = NodesByType(graph, NodeTypes.Screen);
 	graph = setupRegister(screens, graph);
 	graph = setupAuthentication(screens, graph);
-	graph = setupAnonymousLogin(screens, graph)
+	graph = setupAnonymousLogin(screens, graph);
 }
+
 function setupRegister(screens: any, graph: any) {
 	let screen = screens.find((s: Node) => GetNodeProp(s, NodeProperties.UIText).trim() === Titles.Register);
 
@@ -155,14 +156,13 @@ function setupAuthentication(screens: any, graph: any) {
 		`${Titles.Login} Button`,
 		({ screenOption, eventInstance, method }: { screenOption: Node; eventInstance: string; method: Node }) => {
 			let uiType = GetNodeProp(screenOption, NodeProperties.UIType);
-			PerformGraphOperation([
-				...PostAuthenticate({
+			PerformGraphOperation(
+				PostAuthenticate({
 					screen: targetScreen ? targetScreen.id : null,
 					uiType,
 					functionName: `Post Authenticate ${uiType}`,
 					pressInstance: eventInstance
-				})
-			])(GetDispatchFunc(), GetStateFunc());
+				}))(GetDispatchFunc(), GetStateFunc());
 		}
 	);
 	return graph;

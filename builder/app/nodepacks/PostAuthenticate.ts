@@ -2,7 +2,7 @@
 import postAuthenticate_ from './postAuthenticate_';
 import { NodeProperties } from '../constants/nodetypes';
 
-export default function(args: any = {}) {
+export default function PostAuthenticate(args: any = {}) {
 	// node0
 	const context: any = {
 		node2: args.screen,
@@ -12,7 +12,7 @@ export default function(args: any = {}) {
 	};
 
 	return [
-		function() {
+		function () {
 			return [
 				{
 					operation: 'NEW_NODE',
@@ -25,7 +25,7 @@ export default function(args: any = {}) {
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'CHANGE_NODE_TEXT',
@@ -37,7 +37,7 @@ export default function(args: any = {}) {
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'CHANGE_NODE_PROPERTY',
@@ -50,7 +50,7 @@ export default function(args: any = {}) {
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'CHANGE_NODE_PROPERTY',
@@ -63,7 +63,7 @@ export default function(args: any = {}) {
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'CHANGE_NODE_PROPERTY',
@@ -76,7 +76,7 @@ export default function(args: any = {}) {
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'ADD_NEW_NODE',
@@ -106,7 +106,7 @@ export default function(args: any = {}) {
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'CHANGE_NODE_PROPERTY',
@@ -119,7 +119,7 @@ export default function(args: any = {}) {
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'CHANGE_NODE_PROPERTY',
@@ -132,7 +132,7 @@ export default function(args: any = {}) {
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'REMOVE_LINK_BETWEEN_NODES',
@@ -143,12 +143,12 @@ export default function(args: any = {}) {
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'CHANGE_NODE_PROPERTY',
 					options: {
-						prop: 'Screen',
+						prop: NodeProperties.Screen,
 						id: context.node1,
 						value: context.node2
 					}
@@ -156,7 +156,7 @@ export default function(args: any = {}) {
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'ADD_LINK_BETWEEN_NODES',
@@ -172,7 +172,7 @@ export default function(args: any = {}) {
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'CHANGE_NODE_PROPERTY',
@@ -185,7 +185,7 @@ export default function(args: any = {}) {
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'CHANGE_NODE_TEXT',
@@ -197,7 +197,7 @@ export default function(args: any = {}) {
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'CHANGE_NODE_PROPERTY',
@@ -210,7 +210,7 @@ export default function(args: any = {}) {
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'CHANGE_NODE_PROPERTY',
@@ -223,7 +223,7 @@ export default function(args: any = {}) {
 			];
 		},
 
-		function() {
+		function () {
 			return [
 				{
 					operation: 'CHANGE_NODE_PROPERTY',
@@ -237,43 +237,43 @@ export default function(args: any = {}) {
 		},
 
 		context.node3
-			? function() {
-					return [
-						{
-							operation: 'NEW_LINK',
-							options: {
-								target: context.node3,
-								source: context.node0,
-								properties: {
-									type: 'data-chain-link',
-									'data-chain-link': {},
-									singleLink: true,
-									nodeTypes: [ 'data-chain' ]
-								}
+			? function () {
+				return [
+					{
+						operation: 'NEW_LINK',
+						options: {
+							target: context.node3,
+							source: context.node0,
+							properties: {
+								type: 'data-chain-link',
+								'data-chain-link': {},
+								singleLink: true,
+								nodeTypes: ['data-chain']
 							}
 						}
-					];
-				}
+					}
+				];
+			}
 			: false,
 
 		context.node5
-			? function() {
-					return [
-						{
-							operation: 'NEW_LINK',
-							options: {
-								target: context.node5,
-								source: context.node0,
-								properties: {
-									type: 'data-chain-link',
-									'data-chain-link': {},
-									singleLink: true,
-									nodeTypes: [ 'data-chain' ]
-								}
+			? function () {
+				return [
+					{
+						operation: 'NEW_LINK',
+						options: {
+							target: context.node5,
+							source: context.node0,
+							properties: {
+								type: 'data-chain-link',
+								'data-chain-link': {},
+								singleLink: true,
+								nodeTypes: ['data-chain']
 							}
 						}
-					];
-				}
+					}
+				];
+			}
 			: false,
 
 		...postAuthenticate_({

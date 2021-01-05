@@ -39,5 +39,11 @@ namespace {{namespace}}.Web.Controllers
         {
             return base.GetAutoModel(make, model, year);
         }
+        
+        [HttpGet("get/vin/{vin}")]
+        public override Task<IList<VehicleIdentificationNumber>> GetVin(string vin, string year = "")
+        {
+            return base.GetVin(vin, year);
+        }
     }
 }

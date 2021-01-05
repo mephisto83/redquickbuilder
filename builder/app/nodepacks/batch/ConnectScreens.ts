@@ -10,10 +10,11 @@ import {
 	GetCurrentGraph,
 	GetMethodProps,
 	GetNodesByProperties,
-	GetNodeTitle
+	GetNodeTitle,
+	AddLinkBetweenNodes
 } from '../../actions/uiActions';
 
-import { NodeTypes, NodeProperties, LinkType, LinkPropertyKeys } from '../../constants/nodetypes';
+import { NodeTypes, NodeProperties, LinkType, LinkPropertyKeys, LinkProperties } from '../../constants/nodetypes';
 import { MethodFunctions, FunctionTemplateKeys } from '../../constants/functiontypes';
 import { ViewTypes } from '../../constants/viewtypes';
 import ScreenConnectGet from '../screens/ScreenConnectGet';
@@ -37,7 +38,8 @@ import {
 	DashboardViewMount,
 	DashboardEffect,
 	DashboardRouting,
-	DashboardScreenEffectApiProps
+	DashboardScreenEffectApiProps,
+	ScreenVisualInsert
 } from '../../interface/methodprops';
 import SetupViewMouting, { GetViewMounting, GetDashboardViewMounting } from './ConnectScreen/SetupViewMouting';
 import SetupRoute, { GetRoute } from './ConnectScreen/SetupRoute';
@@ -87,6 +89,11 @@ export default async function ConnectScreens(progresFunc: any, filter?: any) {
 					if (screenEffects) {
 						SetupScreenEffects(screen, screenEffects, { agent, model, viewType, agentAccessDescription });
 					}
+					let screenVisualInsertApiProps: { [str: string]: ScreenVisualInsert[] } = GetLinkProperty(agentLink, LinkPropertyKeys.ScreenVisualInsertApiProps);
+					if (screenVisualInsertApiProps) {
+						SetupVisualInsertsMethods(screen, screenVisualInsertApiProps)
+					}
+
 				} else {
 					console.log('Agent link missing, this should never happen');
 					throw new Error('agent link missing');
@@ -167,6 +174,11 @@ export default async function ConnectScreens(progresFunc: any, filter?: any) {
 											agentAccessDescription: dashboardAccess
 										});
 									}
+									let screenVisualInsertApiProps: ScreenVisualInsert[] = GetLinkProperty(agentLink, LinkPropertyKeys.DashboardScreenVisualInsertApiProps);
+									if (screenVisualInsertApiProps) {
+										SetupVisualInserts(screen, screenVisualInsertApiProps)
+									}
+
 								}
 							}
 						});
@@ -390,7 +402,7 @@ export async function ConnectScreens_Old(progresFunc: any, filter?: any) {
 						break;
 				}
 
-				graphOperation([ ...commands ])(GetDispatchFunc(), GetStateFunc());
+				graphOperation([...commands])(GetDispatchFunc(), GetStateFunc());
 			}
 			await progresFunc(index / total);
 		});
@@ -519,4 +531,34 @@ export function GetPossibleMethods(screen: any) {
 			}
 			return true;
 		});
+}
+
+export function SetupVisualInsertsMethods(screen: Node, screenVisualInsertApiProps: { [str: string]: ScreenVisualInsert[] }) {
+	if (screenVisualInsertApiProps) {
+		let methods = ['Get', 'GetAll', 'Update', 'Create'];
+		methods.forEach((method: string) => {
+			if (screenVisualInsertApiProps[method]) {
+				SetupVisualInserts(screen, screenVisualInsertApiProps[method]);
+			}
+		})
+	}
+}
+export function SetupVisualInserts(screen: Node, screenVisualInsertApiProps: ScreenVisualInsert[]) {
+	let screenOptions: Node[] = GetNodesLinkedTo(GetCurrentGraph(), {
+		id: screen.id,
+		componentType: NodeTypes.ScreenOption
+	});
+	let results: any[] = [];
+	screenVisualInsertApiProps.forEach((svi: ScreenVisualInsert) => {
+		if (svi && svi.isReference && svi.reference) {
+			let reference = svi.reference;
+			screenOptions.forEach((sco: Node) => {
+				results.push(AddLinkBetweenNodes(reference, sco.id, {
+					...LinkProperties.ScreenVisualInsert
+				}));
+			})
+		}
+	});
+
+	graphOperation(results)(GetDispatchFunc(), GetStateFunc());
 }

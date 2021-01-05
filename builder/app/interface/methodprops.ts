@@ -1440,7 +1440,9 @@ export interface ComponentDidMountEffect {
 export interface ScreenVisualInsert {
 	id: string;
 	name: string;
-	visualInsert: VisualInsert
+	reference?: string;
+	isReference?: boolean;
+	visualInsert: VisualInsert;
 }
 export interface VisualInsert {
 	where: VisualInsertWhere,

@@ -42,6 +42,35 @@ export default class ScreenVisualInsertComponent extends Component<any, any> {
 				title={insert.name || Titles.ComponentDidMount}
 			>
 				<TreeViewItemContainer>
+					<CheckBox
+						label={Titles.Reference}
+						value={insert.isReference}
+						onChange={(value: boolean) => {
+							insert.isReference = value;
+							this.setState({
+								turn: UIA.GUID()
+							});
+							if (this.props.onChange) {
+								this.props.onChange();
+							}
+						}}
+					/>
+				</TreeViewItemContainer>
+				{insert.isReference ? <SelectInput
+					value={insert.reference}
+					label={"Visual Insert Ref."}
+					onChange={(value: string) => {
+						insert.reference = value;
+						this.setState({
+							turn: UIA.GUID()
+						})
+						if (this.props.onChange) {
+							this.props.onChange();
+						}
+					}}
+					options={UIA.NodesByType(null, NodeTypes.VisualInsert).toNodeSelect()}
+				/> : null}
+				{insert.isReference ? null : <TreeViewItemContainer>
 					<TextInput
 						label={Titles.Name}
 						value={insert.name}
@@ -55,10 +84,9 @@ export default class ScreenVisualInsertComponent extends Component<any, any> {
 							}
 						}}
 					/>
-				</TreeViewItemContainer>
-				<VisualInsertComponent
+				</TreeViewItemContainer>}
+				{insert.isReference ? null : <VisualInsertComponent
 					label={Titles.Insert}
-					options={UIA.NodesByType(null, NodeTypes.DataChain).toNodeSelect()}
 					visualInsert={insert.visualInsert}
 					onChange={() => {
 						this.setState({
@@ -68,7 +96,7 @@ export default class ScreenVisualInsertComponent extends Component<any, any> {
 							this.props.onChange(insert);
 						}
 					}}
-				/>
+				/>}
 				<TreeViewButtonGroup>
 					<TreeViewGroupButton
 						title={`${Titles.RemoveVisualInsert}`}

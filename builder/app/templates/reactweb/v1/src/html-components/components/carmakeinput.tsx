@@ -1,6 +1,7 @@
 import Typeahead from './typeahead';
 import { createRedService } from '../../util/service';
 import * as Globals from '../../util/globals';
+import Observe from './observe';
 let _redservice: any;
 
 function redservice() {
@@ -11,7 +12,8 @@ const CarMakeServiceContext: ICarMakeServiceContext = {
     carMake: '',
     listeners: [],
     context: {},
-    makes: []
+    makes: [],
+    makeSearches: {}
 }
 export interface ICarMakeServiceContext {
     carMake: string;
@@ -21,7 +23,8 @@ export interface ICarMakeServiceContext {
             carMake: string
         }
     },
-    makes: AutoMake[]
+    makes: AutoMake[],
+    makeSearches: { [str: string]: Observe<AutoMake> }
 }
 export function CarMakeContextList(args: { id: string, listener: Function, type?: string, context: string }) {
     CarMakeServiceContext.listeners.push(args);
@@ -101,6 +104,9 @@ export default class CarMakeInput extends Typeahead {
         CarMakeServiceContext.listeners = CarMakeServiceContext.listeners.filter(v => v.id === this.state.id);
     }
     componentDidUpdate(prevProps: any, prevState: any, snapshot: any) {
+        if (!this.props.value) {
+            return;
+        }
         let suggestions = (this.state.suggestions || []);
         let value: { value: string, title: string } = suggestions.find((v: { value: string }) => `${v.value}` === this.props.value);
         if (!value) {
@@ -108,7 +114,7 @@ export default class CarMakeInput extends Typeahead {
                 let suggestions = (this.state.suggestions || []);
                 let value: { value: string, title: string } = suggestions.find((v: { value: string }) => `${v.value}` === this.props.value);
                 if (!value) {
-                    return redservice().get(`/api/red/autoservice/make/${this.props.value}`).then((make: AutoMake) => {
+                    let handleResult = (make: AutoMake) => {
                         let suggests = this.mergeSuggestions([({ title: make.make_Name, value: make.make_ID })]);
                         let optional: any = {};
                         if (this.state.value === `${make.make_ID}`) {
@@ -119,7 +125,17 @@ export default class CarMakeInput extends Typeahead {
                             ...optional,
                             suggestions: suggests
                         });
-                    });
+                        return make;
+                    };
+                    if (CarMakeServiceContext.makeSearches && CarMakeServiceContext.makeSearches[this.props.value]) {
+                        CarMakeServiceContext.makeSearches[this.props.value] = CarMakeServiceContext.makeSearches[this.props.value].then(handleResult);
+                    }
+                    else {
+                        // CarMakeServiceContext.makeSearches[this.props.value] ;
+                        CarMakeServiceContext.makeSearches[this.props.value] = Observe.observe<AutoMake>(redservice().get(`/api/red/autoservice/make/${this.props.value}`).then(handleResult).catch(() => {
+                            delete CarMakeServiceContext.makeSearches[this.props.value];
+                        }));
+                    }
                 }
             });
         }

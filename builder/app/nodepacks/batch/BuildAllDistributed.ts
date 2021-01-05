@@ -377,7 +377,7 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		});
 
 		await run(buildAllProgress, AUTHENTICATION_BUTTONS, async (progressfunc: any) => {
-			await SetupAuthenticationButtons();
+			SetupAuthenticationButtons();
 		});
 		await run(buildAllProgress, ATTACH_TITLE_SERVICE, async (progressfunc: any) => {
 			await AttachTitleService();

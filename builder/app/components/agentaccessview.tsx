@@ -2790,17 +2790,24 @@ function validateScreenVisualInsert(componentDidMounts: ScreenVisualInsert[], re
 	if (componentDidMounts) {
 		componentDidMounts.forEach((componentDidMount: ScreenVisualInsert) => {
 			let messages: string[] = [];
-			
-			if (!componentDidMount.visualInsert) {
-				messages.push('no visual insert.');
-			}
 
-			if (!componentDidMount.visualInsert.template) {
-				messages.push('no visual insert template.');
+			if (componentDidMount.isReference) {
+				if (!componentDidMount.reference) {
+					messages.push('no visual reference');
+				}
 			}
+			else {
+				if (!componentDidMount.visualInsert) {
+					messages.push('no visual insert.');
+				}
 
-			if (!componentDidMount.visualInsert.where) {
-				messages.push('no visual insert where.');
+				if (!componentDidMount.visualInsert.template) {
+					messages.push('no visual insert template.');
+				}
+
+				if (!componentDidMount.visualInsert.where) {
+					messages.push('no visual insert where.');
+				}
 			}
 
 			if (messages.length) {

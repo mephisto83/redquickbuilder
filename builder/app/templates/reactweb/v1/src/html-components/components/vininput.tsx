@@ -18,11 +18,13 @@ function redservice() {
 export default class VINInput extends Input {
 	changedText(a: { target: { checked: any; value: any } }) {
 		let value = a.target.value;
-		return redservice().get(`/api/red/autoservice/get/vin/${value}`).then((result: VehicleIdentificationNumberResult) => {
-			this.setState({
-				vins: result.results
+		if (value && value.length === 17) {
+			return redservice().get(`/api/red/autoservice/get/vin/${value}`).then((result: VehicleIdentificationNumberResult) => {
+				this.setState({
+					vins: result.results
+				});
 			});
-		});
+		}
 	}
 	renderVINs() {
 		if (this.state && this.state.vins) {
@@ -40,9 +42,9 @@ export default class VINInput extends Input {
 		}
 		return [];
 	}
-    componentDidUpdate(prevProps: any) {
-        InputFunctions.componentDidUpdateV2(this, prevProps);
-    }
+	componentDidUpdate(prevProps: any) {
+		InputFunctions.componentDidUpdateV2(this, prevProps);
+	}
 	renderBeforValidation() {
 		return this.renderVINs();
 	}

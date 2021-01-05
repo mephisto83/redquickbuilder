@@ -592,7 +592,7 @@ class ThemeView extends Component<any, any> {
 										breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
 										cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
 									>
-										<div key="a" >
+										<div key="a" data-grid={{ x: 0, y: 0, w: 6, h: 6 }}>
 											<Panel stretch title={Titles.Fonts}>
 												<FormControl>
 													<TextInput
@@ -725,7 +725,7 @@ class ThemeView extends Component<any, any> {
 												</FormControl>
 											</Panel>
 										</div>
-										<div key="b">
+										<div key="b" data-grid={{ x: 6, y: 0, w: 6, h: 6 }}>
 											<Panel stretch title="Variables">
 												<FormControl>
 													<TextInput
@@ -1018,7 +1018,7 @@ class ThemeView extends Component<any, any> {
 												</Box>
 											</Panel>
 										</div>
-										<div key="e" data-grid={{ x: 0, y: 4, w: 3, h: 4 }} >
+										<div key="e" data-grid={{ x: 0, y: 4, w: 2, h: 4 }} >
 											<Panel stretch title={this.state.sectionType || 'Search'}>
 												<Box
 													maxheight={500}
@@ -1076,7 +1076,7 @@ class ThemeView extends Component<any, any> {
 											</Panel>
 										</div>
 
-										<div key="f" data-grid={{ x: 2, y: 4, w: 3, h: 4 }}  >
+										<div key="f" data-grid={{ x: 2, y: 4, w: 2, h: 4 }}  >
 											<Panel stretch title={Titles.ColorUse}>
 												<Box title={Titles.ColorUse}>
 													<FormControl>
@@ -1103,7 +1103,7 @@ class ThemeView extends Component<any, any> {
 												</Box>
 											</Panel>
 										</div>
-										<div key="g" data-grid={{ x: 4, y: 4, w: 3, h: 4 }}  >
+										<div key="g" data-grid={{ x: 4, y: 4, w: 2, h: 4 }}  >
 											<Panel stretch title={Titles.ColorUse}>
 												<Box title={Titles.ColorUse}>
 													<GenericPropertyContainer
@@ -1195,7 +1195,7 @@ class ThemeView extends Component<any, any> {
 												</Box>
 											</Panel>
 										</div>
-										<div key="i" data-grid={{ x: 10, y: 4, w: 3, h: 4 }} >
+										<div key="i" data-grid={{ x: 9, y: 4, w: 3, h: 8 }} >
 											<Panel stretch title={"CSS Selectors"}>
 												<Box title="CSS Selectors">
 													<GenericPropertyContainer
