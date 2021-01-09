@@ -5801,10 +5801,12 @@ function addComponentApiToForm(args: {
 	let externalId: any;
 	let internalId: any;
 	let skip = false;
-	let exists = !!GetComponentInternalApiNode(text, parent, graph);
+	let exists = !!GetComponentInternalApiNode(typeof text === 'object' ? text.from : text, parent, graph);
 	if (exists) {
 		return [];
 	}
+	let targetText = typeof text === 'object' ? text.to : text;
+	let sourceText = typeof text === 'object' ? text.from : text;
 	return [
 		{
 			operation: ADD_NEW_NODE,
@@ -5817,7 +5819,7 @@ function addComponentApiToForm(args: {
 						}).find(
 							(x: any) =>
 								GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentApi &&
-								GetNodeProp(x, NodeProperties.UIText) === text
+								GetNodeProp(x, NodeProperties.UIText) === sourceText
 						);
 						if (temp) {
 							internalId = temp.id;
@@ -5837,7 +5839,7 @@ function addComponentApiToForm(args: {
 						groupProperties: {},
 						properties: {
 							...internalProperties,
-							[NodeProperties.UIText]: text,
+							[NodeProperties.UIText]: sourceText,
 							[NodeProperties.Pinned]: false,
 							[NodeProperties.UseAsValue]: true
 						}
@@ -5855,7 +5857,7 @@ function addComponentApiToForm(args: {
 					}).find(
 						(x: any) =>
 							GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.ComponentApi &&
-							GetNodeProp(x, NodeProperties.UIText) === text
+							GetNodeProp(x, NodeProperties.UIText) === targetText
 					);
 					if (temp) {
 						externalId = temp.id;
@@ -5877,7 +5879,7 @@ function addComponentApiToForm(args: {
 						properties: {
 							...externalProperties,
 							[NodeProperties.Pinned]: false,
-							[NodeProperties.UIText]: text
+							[NodeProperties.UIText]: targetText
 						}
 					};
 				}

@@ -8,68 +8,68 @@ function redservice() {
     _redservice = _redservice || createRedService(Globals.DEFAULT_URL)
     return _redservice;
 }
-const CarMakeServiceContext: ICarMakeServiceContext = {
-    carMake: '',
-    listeners: [],
-    context: {},
-    makes: [],
-    makeSearches: {}
-}
-export interface ICarMakeServiceContext {
-    carMake: string;
-    listeners: { id: string, listener: Function, context: string, type?: string }[],
-    context: {
-        [str: string]: {
-            carMake: string
-        }
-    },
-    makes: AutoMake[],
-    makeSearches: { [str: string]: Observe<AutoMake> }
-}
-export function CarMakeContextList(args: { id: string, listener: Function, type?: string, context: string }) {
-    CarMakeServiceContext.listeners.push(args);
-}
-export function CarMakeServiceRemove(id: string) {
-    CarMakeServiceContext.listeners = CarMakeServiceContext.listeners.filter(v => v.id !== id);
-}
-export function CarMakeService(context: string) {
-    if (CarMakeServiceContext.context && CarMakeServiceContext.context[context]) {
-        return CarMakeServiceContext.context[context].carMake;
-    }
-    return CarMakeServiceContext.carMake
-}
-export function SetCarMake(value: string, context?: string) {
-    if (context) {
-        CarMakeServiceContext.context[context].carMake = value;
-    }
-    else {
-        CarMakeServiceContext.carMake = value;
-    }
+// const CarMakeServiceContext: ICarMakeServiceContext = {
+//     carMake: '',
+//     listeners: [],
+//     context: {},
+//     makes: [],
+//     makeSearches: {}
+// }
+// export interface ICarMakeServiceContext {
+//     carMake: string;
+//     listeners: { id: string, listener: Function, context: string, type?: string }[],
+//     context: {
+//         [str: string]: {
+//             carMake: string
+//         }
+//     },
+//     makes: AutoMake[],
+//     makeSearches: { [str: string]: Observe<AutoMake> }
+// }
+// export function CarMakeContextList(args: { id: string, listener: Function, type?: string, context: string }) {
+//     CarMakeServiceContext.listeners.push(args);
+// }
+// export function CarMakeServiceRemove(id: string) {
+//     CarMakeServiceContext.listeners = CarMakeServiceContext.listeners.filter(v => v.id !== id);
+// }
+// export function CarMakeService(context: string) {
+//     if (CarMakeServiceContext.context && CarMakeServiceContext.context[context]) {
+//         return CarMakeServiceContext.context[context].carMake;
+//     }
+//     return CarMakeServiceContext.carMake
+// }
+// export function SetCarMake(value: string, context?: string) {
+//     if (context) {
+//         CarMakeServiceContext.context[context].carMake = value;
+//     }
+//     else {
+//         CarMakeServiceContext.carMake = value;
+//     }
 
-    CarMakeServiceContext.listeners.filter(v => !v.type).forEach((arg: { id: string, listener: Function, context: string }) => {
-        if (context) {
-            if (arg.context === context) {
-                arg.listener();
-            }
-        }
-        else if (!arg.context) {
-            arg.listener();
-        }
-    })
-}
+//     CarMakeServiceContext.listeners.filter(v => !v.type).forEach((arg: { id: string, listener: Function, context: string }) => {
+//         if (context) {
+//             if (arg.context === context) {
+//                 arg.listener();
+//             }
+//         }
+//         else if (!arg.context) {
+//             arg.listener();
+//         }
+//     })
+// }
 
-export function RaiseEvent(value: any, type?: string, context?: string) {
-    CarMakeServiceContext.listeners.filter(v => v.context === type || !context).forEach((arg: { id: string, listener: Function, context: string }) => {
-        if (context) {
-            if (arg.context === context) {
-                arg.listener({ value: `${value}` });
-            }
-        }
-        else if (!arg.context) {
-            arg.listener({ value: `${value}` });
-        }
-    })
-}
+// export function RaiseEvent(value: any, type?: string, context?: string) {
+//     CarMakeServiceContext.listeners.filter(v => v.context === type || !context).forEach((arg: { id: string, listener: Function, context: string }) => {
+//         if (context) {
+//             if (arg.context === context) {
+//                 arg.listener({ value: `${value}` });
+//             }
+//         }
+//         else if (!arg.context) {
+//             arg.listener({ value: `${value}` });
+//         }
+//     })
+// }
 
 export const VIN_SET = 'VIN_SET';
 export const MAKE_INPUT_CHANGE = 'MAKE_INPUT_CHANGE';
@@ -86,69 +86,75 @@ export default class CarMakeInput extends Typeahead {
     promise: Promise<void>;
     running: boolean;
     runAgain: boolean;
-
+    unmounted: boolean = false;
     componentDidMount() {
-        CarMakeServiceContext.listeners.push({
-            id: this.state.id,
-            context: this.props.context,
-            listener: (val: { value: string, valueTitle: string }) => {
-                if (val) {
-                    this.setState({ ...val })
-                }
-            },
-            type: VIN_SET
-        });
+        // CarMakeServiceContext.listeners.push({
+        //     id: this.state.id,
+        //     context: this.props.context,
+        //     listener: (val: { value: string, valueTitle: string }) => {
+        //         if (val) {
+        //             this.setState({ ...val })
+        //         }
+        //     },
+        //     type: VIN_SET
+        // });
         super.componentDidMount();
     }
     componentWillUnmount() {
-        CarMakeServiceContext.listeners = CarMakeServiceContext.listeners.filter(v => v.id === this.state.id);
+        this.unmounted = true;
     }
     componentDidUpdate(prevProps: any, prevState: any, snapshot: any) {
-        if (!this.props.value) {
-            return;
-        }
-        let suggestions = (this.state.suggestions || []);
-        let value: { value: string, title: string } = suggestions.find((v: { value: string }) => `${v.value}` === this.props.value);
-        if (!value) {
-            this.promise = this.promise.then(() => {
-                let suggestions = (this.state.suggestions || []);
-                let value: { value: string, title: string } = suggestions.find((v: { value: string }) => `${v.value}` === this.props.value);
-                if (!value) {
-                    let handleResult = (make: AutoMake) => {
-                        let suggests = this.mergeSuggestions([({ title: make.make_Name, value: make.make_ID })]);
-                        let optional: any = {};
-                        if (this.state.value === `${make.make_ID}`) {
-                            optional.valueTitle = make.make_Name;
-                            SetCarMake(`${this.state.value}`, this.props.serviceContext);
-                        }
-                        this.setState({
-                            ...optional,
-                            suggestions: suggests
-                        });
-                        return make;
-                    };
-                    if (CarMakeServiceContext.makeSearches && CarMakeServiceContext.makeSearches[this.props.value]) {
-                        CarMakeServiceContext.makeSearches[this.props.value] = CarMakeServiceContext.makeSearches[this.props.value].then(handleResult);
-                    }
-                    else {
-                        // CarMakeServiceContext.makeSearches[this.props.value] ;
-                        CarMakeServiceContext.makeSearches[this.props.value] = Observe.observe<AutoMake>(redservice().get(`/api/red/autoservice/make/${this.props.value}`).then(handleResult).catch(() => {
-                            delete CarMakeServiceContext.makeSearches[this.props.value];
-                        }));
-                    }
-                }
+        if (this.props.valueTitle !== prevProps.valueTitle) {
+            this.setState({
+                valueTitle: this.props.valueTitle,
+                value: this.props.value
             });
         }
-        if (prevProps.value !== this.props.value) {
-            SetCarMake(`${this.props.value}`, this.props.serviceContext);
-            RaiseEvent(this.props.value, MAKE_INPUT_CHANGE, this.props.serviceContext);
-        }
+        // if (!this.props.value) {
+        //     return;
+        // }
+        // let suggestions = (this.state.suggestions || []);
+        // let value: { value: string, title: string } = suggestions.find((v: { value: string }) => `${v.value}` === this.props.value);
+        // if (!value) {
+        //     this.promise = this.promise.then(() => {
+        //         let suggestions = (this.state.suggestions || []);
+        //         let value: { value: string, title: string } = suggestions.find((v: { value: string }) => `${v.value}` === this.props.value);
+        //         if (!value) {
+        //             let handleResult = (make: AutoMake) => {
+        //                 let suggests = this.mergeSuggestions([({ title: make.make_Name, value: make.make_ID })]);
+        //                 let optional: any = {};
+        //                 if (this.state.value === `${make.make_ID}`) {
+        //                     optional.valueTitle = make.make_Name;
+        //                     SetCarMake(`${this.state.value}`, this.props.serviceContext);
+        //                 }
+        //                 this.setState({
+        //                     ...optional,
+        //                     suggestions: suggests
+        //                 });
+        //                 return make;
+        //             };
+        //             if (CarMakeServiceContext.makeSearches && CarMakeServiceContext.makeSearches[this.props.value]) {
+        //                 CarMakeServiceContext.makeSearches[this.props.value] = CarMakeServiceContext.makeSearches[this.props.value].then(handleResult);
+        //             }
+        //             else {
+        //                 // CarMakeServiceContext.makeSearches[this.props.value] ;
+        //                 CarMakeServiceContext.makeSearches[this.props.value] = Observe.observe<AutoMake>(redservice().get(`/api/red/autoservice/make/${this.props.value}`).then(handleResult).catch(() => {
+        //                     delete CarMakeServiceContext.makeSearches[this.props.value];
+        //                 }));
+        //             }
+        //         }
+        //     });
+        // }
+        // if (prevProps.value !== this.props.value) {
+        //     SetCarMake(`${this.props.value}`, this.props.serviceContext);
+        //     RaiseEvent(this.props.value, MAKE_INPUT_CHANGE, this.props.serviceContext);
+        // }
         super.componentDidUpdate(prevProps, prevState, snapshot);
     }
-    suggestionSelected(value: any, title: any) {
-        super.suggestionSelected(`${value}`, title);
-        SetCarMake(`${value}`, this.props.serviceContext);
-    }
+    // suggestionSelected(value: any, title: any) {
+    //     super.suggestionSelected(`${value}`, title);
+    //     // SetCarMake(`${value}`, this.props.serviceContext);
+    // }
 
     onTextChange(e: any) {
         const value = `${e.target.value}`;
@@ -173,20 +179,24 @@ export default class CarMakeInput extends Typeahead {
             if (currentId < this.callId) {
                 return;
             }
-            if (CarMakeServiceContext.makes && CarMakeServiceContext.makes.length) {
-                this.setState(() => ({
-                    suggestions: CarMakeServiceContext.makes
-                }));
-            }
+            // if (CarMakeServiceContext.makes && CarMakeServiceContext.makes.length) {
+            //     this.setState(() => ({
+            //         suggestions: CarMakeServiceContext.makes
+            //     }));
+            // }
             return redservice().get(`/api/red/autoservice/makers/${value}`).then((makers: AutoMake[]) => {
                 if (currentId < this.callId) {
                     return;
                 }
+                if (this.unmounted) {
+                    return;
+                }
+                
                 let suggestions = makers.map((make: AutoMake) => ({ title: make.make_Name, value: make.make_ID }));
 
                 if (this.runAgain || currentValue === this.state.value) {
                     let suggests = this.mergeSuggestions(suggestions);
-                    CarMakeServiceContext.makes = suggests;
+
                     this.setState(() => ({
                         suggestions: suggests
                     }));

@@ -39,6 +39,8 @@ import CountryInput from './components/countryinput';
 import DictionaryInput from './components/dictionaryinput';
 import DateInput from './components/dateinput';
 import VINInput from './components/vininput';
+import AutoModelInput from './components/automodelinput';
+
 export {
   Content,
   VINInput,
@@ -70,6 +72,7 @@ export {
   CountryInput,
   CarYearInput,
   CarModelInput,
+  AutoModelInput,
   DictionaryInput,
   AddressInput,
   View,

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using RedQuickCore.Identity;
 using RedQuickCore.Automodel;
+using RedQuick.Data;
 
 namespace {{namespace}}.Web.Controllers
 {    

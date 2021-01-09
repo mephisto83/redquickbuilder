@@ -6,9 +6,9 @@ import {
 	GetModelPropertyChildren,
 	GetFunctionMethodKey,
 	GetValidatorMethod,
-  graphOperation,
-  GetDispatchFunc,
-  GetStateFunc
+	graphOperation,
+	GetDispatchFunc,
+	GetStateFunc
 } from '../../actions/uiActions';
 import {
 	NodeTypes,
@@ -87,7 +87,7 @@ export default function ApplyValidationFromProperties(filter?: any) {
 							let attributeType = GetNodeProp(attr, NodeProperties.UIAttributeType, graph);
 							switch (attributeType) {
 								case NodeAttributePropertyTypes.ADDRESS:
-									return function() {
+									return function () {
 										if (!condition) {
 											return [];
 										}
@@ -98,10 +98,9 @@ export default function ApplyValidationFromProperties(filter?: any) {
 											methodType: GetNodeProp(methodNode, NodeProperties.FunctionType)
 										});
 									};
-									break;
 								case NodeAttributePropertyTypes.COUNTRY:
 								case NodeAttributePropertyTypes.NAME:
-									return function() {
+									return function () {
 										if (!condition) {
 											return [];
 										}
@@ -115,7 +114,7 @@ export default function ApplyValidationFromProperties(filter?: any) {
 									break;
 								case NodeAttributePropertyTypes.CARMAKE:
 								case NodeAttributePropertyTypes.CARMODEL:
-									return function() {
+									return function () {
 										if (!condition) {
 											return [];
 										}
@@ -129,7 +128,7 @@ export default function ApplyValidationFromProperties(filter?: any) {
 									};
 
 								case NodeAttributePropertyTypes.EMAIL:
-									return function() {
+									return function () {
 										if (!condition) {
 											return [];
 										}
@@ -145,7 +144,7 @@ export default function ApplyValidationFromProperties(filter?: any) {
 										});
 									};
 								case NodeAttributePropertyTypes.VIN:
-									return function() {
+									return function () {
 										if (!condition) {
 											return [];
 										}
@@ -162,7 +161,7 @@ export default function ApplyValidationFromProperties(filter?: any) {
 										});
 									};
 								case NodeAttributePropertyTypes.SOCIALSECURITY:
-									return function() {
+									return function () {
 										if (!condition) {
 											return [];
 										}
@@ -180,7 +179,7 @@ export default function ApplyValidationFromProperties(filter?: any) {
 									};
 								case NodeAttributePropertyTypes.YEAR:
 								case NodeAttributePropertyTypes.CARYEAR:
-									return function() {
+									return function () {
 										if (!condition) {
 											return [];
 										}
@@ -194,7 +193,7 @@ export default function ApplyValidationFromProperties(filter?: any) {
 										});
 									};
 								case NodeAttributePropertyTypes.ZIPCODE:
-									return function() {
+									return function () {
 										if (!condition) {
 											return [];
 										}
@@ -213,7 +212,7 @@ export default function ApplyValidationFromProperties(filter?: any) {
 										link: LinkType.Enumeration
 									});
 									if (enumNode) {
-										return function() {
+										return function () {
 											if (!condition) {
 												return [];
 											}
@@ -232,7 +231,7 @@ export default function ApplyValidationFromProperties(filter?: any) {
 										return false;
 									}
 								case NodeAttributePropertyTypes.CREDITCARD:
-									return function() {
+									return function () {
 										if (!condition) {
 											return [];
 										}
@@ -247,7 +246,7 @@ export default function ApplyValidationFromProperties(filter?: any) {
 										});
 									};
 								case NodeAttributePropertyTypes.LONGSTRING:
-									return function() {
+									return function () {
 										if (!condition) {
 											return [];
 										}

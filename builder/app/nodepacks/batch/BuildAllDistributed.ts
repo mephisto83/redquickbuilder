@@ -20,6 +20,7 @@ import SelectAllOnModelFilters from './SelectAllOnModelFilters';
 import AddFiltersToGetAll from '../method/AddFiltersToGetAll';
 import UpdateScreenUrls from '../screens/UpdateScreenUrls';
 import HaveAllPropertiesOnExecutors from './HaveAllPropertiesOnExecutors';
+import AddViewIdToListItemPropertyInputs from './AddViewIdToListItemPropertyInputs';
 import AddCopyCommandToExecutors from './AddCopyCommandToExecutors';
 import CreateDashboard from '../CreateDashboard_1';
 import { AuthorizedDashboard } from '../../components/titles';
@@ -63,7 +64,7 @@ interface BuildStep {
 export async function pause() {
 	return new Promise((res) => {
 		setTimeout(() => {
-			res();
+			res(true);
 		}, 30);
 	});
 }
@@ -173,6 +174,7 @@ const Add_Filters_To_Get_All = 'Add Filters to Get All';
 const Create_Dashboard = 'Create Dashboard';
 const Create_Login_Models = 'Create Login Models';
 const Add_UserRequirements = 'Add User Requirements';
+const Add_ViewId_To_ListItem_Property_Inputs = 'Add ViewId To ListItem Property Inputs';
 const ListRequiredModelTitles = 'ListRequiredModelTitles';
 const AddTitleService = 'AddTitleService';
 const Load_Window_Settings = 'Load_Window_Settings';
@@ -262,6 +264,7 @@ const buildAllProgress = [
 	{ name: GETALL_LIST_ROUTES },
 	{ name: AUTHENTICATION_BUTTONS },
 	{ name: ATTACH_TITLE_SERVICE },
+	{ name: Add_ViewId_To_ListItem_Property_Inputs },
 	{ name: COMPLETED_BUILD }
 ];
 export const BuildAllInfo = {
@@ -336,7 +339,9 @@ export default async function BuildAllDistributed(command: string, currentJobFil
 		await run(buildAllProgress, Add_UserRequirements, async (progresFunc: (arg0: number) => any) => {
 			AddUserRequirements();
 		});
-
+		await run(buildAllProgress, Add_ViewId_To_ListItem_Property_Inputs, async (progressFunc: (arg0: number) => any) => {
+			await AddViewIdToListItemPropertyInputs();
+		})
 		await threadRun(buildAllProgress, Create_Component_Shared_All, currentJobFile, NodeTypes.Model, 10000);
 
 		// await run(buildAllProgress, Create_Component_Shared_All, async (progresFunc: (arg0: number) => any) => {

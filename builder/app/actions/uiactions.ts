@@ -3059,6 +3059,16 @@ export function GetConditionClause(
 				break;
 		}
 	}
+	else if (componentType === 'AutoModel') {
+		switch (language) {
+			case NodeConstants.ProgrammingLanguages.JavaScript:
+				propNames = ['Make_ID', 'Model_ID', 'ModelYear'].map(v => `${propertyName.toJavascriptName()}?.${v.toJavascriptName()}`);
+				break;
+			default:
+				propNames = ['Make_ID', 'Model_ID', 'ModelYear'].map(v => `${propertyName}?.${v}`);
+				break;
+		}
+	}
 	return propNames.map((propertyName: string) => {
 		const method = GetNodesMethod(adjacentId);
 		const clauseKeyNodeId = GetMethodNodeProp(method, clauseKey);

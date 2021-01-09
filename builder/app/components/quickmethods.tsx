@@ -68,6 +68,7 @@ import SetupAuthenticationButtons from '../nodepacks/batch/SetupAuthenticationBu
 import AttachTitleService from '../nodepacks/batch/AttachTitleService';
 import { buildAst, buildFunctions, buildRules, FlowCodeStatements } from '../constants/flowcode_ast';
 import { GetAgentAccessLink } from '../service/screenservice';
+import AddViewIdToListItemPropertyInputs from '../nodepacks/batch/AddViewIdToListItemPropertyInputs';
 
 class QuickMethods extends Component<any, any, any> {
 	constructor(props: any) {
@@ -361,6 +362,12 @@ class QuickMethods extends Component<any, any, any> {
 									title="Collection Prune DataChain"
 									onClick={() => {
 										CollectionPruneDataChain();
+									}}
+								/>
+								<TreeViewMenu
+									title="Add ViewId To ListItem Property Inputs"
+									onClick={() => {
+										AddViewIdToListItemPropertyInputs();
 									}}
 								/>
 								<TreeViewMenu

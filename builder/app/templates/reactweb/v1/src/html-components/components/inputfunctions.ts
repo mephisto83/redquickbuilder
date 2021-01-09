@@ -82,22 +82,22 @@ export default class InputFunctions {
 		return (v: { target: { checked: any; value: any } }) => {
 			if (arg0.immediate() || force) {
 				if (arg0.changedText) {
-					arg0.changedText(v);
+					arg0.changedText(v, arg0.state.valueTitle);
 				}
 				if (arg0.props.onChange) {
-					arg0.props.onChange(v);
+					arg0.props.onChange(v, arg0.state.valueTitle);
 				}
 
 				if (arg0.props.onChangeText) {
 					if (arg0.inputType === 'checkbox') {
-						arg0.props.onChangeText(v.target.checked);
+						arg0.props.onChangeText(v.target.checked, arg0.state.valueTitle);
 					} else {
-						arg0.props.onChangeText(v.target.value);
+						arg0.props.onChangeText(v.target.value, arg0.state.valueTitle);
 					}
 				}
 			} else {
 				if (arg0.changedText) {
-					arg0.changedText(v);
+					arg0.changedText(v, arg0.state.valueTitle);
 				}
 				if (arg0.inputType === 'checkbox') {
 					arg0.setState({ value: v.target.checked });

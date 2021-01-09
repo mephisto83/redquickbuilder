@@ -117,6 +117,7 @@ const INPUT_DEFAULT_API = [
 	'floatingLabel',
 	'stackedLabel',
 	'fixedLabel',
+	'viewId',
 	'success',
 	'error'
 ].map((x) => ({ property: x }));
@@ -133,6 +134,7 @@ const BUTTON_DEFAULT_API = [
 	'rounded',
 	'large',
 	'small',
+	'viewId',
 	'active'
 ].map((x) => ({ property: x }));
 const LOCAL_STATE_PROPERTY = ['error'].map((x) => ({ property: x }));
@@ -196,6 +198,7 @@ export const ComponentTypeKeys = {
 	Year: 'Year',
 	StateProvince: 'StateProvince',
 	GoogleAddress: 'GoogleAddress',
+	AutoModel: 'AutoModel',
 	VIN: 'VIN',
 	CurrencyInput: 'CurrencyInput',
 	DateInput: 'DateInput',
@@ -230,6 +233,10 @@ function BuildTypeahead(args: { template: string } = { template: 'typeahead.tpl'
 			...DEFAULT_INPUT_API_PROPERTIES,
 			value: {
 				nodeProperty: NodeProperties.value,
+				template: true
+			},
+			viewId: {
+				nodeProperty: NodeProperties.viewId,
 				template: true
 			},
 			label: {
@@ -299,6 +306,10 @@ export const ComponentTypes: any = {
 					nodeProperty: NodeProperties.value,
 					template: true
 				},
+				viewId: {
+					nodeProperty: NodeProperties.viewId,
+					template: true
+				},
 				label: {
 					nodeProperty: NodeProperties.Label,
 					template: true
@@ -343,6 +354,10 @@ export const ComponentTypes: any = {
 				...DEFAULT_INPUT_API_PROPERTIES,
 				value: {
 					nodeProperty: NodeProperties.value,
+					template: true
+				},
+				viewId: {
+					nodeProperty: NodeProperties.viewId,
 					template: true
 				},
 				options: {
@@ -494,6 +509,10 @@ export const ComponentTypes: any = {
 					nodeProperty: NodeProperties.value,
 					template: true
 				},
+				viewId: {
+					nodeProperty: NodeProperties.viewId,
+					template: true
+				},
 				label: {
 					nodeProperty: NodeProperties.Label,
 					template: true
@@ -518,6 +537,7 @@ export const ComponentTypes: any = {
 		[ComponentTypeKeys.CarYear]: BuildTypeahead({ template: 'caryearinput.tpl' }),
 		[ComponentTypeKeys.StateProvince]: BuildTypeahead({ template: 'stateinput.tpl' }),
 		[ComponentTypeKeys.GoogleAddress]: BuildTypeahead({ template: 'addressinput.tpl' }),
+		[ComponentTypeKeys.AutoModel]: BuildTypeahead({ template: 'automodelinput.tpl' }),
 		[ComponentTypeKeys.VIN]: BuildTypeahead({ template: 'vininput.tpl' }),
 		[ComponentTypeKeys.CurrencyInput]: BuildTypeahead({ template: 'currencyinput.tpl' }),
 		[ComponentTypeKeys.DateInput]: BuildTypeahead({ template: 'dateinput.tpl' }),
@@ -544,6 +564,10 @@ export const ComponentTypes: any = {
 			template: './app/templates/components/list.tpl',
 			datasource: true,
 			properties: {
+				viewId: {
+					nodeProperty: NodeProperties.viewId,
+					template: true
+				},
 				item_attributes: {
 					nodeProperty: NodeProperties.TextType,
 					template: '{{value}}',
@@ -574,6 +598,10 @@ export const ComponentTypes: any = {
 			template: './app/templates/components/multiviewlist.tpl',
 			datasource: true,
 			properties: {
+				viewId: {
+					nodeProperty: NodeProperties.viewId,
+					template: true
+				},
 				item_attributes: {
 					nodeProperty: NodeProperties.TextType,
 					template: '{{value}}',
@@ -593,6 +621,10 @@ export const ComponentTypes: any = {
 			template: './app/templates/components/multiselectlist.tpl',
 			datasource: true,
 			properties: {
+				viewId: {
+					nodeProperty: NodeProperties.viewId,
+					template: true
+				},
 				item_attributes: {
 					nodeProperty: NodeProperties.TextType,
 					template: '{{value}}',
@@ -609,6 +641,10 @@ export const ComponentTypes: any = {
 			template: './app/templates/components/infinitelist.tpl',
 			datasource: true,
 			properties: {
+				viewId: {
+					nodeProperty: NodeProperties.viewId,
+					template: true
+				},
 				item_attributes: {
 					nodeProperty: NodeProperties.TextType,
 					template: '{{value}}',

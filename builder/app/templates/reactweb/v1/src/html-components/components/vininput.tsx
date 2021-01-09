@@ -3,10 +3,6 @@ import { createRedService } from '../../util/service';
 import * as Globals from '../../util/globals';
 import InputFunctions from './inputfunctions';
 import React from 'react';
-import Validation from './validation';
-import * as CarMakeInput from './carmakeinput';
-import * as CarModelInput from './carmodelinput';
-import * as CarYearInput from './caryearinput';
 
 let _redservice: any;
 function redservice() {
@@ -30,9 +26,6 @@ export default class VINInput extends Input {
 		if (this.state && this.state.vins) {
 			return this.state.vins.map((vin: VehicleIdentificationNumber) => {
 				return (<div key={`${vin.makeID}-${vin.modelID}-${vin.modelYear}`} onClick={() => {
-					CarMakeInput.RaiseEvent({ value: vin.makeID, valueTitle: vin.make }, CarMakeInput.VIN_SET, this.props.context);
-					CarModelInput.RaiseEvent({ value: vin.modelID, valueTitle: vin.model }, CarMakeInput.VIN_SET, this.props.context);
-					CarYearInput.RaiseEvent({ value: vin.modelYear, valueTitle: vin.modelYear }, CarMakeInput.VIN_SET, this.props.context);
 				}}>
 					<span>{vin.modelYear}</span>
 					<span>{vin.make}</span>

@@ -410,7 +410,8 @@ export const ConfigurationProperties = {
 };
 
 export const ApiNodeKeys = {
-	ViewModel: 'viewModel'
+	ViewModel: 'viewModel',
+	ViewId: 'viewId'
 };
 export const SelectorPropertyKeys = {
 	Dirty: 'dirty',
@@ -594,6 +595,7 @@ export const NodeProperties = {
 	Value: 'Value',
 	ContextParams: 'ContextParams',
 	value: 'value',
+	viewId: 'viewId',
 	Number: 'Number',
 	OnFocus: 'onFocus',
 	Purpose: 'Purpose',
@@ -1723,6 +1725,7 @@ export const NodePropertyTypes = {
 	INT: 'INT',
 	ADDRESS: 'ADDRESS',
 	FLOAT: 'FLOAT',
+	AUTOMOBILE: 'AUTOMOBILE',
 	DOUBLE: 'DOUBLE',
 	LONG: 'LONG',
 	BOOLEAN: 'BOOLEAN',
@@ -1757,6 +1760,7 @@ export const NodePropertyTypesByLanguage = {
 		[NodePropertyTypes.LISTOFSTRINGS]: 'IList<string>',
 		[NodePropertyTypes.DICTSTRING]: 'IDictionary<string, string>',
 		[NodePropertyTypes.ADDRESS]: 'GoogleAddress',
+		[NodePropertyTypes.AUTOMOBILE]: ' AutoModel',
 		[NodePropertyTypes.INT]: 'int',
 		[NodePropertyTypes.FLOAT]: 'float',
 		[NodePropertyTypes.DOUBLE]: 'double',
@@ -1768,6 +1772,7 @@ export const NodePropertyTypesByLanguage = {
 		[NodePropertyTypes.DATETIME]: 'any',
 		[NodePropertyTypes.STRING]: 'string',
 		[NodePropertyTypes.ADDRESS]: '{ [str:string]: any }',
+		[NodePropertyTypes.AUTOMOBILE]: '{ [str:string]: any }',
 		[NodePropertyTypes.LISTOFSTRINGS]: 'IList<string>',
 		[NodePropertyTypes.DICTSTRING]: '{ [str: string]: string }',
 		[NodePropertyTypes.INT]: 'number',
@@ -1785,7 +1790,8 @@ export const Usings = {
 	[ProgrammingLanguages.CSHARP]: {
 		[NodePropertyTypes.EMAIL]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES],
 		[NodePropertyTypes.PHONENUMBER]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES],
-		[NodePropertyTypes.ADDRESS]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES]
+		[NodePropertyTypes.ADDRESS]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES],
+		[NodePropertyTypes.AUTOMOBILE]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES]
 	}
 };
 export const NodeAttributePropertyTypes = {
@@ -1817,6 +1823,7 @@ export const NodeAttributePropertyTypes = {
 	BOOLEAN: 'BOOLEAN',
 	ACCOUNTNUMBER: 'ACCOUNTNUMBER',
 	ADDRESS: 'ADDRESS',
+	AUTOMOBILE: 'AUTOMOBILE',
 	COLLECTION: 'COLLECTION',
 	OBJECT: 'OBJECT',
 	RADIO: 'RADIO',

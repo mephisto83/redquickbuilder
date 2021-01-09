@@ -943,273 +943,303 @@ class ThemeView extends Component<any, any> {
 										breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
 										cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
 									>
-										<div key="a" data-grid={{ x: 0, y: 0, w: 3, h: 4 }}>
+										<div key="a" data-grid={{ x: 0, y: 0, w: 2, h: 4 }}>
 											<Panel stretch title={Titles.Fonts}>
 												<FormControl>{colors}</FormControl>
 											</Panel>
 										</div>
-										<div key="b" data-grid={{ x: 3, y: 0, w: 3, h: 4 }}>
+										<div key="b" data-grid={{ x: 2, y: 0, w: 2, h: 4 }}>
 											<Panel stretch title={Titles.Fonts}>
 												<FormControl>{colorUses}</FormControl>
 											</Panel>
 										</div>
-										<div key="c" data-grid={{ x: 6, y: 0, w: 3, h: 4 }}>
+										<div key="c" data-grid={{ x: 4, y: 0, w: 2, h: 4 }}>
 											<Panel stretch title={Titles.Fonts}>
 												<FormControl>{otherUses}</FormControl>
 											</Panel>
 										</div>
-										<div key="d" data-grid={{ x: 9, y: 0, w: 3, h: 4 }}>
-											<Panel stretch title={Titles.Fonts}>
-												<Box
-													maxheight={500}
-													title={Titles.SpaceTheme}
-													onSearch={(search: string) => {
-														this.setState({
-															spaceSearch: search
-														});
-													}}
-												>
-													<FormControl>
-														<Typeahead
-															options={[...Object.keys(ComponentTags).map((v) => ({
+										<div key="d" data-grid={{ x: 6, y: 0, w: 3, h: 4 }}>
+											<Box
+												maxheight={500}
+												title={Titles.SpaceTheme}
+												onSearch={(search: string) => {
+													this.setState({
+														spaceSearch: search
+													});
+												}}
+											>
+												<FormControl>
+													<Typeahead
+														options={[...Object.keys(ComponentTags).map((v) => ({
+															title: v,
+															value: v,
+															id: v
+														})), ...(themeGridPlacements ? themeGridPlacements.grids || [] : []).map((v: any) => ({
+															...v,
+															title: v.name,
+															value: v.name,
+															id: v.name
+														})), ...this.state.modelPropertyClasses.map((v: string) => {
+															return {
 																title: v,
 																value: v,
 																id: v
-															})), ...(themeGridPlacements ? themeGridPlacements.grids || [] : []).map((v: any) => ({
-																...v,
-																title: v.name,
-																value: v.name,
-																id: v.name
-															})), ...this.state.modelPropertyClasses.map((v: string) => {
-																return {
-																	title: v,
-																	value: v,
-																	id: v
-																}
-															}), this.state.currentFieldValue ? {
-																title: this.state.currentFieldValue,
-																value: this.state.currentFieldValue
-															} : null].filter(v => v)}
-															onChangeText={(value: string) => {
-																this.setState({
-																	currentFieldValue: value
-																});
-															}}
-															label="Spaces"
-															onChange={(value: string) => {
-																this.setState({ componentTag: value });
-															}}
-															value={this.state.componentTag}
-														/>
+															}
+														}), this.state.currentFieldValue ? {
+															title: this.state.currentFieldValue,
+															value: this.state.currentFieldValue
+														} : null].filter(v => v)}
+														onChangeText={(value: string) => {
+															this.setState({
+																currentFieldValue: value
+															});
+														}}
+														label="Spaces"
+														onChange={(value: string) => {
+															this.setState({ componentTag: value });
+														}}
+														value={this.state.componentTag}
+													/>
 
-														{this.getSpaceFields(
-															this.state.componentTag,
-															this.state.mediaSize,
-															spaceTheme,
-															themeColors,
-															themeVariables,
-															(f: string) =>
-																this.state.spaceSearch &&
-																f.toLowerCase()
-																	.indexOf(this.state.spaceSearch.toLowerCase()) !== -1
-														)}
-														<div style={{ height: 300 }} />
-													</FormControl>
-												</Box>
-											</Panel>
+													{this.getSpaceFields(
+														this.state.componentTag,
+														this.state.mediaSize,
+														spaceTheme,
+														themeColors,
+														themeVariables,
+														(f: string) =>
+															this.state.spaceSearch &&
+															f.toLowerCase()
+																.indexOf(this.state.spaceSearch.toLowerCase()) !== -1
+													)}
+													<div style={{ height: 300 }} />
+												</FormControl>
+											</Box>
 										</div>
 										<div key="e" data-grid={{ x: 0, y: 4, w: 2, h: 4 }} >
-											<Panel stretch title={this.state.sectionType || 'Search'}>
-												<Box
-													maxheight={500}
-													title={this.state.sectionType || 'Search'}
-													onSearch={(search) => {
-														this.setState({
-															[`search-${this.state.sectionType || 'search'}`]: search
-														});
-													}}
-												>
-													<FormControl>
+											<Box
+												maxheight={500}
+												title={this.state.sectionType || 'Search'}
+												onSearch={(search: string) => {
+													this.setState({
+														[`search-${this.state.sectionType || 'search'}`]: search
+													});
+												}}
+											>
+												<FormControl>
+													<SelectInput
+														options={HTMLElementGroups.map((v) => ({
+															title: v.name,
+															value: v.name,
+															id: v.name
+														}))}
+														label="Section Types"
+														onChange={(value) => {
+															this.setState({ sectionType: value });
+														}}
+														value={this.state.sectionType}
+													/>
+													{this.state.sectionType ? (
 														<SelectInput
-															options={HTMLElementGroups.map((v) => ({
-																title: v.name,
-																value: v.name,
-																id: v.name
-															}))}
-															label="Section Types"
+															options={sectionTypeOptions}
+															label={this.state.sectionType}
 															onChange={(value) => {
-																this.setState({ sectionType: value });
+																this.setState({ [this.state.sectionType]: value });
 															}}
-															value={this.state.sectionType}
+															value={this.state[this.state.sectionType]}
 														/>
-														{this.state.sectionType ? (
-															<SelectInput
-																options={sectionTypeOptions}
-																label={this.state.sectionType}
-																onChange={(value) => {
-																	this.setState({ [this.state.sectionType]: value });
-																}}
-																value={this.state[this.state.sectionType]}
-															/>
-														) : null}
-														{this.getEditBoxes(
-															this.state[this.state.sectionType],
-															this.state.mediaSize,
-															spaceTheme,
-															themeColors,
-															HTMLElementGroups.find(
-																(f) => f.name === this.state.sectionType
-															),
-															themeVariables,
-															(f) =>
-																this.state[`search-${this.state.sectionType}`] &&
-																f
-																	.toLowerCase()
-																	.indexOf(
-																		`${this.state[
-																			`search-${this.state.sectionType}`
-																		]}`.toLowerCase()
-																	) !== -1
-														)}
-													</FormControl>
-												</Box>
-											</Panel>
+													) : null}
+													{this.getEditBoxes(
+														this.state[this.state.sectionType],
+														this.state.mediaSize,
+														spaceTheme,
+														themeColors,
+														HTMLElementGroups.find(
+															(f) => f.name === this.state.sectionType
+														),
+														themeVariables,
+														(f) =>
+															this.state[`search-${this.state.sectionType}`] &&
+															f
+																.toLowerCase()
+																.indexOf(
+																	`${this.state[
+																		`search-${this.state.sectionType}`
+																	]}`.toLowerCase()
+																) !== -1
+													)}
+												</FormControl>
+											</Box>
 										</div>
 
 										<div key="f" data-grid={{ x: 2, y: 4, w: 2, h: 4 }}  >
 											<Panel stretch title={Titles.ColorUse}>
-												<Box title={Titles.ColorUse}>
-													<FormControl>
-														<TextInput
-															value={this.state.cssString}
-															textarea
-															onChangeText={(val: string) => {
-																// this.setState({ cssString: val })
-															}}
-															onChanged={(val: string) => {
-																this.setState({ cssString: val })
-															}} />
-														<button
-															className="btn btn-default btn-flat"
-															onClick={(e) => {
-																let res: JSONNode = cssToJson(this.state.cssString);
-																let colors = GetColors(this.state.cssString)
-																this.setState({ cssJson: res, cssColors: colors });
-																e.preventDefault();
-																e.stopPropagation()
-															}}
-														>View</button>
-													</FormControl>
-												</Box>
+												<FormControl>
+													<TextInput
+														value={this.state.cssString}
+														textarea
+														onChangeText={(val: string) => {
+															// this.setState({ cssString: val })
+														}}
+														onChanged={(val: string) => {
+															this.setState({ cssString: val })
+														}} />
+													<button
+														className="btn btn-default btn-flat"
+														onClick={(e) => {
+															let res: JSONNode = cssToJson(this.state.cssString);
+															let colors = GetColors(this.state.cssString)
+															this.setState({ cssJson: res, cssColors: colors });
+															e.preventDefault();
+															e.stopPropagation()
+														}}
+													>View</button>
+												</FormControl>
 											</Panel>
 										</div>
 										<div key="g" data-grid={{ x: 4, y: 4, w: 2, h: 4 }}  >
-											<Panel stretch title={Titles.ColorUse}>
-												<Box title={Titles.ColorUse}>
-													<GenericPropertyContainer
-														sideBarStyle={{ right: 0 }}
-														active
-														title="CSS"
-														subTitle="afaf"
-													>
-														<TreeViewMenu active open={this.state.cssJsonOpen} toggle={() => {
-															this.setState({
-																cssJsonOpen: !this.state.cssJsonOpen
-															});
-														}} >
-															{
-																this.state.cssJson && this.state.cssJson.children && this.state.cssJson.children ? Object.entries(this.state.cssJson.children).map((item: any) => {
-																	let [key, children]: [string, Children] = item;
-																	let attributes: any = [];
-																	if (children.attributes) {
-																		attributes = Object.entries(children.attributes).map((item: any) => {
-																			return <ThemeStyleSection child={children} key={item[0]} title={item[0]} item={item[1]} />;
-																		});
-																	}
-																	return <TreeViewMenu active key={key} title={key} description={key} open={this.state['asdff-' + key]} toggle={() => {
-																		this.setState({
-																			['asdff-' + key]: !this.state['asdff-' + key]
-																		});
-																	}}>
-																		<TreeViewItemContainer>
-																			<TextInput label="target name" value={this.state[`target_name` + key] || key} onChangeText={(val: string) => {
-																				this.setState({
-																					[`target_name` + key]: val
-																				});
-																			}} />
-																		</TreeViewItemContainer>
-																		<TreeViewButtonGroup>
-																			<TreeViewGroupButton
-																				icon="fa fa-star"
-																				onClick={() => {
-																					let formTheme = spaceTheme;
-																					let formType = this.state[`target_name` + key] || key;
-																					formTheme[formType] = formTheme[formType] || {};
-																					['@media only screen and (min-width: 1200px)', ...Object.keys(MediaQueries)].map((ms: string) => {
-																						formTheme[formType][ms] = {};
-																						Object.entries(children.attributes).forEach((item: any) => {
-																							let key = item[0];
-																							let value = item[1];
-																							formTheme[formType][ms][key] = value;
-																						})
-																					});
-																					this.setState({
-																						turn: Date.now()
+											<Box title={Titles.ColorUse}>
+												<GenericPropertyContainer
+													sideBarStyle={{ right: 0 }}
+													active
+													title="CSS"
+													subTitle="afaf"
+												>
+													<TreeViewMenu active open={this.state.cssJsonOpen} toggle={() => {
+														this.setState({
+															cssJsonOpen: !this.state.cssJsonOpen
+														});
+													}} >
+														{
+															this.state.cssJson && this.state.cssJson.children && this.state.cssJson.children ? Object.entries(this.state.cssJson.children).map((item: any) => {
+																let [key, children]: [string, Children] = item;
+																let attributes: any = [];
+																if (children.attributes) {
+																	attributes = Object.entries(children.attributes).map((item: any) => {
+																		return <ThemeStyleSection child={children} key={item[0]} title={item[0]} item={item[1]} />;
+																	});
+																}
+																return <TreeViewMenu active key={key} title={key} description={key} open={this.state['asdff-' + key]} toggle={() => {
+																	this.setState({
+																		['asdff-' + key]: !this.state['asdff-' + key]
+																	});
+																}}>
+																	<TreeViewItemContainer>
+																		<TextInput label="target name" value={this.state[`target_name` + key] || key} onChangeText={(val: string) => {
+																			this.setState({
+																				[`target_name` + key]: val
+																			});
+																		}} />
+																	</TreeViewItemContainer>
+																	<TreeViewButtonGroup>
+																		<TreeViewGroupButton
+																			icon="fa fa-star"
+																			onClick={() => {
+																				let formTheme = spaceTheme;
+																				let formType = this.state[`target_name` + key] || key;
+																				formTheme[formType] = formTheme[formType] || {};
+																				['@media only screen and (min-width: 1200px)', ...Object.keys(MediaQueries)].map((ms: string) => {
+																					formTheme[formType][ms] = {};
+																					Object.entries(children.attributes).forEach((item: any) => {
+																						let key = item[0];
+																						let value = item[1];
+																						formTheme[formType][ms][key] = value;
 																					})
-																					// spaceTheme,
-																					// themeColors,
-																					// themeVariables
-																				}}
-																			/>
-																		</TreeViewButtonGroup>
-																		{attributes}
-																	</TreeViewMenu>
-																}) : []
-															}
-														</TreeViewMenu>
-													</GenericPropertyContainer>
-												</Box>
-											</Panel>
+																				});
+																				this.setState({
+																					turn: Date.now()
+																				})
+																				// spaceTheme,
+																				// themeColors,
+																				// themeVariables
+																			}}
+																		/>
+																	</TreeViewButtonGroup>
+																	{attributes}
+																</TreeViewMenu>
+															}) : []
+														}
+													</TreeViewMenu>
+												</GenericPropertyContainer>
+											</Box>
 										</div>
-										<div key="h" data-grid={{ x: 6, y: 4, w: 3, h: 4 }} >
-											<Panel stretch title={"CSS Colors"}>
-												<Box title="CSS Colors">
-													{(this.state.cssColors || [])
-														.map((color: string) => {
-															if (color) {
-																return [
-																	<ColorInput
-																		value={color}
-																		immediate
-																		label={`${color} : ${color}`}
-																		key={`css-color-${color}`}
-																		onChange={(value: any) => {
-																		}}
-																		placeholder={color}
-																	/>
-																];
-															}
-															return null;
-														})
-														.filter((x: any) => x)}
-												</Box>
-											</Panel>
+										<div key="h" data-grid={{ x: 6, y: 4, w: 2, h: 4 }} >
+											<Box title="CSS Colors">
+												{(this.state.cssColors || [])
+													.map((color: string) => {
+														if (color) {
+															return [
+																<ColorInput
+																	value={color}
+																	immediate
+																	label={`${color} : ${color}`}
+																	key={`css-color-${color}`}
+																	onChange={(value: any) => {
+																	}}
+																	placeholder={color}
+																/>
+															];
+														}
+														return null;
+													})
+													.filter((x: any) => x)}
+											</Box>
 										</div>
 										<div key="i" data-grid={{ x: 9, y: 4, w: 3, h: 8 }} >
-											<Panel stretch title={"CSS Selectors"}>
-												<Box title="CSS Selectors">
-													<GenericPropertyContainer
-														sideBarStyle={{ right: 0 }}
+											<Panel stretch title={"CSS Selectors"} onSearch={(val: string) => {
+												this.setState({ filterCssSelectors: val })
+											}}>
+												<GenericPropertyContainer
+													sideBarStyle={{ right: 0 }}
+													active
+													title="Css Selectors"
+													subTitle="Css Selectors"
+												>
+													<TreeViewMenu
 														active
-														title="Css Selectors"
-														subTitle="Css Selectors"
-													>
+														open={this.state.cssSelectorPanel}
+														toggle={() => {
+															this.setState({
+																cssSelectorPanel: !this.state.cssSelectorPanel
+															});
+														}}>
+														<TreeViewItemContainer>
+															<TextInput label="pattern swap" value={this.state.patternSwap || ''} onChange={(val: string) => {
+																this.setState({ patternSwap: val });
+															}} />
+														</TreeViewItemContainer>
+														<TreeViewButtonGroup>
+															<TreeViewGroupButton icon={'far fa-copy'} onClick={() => {
+																let keysToCopy = (spaceTheme ? Object.keys(spaceTheme) : []).filter((v: any) => {
+																	if (this.state.filterCssSelectors) {
+																		let temp = `${this.state.filterCssSelectors}`.toLowerCase();
+																		return `${v}`.toLowerCase().indexOf(temp) !== -1;
+							``										}
+																	return true;
+																});
+																let { patternSwap, filterCssSelectors } = this.state;
+																if (patternSwap && filterCssSelectors) {
+																	keysToCopy.forEach((key: string) => {
+																		let duplicate = JSON.parse(JSON.stringify(spaceTheme[key]));
+																		let newKey = key.replace(filterCssSelectors, patternSwap)
+																		spaceTheme[newKey] = duplicate;
+																	});
+																	this.setState({ turn: Date.now() })
+																}
+															}} />
+														</TreeViewButtonGroup>
 														<TreeViewMenu active title={'CSS Selectors'} open={this.state.cssSelectors} toggle={() => {
 															this.setState({
 																cssSelectors: !this.state.cssSelectors
 															});
 														}}>
-															{(spaceTheme ? Object.keys(spaceTheme) : []).map((v: any) => {
+															{(spaceTheme ? Object.keys(spaceTheme) : []).filter((v: any) => {
+																if (this.state.filterCssSelectors) {
+																	let temp = `${this.state.filterCssSelectors}`.toLowerCase();
+																	return `${v}`.toLowerCase().indexOf(temp) !== -1;
+																}
+																return true;
+															}).map((v: any) => {
 																return (<TreeViewMenu title={v} active open={this.state[`selecto-${v}`]} onClick={() => {
 																	this.setState({
 																		[`selecto-${v}`]: !this.state[`selecto-${v}`]
@@ -1225,8 +1255,8 @@ class ThemeView extends Component<any, any> {
 																</TreeViewMenu>);
 															})}
 														</TreeViewMenu>
-													</GenericPropertyContainer>
-												</Box>
+													</TreeViewMenu>
+												</GenericPropertyContainer>
 											</Panel>
 										</div>
 									</ResponsiveGridLayout>

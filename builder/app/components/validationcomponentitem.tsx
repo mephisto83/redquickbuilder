@@ -702,6 +702,36 @@ export function updateValidationMethod({
 									supplementalValidations.push(subValidation);
 								});
 								return false;
+							case NodeAttributePropertyTypes.AUTOMOBILE:
+								simpleValidation.isNotNull = CreateBoolean();
+								simpleValidation.isNotNull.enabled = true;
+								['Make_ID', 'Model_ID'].forEach((_path) => {
+									let subValidation = CreateSimpleValidation();
+									if (meaning.actorClause.relationType) {
+										subValidation.relationType = meaning.actorClause.relationType;
+										setupRelation(subValidation, meaning.actorClause);
+									}
+									subValidation.path = _path;
+									subValidation.enabled = true;
+									subValidation.name = `check automobile's ${_path} property`;
+									subValidation.numericInt = CreateBoolean();
+									subValidation.numericInt.enabled = true;
+									supplementalValidations.push(subValidation);
+								});
+								['Make_Name', 'Model_Name', 'ModelYear'].forEach((_path) => {
+									let subValidation = CreateSimpleValidation();
+									if (meaning.actorClause.relationType) {
+										subValidation.relationType = meaning.actorClause.relationType;
+										setupRelation(subValidation, meaning.actorClause);
+									}
+									subValidation.path = _path;
+									subValidation.enabled = true;
+									subValidation.name = `check automobile's ${_path} property`;
+									subValidation.isNotNull = CreateBoolean();
+									subValidation.isNotNull.enabled = true;
+									supplementalValidations.push(subValidation);
+								});
+								return false;
 							case NodeAttributePropertyTypes.LONGSTRING:
 								simpleValidation.maxLength = CreateMaxLength('500');
 								simpleValidation.maxLength.enabled = true;
