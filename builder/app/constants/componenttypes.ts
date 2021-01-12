@@ -193,12 +193,20 @@ export const ComponentTypeKeys = {
 	Typeahead: 'Typeahead',
 	CarModel: 'CarModel',
 	CarMake: 'CarMake',
+	Gender: 'Gender',
+	PrimaryVehicleUse: 'PrimaryVehicleUse',
+	EmploymentOccupation: 'EmploymentOccupation',
 	DictionaryString: 'DictionaryString',
+	Telephone: 'Telephone',
 	CarYear: 'CarYear',
 	Year: 'Year',
 	StateProvince: 'StateProvince',
 	GoogleAddress: 'GoogleAddress',
 	AutoModel: 'AutoModel',
+	LienHolder: 'LienHolder',
+	LienHolders: 'LienHolders',
+	AnitTheft: 'AnitTheft',
+	Marital: 'Marital',
 	VIN: 'VIN',
 	CurrencyInput: 'CurrencyInput',
 	DateInput: 'DateInput',
@@ -208,7 +216,111 @@ export const ComponentTypeKeys = {
 	H1: 'H1',
 	InfiniteList: 'InfiniteList' // a list of items which maybe of unbounded length, create items and add to list, and remove and delete items, and update items
 };
+function BuildDropdown(args: { template: string } = { template: 'dropdown.tpl' }) {
+	return {
+		template: './app/templates/components/' + args.template,
+		defaultApi: INPUT_DEFAULT_API,
+		eventApi: [ComponentEvents.onBlur, ComponentEvents.onFocus, ComponentEvents.onChangeText],
+		properties: {
+			item_attributes: {
+				nodeProperty: NodeProperties.TextType,
+				template: '{{value}}',
+				options: [
+					'fixedLabel',
+					'inlineLabel',
+					'floatingLabel',
+					'stackedLabel',
+					'regular',
+					'rounded',
+					'success',
+					'error',
+					'disabled'
+				],
+				ui: true
+			},
+			...DEFAULT_INPUT_API_PROPERTIES,
+			value: {
+				nodeProperty: NodeProperties.value,
+				template: true
+			},
+			viewId: {
+				nodeProperty: NodeProperties.viewId,
+				template: true
+			},
+			options: {
+				nodeProperty: NodeProperties.Options,
+				template: true
+			},
+			label: {
+				nodeProperty: NodeProperties.Label,
+				template: true
+			},
+			placeholder: {
+				nodeProperty: NodeProperties.Placeholder,
+				template: true
+			},
+			error: {
+				nodeProperty: NodeProperties.Error,
+				template: true
+			},
+			success: {
+				nodeProperty: NodeProperties.Success,
+				template: true
+			}
+		}
+	}
+}
 function BuildTypeahead(args: { template: string } = { template: 'typeahead.tpl' }) {
+	return {
+		template: './app/templates/components/' + args.template,
+		defaultApi: INPUT_DEFAULT_API,
+		eventApi: [ComponentEvents.onBlur, ComponentEvents.onFocus, ComponentEvents.onChangeText],
+		properties: {
+			item_attributes: {
+				nodeProperty: NodeProperties.TextType,
+				template: '{{value}}',
+				options: [
+					'fixedLabel',
+					'inlineLabel',
+					'floatingLabel',
+					'stackedLabel',
+					'regular',
+					'rounded',
+					'success',
+					'error',
+					'disabled'
+				],
+				ui: true
+			},
+			...DEFAULT_INPUT_API_PROPERTIES,
+			value: {
+				nodeProperty: NodeProperties.value,
+				template: true
+			},
+			viewId: {
+				nodeProperty: NodeProperties.viewId,
+				template: true
+			},
+			label: {
+				nodeProperty: NodeProperties.Label,
+				template: true
+			},
+			placeholder: {
+				nodeProperty: NodeProperties.Placeholder,
+				template: true
+			},
+			error: {
+				nodeProperty: NodeProperties.Error,
+				template: true
+			},
+			success: {
+				nodeProperty: NodeProperties.Success,
+				template: true
+			}
+		}
+	}
+}
+function BuildInput(args: { template: string } = { template: 'input.tpl' }) {
 	return {
 		template: './app/templates/components/' + args.template,
 		defaultApi: INPUT_DEFAULT_API,
@@ -330,58 +442,14 @@ export const ComponentTypes: any = {
 		},
 		Container: {},
 		Content: {},
-		[ComponentTypeKeys.Dropdown]: {
-			template: './app/templates/components/dropdown.tpl',
-			defaultApi: INPUT_DEFAULT_API,
-			eventApi: [ComponentEvents.onBlur, ComponentEvents.onFocus, ComponentEvents.onChangeText],
-			properties: {
-				item_attributes: {
-					nodeProperty: NodeProperties.TextType,
-					template: '{{value}}',
-					options: [
-						'fixedLabel',
-						'inlineLabel',
-						'floatingLabel',
-						'stackedLabel',
-						'regular',
-						'rounded',
-						'success',
-						'error',
-						'disabled'
-					],
-					ui: true
-				},
-				...DEFAULT_INPUT_API_PROPERTIES,
-				value: {
-					nodeProperty: NodeProperties.value,
-					template: true
-				},
-				viewId: {
-					nodeProperty: NodeProperties.viewId,
-					template: true
-				},
-				options: {
-					nodeProperty: NodeProperties.Options,
-					template: true
-				},
-				label: {
-					nodeProperty: NodeProperties.Label,
-					template: true
-				},
-				placeholder: {
-					nodeProperty: NodeProperties.Placeholder,
-					template: true
-				},
-				error: {
-					nodeProperty: NodeProperties.Error,
-					template: true
-				},
-				success: {
-					nodeProperty: NodeProperties.Success,
-					template: true
-				}
-			}
-		},
+		[ComponentTypeKeys.EmploymentOccupation]: BuildInput({ template: 'employmentoccupation.tpl' }),
+		[ComponentTypeKeys.LienHolder]: BuildInput({ template: 'lienholder.tpl' }),
+		[ComponentTypeKeys.LienHolders]: BuildInput({ template: 'lienholders.tpl' }),
+		[ComponentTypeKeys.Gender]: BuildDropdown({ template: 'gender.tpl' }),
+		[ComponentTypeKeys.PrimaryVehicleUse]: BuildDropdown({ template: 'primaryvehicleuse.tpl' }),
+		[ComponentTypeKeys.AnitTheft]: BuildDropdown({ template: 'antitheft.tpl' }),
+		[ComponentTypeKeys.Marital]: BuildDropdown({ template: 'marital.tpl' }),
+		[ComponentTypeKeys.Dropdown]: BuildDropdown(),
 		Fab: {},
 		Footer: {},
 		FooterTab: {},
@@ -534,6 +602,7 @@ export const ComponentTypes: any = {
 		[ComponentTypeKeys.Typeahead]: BuildTypeahead({ template: 'typeahead.tpl' }),
 		[ComponentTypeKeys.CarModel]: BuildTypeahead({ template: 'carmodelinput.tpl' }),
 		[ComponentTypeKeys.CarMake]: BuildTypeahead({ template: 'carmakeinput.tpl' }),
+		[ComponentTypeKeys.Telephone]: BuildTypeahead({ template: 'telephone.tpl' }),
 		[ComponentTypeKeys.CarYear]: BuildTypeahead({ template: 'caryearinput.tpl' }),
 		[ComponentTypeKeys.StateProvince]: BuildTypeahead({ template: 'stateinput.tpl' }),
 		[ComponentTypeKeys.GoogleAddress]: BuildTypeahead({ template: 'addressinput.tpl' }),

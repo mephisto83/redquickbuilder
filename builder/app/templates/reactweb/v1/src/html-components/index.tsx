@@ -3,6 +3,7 @@ import Content from './components/content';
 import ListItem from './components/listitem';
 import Header from './components/header';
 import Title from './components/title';
+import EducationLevelInput from './components/educationlevel';
 import Footer from './components/footer';
 import FooterTab from './components/footer-tab';
 import Button from './components/button';
@@ -40,6 +41,17 @@ import DictionaryInput from './components/dictionaryinput';
 import DateInput from './components/dateinput';
 import VINInput from './components/vininput';
 import AutoModelInput from './components/automodelinput';
+import GenderInput from './components/gender';
+import PhoneNumberInput from './components/phonenumberinput';
+import MaritalStatusInput from './components/marital';
+import EmploymentOccupationInput from './components/employmentoccupation';
+import PrimaryVehicleUseInput from './components/primaryvehicleuse';
+import AntiTheftInput from './components/antitheft';
+import AutoDriverStatusInput from './components/autodriverstatus';
+import DriverLicenseStatusInput from './components/driverlicensestatus';
+import SuffixInput from './components/suffixinput';
+import AccidentViolationsInput from './components/accidentviolations';
+import InsuranceCarriersInput from './components/insurancecarriers';
 
 export {
   Content,
@@ -83,5 +95,17 @@ export {
   MultiViewList,
   Image,
   DateInput,
-  SingleSelect
+  GenderInput,
+  SingleSelect,
+  PhoneNumberInput,
+  MaritalStatusInput,
+  EmploymentOccupationInput,
+  PrimaryVehicleUseInput,
+  AntiTheftInput,
+  EducationLevelInput,
+  AutoDriverStatusInput,
+  DriverLicenseStatusInput,
+  SuffixInput,
+  AccidentViolationsInput,
+  InsuranceCarriersInput
 };

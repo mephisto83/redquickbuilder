@@ -79,13 +79,16 @@ export default class InputFunctions {
 		};
 	}
 	static onChange(arg0: any, force?: boolean) {
-		return (v: { target: { checked: any; value: any } }) => {
+		return (v: { target: { checked: any; value: any, valueTitle?: string } }) => {
+			if (v.target.valueTitle === undefined) {
+				v.target.valueTitle = arg0.state.valueTitle;
+			}
 			if (arg0.immediate() || force) {
 				if (arg0.changedText) {
-					arg0.changedText(v, arg0.state.valueTitle);
+					arg0.changedText(v);
 				}
 				if (arg0.props.onChange) {
-					arg0.props.onChange(v, arg0.state.valueTitle);
+					arg0.props.onChange(v);
 				}
 
 				if (arg0.props.onChangeText) {

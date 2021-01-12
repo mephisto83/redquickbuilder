@@ -95,6 +95,7 @@ export default class Input extends React.Component<any, any> {
 				<input
 					type={this.inputType || 'text'}
 					disabled={this.disabled()}
+					pattern={this.props.pattern}
 					className={`form-control ${this.cssClasses()}`}
 					onBlur={InputFunctions.onBlur(this)}
 					onFocus={InputFunctions.onFocus(this)}

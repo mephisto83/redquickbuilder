@@ -702,6 +702,31 @@ export function updateValidationMethod({
 									supplementalValidations.push(subValidation);
 								});
 								return false;
+							case NodeAttributePropertyTypes.EMPLOYMENTOCCUPATION:
+								simpleValidation.isNotNull = CreateBoolean();
+								simpleValidation.isNotNull.enabled = true;
+								['EmploymentId', 'EmploymentName', 'OccupationId', 'OccupationName'].forEach((_path) => {
+									let subValidation = CreateSimpleValidation();
+									if (meaning.actorClause.relationType) {
+										subValidation.relationType = meaning.actorClause.relationType;
+										setupRelation(subValidation, meaning.actorClause);
+									}
+									subValidation.path = _path;
+									subValidation.enabled = true;
+									subValidation.name = `check employment occupation's ${_path} property`;
+									subValidation.maxLength = CreateMaxLength('10');
+									subValidation.maxLength.enabled = true;
+									subValidation.minLength = CreateMinLength('2');
+									subValidation.minLength.enabled = true;
+									subValidation.isNotNull = CreateBoolean();
+									subValidation.isNotNull.enabled = true;
+									supplementalValidations.push(subValidation);
+								});
+								return false;
+							case NodeAttributePropertyTypes.LIENHOLDERS:
+								return false;
+							case NodeAttributePropertyTypes.LIENHOLDER:
+								return false;
 							case NodeAttributePropertyTypes.AUTOMOBILE:
 								simpleValidation.isNotNull = CreateBoolean();
 								simpleValidation.isNotNull.enabled = true;

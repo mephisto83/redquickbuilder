@@ -6,6 +6,7 @@ import CarModelInput from './carmodelinput';
 import { createRedService } from '../../util/service';
 import * as Globals from '../../util/globals';
 import Observe from './observe';
+import { InputEvent } from './types';
 
 
 let _redservice: any;
@@ -78,15 +79,21 @@ export default class AutoModelInput extends React.Component<any, any> {
         };
         delete props.children;
         return (
-            <View {...props}>
-                <CarYearInput valueTitle={this.state.autoModel.modelYear} value={this.state.autoModel.modelYear} onChange={(year: string) => {
-                    this.setState({
-                        autoModel: {
-                            ...this.state.autoModel,
-                            modelYear: year
+            <View >
+                <CarYearInput
+                    viewModel={this.props.viewModel}
+                    valueTitle={this.state.autoModel.modelYear}
+                    value={this.state.autoModel.modelYear}
+                    onChange={(year: InputEvent) => {
+                        if (year && year.target && year.target.value) {
+                            this.setState({
+                                autoModel: {
+                                    ...this.state.autoModel,
+                                    modelYear: year.target.value
+                                }
+                            });
                         }
-                    });
-                }}
+                    }}
                     onBlur={() => {
                         if (this.props.onBlur) {
                             this.props.onBlur();
@@ -98,18 +105,18 @@ export default class AutoModelInput extends React.Component<any, any> {
                         }
                     }}
                 />
-                {!this.state.autoModel.modelYear ? null : <CarMakeInput
+                {!this.state.autoModel.modelYear ? null : <CarMakeInput viewModel={this.props.viewModel}
                     valueTitle={this.state.autoModel.make_Name}
                     value={this.state.autoModel.make_ID}
-                    onChange={(make: string, makeName: string) => {
-                        if (this.state.autoModel.make_ID !== make) {
+                    onChange={(make: InputEvent) => {
+                        if (make && make.target && this.state.autoModel.make_ID !== make.target.value) {
                             this.setState({
                                 autoModel: {
                                     ...this.state.autoModel,
-                                    make_ID: make,
+                                    make_ID: make.target.value,
                                     model_Name: null,
                                     model_ID: null,
-                                    make_Name: makeName,
+                                    make_Name: make.target.valueTitle,
                                     modelSuggestions: []
                                 }
                             }, () => {
@@ -127,16 +134,17 @@ export default class AutoModelInput extends React.Component<any, any> {
                             this.props.onFocus();
                         }
                     }} />}
-                <CarModelInput
+                <CarModelInput viewModel={this.props.viewModel}
                     suggestions={this.state.modelSuggestions}
                     valueTitle={this.state.autoModel.model_Name}
                     value={this.state.autoModel.model_ID}
-                    onChange={(model: string, modelName: string) => {
+                    onChange={(model: InputEvent) => {
+                        if(model && model.target && model.target.value)
                         this.setState({
                             autoModel: {
                                 ...this.state.autoModel,
-                                model_ID: model,
-                                model_Name: modelName
+                                model_ID: model.target.value,
+                                model_Name: model.target.valueTitle
                             }
                         }, () => {
                             if (this.isValid()) {

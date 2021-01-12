@@ -1726,6 +1726,9 @@ export const NodePropertyTypes = {
 	ADDRESS: 'ADDRESS',
 	FLOAT: 'FLOAT',
 	AUTOMOBILE: 'AUTOMOBILE',
+	LIENHOLDERS: 'LIENHOLDERS',
+	LIENHOLDER: 'LIENHOLDER',
+	GENDER: 'GENDER',
 	DOUBLE: 'DOUBLE',
 	LONG: 'LONG',
 	BOOLEAN: 'BOOLEAN',
@@ -1761,6 +1764,8 @@ export const NodePropertyTypesByLanguage = {
 		[NodePropertyTypes.DICTSTRING]: 'IDictionary<string, string>',
 		[NodePropertyTypes.ADDRESS]: 'GoogleAddress',
 		[NodePropertyTypes.AUTOMOBILE]: ' AutoModel',
+		[NodePropertyTypes.LIENHOLDERS]: 'LienHolders',
+		[NodePropertyTypes.GENDER]: 'string',
 		[NodePropertyTypes.INT]: 'int',
 		[NodePropertyTypes.FLOAT]: 'float',
 		[NodePropertyTypes.DOUBLE]: 'double',
@@ -1775,8 +1780,10 @@ export const NodePropertyTypesByLanguage = {
 		[NodePropertyTypes.AUTOMOBILE]: '{ [str:string]: any }',
 		[NodePropertyTypes.LISTOFSTRINGS]: 'IList<string>',
 		[NodePropertyTypes.DICTSTRING]: '{ [str: string]: string }',
+		[NodePropertyTypes.LIENHOLDERS]: '{ [str:string]: any }',
 		[NodePropertyTypes.INT]: 'number',
 		[NodePropertyTypes.FLOAT]: 'number',
+		[NodePropertyTypes.GENDER]: 'string',
 		[NodePropertyTypes.DOUBLE]: 'number',
 		[NodePropertyTypes.BOOLEAN]: 'boolean',
 		[NodePropertyTypes.EMAIL]: 'string',
@@ -1791,7 +1798,9 @@ export const Usings = {
 		[NodePropertyTypes.EMAIL]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES],
 		[NodePropertyTypes.PHONENUMBER]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES],
 		[NodePropertyTypes.ADDRESS]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES],
-		[NodePropertyTypes.AUTOMOBILE]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES]
+		[NodePropertyTypes.AUTOMOBILE]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES],
+		[NodePropertyTypes.LIENHOLDERS]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES],
+		[NodePropertyTypes.LIENHOLDER]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES]
 	}
 };
 export const NodeAttributePropertyTypes = {
@@ -1824,6 +1833,9 @@ export const NodeAttributePropertyTypes = {
 	ACCOUNTNUMBER: 'ACCOUNTNUMBER',
 	ADDRESS: 'ADDRESS',
 	AUTOMOBILE: 'AUTOMOBILE',
+	EMPLOYMENTOCCUPATION: 'EMPLOYMENTOCCUPATION',
+	LIENHOLDER: 'LIENHOLDER',
+	LIENHOLDERS: 'LIENHOLDERS',
 	COLLECTION: 'COLLECTION',
 	OBJECT: 'OBJECT',
 	RADIO: 'RADIO',
