@@ -15,7 +15,7 @@ import { NodeProperties } from '../constants/nodetypes';
 import { uuidv4 } from '../utils/array';
 
 class EnumerationActivityMenu extends Component<any, any> {
-    constructor(props) {
+    constructor(props: any) {
         super(props);
 
         this.state = {

@@ -1604,6 +1604,22 @@ class ContextMenu extends Component<any, any> {
 						}}
 					>
 						<TreeViewItemContainer>
+							<CheckBox value={GetNodeProp(currentNode, NodeProperties.UseCustomComponent)}
+								label={Titles.UseCustomComponent}
+								onChange={(value: boolean) => {
+									this.props.graphOperation([
+										{
+											operation: UIA.CHANGE_NODE_PROPERTY,
+											options: {
+												prop: UIA.NodeProperties.UseCustomComponent,
+												id: currentNode.id,
+												value: value
+											}
+										}
+									]);
+								}} />
+						</TreeViewItemContainer>
+						<TreeViewItemContainer>
 							<SelectInput
 								label={Titles.ComponentType}
 								options={Object.entries(ComponentTypeKeys).map((v: any) => {
@@ -1626,6 +1642,25 @@ class ContextMenu extends Component<any, any> {
 									]);
 								}}
 								value={GetNodeProp(currentNode, NodeProperties.ComponentType)}
+							/>
+						</TreeViewItemContainer>
+						<TreeViewItemContainer>
+							<SelectInput
+								label={Titles.ComplexType}
+								options={NodesByType(UIA.GetCurrentGraph(), NodeTypes.CustomComponent).toNodeSelect()}
+								onChange={(value: any) => {
+									this.props.graphOperation([
+										{
+											operation: UIA.CHANGE_NODE_PROPERTY,
+											options: {
+												prop: UIA.NodeProperties.CustomComponent,
+												id: currentNode.id,
+												value: value
+											}
+										}
+									]);
+								}}
+								value={GetNodeProp(currentNode, NodeProperties.CustomComponent)}
 							/>
 						</TreeViewItemContainer>
 						{Object.keys(NodeAttributePropertyTypes).sort((a, b) => a.localeCompare(b)).map((key) => {

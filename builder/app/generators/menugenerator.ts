@@ -262,10 +262,7 @@ export default class MenuGenerator {
 			};
 			return { [`menuSource.ts`]: result };
 		}
-		// models.map((model: { id: any }) => {
-		// 	const res: any = {};
-		// 	result[res.id] = res;
-		// });
+
 		return {};
 	}
 	static tabs(c: number) {

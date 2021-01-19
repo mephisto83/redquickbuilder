@@ -141,7 +141,6 @@ export default class TypeAheadDropDown extends React.Component<any, any> {
                         }}
                         value={InputFunctions.value(this)}
                         onKeyDown={(e) => {
-                            console.log(e);
                             if (e.keyCode) {
                                 let direction: number = 0;
                                 switch (`${e.keyCode}`) {

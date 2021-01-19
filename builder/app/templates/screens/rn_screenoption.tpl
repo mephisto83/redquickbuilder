@@ -20,6 +20,9 @@ import material from '{{relative_depth}}../native-base-theme/variables/variables
 import { GetScreenInstance, GetScreenInstanceObject, GetAppStateObject, GetModelInstance, GetModelInstanceObject } from '{{relative_depth}}actions/uiActions';
 import { DrawerActions } from 'react-navigation-drawer';
 import { Content, StyleProvider } from 'native-base';
+import {
+  {{custom_elements}}
+} from '{{relative_depth}}custom-components';
 import { SingleSelect, Container, ListItem,
  Header, Title, Footer, FooterTab,
   H3, H1, H2, Button, Left,
@@ -27,7 +30,17 @@ import { SingleSelect, Container, ListItem,
   View, Form, Item,AutoDriverStatusInput ,PrimaryVehicleUseInput,
   AntiTheftInput,
   EducationLevelInput,
-  Typeahead, PhoneNumberInput, AnitTheftInput, PrimaryVehicleUseInput, GenderInput, AutoModelInput, CarMakeInput, CarModelInput, CarYearInput, StateProvinceInput, CountryInput,DictionaryInput,AddressInput, DateInput,
+  SuffixInput,
+  AccidentViolationsInput,
+  MaritalStatusInput,
+  LienHolderInput,
+  LienHoldersInput,
+  DriverLicenseNumberInput,
+  Typeahead, PhoneNumberInput, 
+  EmploymentOccupationInput,
+  AutoDetailPolicyInput,
+  GenderInput, AutoModelInput, CarMakeInput, CarModelInput, 
+  CarYearInput, StateProvinceInput, CountryInput,DictionaryInput,AddressInput, DateInput,
   Dropdown,
   CheckBox,
   PasswordField,

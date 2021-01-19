@@ -81,6 +81,7 @@ import { ViewTypes } from '../constants/viewtypes';
 import { ComponentDidMountEffect, RouteSource, RouteSourceType } from '../interface/methodprops';
 import { constructCellStyles } from './sharedservice';
 import { fs_readFileSync } from '../generators/modelgenerators';
+import CustomComponentGenerator from '../generators/customcomponentgenerator';
 
 export function GenerateScreens(options: { language: any }) {
 	const { language } = options;
@@ -112,9 +113,11 @@ export function GenerateScreenMarkup(id: string, language: string) {
 				template = fs_readFileSync('./app/templates/screens/rn_screen.tpl', 'utf8');
 				break;
 		}
+		let customComponents = CustomComponentGenerator.GenerateCustomComponentList();
 		return bindTemplate(template, {
 			name: GetCodeName(screen),
 			title: `"${GetNodeTitle(screen)}"`,
+			custom_elements: customComponents.join(`,${NEW_LINE}`),
 			imports: imports.join(NEW_LINE),
 			elements: elements.join(NEW_LINE),
 			component_did_update: GetComponentDidUpdate(screenOption, {
@@ -464,7 +467,6 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 			apiProperties
 		});
 	}
-
 	if (ComponentTypes) {
 		if (ComponentTypes[language]) {
 			if (ComponentTypes[language][componentType]) {
@@ -487,6 +489,7 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 	let templateStr = null;
 	let ending = '.js';
 	let styleRules = null;
+	let customComponents = CustomComponentGenerator.GenerateCustomComponentList();
 	switch (language) {
 		case UITypes.ElectronIO:
 			ending = '.tsx';
@@ -531,6 +534,7 @@ export function GenerateRNScreenOptionSource(node: any, relativePath: any, langu
 		name: GetCodeName(node),
 		title: `"${GetNodeTitle(node)}"`,
 		screen_options,
+		custom_elements: customComponents.join(`,${NEW_LINE}`),
 		component_did_update: GetComponentDidUpdate(node),
 		imports: [...imports, cssImport, ...extraimports].unique().join(NEW_LINE),
 		elements: addNewLine(layoutSrc, 4)
@@ -819,6 +823,7 @@ export function GenerateRNComponents(
 			fileEnding = '.tsx';
 			break;
 	}
+	let customComponents = CustomComponentGenerator.GenerateCustomComponentList();
 	const componentType = GetNodeProp(node, NodeProperties.ComponentType);
 	if (
 		!layoutObj &&
@@ -843,6 +848,31 @@ export function GenerateRNComponents(
 				let elements = null;
 				if (ComponentTypes[language] && ComponentTypes[language][componentType]) {
 					elements = bindComponent(node, ComponentTypes[language][componentType], language);
+
+					let linkedProperty = GetNodeLinkedTo(GetCurrentGraph(), {
+						id: node && node.id ? node.id : GetNodeById(node).id,
+						link: LinkType.PropertyLink
+					});
+					let customComponentTypeTag = '';
+					if (linkedProperty && GetNodeProp(linkedProperty, NodeProperties.CustomComponent)) {
+						let customComponentType = GetNodeProp(linkedProperty, NodeProperties.CustomComponent);
+						if (customComponentType) {
+							customComponentTypeTag = GetCodeName(customComponentType);
+						}
+					}
+					if (customComponentTypeTag) {
+						if (elements.indexOf('<Text') === 0) {
+							let template = fs_readFileSync('./app/templates/components/generic.tpl', 'utf8');
+							elements = bindTemplate(template, {
+								generic: customComponentTypeTag
+							});
+
+						}
+						else {
+							elements = `${elements}`.replace('<Input', `<${customComponentTypeTag}`);
+						}
+					}
+
 					if (
 						ComponentTypes[language][componentType].properties &&
 						ComponentTypes[language][componentType].properties
@@ -888,6 +918,7 @@ export function GenerateRNComponents(
 					imports: [cssImport].join(NEW_LINE),
 					component_did_update,
 					screen_options: '',
+					custom_elements: customComponents,
 					elements: elements || GetDefaultElement()
 				});
 				template = bindTemplate(template, {

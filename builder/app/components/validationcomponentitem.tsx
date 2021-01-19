@@ -344,18 +344,20 @@ export default class ValidationComponentItem extends Component<any, any> {
 															id: modelProperty.id,
 															componentType: NodeTypes.Enumeration
 														});
-														propertySentences.push(
-															`The model's ${UIA.GetCodeName(
-																modelProperty
-															).toLowerCase()} property is in an enumeration ${GetCodeName(
-																enumerationNode
-															)} with a ${GetNodeProp(
-																enumerationNode,
-																NodeProperties.Enumeration
-															)
-																.map((v: any) => v.value)
-																.join(', ')} .`
-														);
+														if (enumerationNode) {
+															propertySentences.push(
+																`The model's ${UIA.GetCodeName(
+																	modelProperty
+																).toLowerCase()} property is in an enumeration ${GetCodeName(
+																	enumerationNode
+																)} with a ${GetNodeProp(
+																	enumerationNode,
+																	NodeProperties.Enumeration
+																)
+																	.map((v: any) => v.value)
+																	.join(', ')} .`
+															);
+														}
 														break;
 													default:
 														propertySentences.push(
@@ -879,6 +881,10 @@ export function updateValidationMethod({
 								simpleValidation.isNotNull.enabled = true;
 								simpleValidation.numericInt = CreateBoolean();
 								simpleValidation.numericInt.enabled = true;
+								break;
+							default:
+								simpleValidation.isNotNull = CreateBoolean();
+								simpleValidation.isNotNull.enabled = true;
 								break;
 						}
 					}

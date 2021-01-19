@@ -1,7 +1,7 @@
 import GenericDropDown from './genericdropdown';
 
 export default class EducationLevel extends GenericDropDown {
-	constructor(props) {
+	constructor(props: any) {
 		super(props);
 		this.options = [
 			{ title: 'No high school diploma or GED', value: '1' },

@@ -14,7 +14,75 @@ export default class InputFunctions {
 	}
 
 	static placeholder(arg0: any) {
-		return arg0.props.placeholder || '';
+		return arg0.placeHolder || arg0.props.placeholder || '';
+	}
+	static handleMaskChange(arg0: any, e: any) {
+
+		var isCharsetPresent = e.target.getAttribute('data-charset'),
+			maskedNumber = 'XMDY',
+			maskedLetter = '_',
+			placeholder = isCharsetPresent || e.target.getAttribute('data-placeholder'),
+			value = e.target.value, l = placeholder.length, newValue = '',
+			i, j, isInt, isLetter, strippedValue, matchesNumber, matchesLetter;
+
+		// strip special characters
+		strippedValue = isCharsetPresent ? value.replace(/\W/g, "") : value.replace(/\D/g, "");
+
+		for (i = 0, j = 0; i < l; i++) {
+			isInt = !isNaN(parseInt(strippedValue[j]));
+			isLetter = strippedValue[j] ? strippedValue[j].match(/[A-Z]/i) : false;
+			matchesNumber = (maskedNumber.indexOf(placeholder[i]) >= 0);
+			matchesLetter = (maskedLetter.indexOf(placeholder[i]) >= 0);
+			if ((matchesNumber && isInt) || (isCharsetPresent && matchesLetter && isLetter)) {
+				newValue += strippedValue[j++];
+			} else if ((!isCharsetPresent && !isInt && matchesNumber) || (isCharsetPresent && ((matchesLetter && !isLetter) || (matchesNumber && !isInt)))) {
+				//this.options.onError( e ); // write your own error handling function
+				return newValue;
+			} else {
+				newValue += placeholder[i];
+			}
+			// break if no characters left and the pattern is non-special character
+			if (strippedValue[j] == undefined) {
+				break;
+			}
+		}
+
+		if (arg0.props['data-valid-example']) {
+			return InputFunctions.validateProgress(arg0, e, newValue);
+		}
+
+		return newValue;
+	}
+	static validateProgress(arg0: any, e: any, value: any) {
+		var validExample = arg0.props['data-valid-example'],
+			pattern = new RegExp(arg0.props.pattern),
+			placeholder = e.target.getAttribute('data-placeholder'),
+			l = value.length, testValue = '', i;
+
+		//convert to months
+		if ((l == 1) && (placeholder.toUpperCase().substr(0, 2) == 'MM')) {
+			if (value > 1 && value < 10) {
+				value = '0' + value;
+			}
+			return value;
+		}
+
+		for (i = l; i >= 0; i--) {
+			testValue = value + validExample.substr(value.length);
+			if (pattern.test(testValue)) {
+				return value;
+			} else {
+				value = value.substr(0, value.length - 1);
+			}
+		}
+
+		return value;
+	}
+	static setValueOfMask(e: any) {
+		var value = e.target.value,
+			placeholder = e.target.getAttribute('data-placeholder');
+
+		return "<i>" + value + "</i>" + placeholder.substr(value.length);
 	}
 
 	static disabled(arg0: any) {
@@ -80,6 +148,9 @@ export default class InputFunctions {
 	}
 	static onChange(arg0: any, force?: boolean) {
 		return (v: { target: { checked: any; value: any, valueTitle?: string } }) => {
+			if (arg0.masked) {
+				v.target.value = InputFunctions.handleMaskChange(arg0, v);
+			}
 			if (v.target.valueTitle === undefined) {
 				v.target.valueTitle = arg0.state.valueTitle;
 			}

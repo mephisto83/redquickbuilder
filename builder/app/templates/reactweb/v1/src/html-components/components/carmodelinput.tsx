@@ -105,7 +105,7 @@ export default class CarModelInput extends Typeahead {
             showSuggestions: false,
             tentativeIndex: null
         })
-        InputFunctions.onChange(this, true)({ target: { checked: false, value: `${value}` } });
+        InputFunctions.onChange(this, true)({ target: { checked: false, value: `${value}`, valueTitle: title } });
     }
     componentDidUpdate(prevProps: any, prevState: any, snapshot: any) {
         super.componentDidUpdate(prevProps, prevState, snapshot);

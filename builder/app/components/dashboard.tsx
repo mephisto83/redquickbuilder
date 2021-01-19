@@ -135,7 +135,8 @@ import {
 	PROGRESS_VIEW,
 	AGENT_ACCESS_VIEW,
 	CODE_EDITOR,
-	ConditionTypes
+	ConditionTypes,
+	COMPONENT_EDITOR
 } from '../constants/nodetypes';
 import CodeView from './codeview';
 import LayoutView from './layoutview';
@@ -144,6 +145,7 @@ import AgentAccessView from './agentaccessview';
 import TranslationView from './translationview';
 import ProgressView from './progressview';
 import AnalysisView from './analysisview';
+import ComponentEditorView from './componenteditorview';
 import {
 	getLinkInstance,
 	createEventProp,
@@ -1833,6 +1835,15 @@ class Dashboard extends Component<any, any> {
 									<NavBarButton
 										active={mainContent === CODE_VIEW}
 										hideArrow
+										title={Titles.ComponentEditor}
+										icon="fa fa-code"
+										onClick={() => {
+											this.props.setVisual(MAIN_CONTENT, CODE_VIEW);
+										}}
+									/>
+									<NavBarButton
+										active={mainContent === CODE_VIEW}
+										hideArrow
 										title={Titles.CodeView}
 										icon="fa fa-code"
 										onClick={() => {
@@ -2055,7 +2066,7 @@ class Dashboard extends Component<any, any> {
 									<TreeViewMenu
 										active={mainContent === THEME_VIEW}
 										title={Titles.Theme}
-										icon="fa-paint-brush"
+										icon="fa fa-paint-brush"
 										onClick={() => {
 											this.props.setVisual(MAIN_CONTENT, THEME_VIEW);
 										}}
@@ -2063,9 +2074,19 @@ class Dashboard extends Component<any, any> {
 								) : null}
 								{UIA.Visual(state, 'MAIN_NAV') ? (
 									<TreeViewMenu
+										active={mainContent === COMPONENT_EDITOR}
+										title={Titles.ComponentEditor}
+										icon="fab fa-apple"
+										onClick={() => {
+											this.props.setVisual(MAIN_CONTENT, COMPONENT_EDITOR);
+										}}
+									/>
+								) : null}
+								{UIA.Visual(state, 'MAIN_NAV') ? (
+									<TreeViewMenu
 										active
 										title={Titles.FlowCode}
-										icon="fa-paint-brush"
+										icon="fa fa-paint-brush"
 										onClick={() => {
 											viewFlowCode({})
 										}}
@@ -2384,10 +2405,8 @@ class Dashboard extends Component<any, any> {
 							<TranslationView active={UIA.Visual(state, MAIN_CONTENT) === TRANSLATION_VIEW} />
 							<ProgressView active={UIA.Visual(state, MAIN_CONTENT) === PROGRESS_VIEW} />
 							<AnalysisView active={UIA.Visual(state, MAIN_CONTENT) === ANALYSIS_VIEW} />
-							<CodeEditor
-								active={UIA.Visual(state, MAIN_CONTENT) === CODE_EDITOR}
-								value={UIA.Visual(state, UIA.CODE_EDITOR_INIT_VALUE)}
-							/>
+							<ComponentEditorView active={UIA.Visual(state, MAIN_CONTENT) === COMPONENT_EDITOR} />
+							<CodeEditor active={UIA.Visual(state, MAIN_CONTENT) === CODE_EDITOR} value={UIA.Visual(state, UIA.CODE_EDITOR_INIT_VALUE)} />
 							{mainContent === MIND_MAP ? (
 								<MindMap
 									small={this.state.small}

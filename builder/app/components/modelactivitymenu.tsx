@@ -189,6 +189,20 @@ class ModelActivityMenu extends Component<any, any> {
                   });
                 }}
               />
+              <CheckBox
+                label={Titles.ComplexType}
+                value={UIA.GetNodeProp(
+                  currentNode,
+                  UIA.NodeProperties.ComplexType
+                )}
+                onChange={(value: any) => {
+                  this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                    prop: UIA.NodeProperties.ComplexType,
+                    id: currentNode.id,
+                    value
+                  });
+                }}
+              />
               <CheckBoxProperty
                 node={currentNode}
                 property={NodeProperties.IsFetchOutput}

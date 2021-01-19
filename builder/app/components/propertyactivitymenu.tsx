@@ -10,6 +10,8 @@ import TextInput from './textinput';
 import SelectInput from './selectinput';
 import CheckBox from './checkbox';
 import { NodeTypes, LinkProperties, NodeProperties, GeneratedDataTypes } from '../constants/nodetypes';
+import Check from '../analysis/check';
+import { GetNodeProp } from '../actions/uiActions';
 class PropertyActivityMenu extends Component<any, any> {
 	render() {
 		var { state } = this.props;
@@ -132,15 +134,15 @@ class PropertyActivityMenu extends Component<any, any> {
 										value
 											? null
 											: {
-													operation: UIA.REMOVE_LINK_BETWEEN_NODES,
-													options: {
-														target:
-															currentNode.properties[
-																UIA.NodeProperties.ManyToManyNexusType
-															],
-														source: id
-													}
-												},
+												operation: UIA.REMOVE_LINK_BETWEEN_NODES,
+												options: {
+													target:
+														currentNode.properties[
+														UIA.NodeProperties.ManyToManyNexusType
+														],
+													source: id
+												}
+											},
 										{
 											operation: UIA.CHANGE_NODE_PROPERTY,
 											options: {
@@ -152,16 +154,16 @@ class PropertyActivityMenu extends Component<any, any> {
 										!value || !currentNode.properties[UIA.NodeProperties.ManyToManyNexusType]
 											? null
 											: {
-													operation: UIA.ADD_LINK_BETWEEN_NODES,
-													options: {
-														target:
-															currentNode.properties[
-																UIA.NodeProperties.ManyToManyNexusType
-															],
-														source: id,
-														properties: { ...UIA.LinkProperties.ManyToManyLink }
-													}
+												operation: UIA.ADD_LINK_BETWEEN_NODES,
+												options: {
+													target:
+														currentNode.properties[
+														UIA.NodeProperties.ManyToManyNexusType
+														],
+													source: id,
+													properties: { ...UIA.LinkProperties.ManyToManyLink }
 												}
+											}
 									].filter((x) => x)
 								);
 							}}
@@ -225,7 +227,18 @@ class PropertyActivityMenu extends Component<any, any> {
 								value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.ManyToManyNexusType)}
 							/>
 						) : null}
-
+						<CheckBox label={'Use Complex Type'}
+							value={GetNodeProp(currentNode, UIA.NodeProperties.UseComplexAsType)}
+							onChange={(value: boolean) => {
+								this.props.graphOperation([{
+									operation: UIA.CHANGE_NODE_PROPERTY,
+									options: {
+										prop: UIA.NodeProperties.UseComplexAsType,
+										id: currentNode.id,
+										value
+									}
+								}])
+							}} />
 						<CheckBox
 							label={Titles.UseModelAsType}
 							value={
@@ -237,12 +250,12 @@ class PropertyActivityMenu extends Component<any, any> {
 									value
 										? null
 										: {
-												operation: UIA.REMOVE_LINK_BETWEEN_NODES,
-												options: {
-													target: currentNode.properties[UIA.NodeProperties.UIModelType],
-													source: id
-												}
-											},
+											operation: UIA.REMOVE_LINK_BETWEEN_NODES,
+											options: {
+												target: currentNode.properties[UIA.NodeProperties.UIModelType],
+												source: id
+											}
+										},
 									{
 										operation: UIA.CHANGE_NODE_PROPERTY,
 										options: {
@@ -254,17 +267,26 @@ class PropertyActivityMenu extends Component<any, any> {
 									!value || !currentNode.properties[UIA.NodeProperties.UIModelType]
 										? null
 										: {
-												operation: UIA.ADD_LINK_BETWEEN_NODES,
-												options: {
-													target: currentNode.properties[UIA.NodeProperties.UIModelType],
-													source: id,
-													properties: { ...UIA.LinkProperties.ModelTypeLink }
-												}
+											operation: UIA.ADD_LINK_BETWEEN_NODES,
+											options: {
+												target: currentNode.properties[UIA.NodeProperties.UIModelType],
+												source: id,
+												properties: { ...UIA.LinkProperties.ModelTypeLink }
 											}
+										}
 								]);
 							}}
 						/>
-						{!use_model_as_type ? (
+						{!GetNodeProp(currentNode, UIA.NodeProperties.UseComplexAsType) ? null : <SelectInput
+							options={UIA.GetNodesByProperties({
+								[UIA.NodeProperties.NODEType]: NodeTypes.Model,
+								[UIA.NodeProperties.ComplexType]: true
+							}).toNodeSelect()}
+							onChange={(val: string) => {
+								UIA.updateComponentProperty(currentNode.id, NodeProperties.ComplexAsType, val);
+							}}
+							value={GetNodeProp(currentNode, UIA.NodeProperties.ComplexAsType)} />}
+						{!use_model_as_type && !GetNodeProp(currentNode, UIA.NodeProperties.UseComplexAsType) ? (
 							<SelectInput
 								options={Object.keys(UIA.NodePropertyTypes)
 									.sort((a, b) => a.localeCompare(b))
@@ -286,12 +308,12 @@ class PropertyActivityMenu extends Component<any, any> {
 									currentNode.properties ? (
 										currentNode.properties[UIA.NodeProperties.UIAttributeType]
 									) : (
-										''
-									)
+											''
+										)
 								}
 							/>
 						) : null}
-						{use_model_as_type ? (
+						{use_model_as_type && !GetNodeProp(currentNode, UIA.NodeProperties.UseComplexAsType) ? (
 							<SelectInput
 								options={UIA.NodesByType(state, NodeTypes.Model).map((x) => {
 									return {
@@ -340,8 +362,8 @@ class PropertyActivityMenu extends Component<any, any> {
 									currentNode.properties ? (
 										currentNode.properties[UIA.NodeProperties.IsReferenceList]
 									) : (
-										''
-									)
+											''
+										)
 								}
 								onChange={(value) => {
 									this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {

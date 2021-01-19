@@ -75,11 +75,13 @@ export default class Dropdown extends React.Component<any, any> {
 					value={InputFunctions.value(this)}
 					onKeyPress={handleKeyPress}
 					onChange={() => {
-						let { options } = this.props;
-						let el: any = document.querySelector(`#${this.state.id}`);
-						if (el.selectedIndex) {
-							let { value } = options[el.selectedIndex - 1];
-							InputFunctions.onChange(this)({ target: { checked: false, value: value } });
+						let options = this.getOptions();
+						if (options) {
+							let el: any = document.querySelector(`#${this.state.id}`);
+							if (el.selectedIndex) {
+								let { value, title } = options[el.selectedIndex - 1];
+								InputFunctions.onChange(this)({ target: { checked: false, value: value, valueTitle: title } });
+							}
 						}
 					}}
 					placeholder={InputFunctions.placeholder(this)}
@@ -90,6 +92,10 @@ export default class Dropdown extends React.Component<any, any> {
 				<Validation data={this.props.error} />
 			</div>
 		);
+	}
+	getOptions() {
+		let { options } = this.props;
+		return options;
 	}
 	renderOptions(): React.ReactNode {
 		let { options } = this.props;

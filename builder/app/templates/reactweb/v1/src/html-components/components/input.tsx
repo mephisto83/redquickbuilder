@@ -4,10 +4,18 @@ import InputFunctions from './inputfunctions';
 import { $CreateModels, $UpdateModels } from '../../actions/screenInfo';
 export default class Input extends React.Component<any, any> {
 	inputType: string;
+	placeHolder?: string;
+	dataCharset?: string
+	pattern?: string;
+	masked?: boolean;
+	id: string;
+	example: string;
 	constructor(props: any) {
 		super(props);
 		this.state = {};
 		this.inputType = '';
+		this.example = '';
+		this.id = `input-${Math.random()}`;
 	}
 	label() {
 		return InputFunctions.label(this);
@@ -45,16 +53,16 @@ export default class Input extends React.Component<any, any> {
 		}
 		return editMode;
 	}
-	renderBeforeValidation() {
+	renderBeforeValidation(): any {
 		return null;
 	}
-	renderAfterValidation() {
+	renderAfterValidation(): any {
 		return null;
 	}
-	renderBeforeInput() {
+	renderBeforeInput(): any {
 		return null;
 	}
-	renderAfterInput() {
+	renderAfterInput(): any {
 		return null;
 	}
 	render() {
@@ -68,7 +76,7 @@ export default class Input extends React.Component<any, any> {
 				let temp = InputFunctions.value(this);
 				let date = Date.parse(temp)
 				if (!isNaN(date)) {
-					temp = new Date(date).toLocaleDateString()
+					temp = new Date(date).toDateString()
 				}
 				return (<div className="form__group field">
 					{this.renderBeforeInput()}
@@ -95,7 +103,7 @@ export default class Input extends React.Component<any, any> {
 				<input
 					type={this.inputType || 'text'}
 					disabled={this.disabled()}
-					pattern={this.props.pattern}
+					pattern={this.props.pattern || this.pattern}
 					className={`form-control ${this.cssClasses()}`}
 					onBlur={InputFunctions.onBlur(this)}
 					onFocus={InputFunctions.onFocus(this)}
@@ -103,6 +111,10 @@ export default class Input extends React.Component<any, any> {
 					onKeyPress={handleKeyPress}
 					onChange={InputFunctions.onChange(this)}
 					placeholder={InputFunctions.placeholder(this)}
+					data-placeholder={InputFunctions.placeholder(this)}
+					data-pattern={this.props.pattern || this.pattern}
+					data-valid-example={this.example || ''}
+					data-charset={this.dataCharset}
 				/>
 				{this.renderAfterInput()}
 				{this.renderBeforeValidation()}

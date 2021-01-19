@@ -89,7 +89,15 @@ export default class ModelGenerator {
 		const { state } = options;
 		const graphRoot = GetRootGraph(state);
 		const models = NodesByType(state, NodeTypes.Model)
-			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromController))
+			.filter((x: any) => {
+				if (GetNodeProp(x, NodeProperties.ExcludeFromController)) {
+					if (GetNodeProp(x, NodeProperties.ComplexType)) {
+						return true;
+					}
+					return false;
+				}
+				return true;
+			})
 			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration));
 		const result: any = {};
 		models.map((model: { id: any }) => {
@@ -114,7 +122,7 @@ export default class ModelGenerator {
 			`
       const Models = { ` +
 			NodesByType(GetState(), NodeTypes.Model)
-				.map((g) => `${GetCodeName(g)}: '${GetCodeName(g)}'`)
+				.map((g: any) => `${GetCodeName(g)}: '${GetCodeName(g)}'`)
 				.join(',' + NEW_LINE) +
 			'};';
 		return {
@@ -241,6 +249,10 @@ export default class ModelGenerator {
 						propType = GetCodeName(types[0]);
 						propType = `IList<${propType}>`;
 					}
+				} else if (
+					GetNodeProp(propNode, NodeProperties.UseComplexAsType) &&
+					GetNodeProp(propNode, NodeProperties.ComplexAsType)) {
+					propType = GetCodeName(GetNodeProp(propNode, NodeProperties.ComplexAsType));
 				} else if (
 					GetNodeProp(propNode, NodeProperties.UIModelType) &&
 					GetNodeProp(propNode, NodeProperties.UseModelAsType)
@@ -404,6 +416,8 @@ export default class ModelGenerator {
 			.map((v: any) => {
 				const propType = GetNodeProp(v, NodeProperties.UIAttributeType);
 				const nodeType = GetNodeType(v);
+				const useComplexAsType = GetNodeProp(v, NodeProperties.UseComplexAsType);
+				const complexAsType = GetNodeProp(v, NodeProperties.ComplexAsType);
 				if (nodeType === NodeTypes.Model) {
 					const modelLink =
 						GraphMethods.GetLinkBetween(v.id, node.id, graph) ||
@@ -415,6 +429,7 @@ export default class ModelGenerator {
 					}
 					switch (propType) {
 						case NodePropertyTypes.STRING:
+
 							return `if(string.IsNullOrEmpty(a.${GetCodeName(v)})){
               model.${GetCodeName(v)} = b.${GetCodeName(v)};
             }`;
@@ -425,6 +440,13 @@ export default class ModelGenerator {
 				}
 				switch (propType) {
 					case NodePropertyTypes.STRING:
+						if (useComplexAsType && complexAsType) {
+							return `if(a.${GetCodeName(v)} != null && b.${GetCodeName(v)} != null) {
+			  model.${GetCodeName(v)} = ${GetCodeName(complexAsType)}.Merge(a.${GetCodeName(v)}, b.${GetCodeName(v)});
+			} else if(a.${GetCodeName(v)} == null && b.${GetCodeName(v)} != null) { 
+				model.${GetCodeName(v)} = b.${GetCodeName(v)};
+			}`;
+						}
 						return `if(string.IsNullOrEmpty(a.${GetCodeName(v)})){
             model.${GetCodeName(v)} = b.${GetCodeName(v)};
           }`;

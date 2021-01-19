@@ -1,7 +1,7 @@
 import GenericDropDown from './genericdropdown';
 
 export default class SuffixInput extends GenericDropDown {
-	constructor(props) {
+	constructor(props: any) {
 		super(props);
 		this.options = [
 			{ title: 'Jr', value: 'JR' },

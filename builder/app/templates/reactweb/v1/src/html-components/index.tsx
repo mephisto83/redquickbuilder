@@ -52,7 +52,10 @@ import DriverLicenseStatusInput from './components/driverlicensestatus';
 import SuffixInput from './components/suffixinput';
 import AccidentViolationsInput from './components/accidentviolations';
 import InsuranceCarriersInput from './components/insurancecarriers';
-
+import AutoDetailPolicyInput from './components/autodetailpolicyinput';
+import DriverLicenseNumberInput from './components/driverlicensenumber';
+import LienHoldersInput from './components/lienholdersinput';
+import LienHolderInput from './components/lienholderinput';
 export {
   Content,
   VINInput,
@@ -98,6 +101,8 @@ export {
   GenderInput,
   SingleSelect,
   PhoneNumberInput,
+  LienHolderInput,
+  LienHoldersInput,
   MaritalStatusInput,
   EmploymentOccupationInput,
   PrimaryVehicleUseInput,
@@ -107,5 +112,7 @@ export {
   DriverLicenseStatusInput,
   SuffixInput,
   AccidentViolationsInput,
-  InsuranceCarriersInput
+  InsuranceCarriersInput,
+  AutoDetailPolicyInput,
+  DriverLicenseNumberInput
 };

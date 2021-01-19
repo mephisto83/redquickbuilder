@@ -21,6 +21,9 @@ import { fetchModel, retrieveParameters } from '{{relative_depth}}actions/reduti
 import { GetScreenInstance, GetScreenInstanceObject, GetAppStateObject, GetModelInstance, GetModelInstanceObject } from '{{relative_depth}}actions/uiActions';
 import { Content, StyleProvider } from '{{relative_depth}}html-components';
 import {
+  {{custom_elements}}
+} from '{{relative_depth}}custom-components';
+import {
   MultiSelectList, MultiViewList,
   Container, ListItem, Header, Title,
   H3, H1, H2, Footer, FooterTab,
@@ -29,14 +32,22 @@ import {
   Text, View, Form, Item,
   CheckBox,
   Dropdown,
+  MaritalStatusInput,
   PasswordField,
   Input, Label, 
   Typeahead, GenderInput,
   AutoDriverStatusInput,
+  SuffixInput,
+  DriverLicenseNumberInput,
+  AccidentViolationsInput,
   PrimaryVehicleUseInput,
   AntiTheftInput,
+  LienHolderInput,
+  LienHoldersInput,
+  EmploymentOccupationInput,
+  AutoDetailPolicyInput,
   EducationLevelInput,
-  AnitTheftInput, PrimaryVehicleUseInput, PhoneNumberInput, AutoModelInput, CarMakeInput, CarModelInput, CarYearInput, StateProvinceInput, CountryInput, DictionaryInput,AddressInput, DateInput, VINInput,
+  PhoneNumberInput, AutoModelInput, CarMakeInput, CarModelInput, CarYearInput, StateProvinceInput, CountryInput, DictionaryInput,AddressInput, DateInput, VINInput,
   Menu
 }  from '{{relative_depth}}html-components';
 

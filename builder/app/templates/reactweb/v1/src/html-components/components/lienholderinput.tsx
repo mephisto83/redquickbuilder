@@ -3,6 +3,7 @@ import View from './view';
 import { InputEvent } from './types';
 import Dropdown from './dropdown';
 import Input from './input';
+import { $CreateModels, $UpdateModels } from '../../actions/screenInfo';
 
 export default class LienHolderInput extends React.Component<any, any> {
     constructor(props: any) {
@@ -20,6 +21,17 @@ export default class LienHolderInput extends React.Component<any, any> {
             });
         }
     }
+	isEditMode() {
+		let { viewModel } = this.props;
+
+		let editMode = false;
+		if ($CreateModels && $UpdateModels) {
+			if (($CreateModels as any)[viewModel] || ($UpdateModels as any)[viewModel]) {
+				editMode = true;
+			}
+		}
+		return editMode;
+	}
     render() {
         var props = {
             ...this.props
@@ -29,10 +41,13 @@ export default class LienHolderInput extends React.Component<any, any> {
         let lienHolder: LienHolder = this.state.lienHolderInput;
         return (
             <View >
-                <Dropdown options={companies.map(v => v.company)} value={lienHolder && lienHolder.company ? lienHolder.company.value : null} onChange={(val: InputEvent) => {
+                <Dropdown viewModel={this.props.viewModel} options={companies.map(v => v.company)} value={lienHolder && lienHolder.company ? lienHolder.company.value : null} onChange={(val: InputEvent) => {
                     if (val.target.value) {
                         let category = companies.find(v => v.company.value === val.target.value);
-                        if (category && category.company.value !== lienHolder.company.value) {
+                        if (category &&
+                            category.company &&
+                            (!lienHolder.company ||
+                                category.company.value !== lienHolder.company.value)) {
                             this.setState({
                                 lienHolderInput: {
                                     ...lienHolder,
@@ -40,7 +55,10 @@ export default class LienHolderInput extends React.Component<any, any> {
                                 }
                             }, () => {
                                 if (this.props.onChangeText) {
-                                    this.props.onChangeText(this.state.lienHolderInput);
+                                    this.props.onChangeText({ target: { value: this.state.lienHolderInput } });
+                                }
+                                if (this.props.onChange) {
+                                    this.props.onChange({ target: { value: this.state.lienHolderInput } });
                                 }
                             });
                         }

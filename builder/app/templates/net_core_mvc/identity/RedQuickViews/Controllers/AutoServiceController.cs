@@ -26,17 +26,17 @@ namespace {{namespace}}.Web.Controllers
             return base.GetMakes(search);
         }
         [HttpGet("models/{year}/{make}")]
-        public override Task<IList<AutoModel>> GetModelsForMakeYear(string year, int make)
+        public override Task<IList<AutoModel>> GetModelsForMakeYear(string year, string make)
         {
             return base.GetModelsForMakeYear(year, make);
         }
         [HttpGet("make/{make}")]
-        public override Task<AutoMake> GetAutoMake(int make)
+        public override Task<AutoMake> GetAutoMake(string make)
         {
             return base.GetAutoMake(make);
         }
         [HttpGet("model/{make}/{model}/{year}")]
-        public override Task<AutoModel> GetAutoModel(int make, int model, string year)
+        public override Task<AutoModel> GetAutoModel(string make, string model, string year)
         {
             return base.GetAutoModel(make, model, year);
         }

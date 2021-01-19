@@ -13,6 +13,7 @@ export const NodeTypes = {
 	Property: 'model-property',
 	UserOfAgentType: 'UserOfAgentType',
 	StateKey: 'StateKey',
+	CustomComponent: 'CustomComponent',
 	ModelFilter: 'model-filter',
 	Struct: 'struct',
 	UIMethod: 'UIMethod',
@@ -230,6 +231,7 @@ export const ReactNativeTypes = {
 	TitleService: 'title-service',
 	Menus: 'menus',
 	Configuration: 'configuration',
+	CustomComponents: 'custom-components',
 	Selectors: 'selectors',
 	DataChainFunctions: 'data-chain',
 	Lists: 'lists'
@@ -389,6 +391,7 @@ export const TRANSLATION_VIEW = 'TRANSLATION_VIEW';
 export const PROGRESS_VIEW = 'PROGRESS_VIEW';
 export const CODE_EDITOR = 'CODE_EDITOR';
 export const THEME_VIEW = 'THEME_VIEW';
+export const COMPONENT_EDITOR = 'COMPONENT_EDITOR';
 export const AGENT_ACCESS_VIEW = 'AGENT_ACCESS_VIEW';
 
 export const GeneratedDataTypes = {
@@ -487,6 +490,7 @@ export const NodeProperties = {
 	Screen: 'Screen',
 	MenuRootNode: 'MenuRootNode',
 	IsFetchOutput: 'IsFetchOutput',
+	Implementation: 'Implementation',
 	UIActionMethod: 'UIActionMethod',
 	HideStyle: 'HideStyle',
 	VisualInsert: 'VisualInsert',
@@ -648,6 +652,7 @@ export const NodeProperties = {
 	ExcludeFromController: 'ExcludeFromController',
 	IsAgent: 'isAgent',
 	CancelButton: 'CancelButton',
+	ComplexType: 'ComplexType',
 	IsCompositeInput: 'IsCompositeInput',
 	IsParent: 'isParent', //This is a program setting. Just for allowing us to hide and show the model picker.
 	IsUser: 'IsUser', //User is the object directly associated with a IdentityProvider.
@@ -742,6 +747,8 @@ export const NodeProperties = {
 	DefaultViewTypeDelete: 'DefaultViewTypeDelete',
 	DefaultViewTypeCreate: 'DefaultViewTypeCreate',
 	ComponentType: 'component-type',
+	UseCustomComponent: 'UseCustomComponent',
+	CustomComponent: 'CustomComponent',
 	UsingSharedComponent: 'UsingSharedComponent',
 	ReferenceType: 'referenceType', //Reference nodes will have this type.
 
@@ -749,10 +756,11 @@ export const NodeProperties = {
 	UIAttributeType: 'uiAttributeType',
 	PermissionValueType: 'PermissionValueType',
 	UseModelAsType: 'useModelAsType',
+	UseComplexAsType: 'UseComplexAsType',
 
 	IsDefaultProperty: 'isDefaultProperty',
 	ExecuteComponent: 'ExecuteComponent',
-
+	ComplexAsType: 'ComplexAsType',
 	HasLogicalChildren: 'hasLogicalChildren',
 	LogicalChildrenTypes: 'logicalChildrenTypes',
 	HasLogicalNieces: 'hasLogicalNieces',
@@ -1728,6 +1736,9 @@ export const NodePropertyTypes = {
 	AUTOMOBILE: 'AUTOMOBILE',
 	LIENHOLDERS: 'LIENHOLDERS',
 	LIENHOLDER: 'LIENHOLDER',
+	AUTODETAILPOLICY: 'AUTODETAILPOLICY',
+	ACCIDENTSANDVIOLATIONS: 'ACCIDENTSANDVIOLATIONS',
+	EMPLOYMENTOCCUPATION: 'EMPLOYMENTOCCUPATION',
 	GENDER: 'GENDER',
 	DOUBLE: 'DOUBLE',
 	LONG: 'LONG',
@@ -1765,13 +1776,16 @@ export const NodePropertyTypesByLanguage = {
 		[NodePropertyTypes.ADDRESS]: 'GoogleAddress',
 		[NodePropertyTypes.AUTOMOBILE]: ' AutoModel',
 		[NodePropertyTypes.LIENHOLDERS]: 'LienHolders',
+		[NodePropertyTypes.AUTODETAILPOLICY]: 'AutoDetailPolicy',
+		[NodePropertyTypes.ACCIDENTSANDVIOLATIONS]: 'AccidentViolations',
+		[NodePropertyTypes.EMPLOYMENTOCCUPATION]: 'EmploymentOccupation',
 		[NodePropertyTypes.GENDER]: 'string',
 		[NodePropertyTypes.INT]: 'int',
 		[NodePropertyTypes.FLOAT]: 'float',
 		[NodePropertyTypes.DOUBLE]: 'double',
 		[NodePropertyTypes.BOOLEAN]: 'bool',
 		[NodePropertyTypes.EMAIL]: 'Email',
-		[NodePropertyTypes.PHONENUMBER]: 'PhoneNumber'
+		[NodePropertyTypes.PHONENUMBER]: 'Telephone'
 	},
 	[ProgrammingLanguages.JavaScript]: {
 		[NodePropertyTypes.DATETIME]: 'any',
@@ -1781,6 +1795,9 @@ export const NodePropertyTypesByLanguage = {
 		[NodePropertyTypes.LISTOFSTRINGS]: 'IList<string>',
 		[NodePropertyTypes.DICTSTRING]: '{ [str: string]: string }',
 		[NodePropertyTypes.LIENHOLDERS]: '{ [str:string]: any }',
+		[NodePropertyTypes.AUTODETAILPOLICY]: 'any',
+		[NodePropertyTypes.ACCIDENTSANDVIOLATIONS]: 'any',
+		[NodePropertyTypes.EMPLOYMENTOCCUPATION]: '{ [str:string]: any }',
 		[NodePropertyTypes.INT]: 'number',
 		[NodePropertyTypes.FLOAT]: 'number',
 		[NodePropertyTypes.GENDER]: 'string',
@@ -1800,6 +1817,9 @@ export const Usings = {
 		[NodePropertyTypes.ADDRESS]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES],
 		[NodePropertyTypes.AUTOMOBILE]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES],
 		[NodePropertyTypes.LIENHOLDERS]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES],
+		[NodePropertyTypes.AUTODETAILPOLICY]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES],
+		[NodePropertyTypes.ACCIDENTSANDVIOLATIONS]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES],
+		[NodePropertyTypes.EMPLOYMENTOCCUPATION]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES],
 		[NodePropertyTypes.LIENHOLDER]: [RED_QUICK_DATA, RED_QUICK_ATTRIBUTES]
 	}
 };
@@ -1836,6 +1856,9 @@ export const NodeAttributePropertyTypes = {
 	EMPLOYMENTOCCUPATION: 'EMPLOYMENTOCCUPATION',
 	LIENHOLDER: 'LIENHOLDER',
 	LIENHOLDERS: 'LIENHOLDERS',
+	AUTODETAILPOLICY: 'AUTODETAILPOLICY',
+	ACCIDENTSANDVIOLATIONS: 'ACCIDENTSANDVIOLATIONS',
+	DRIVERLICENSENUMBER: 'DRIVERLICENSENUMBER',
 	COLLECTION: 'COLLECTION',
 	OBJECT: 'OBJECT',
 	RADIO: 'RADIO',

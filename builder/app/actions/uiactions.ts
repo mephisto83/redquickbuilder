@@ -4999,6 +4999,9 @@ export function updateComponentProperty(nodeId: string, prop: string, value: any
 		graph
 	)(GetDispatchFunc(), GetStateFunc());
 }
+export function QuickComponentProperty(node: any, prop: string, value: string) {
+	node.properties[prop]=value;
+}
 export function selectAllConnected(id: string) {
 	return (dispatch: any, getState: Function) => {
 		const nodes = GraphMethods.GetNodesLinkedTo(GetCurrentGraph(getState()), {

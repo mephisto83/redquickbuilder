@@ -1,7 +1,7 @@
 import GenericDropDown from './genericdropdown';
 
 export default class AutoDriverStatus extends GenericDropDown {
-	constructor(props) {
+	constructor(props:any) {
 		super(props);
 		this.options = [
 			{ title: 'Rated', value: 'R' },

@@ -6,10 +6,18 @@ import './input.css';
 
 export default class Input extends React.Component<any, any> {
 	inputType: string;
+	placeHolder?: string;
+	dataCharset?: string
+	pattern?: string;
+	masked?: boolean;
+	id: string;
+	example: string;
 	constructor(props: any) {
 		super(props);
 		this.state = { $name: `input-${Date.now()}` };
 		this.inputType = '';
+		this.example = '';
+		this.id = `input-${Math.random()}`;
 	}
 	label() {
 		return InputFunctions.label(this);
@@ -70,13 +78,13 @@ export default class Input extends React.Component<any, any> {
 			let temp = InputFunctions.value(this);
 			let date = Date.parse(temp)
 			if (!isNaN(date)) {
-				temp = new Date(date).toLocaleDateString()
+				temp = new Date(date).toISOString().substr(0, 'YYYY-MM-DD'.length);
 			}
 			return (<div className={`form__group  field}`}>
 				{this.renderBeforeInput()}
 				<input
 					type={this.inputType || 'text'}
-					disabled={true}
+					disabled={this.disabled() || !this.isEditMode() ? true : false}
 					className={` form__field ${this.cssClasses()}`}
 					onBlur={InputFunctions.onBlur(this)}
 					onFocus={InputFunctions.onFocus(this)}
@@ -112,6 +120,10 @@ export default class Input extends React.Component<any, any> {
 					required
 					{...extra_objects}
 					name={this.state.$name}
+					data-placeholder={InputFunctions.placeholder(this)}
+					data-pattern={this.props.pattern || this.pattern}
+					data-valid-example={this.example || ''}
+					data-charset={this.dataCharset}
 				/>
 				<label className={` form__label`} htmlFor={this.state.$name}>
 					{InputFunctions.placeholder(this)}

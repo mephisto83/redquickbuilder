@@ -24,6 +24,7 @@ import ModelReturnGenerator from './modelreturngenerator';
 import ModelExceptionGenerator from './modelexceptiongenerator';
 import ModelItemFilter from './modelitemfiltergenerator';
 import CustomService from './customservicegenerator';
+import CustomComponentGenerator from './customcomponentgenerator';
 import ModelGetGenerator from './modelgetgenerators';
 import ReactNativeScreens from './screengenerator';
 import ReactNativeNavigation from './navigationgenerator';
@@ -61,8 +62,8 @@ export default class Generator {
 				const models = NodesByType(state, NodeTypes.Model)
 					.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration))
 					.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromController));
-				const functions = NodesByType(state, [ NodeTypes.Function, NodeTypes.Method ]);
-				const executors = NodesByType(state, [ NodeTypes.Executor ]);
+				const functions = NodesByType(state, [NodeTypes.Function, NodeTypes.Method]);
+				const executors = NodesByType(state, [NodeTypes.Executor]);
 				const enumerations = NodesByType(state, NodeTypes.Enumeration).map((node: any) => {
 					const enums = GetNodeProp(node, NodeProperties.Enumeration);
 					const larg: any = {};
@@ -84,7 +85,7 @@ export default class Generator {
 					).toUpperCase();
 				});
 				const functionsTypes: any = {};
-				[ ...executors, ...functions ].forEach((t: any) => {
+				[...executors, ...functions].forEach((t: any) => {
 					functionsTypes[GetNodeProp(t, NodeProperties.CodeName)] = GetNodeProp(
 						t,
 						NodeProperties.CodeName
@@ -127,7 +128,7 @@ export default class Generator {
 					.filter((v: any) => v);
 
 				return ConstantsGenerator.GenerateTs({
-					values: [ ...enumerations_ts ],
+					values: [...enumerations_ts],
 					state,
 					key
 				});
@@ -167,6 +168,8 @@ export default class Generator {
 				return ModelGenerator.GenerateTs({ state, key, language, includeImports: true });
 			case ReactNativeTypes.Menus:
 				return MenuGenerator.Generate({ state, key, language });
+			case ReactNativeTypes.CustomComponents:
+				return CustomComponentGenerator.Generate({ state, key, language });
 			case ReactNativeTypes.Configuration:
 				return ReactNativeConfiguration.Generate({ state, key, language });
 			case ReactNativeTypes.ControllerActions:

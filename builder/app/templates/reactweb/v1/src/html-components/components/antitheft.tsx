@@ -7,7 +7,7 @@ import DropDown from './dropdown';
 import GenericDropDown from './genericdropdown';
 
 export default class AntiTheft extends GenericDropDown {
-	constructor(props) {
+	constructor(props: any) {
 		super(props);
 		this.options = [{ title: 'Anti-theft', value: '1' }, { title: 'None', value: 'N' }];
 	}
