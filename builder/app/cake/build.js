@@ -320,7 +320,8 @@ function createWorkSpace() {
             }
         })
         .then(() => executeSpawnCmd('dotnet', ['new', 'web', '--force', '-n', `${build.solutionName}.Web`], {}))
-        .then(() => executeSpawnCmd('dotnet', ['new', 'web', '--force', '-n', `${build.solutionName}.JobFunctionService`], {}))
+        .then(() => executeSpawnCmd('dotnet', ['new', 'web', '--force', '-n', `${build.solutionName}.JobAgentService`], {}))
+        .then(() => executeSpawnCmd('dotnet', ['new', 'web', '--force', '-n', `${build.solutionName}.JobAgentCoordinator`], {}))
         .then(() => executeSpawnCmd('dotnet', ['new', 'mstest', '--force', '-n', `${build.solutionName}.Tests`], {}))
         .then(() =>
             executeSpawnCmd('dotnet', ['new', 'classlib', '--framework', framework, '--force', '-n', `${build.solutionName}.Models`], {})
@@ -342,7 +343,12 @@ function createWorkSpace() {
             return executeSpawnCmd('dotnet', ['sln', solutionPath, 'add', projectPath], {});
         })
         .then(() => {
-            const projectPath = `${build.solutionName}.JobFunctionService/${build.solutionName}.JobFunctionService.csproj`;
+            const projectPath = `${build.solutionName}.JobAgentService/${build.solutionName}.JobAgentService.csproj`;
+            // dotnet sln todo.sln add todo-app/todo-app.csproj
+            return executeSpawnCmd('dotnet', ['sln', solutionPath, 'add', projectPath], {});
+        })
+        .then(() => {
+            const projectPath = `${build.solutionName}.JobAgentCoordinator/${build.solutionName}.JobAgentCoordinator.csproj`;
             // dotnet sln todo.sln add todo-app/todo-app.csproj
             return executeSpawnCmd('dotnet', ['sln', solutionPath, 'add', projectPath], {});
         })
@@ -398,21 +404,42 @@ function createWorkSpace() {
         })
         .then(() => {
             // dotnet add app/app.csproj reference lib/lib.csproj
-            const projectPath = `${build.solutionName}.JobFunctionService/${build.solutionName}.JobFunctionService.csproj`;
+            const projectPath = `${build.solutionName}.JobAgentService/${build.solutionName}.JobAgentService.csproj`;
             const relPath = `${build.solutionName}.Interfaces/${build.solutionName}.Interfaces.csproj`;
             // dotnet sln todo.sln add todo-app/todo-app.csproj
             return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
         })
         .then(() => {
             // dotnet add app/app.csproj reference lib/lib.csproj
-            const projectPath = `${build.solutionName}.JobFunctionService/${build.solutionName}.JobFunctionService.csproj`;
+            const projectPath = `${build.solutionName}.JobAgentService/${build.solutionName}.JobAgentService.csproj`;
             const relPath = `${build.solutionName}.Models/${build.solutionName}.Models.csproj`;
             // dotnet sln todo.sln add todo-app/todo-app.csproj
             return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
         })
         .then(() => {
             // dotnet add app/app.csproj reference lib/lib.csproj
-            const projectPath = `${build.solutionName}.JobFunctionService/${build.solutionName}.JobFunctionService.csproj`;
+            const projectPath = `${build.solutionName}.JobAgentService/${build.solutionName}.JobAgentService.csproj`;
+            const relPath = `${build.solutionName}.Controllers/${build.solutionName}.Controllers.csproj`;
+            // dotnet sln todo.sln add todo-app/todo-app.csproj
+            return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
+        })
+        .then(() => {
+            // dotnet add app/app.csproj reference lib/lib.csproj
+            const projectPath = `${build.solutionName}.JobAgentCoordinator/${build.solutionName}.JobAgentCoordinator.csproj`;
+            const relPath = `${build.solutionName}.Interfaces/${build.solutionName}.Interfaces.csproj`;
+            // dotnet sln todo.sln add todo-app/todo-app.csproj
+            return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
+        })
+        .then(() => {
+            // dotnet add app/app.csproj reference lib/lib.csproj
+            const projectPath = `${build.solutionName}.JobAgentCoordinator/${build.solutionName}.JobAgentCoordinator.csproj`;
+            const relPath = `${build.solutionName}.Models/${build.solutionName}.Models.csproj`;
+            // dotnet sln todo.sln add todo-app/todo-app.csproj
+            return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
+        })
+        .then(() => {
+            // dotnet add app/app.csproj reference lib/lib.csproj
+            const projectPath = `${build.solutionName}.JobAgentCoordinator/${build.solutionName}.JobAgentCoordinator.csproj`;
             const relPath = `${build.solutionName}.Controllers/${build.solutionName}.Controllers.csproj`;
             // dotnet sln todo.sln add todo-app/todo-app.csproj
             return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});

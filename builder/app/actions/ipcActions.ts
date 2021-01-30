@@ -655,19 +655,19 @@ export function scaffoldThemes(options: any = {}) {
 				state
 			);
 		})
-		.then(() => {
-			console.log('generating react web');
-			if (options.exclusive && !options.reactweb) {
-				return Promise.resolve();
-			}
-			return generateReactWebTheme(
-				path.join(workspace, root.title, 'reactweb', root[GraphKeys.PROJECTNAME]),
-				state
-			);
-		})
-		.then(() => {
-			console.log('Scaffold complete');
-		});
+			.then(() => {
+				console.log('generating react web');
+				if (options.exclusive && !options.reactweb) {
+					return Promise.resolve();
+				}
+				return generateReactWebTheme(
+					path.join(workspace, root.title, 'reactweb', root[GraphKeys.PROJECTNAME]),
+					state
+				);
+			})
+			.then(() => {
+				console.log('Scaffold complete');
+			});
 	};
 }
 function errorHandler(): ((value: unknown) => void | PromiseLike<void>) | null | undefined {
@@ -990,10 +990,21 @@ function generateFiles(workspace: string, solutionName: string, state: any) {
 			JSON.stringify(root.appConfig, null, 4)
 		);
 
-		ensureDirectory(path.join(workspace, `${solutionName}.JobFunctionService`));
+		let appConfigCopy = JSON.parse(JSON.stringify(root.appConfig));
+		if (appConfigCopy && appConfigCopy.AppSettings) {
+			appConfigCopy.AppSettings.center = 'http://localhost:4123';
+		}
+
+		ensureDirectory(path.join(workspace, `${solutionName}.JobAgentService`));
 		writeFileSync(
-			path.join(workspace, `${solutionName}.JobFunctionService`, `appsettings.json`),
-			JSON.stringify(root.appConfig, null, 4)
+			path.join(workspace, `${solutionName}.JobAgentService`, `appsettings.json`),
+			JSON.stringify(appConfigCopy, null, 4)
+		);
+		ensureDirectory(path.join(workspace, `${solutionName}.JobAgentCoordinator`));
+		
+		writeFileSync(
+			path.join(workspace, `${solutionName}.JobAgentCoordinator`, `appsettings.json`),
+			JSON.stringify(appConfigCopy, null, 4)
 		);
 	}
 }
