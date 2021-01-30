@@ -194,14 +194,17 @@ export default class StreamProcessOrchestrationGenerator {
 				.map((model: any) => {
 					modelexecution.push(
 						Tabs(4) +
-							`await Process${GetNodeProp(model, NodeProperties.CodeName)}ChangesBy${GetCodeName(
+							`var report${GetNodeProp(model, NodeProperties.CodeName)} = await Process${GetNodeProp(model, NodeProperties.CodeName)}ChangesBy${GetCodeName(
 								agent
-							)}();` +
+							)}(distribution);
+							distributionReports.Add(report${GetNodeProp(model, NodeProperties.CodeName)});
+							` +
 							jNL
 					);
 				});
 		});
-		result.push(`       public async Task ProcessStagedChanges(Distribution distribution = null) {
+		result.push(`       public async Task<IList<DistributionReport>> ProcessStagedChanges(Distribution distribution = null) {
+			var distributionReports = new List<DistributionReport>();
 ${modelexecution.join('')}
         }
 `);
@@ -732,16 +735,23 @@ ${modelexecution.join('')}
 		_streamProcessTemplate = bindTemplate(_streamProcessTemplate, {
 			agent_type_methods: `
 
-        public async Task ProcessStagedChanges(Distribution distribution = null)
+        public async Task<IList<DistributionReport>> ProcessStagedChanges(Distribution distribution = null)
         {
+			var result = new List<DistributionReport>();
 ${agents
 				.map((agent: any) => {
-					return `await ${GetCodeName(
+					return `var reports${GetCodeName(
 						agent
-					).toLowerCase()}StreamProcessOrchestration.ProcessStagedChanges(distribution);`;
+					).toLowerCase()} = await ${GetCodeName(
+						agent
+					).toLowerCase()}StreamProcessOrchestration.ProcessStagedChanges(distribution);
+					result.AddList(reports${GetCodeName(
+						agent
+					).toLowerCase()}))`;
 				})
 				.map((v: string) => Tabs(4) + v + jNL)
 				.join('')}
+			return result;
         }
         `,
 			arbiters_strappers: strappers,

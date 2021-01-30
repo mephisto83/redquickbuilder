@@ -989,6 +989,12 @@ function generateFiles(workspace: string, solutionName: string, state: any) {
 			path.join(workspace, `${solutionName}.Web`, `appsettings.json`),
 			JSON.stringify(root.appConfig, null, 4)
 		);
+
+		ensureDirectory(path.join(workspace, `${solutionName}.JobFunctionService`));
+		writeFileSync(
+			path.join(workspace, `${solutionName}.JobFunctionService`, `appsettings.json`),
+			JSON.stringify(root.appConfig, null, 4)
+		);
 	}
 }
 function CreateRegistrations(nodes: any[], namefunc: any = null, interfacefunc: any = null) {
