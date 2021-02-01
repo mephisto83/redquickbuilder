@@ -36,6 +36,7 @@ import ReactNativeSelectorFunctions from './selectorgenerator';
 import ReactNativeLists from './listsgenerator';
 import ValidatorGenerator from './validatorgenerator';
 import FetchServiceGenerator from './fetchservicegenerator';
+import StreamTypeServiceGenerator from './streamtypeservicegenerator';
 import TitleServiceLibraryGenerator from './titleServiceLibraryGenerator';
 import MenuGenerator from './menugenerator';
 
@@ -47,6 +48,8 @@ export default class Generator {
 				return ControllerGenerator.Generate({ state, key, language });
 			case NodeTypes.FetchService:
 				return FetchServiceGenerator.Generate({ state, key, language });
+			case GeneratedTypes.StreamTypeService:
+				return StreamTypeServiceGenerator.Generate({ state, key, language });
 			case NodeTypes.Model:
 				return ModelGenerator.Generate({ state, key, language });
 			case NodeTypes.ExtensionType:

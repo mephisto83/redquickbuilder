@@ -11,9 +11,9 @@ using Microsoft.Extensions.Localization;
 using RedQuickCore.Identity;
 using RedQuickCore.Interfaces;
 using {{namespace}}.Models;
-using {{namespace}}.Resources;
 using Swashbuckle.AspNetCore.Swagger;
 using RedQuick.Util;
+using RedQuickCore.Worker;
 using Autofac;
 using {{namespace}}.Controllers;
 using {{namespace}}.Permissions;
@@ -42,14 +42,18 @@ namespace {{namespace}}.Coordinator.Web
                 {{executor_registrations}}
                 {{orchestration_registrations}}
                 {{validation_registrations}}
+                
+                builder.RegisterType<StreamTypeService>().As<IStreamTypeService>();
+                builder.RegisterType<StreamTypeService>().As<IWorkTaskService>();
+                builder.RegisterType<StreamTypeService>().As<IWorkDistributionService>();
             });
+
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Red Quick Coordinator", Version = "v1" });
             });
-            RedStartUp.ConfigurationServices<{{model}}>(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

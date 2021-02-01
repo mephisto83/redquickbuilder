@@ -206,6 +206,7 @@ export default class StreamProcessOrchestrationGenerator {
 		result.push(`       public async Task<IList<DistributionReport>> ProcessStagedChanges(Distribution distribution = null) {
 			var distributionReports = new List<DistributionReport>();
 ${modelexecution.join('')}
+return distributionReports;
         }
 `);
 		// agents.map(agent => {
@@ -745,9 +746,9 @@ ${agents
 					).toLowerCase()} = await ${GetCodeName(
 						agent
 					).toLowerCase()}StreamProcessOrchestration.ProcessStagedChanges(distribution);
-					result.AddList(reports${GetCodeName(
+					result.AddRange(reports${GetCodeName(
 						agent
-					).toLowerCase()}))`;
+					).toLowerCase()});`;
 				})
 				.map((v: string) => Tabs(4) + v + jNL)
 				.join('')}

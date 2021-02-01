@@ -13,16 +13,13 @@ namespace {{namespace}}.Coordinator.Controllers
 {
     [ApiController]
     [Route("work")]
-    public class RedWorkCoordinatorController : Controller
+    public class RedWorkCoordinatorController : WorkerController
     {
-        WorkerMinisterMessageChannel ministerChannel;
         ILogger<RedWorkCoordinatorController> logger;
-        IBackgroundReplyService backgroundReplyService;
         public RedWorkCoordinatorController(WorkerMinisterMessageChannel _ministerChannel, ILogger<RedWorkCoordinatorController> _logger)
+            :base(_ministerChannel)
         {
             logger = _logger;
-            ministerChannel = _ministerChannel;
-            backgroundReplyService = RedStrapper.Resolve<IBackgroundReplyService>();
         }
 
         [AllowAnonymous]
@@ -43,27 +40,6 @@ namespace {{namespace}}.Coordinator.Controllers
             await Handle<DyingResult>(message, stoppingToken, true);
 
             return DyingResult.Dying();
-        }
-
-        private async Task<Task<T>> Handle<T>(WorkerMinisterMessage message, CancellationToken stoppingToken, bool nowait = false)
-        {
-            var internalId = Guid.NewGuid().ToString();
-            message.InternalRequestId = internalId;
-            if (!nowait)
-            {
-                var res = backgroundReplyService.RegisterWait(internalId, (T result) =>
-            {
-                return result;
-            });
-                await ministerChannel.Writer.WriteAsync(message, stoppingToken);
-                return res;
-            }
-
-            else
-            {
-                await ministerChannel.Writer.WriteAsync(message, stoppingToken);
-                return default(Task<T>);
-            }
         }
     }
 }

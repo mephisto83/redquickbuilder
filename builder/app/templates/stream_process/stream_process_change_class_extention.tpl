@@ -1,8 +1,7 @@
-    public class {{model}}ChangeBy{{agent_type}} : StagedChanged
+    public class {{model}}ChangeBy{{agent_type}} : GenericStageChanged<{{model}}>
     {
-        public {{model}} Data { get; set; }
         public string NextPath { get; set; }
-
+        static IWorkTaskService WorkTaskService;
         public static void  UpdatePath({{model}}ChangeBy{{agent_type}} parameters, string nextPath) {
           parameters.NextPath = nextPath;
         }

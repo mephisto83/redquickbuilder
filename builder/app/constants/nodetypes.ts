@@ -212,6 +212,7 @@ export const GeneratedTypes = {
 	Validators: 'validator-generated',
 	Permissions: 'permissions-generated',
 	Executors: 'executors',
+	StreamTypeService: 'stream-type-service',
 	ModelItemFilter: 'model-item-filter',
 	ModelReturn: 'model-return',
 	ModelGet: 'model-get',

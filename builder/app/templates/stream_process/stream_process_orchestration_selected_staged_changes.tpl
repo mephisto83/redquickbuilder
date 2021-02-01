@@ -5,8 +5,8 @@
         IList<{{model}}ChangeBy{{agent_type}}> changes = null;
         if (Distribution.Ok(distribution))
         {
-            Expression<Func<{{model}}ChangeBy{{agent_type}}, bool>> funct = (c) => (c.StreamType == distribution.Stream);
-            changes = (await {{model#lower}}ChangeArbiter.Query(distribution.RedExpression<{{model}}ChangeBy{{agent_type}}>().And(funct))).ToList();
+            Expression<Func<{{model}}ChangeBy{{agent_type}}, bool>> funct = (c) => (c.StreamType == distribution.Stream && c.WorkTask == distribution.WorkTask);
+            changes = (await {{model#lower}}ChangeArbiter.Query(distribution.RedExpression<{{model}}ChangeBy{{agent_type}},{{model}}>().And(funct))).ToList();
         }
         else
         {

@@ -308,6 +308,7 @@ function createWorkSpace() {
 	let build: any = fs_readFileSync('./workspace.json', 'utf8');
 	build = JSON.parse(build);
 	const solutionPath = path.resolve(`./${build.solutionName}.sln`);
+    let framework = 'net5.0';
 	return Promise.resolve()
 		.then(() => {
 			if (!fs_existsSync(`${build.solutionName}`)) {
@@ -315,17 +316,17 @@ function createWorkSpace() {
 			}
 		})
 		.then(() => executeSpawnCmd('dotnet', ['new', 'web', '--force', '-n', `${build.solutionName}.Web`], {}))
-		.then(() => executeSpawnCmd('dotnet', ['new', 'web', '--force', '-n', `${build.solutionName}.JobAgentService`], {}))
-		.then(() => executeSpawnCmd('dotnet', ['new', 'web', '--force', '-n', `${build.solutionName}.JobAgentCoordinator`], {}))
+		.then(() => executeSpawnCmd('dotnet', ['new', 'web', '--force', '-n', `${build.solutionName}.Agent.Web`], {}))
+		.then(() => executeSpawnCmd('dotnet', ['new', 'web', '--force', '-n', `${build.solutionName}.Coordinator.Web`], {}))
 		.then(() => executeSpawnCmd('dotnet', ['new', 'mstest', '--force', '-n', `${build.solutionName}.Tests`], {}))
 		.then(() =>
-			executeSpawnCmd('dotnet', ['new', 'classlib', '--force', '-n', `${build.solutionName}.Models`], {})
+			executeSpawnCmd('dotnet', ['new', 'classlib','--framework', framework, '--force', '-n', `${build.solutionName}.Models`], {})
 		)
 		.then(() =>
-			executeSpawnCmd('dotnet', ['new', 'classlib', '--force', '-n', `${build.solutionName}.Interfaces`], {})
+			executeSpawnCmd('dotnet', ['new', 'classlib', '--framework', framework,'--force', '-n', `${build.solutionName}.Interfaces`], {})
 		)
 		.then(() =>
-			executeSpawnCmd('dotnet', ['new', 'classlib', '--force', '-n', `${build.solutionName}.Controllers`], {})
+			executeSpawnCmd('dotnet', ['new', 'classlib','--framework', framework, '--force', '-n', `${build.solutionName}.Controllers`], {})
 		)
 		.then(() => {
 			const projectPath = `${build.solutionName}.Tests/${build.solutionName}.Tests.csproj`;
@@ -338,12 +339,12 @@ function createWorkSpace() {
 			return executeSpawnCmd('dotnet', ['sln', solutionPath, 'add', projectPath], {});
 		})
 		.then(() => {
-			const projectPath = `${build.solutionName}.JobAgentService/${build.solutionName}.JobAgentService.csproj`;
+			const projectPath = `${build.solutionName}.Agent.Web/${build.solutionName}.Agent.Web.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
 			return executeSpawnCmd('dotnet', ['sln', solutionPath, 'add', projectPath], {});
 		})
 		.then(() => {
-			const projectPath = `${build.solutionName}.JobAgentCoordinator/${build.solutionName}.JobAgentCoordinator.csproj`;
+			const projectPath = `${build.solutionName}.Coordinator.Web/${build.solutionName}.Coordinator.Web.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
 			return executeSpawnCmd('dotnet', ['sln', solutionPath, 'add', projectPath], {});
 		})
@@ -407,42 +408,42 @@ function createWorkSpace() {
 		
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
-			const projectPath = `${build.solutionName}.JobAgentService/${build.solutionName}.JobAgentService.csproj`;
+			const projectPath = `${build.solutionName}.Agent.Web/${build.solutionName}.Agent.Web.csproj`;
 			const relPath = `${build.solutionName}.Interfaces/${build.solutionName}.Interfaces.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
 			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
-			const projectPath = `${build.solutionName}.JobAgentService/${build.solutionName}.JobAgentService.csproj`;
+			const projectPath = `${build.solutionName}.Agent.Web/${build.solutionName}.Agent.Web.csproj`;
 			const relPath = `${build.solutionName}.Models/${build.solutionName}.Models.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
 			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
-			const projectPath = `${build.solutionName}.JobAgentService/${build.solutionName}.JobAgentService.csproj`;
+			const projectPath = `${build.solutionName}.Agent.Web/${build.solutionName}.Agent.Web.csproj`;
 			const relPath = `${build.solutionName}.Controllers/${build.solutionName}.Controllers.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
 			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
-			const projectPath = `${build.solutionName}.JobAgentCoordinator/${build.solutionName}.JobAgentCoordinator.csproj`;
+			const projectPath = `${build.solutionName}.Coordinator.Web/${build.solutionName}.Coordinator.Web.csproj`;
 			const relPath = `${build.solutionName}.Interfaces/${build.solutionName}.Interfaces.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
 			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
-			const projectPath = `${build.solutionName}.JobAgentCoordinator/${build.solutionName}.JobAgentCoordinator.csproj`;
+			const projectPath = `${build.solutionName}.Coordinator.Web/${build.solutionName}.Coordinator.Web.csproj`;
 			const relPath = `${build.solutionName}.Models/${build.solutionName}.Models.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
 			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
 		})
 		.then(() => {
 			// dotnet add app/app.csproj reference lib/lib.csproj
-			const projectPath = `${build.solutionName}.JobAgentCoordinator/${build.solutionName}.JobAgentCoordinator.csproj`;
+			const projectPath = `${build.solutionName}.Coordinator.Web/${build.solutionName}.Coordinator.Web.csproj`;
 			const relPath = `${build.solutionName}.Controllers/${build.solutionName}.Controllers.csproj`;
 			// dotnet sln todo.sln add todo-app/todo-app.csproj
 			return executeSpawnCmd('dotnet', ['add', projectPath, 'reference', relPath], {});
@@ -516,7 +517,7 @@ function createWorkSpace() {
 
 			webProjectDeps.map((dep) => {
 				promise = promise.then(() =>
-					executeSpawnCmd('dotnet', ['add', webProject, 'package', dep, '-s', source], {})
+					executeSpawnCmd('dotnet', ['add', webProject, 'package', dep], {})//, '-s', source
 				);
 			});
 

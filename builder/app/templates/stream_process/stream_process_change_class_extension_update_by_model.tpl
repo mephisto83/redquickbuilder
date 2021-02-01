@@ -13,5 +13,7 @@
             result.{{model_update}} = data;
             result.ChangeType = {{change_type}};
             result.FunctionName = functionName;
+            WorkTaskService = WorkTaskService ?? RedStrapper.Resolve<IWorkTaskService>();
+            result.WorkTask = WorkTaskService.GetWorkTaskFor(result.StreamType, result.AgentType, result.ChangeType, result.FunctionName);
             return result;
         }

@@ -11,14 +11,13 @@ namespace {{namespace}}.Agent.Controllers
 {
     [ApiController]
     [Route("work")]
-    public class RedWorkAgentController : Controller
+    public class RedWorkAgentController : WorkerController
     {
         WorkerMinisterMessageChannel ministerChannel;
         IBackgroundReplyService backgroundReplyService;
         public RedWorkAgentController(WorkerMinisterMessageChannel _ministerChannel)
+            : base(_ministerChannel)
         {
-            ministerChannel = _ministerChannel;
-            backgroundReplyService = RedStrapper.Resolve<IBackgroundReplyService>();
         }
         [HttpGet("heart")]
         public async Task<ConfirmationResult> Heart()
@@ -26,23 +25,20 @@ namespace {{namespace}}.Agent.Controllers
             return ConfirmationResult.Confirming();
         }
 
-        [HttpPost("change/{workstate}")]
-        public async Task<ChangeResult> Change([FromBody] WorkerMinisterMessage message, string workstate, CancellationToken stoppingToken)
+        [AllowAnonymous]
+        [HttpPost("work")]
+        public async Task<ValidResult> Work([FromBody] WorkerMinisterMessage message, CancellationToken stoppingToken)
         {
-            Task<ChangeResult> res = await Handle<ChangeResult>(message, stoppingToken);
+            Task<ValidResult> res = await Handle<ValidResult>(message, stoppingToken);
+
             return await res;
         }
 
-        private async Task<Task<T>> Handle<T>(WorkerMinisterMessage message, CancellationToken stoppingToken)
+        [HttpPost("change")]
+        public async Task<ChangeResult> Change([FromBody] WorkerMinisterMessage message, CancellationToken stoppingToken)
         {
-            var internalId = Guid.NewGuid().ToString();
-            message.InternalRequestId = internalId;
-            var res = backgroundReplyService.RegisterWait(internalId, (T result) =>
-            {
-                return result;
-            });
-            await ministerChannel.Writer.WriteAsync(message, stoppingToken);
-            return res;
+            Task<ChangeResult> res = await Handle<ChangeResult>(message, stoppingToken);
+            return await res;
         }
     }
 }

@@ -349,48 +349,55 @@ export function scaffoldProject(options: any = {}) {
             `
 						)
 						.join('');
-					generateFolderStructure(
-						path.join(`./app/templates/net_core_mvc/identity/${server_side_setup}`),
-						{
-							maestro_registrations: CreateRegistrations(
-								NodesByType(null, NodeTypes.Maestro).filter(
-									(x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration)
-								)
-							),
-							permission_registrations: CreateRegistrations(
-								NodesByType(null, NodeTypes.Model).filter((x: any) =>
-									GetNodeProp(x, NodeProperties.IsAgent)
+					[
+						{ folder: server_side_setup, suffix: '.Web' },
+						{ folder: 'RedQuickCoordinator', suffix: '.Coordinator.Web' },
+						{ folder: 'RedQuickAgents', suffix: '.Agent.Web' }
+					].map((temp: any) => {
+						var { folder, suffix } = temp;
+						generateFolderStructure(
+							path.join(`./app/templates/net_core_mvc/identity/${folder}`),
+							{
+								maestro_registrations: CreateRegistrations(
+									NodesByType(null, NodeTypes.Maestro).filter(
+										(x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration)
+									)
 								),
-								(v: any) => `Permissions${GetCodeName(v)}`,
-								(v: any) => `IPermissions${GetCodeName(v)}`
-							),
-							executor_registrations: CreateRegistrations(
-								NodesByType(null, NodeTypes.Model).filter((x: any) =>
-									GetNodeProp(x, NodeProperties.IsAgent)
+								permission_registrations: CreateRegistrations(
+									NodesByType(null, NodeTypes.Model).filter((x: any) =>
+										GetNodeProp(x, NodeProperties.IsAgent)
+									),
+									(v: any) => `Permissions${GetCodeName(v)}`,
+									(v: any) => `IPermissions${GetCodeName(v)}`
 								),
-								(v: any) => `${GetCodeName(v)}Executor`,
-								(v: any) => `I${GetCodeName(v)}Executor`
-							),
-							orchestration_registrations: CreateRegistrations(
-								NodesByType(null, NodeTypes.Model).filter((x: any) =>
-									GetNodeProp(x, NodeProperties.IsAgent)
+								executor_registrations: CreateRegistrations(
+									NodesByType(null, NodeTypes.Model).filter((x: any) =>
+										GetNodeProp(x, NodeProperties.IsAgent)
+									),
+									(v: any) => `${GetCodeName(v)}Executor`,
+									(v: any) => `I${GetCodeName(v)}Executor`
 								),
-								(v: any) => `${GetCodeName(v)}StreamProcessOrchestration`,
-								(v: any) => `I${GetCodeName(v)}StreamProcessOrchestration`
-							),
-							validation_registrations: CreateRegistrations(
-								NodesByType(null, NodeTypes.Model).filter((x: any) =>
-									GetNodeProp(x, NodeProperties.IsAgent)
+								orchestration_registrations: CreateRegistrations(
+									NodesByType(null, NodeTypes.Model).filter((x: any) =>
+										GetNodeProp(x, NodeProperties.IsAgent)
+									),
+									(v: any) => `${GetCodeName(v)}StreamProcessOrchestration`,
+									(v: any) => `I${GetCodeName(v)}StreamProcessOrchestration`
 								),
-								(v: any) => `${GetCodeName(v)}Validations`,
-								(v: any) => `I${GetCodeName(v)}Validations`
-							),
-							model: GetNodeProp(userNode, NodeProperties.CodeName),
-							namespace
-						},
-						null,
-						path.join(path.join(workspace, root.title, 'netcore'), solutionName + path.join('.Web'))
-					);
+								validation_registrations: CreateRegistrations(
+									NodesByType(null, NodeTypes.Model).filter((x: any) =>
+										GetNodeProp(x, NodeProperties.IsAgent)
+									),
+									(v: any) => `${GetCodeName(v)}Validations`,
+									(v: any) => `I${GetCodeName(v)}Validations`
+								),
+								model: GetNodeProp(userNode, NodeProperties.CodeName),
+								namespace
+							},
+							null,
+							path.join(path.join(workspace, root.title, 'netcore'), solutionName + path.join(suffix))
+						);
+					})
 					let more_interfaces = '';
 					const interface_implementations = [];
 					const user_update_implementation: string[] = [];
@@ -995,15 +1002,15 @@ function generateFiles(workspace: string, solutionName: string, state: any) {
 			appConfigCopy.AppSettings.center = 'http://localhost:4123';
 		}
 
-		ensureDirectory(path.join(workspace, `${solutionName}.JobAgentService`));
+		ensureDirectory(path.join(workspace, `${solutionName}.Agent.Web`));
 		writeFileSync(
-			path.join(workspace, `${solutionName}.JobAgentService`, `appsettings.json`),
+			path.join(workspace, `${solutionName}.Agent.Web`, `appsettings.json`),
 			JSON.stringify(appConfigCopy, null, 4)
 		);
-		ensureDirectory(path.join(workspace, `${solutionName}.JobAgentCoordinator`));
-		
+		ensureDirectory(path.join(workspace, `${solutionName}.Coordinator.Web`));
+
 		writeFileSync(
-			path.join(workspace, `${solutionName}.JobAgentCoordinator`, `appsettings.json`),
+			path.join(workspace, `${solutionName}.Coordinator.Web`, `appsettings.json`),
 			JSON.stringify(appConfigCopy, null, 4)
 		);
 	}
@@ -1058,6 +1065,7 @@ const CodeTypeToArea = {
 	[GeneratedTypes.CSDataChain]: '.Controllers',
 	[GeneratedTypes.ModelItemFilter]: '.Controllers',
 	[GeneratedTypes.StreamProcess]: '.Controllers',
+	[GeneratedTypes.StreamTypeService]: '.Controllers',
 	[GeneratedTypes.StreamProcessOrchestration]: '.Controllers'
 };
 

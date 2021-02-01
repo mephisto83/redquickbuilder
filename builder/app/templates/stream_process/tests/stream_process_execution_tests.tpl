@@ -33,7 +33,7 @@
             var orchestration = RedStrapper.Resolve<I{{agent_type}}StreamProcessOrchestration>();
 
             //Act
-            await orchestration.ProcessStagedChanges();
+            var stageChangedOutput = await orchestration.ProcessStagedChanges();
             var response = (await responseArbiter.GetBy(e => e.Response == parameters.Response)).Single();
 
             //Assert
@@ -76,7 +76,7 @@
             var orchestration = RedStrapper.Resolve<IStreamProcessOrchestration>();
 
             //Act
-            await orchestration.ProcessStagedChanges();
+            var stageChangedOutput = await orchestration.ProcessStagedChanges();
             var response = (await responseArbiter.GetBy(e => e.Response == parameters.Response)).Single();
 
             //Assert
@@ -122,7 +122,7 @@
             var orchestration = RedStrapper.Resolve<IStreamProcessOrchestration>();
 
             //Act
-            await orchestration.ProcessStagedChanges();
+            var stageChangedOutput = await orchestration.ProcessStagedChanges();
             var response = (await responseArbiter.GetBy(e => e.Response == parameters.Response)).Single();
 
             //Assert
