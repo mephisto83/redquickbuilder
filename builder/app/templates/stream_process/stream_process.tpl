@@ -24,6 +24,16 @@
                 }
 
             }
+            else if (RedConfiguration.MultiThreaded)
+            {
+                var agentCenter = RedStrapper.Resolve<IRedAgentCenter>();
+
+                stagedChangeResponse = await agentCenter.Send<T, U>(change, noWait);
+                if (!noWait)
+                {
+                    await stagedResponseArbiter.Delete(stagedChangeResponse.Id);
+                }
+            }
             else
             {
                 IRedEventHubClient client = RedStrapper.Resolve<IRedEventHubClient>();

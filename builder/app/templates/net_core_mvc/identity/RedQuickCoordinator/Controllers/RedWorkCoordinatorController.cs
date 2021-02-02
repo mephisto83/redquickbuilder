@@ -33,6 +33,15 @@ namespace {{namespace}}.Coordinator.Controllers
 
             return await res;
         }
+        
+        [AllowAnonymous]
+        [HttpPost("request/address")]
+        public async Task<AgentReply> RequestAddress([FromBody] AgentRequest request, CancellationToken stoppingToken)
+        {
+            var res = await Handle<AgentReply>(WorkerMinisterMessage.Create(request), stoppingToken);
+            return await res;
+        }
+        
         [AllowAnonymous]
         [HttpPost("die")]
         public async Task<DyingResult> Dying([FromBody] WorkerMinisterMessage message, CancellationToken stoppingToken)
