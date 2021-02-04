@@ -1,5 +1,6 @@
 # RedQuickBuilder
 ## Quick Start
+If I was you, I wouldn't actually try to use this thing, cause its tied together with hopes and dreams at the moment. But, If you want to play around with it for fun. Then have a go.
 
 ### Dev mode
     ```
@@ -68,6 +69,19 @@ The job list displays which step is currently being executed, and where the proc
 ![Job Stage List](presentationsrc/job_stage_list.png)
 
 The test applications that I have been working on have typically take around 4-6 hours to process all the way through, which is terribly long. But, I would estimate the amount of "me" time it would take to do it manually would be in the months range. So, from that perspective I'm calling it a win. I would also assume that since I've written the program in typescript, that isn't helping the speed at all. 
+
+In a perfect world, these are the general steps of building an application in RedQuickBuilder.
+
+![Perfect Steps](presentationsrc/perfect_steps.png)
+
+- Make Project
+    -   Building the project in the RedQuickBuilder UI.
+- Build Project
+    -   The multi threaded building of all the Screens and Components used in the various UIs and the back-end services.
+- Title Translation
+    - Translating all the words used in the site in to the various languages that you care about. Even though it only supports 4 at the moment. This obviously could expand, but I only know 4 well enough to know if I was waaaaaaaay wrong.
+- Customize UI
+    - Inside RedQuickBuilder, you will be able to organize and build your sites css.
 
 #### Main UI
 The main UI, as previously described, will be where almost all the user's time will be spent organizing and building the application. When the application is ready to be "printed", new jobs can be kicked off from here and monitored in the UI.
