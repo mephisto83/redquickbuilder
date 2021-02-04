@@ -36,7 +36,7 @@ RedQuickBuilder is an application which can produce applications from a visual g
 ### Architecture
 #### Output architecture
 
-RedQuickBuilder's goal is to generate applications, but those applications are designed to be generated in a way that seems human written. So, names of screens, properties and variables, hopefully will give the impression that a human being wrote most of the code, and was following the application's intentions.
+RedQuickBuilder's goal is to generate applications, but those applications are designed to be generated in a way that seems human written. So, names of screens, properties and variables, hopefully, will give the impression that a human being wrote most of the code, and was following the application's intentions.
 
 #### Front End
 ##### Client Apps
