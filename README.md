@@ -37,31 +37,6 @@ RedQuickBuilder is an application which can produce applications from a visual g
 1. The may represent connections between models.
 1. The may represent abstract concepts that only make sense within the context of the application.
 
-##### Controllers 
-1. Are the same controllers that exist in most .net core web api based applications.
-1. Why use an API
-    1. Multiple UIs can use the same UI, instead of generating html or whatever for the client side to render.
-1. Controllers Do
-    1. Authentication
-        1. Bearer Tokens 
-    1. Authorization
-        1. Business rules guide who can do what and when
-    1. Execution
-        1. Executing the logic 
-        1. Eliminating Race conditions
-    
-##### Filtering
-    1. Filtering based on business rules
-
-##### Views
-    1. Building basic UIs
-
-##### Language
-    1. Building a title service to deliver content in the language of choice.
-
-##### Scaling
-    1. Scaling the processing of commands, without losing the ability to guarentee no model is manipulated twice by the same.
-
 ### Architecture
 #### Output architecture
 
@@ -574,73 +549,107 @@ The archictecture of all the client applications follows the same pattern, as il
         1. All the previous code architecture would apply to VR apps also.
     1. AR
         1. All the previous code architecture would apply to AR apps also.
-    1. Back End
-        1. Server side
-1. Graph
-	1. The graph is the document that describes the application in terms of nodes and links.
-	1. Nodes
-		1. Nodes have properties that describe the node. There are lots of potential properties, and the majority are used for specific purposes depending on context.
-		1. Required Properties
-			1. NodeTypes
-	1. Links
-		1. Links describe relationships between nodes using properties attached to the link. 
-		1. Generally links have types, and properties that may describe specific relationships.
-			1. Example: A Model node references Property node with a link with the link type 'property-link'.
+
+## Back End
+### Server side
+### Scaling Resources
+Considerations for scaling resources to handle large amounts of data starts from the model. The goal of this model is not for maximizing the speed of an individual transaction, but maximizing the amount of transactions that can take place. Since devops is a lifestyle, we want to enable ourselves to turn up and down the number of agent instances running at any moment. In order to achieve this, agents have to be self organizing to maintain the flow integrity requirement of the system.  Flow integrity, in this context, meaning that an instance of a model will never be worked on my two different agent instances.
+
+### Background Agents
+Background agents process events in bulk to handle a large influx of messages, and maintain flow integrity.
+
+### Web Service
+##### Controllers 
+1. Are the same controllers that exist in most .net core web api based applications.
+1. Why use an API
+    1. Multiple UIs can use the same UI, instead of generating html or whatever for the client side to render.
+1. Controllers Do
+    1. Authentication
+        1. Bearer Tokens 
+    1. Authorization
+        1. Business rules guide who can do what and when
+    1. Execution
+        1. Executing the logic 
+        1. Eliminating Race conditions
+    
+##### Filtering
+    1. Filtering based on business rules
+
+##### Views
+    1. Building basic UIs
+
+##### Language
+    1. Building a title service to deliver content in the language of choice.
+
+##### Scaling
+    1. Scaling the processing of commands, without losing the ability to guarentee no model is manipulated twice by the same.
+
+## Graph
+1. The graph is the document that describes the application in terms of nodes and links.
+1. Nodes
+    1. Nodes have properties that describe the node. There are lots of potential properties, and the majority are used for specific purposes depending on context.
+    1. Required Properties
+        1. NodeTypes
+1. Links
+    1. Links describe relationships between nodes using properties attached to the link. 
+    1. Generally links have types, and properties that may describe specific relationships.
+        1. Example: A Model node references Property node with a link with the link type 'property-link'.
 		
-1. Models
-	1. Modeles encapsulate concepts that are pertinent to the application.
-		1. Models may be related to the functionality of the application or the operation of the application.
-			1. Operation
-				1. Models may describe User objects or other concepts used for logging in.
-		1. Models can be Agents, Users or neither.
-			1. Users are the actual accounts used by the system for logging in.
-				1. Users may have multiple agents, and therefore can perform different actions based on their roles, and possible see more of less data in their UIs.
-			1. Agents are personas that users may use to execute functionality with in the application.
-				1. Example:
-					1. A 'Customer' may be an Agent which performs operations on behalf of the User.
-		1.	Models have properties.
-			1. There are default properties which will exist on every model, but don't necessarily appear in the RedQuickBuilder UI.
-			1. Default Properties
-				1. Owner
-				1. Updated
-				1. Id
-				1. Created
-				1. Deleted
-				1. Version
-			1. The default properties will afford the system assumptions that can be made to implement features such as:
-				1. constrained concurrency
-					1. Guarenteeing that no race conditions can occur with a unique model instance.
-				1. model versioning
-					1. Reconciliation
-				1. un-deletion.
-		1. Referencing other models
-			1. Models can reference other models by describing them as logical children.
-				1. References are kept on the referenced model type as a string property with the Id of the model on a property named as the Model's name.
-					1. Example.
-						1. School has a child of ClassRoom, then ClassRoom has a property called School.
-				1. If the model needs to encapsulate a Many to Many relationship, an intermediate Model can hold the references to the Models it is connecting. This also give an opportunity to keep more data describing the relationship on the intermediate model.
-1. Properties
+### Models
+1. Models encapsulate concepts that are pertinent to the application.
+    1. Models may be related to the functionality of the application or the operation of the application.
+        1. Operation
+            1. Models may describe User objects or other concepts used for logging in.
+    1. Models can be Agents, Users or neither.
+        1. Users are the actual accounts used by the system for logging in.
+            1. Users may have multiple agents, and therefore can perform different actions based on their roles, and possible see more of less data in their UIs.
+        1. Agents are personas that users may use to execute functionality with in the application.
+            1. Example:
+                1. A 'Customer' may be an Agent which performs operations on behalf of the User.
+    1.	Models have properties.
+        1. There are default properties which will exist on every model, but don't necessarily appear in the RedQuickBuilder UI.
+        1. Default Properties
+            1. Owner
+            1. Updated
+            1. Id
+            1. Created
+            1. Deleted
+            1. Version
+        1. The default properties will afford the system assumptions that can be made to implement features such as:
+            1. constrained concurrency
+                1. Guarenteeing that no race conditions can occur with a unique model instance.
+            1. model versioning
+                1. Reconciliation
+            1. un-deletion.
+    1. Referencing other models
+        1. Models can reference other models by describing them as logical children.
+            1. References are kept on the referenced model type as a string property with the Id of the model on a property named as the Model's name.
+                1. Example.
+                    1. School has a child of ClassRoom, then ClassRoom has a property called School.
+            1. If the model needs to encapsulate a Many to Many relationship, an intermediate Model can hold the references to the Models it is connecting. This also give an opportunity to keep more data describing the relationship on the intermediate model.
+### Properties
 	1. Properties give models meaning. They have types which can be simple, like int, string, DateTime or they can be complex reference types.
 	1. Models are almost always connected to properties.
 	1. Attributes that are connected to properties, give clues to the expectations of the property.
 		1. Example: An attribute with an Email type, suggests that the property will have to have a string with a valid email address.
 		1. Attributes effects can be seen in the client and server side of the applications. The validation sections of the applications will generate code that enforce these attributes. The client side of the application will also attempt to enforce the rules descibed by the attributes.
 		1. There are no limits to the number of attributes that can be applied to a property, but if they attributes contradict the type of property, build or runtime errors may occur.
-1. Agent Access
-	1. Purpose
-		1. Describes how screens will be generated
-		1. Describes which Agents can access screens.
-		1. Describes functions for loading screens,
-		1. Describes actions that can occur on the screens.
-	1. Dashboard Screens
-		1. Dashboard screens are meant as screens that direct "traffic" from on form to the next. At least at the time of this writing.
-	1. Agent Screens
+## RedQuickBuilder Application
+### Agent Access
+1. Purpose
+    1. Describes how screens will be generated
+    1. Describes which Agents can access screens.
+    1. Describes functions for loading screens,
+    1. Describes actions that can occur on the screens.
+1. Dashboard Screens
+    1. Dashboard screens are meant as screens that direct "traffic" from on form to the next. At least at the time of this writing.
+1. Agent Screens
 		1. Agent screen are meant for forms that the Agents can use to Update, Create or View Data.     
-1. Title System
-    1. Internationalization is a 1st class consideration in RedQuickBuilder. All text that is presented to the user, should be translated for end-users. Its very expensive to think about languages/cultures half way through the life-cycle of the applications, so we take care of it up front. Even if one language is used, just having the framwork setup for multiple languages lowers the effort immensely.
-    1. Currently, RedQuickBuilder is capable of adding translations in:
-        1. English
-        1. French
-        1. Norwegian
-        1. German
-    1. ![presentationsrc/title_input_screen.png](presentationsrc/title_input_screen.png)
+### Title System
+1. Internationalization is a 1st class consideration in RedQuickBuilder. All text that is presented to the user, should be translated for end-users. Its very expensive to think about languages/cultures half way through the life-cycle of the applications, so we take care of it up front. Even if one language is used, just having the framwork setup for multiple languages lowers the effort immensely.
+1. Currently, RedQuickBuilder is capable of adding translations in:
+    1. English
+    1. French
+    1. Norwegian
+    1. German
+1. ![presentationsrc/title_input_screen.png](presentationsrc/title_input_screen.png)
