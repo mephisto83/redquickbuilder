@@ -2,18 +2,18 @@
 
 ## Intro
 
-1. Who are you
-	1. Andrew Porter
-	1. Software Engineer
-	1. Minnesota
-1. What are you doing
+### Who are I
+	- Andrew Porter
+	- Software Engineer
+	- Minnesota
+### What are you doing
 	1. State the problem
 		1. I want to execute my "what if ideas" faster.
 		1. I want to be able to execute other people's ideas faster
 		1. I want to build complete solutions that can scale to millions of users.
 			1. Why not billions.
 				1. I can solve those problems later.
-1. State the solution
+### State the solution
 	1. The solution is abnoxiously large
 	1. RedQuickBuilder
         1. Is an application which can produce applications from a visual graph representation. It is capabable of producing apps for different devices. The intention is to be able to generate apps for all sorts of different UI situations. The purpose of RedQuickBuilder isn't for continuously developing applications, but to jump start the app building process.
@@ -52,7 +52,7 @@
 			1. Building a title service to deliver content in the language of choice.
 		1. Scaling
 			1. Scaling the processing of commands, without losing the ability to guarentee no model is manipulated twice by the same
-1. Architecture
+### Architecture
     1. Output architecture
         1. RedQuickBuilder's goal is to generate applications, but those applications are designed to be generated in a way that seems human written. So, names of screens, properties and variables, hopefully will give the impression of following along with the application's designer's intentions.
         1. Front End
