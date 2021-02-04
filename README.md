@@ -27,10 +27,10 @@ RedQuickBuilder is an application which can produce applications from a visual g
     1. AR (not yet realized)
 
 ##### Models
-    1. Represent ideas.
-        1. The may represent 
-            1. people or personas
-            1. Things
+1. Represent ideas.
+    1. The may represent 
+        1. people or personas
+        1. Things
 ##### Properties
     1. The things that keep information about the models.
     1. The may represent connections between models.
