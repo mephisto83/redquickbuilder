@@ -70,7 +70,7 @@ RedQuickBuilder's goal is to generate applications, but those applications are d
 #### Front End
 ##### Client Apps
 The archictecture of all the client applications follows the same pattern, as illustrated below.
-![client side app structure](presentationsrc\client_side_app_structure.png)
+![client side app structure](presentationsrc/client_side_app_structure.png)
 
 1. Web
     1. React
