@@ -2,11 +2,11 @@
 
 ## Intro
 
-### Who are I
+### Who am I
 	- Andrew Porter
 	- Software Engineer
 	- Minnesota
-### What are you doing
+### What am I doing
 	1. State the problem
 		1. I want to execute my "what if ideas" faster.
 		1. I want to be able to execute other people's ideas faster
