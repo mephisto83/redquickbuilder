@@ -15,32 +15,22 @@
 				1. I can solve those problems later.
 ### State the solution
 
-The solution is abnoxiously large
+The solution is abnoxiously large, at least for 1 dev.
 
 #### RedQuickBuilder
 
-RedQuickBuilder is an application which can produce applications from a visual graph representation. It is capabable of producing apps for different devices. The intention is to be able to generate apps for all sorts of different UI situations. The purpose of RedQuickBuilder isn't for continuously developing applications, but to jump start the app building process.
+RedQuickBuilder is an application which can produce applications from a visual graph representation. It is capabable of producing apps for different devices. The intention is to be able to generate apps for all sorts of different UI situations. The purpose of RedQuickBuilder isn't for continuously developing applications, but to jump start the app building process. It would be cool to only develop applications in RedQuickBuilder, but that won't happen for a long while.
     1. Web
     1. Native Mobile
     1. Desktop
     1. VR (not yet realized)
     1. AR (not yet realized)
 
-##### Models
-1. Represent ideas.
-    1. The may represent 
-        1. people/personas
-        1. things
-
-##### Properties
-1. The things that keep information about the models.
-1. The may represent connections between models.
-1. The may represent abstract concepts that only make sense within the context of the application.
 
 ### Architecture
 #### Output architecture
 
-RedQuickBuilder's goal is to generate applications, but those applications are designed to be generated in a way that seems human written. So, names of screens, properties and variables, hopefully will give the impression of following along with the application's designer's intentions.
+RedQuickBuilder's goal is to generate applications, but those applications are designed to be generated in a way that seems human written. So, names of screens, properties and variables, hopefully will give the impression that a human being wrote most of the code, and was following the application's intentions.
 
 #### Front End
 ##### Client Apps
@@ -627,6 +617,7 @@ Background agents process events in bulk to handle a large influx of messages, a
                 1. Example.
                     1. School has a child of ClassRoom, then ClassRoom has a property called School.
             1. If the model needs to encapsulate a Many to Many relationship, an intermediate Model can hold the references to the Models it is connecting. This also give an opportunity to keep more data describing the relationship on the intermediate model.
+
 ### Properties
 	1. Properties give models meaning. They have types which can be simple, like int, string, DateTime or they can be complex reference types.
 	1. Models are almost always connected to properties.
