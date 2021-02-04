@@ -207,15 +207,17 @@ The archictecture of all the client applications follows the same pattern, as il
             );
 
             ```
-                1. setParameters
-                    1. In the example above setParameters are executed when navigated to the screen. The parameters are pulled from the url on navigation, and set so that components can grab them for use. Not every screen has a parameter, but they all will execute that function. The idea being that if you want to add them later manually, it should be really easy.
-                    1. You may notice that the viewModel is being pull from the *match.params*, but it is being immediately overridden by a function call. If we were writing this manually that wouldn't ever happen, but since this is being generated from a graph things like this happen. Since, it won't cause any known issues, its a low priority to fix at the moment. 
-                1. viewModel
-                    1. In the context of a RedQuickBuilder generated app, it describes the context in which a screen lives. Screens that are for Creating or Updating models have *viewModel* that are used as keys to store the current forms state. If a model is being updated, the model is copied to a different store key to be manipulated separately. If the work is saved, it will send an update command to the server side, and assuming a successfuly update. Its updated version will be reloaded and placed into the part of the state storing all the models of its type.
-                1. model
-                    1. Usually the id of the model that will be pulled from the server-side on load, to ensure that the latest possible version of the model is loaded.
-                1. viewModel and model
-                    1. The two values are properties of most screens, if they exist, and will be passed down from the screen component to each of the child components.
+            1. setParameters
+                1. In the example above setParameters are executed when navigated to the screen. The parameters are pulled from the url on navigation, and set so that components can grab them for use. Not every screen has a parameter, but they all will execute that function. The idea being that if you want to add them later manually, it should be really easy.
+                1. You may notice that the viewModel is being pull from the *match.params*, but it is being immediately overridden by a function call. If we were writing this manually that wouldn't ever happen, but since this is being generated from a graph things like this happen. Since, it won't cause any known issues, its a low priority to fix at the moment. 
+            1. viewModel
+                1. In the context of a RedQuickBuilder generated app, it describes the context in which a screen lives. Screens that are for Creating or Updating models have *viewModel* that are used as keys to store the current forms state. If a model is being updated, the model is copied to a different store key to be manipulated separately. If the work is saved, it will send an update command to the server side, and assuming a successfuly update. Its updated version will be reloaded and placed into the part of the state storing all the models of its type.
+            1. model
+                1. Usually the id of the model that will be pulled from the server-side on load, to ensure that the latest possible version of the model is loaded.
+            1. viewModel and model
+                1. The two values are properties of most screens, if they exist, and will be passed down from the screen component to each of the child components.
+
+
             1. Screens
                 1. Basic anatomy of a screen. The code generated will be very uniform so that customizing the UI beyond the existing it generated form is easy. The purpose of RedQuickBuilder isn't for continuously developing applications, but to jump start the app building process.
                 ```tsx
@@ -554,6 +556,7 @@ The archictecture of all the client applications follows the same pattern, as il
                     1. When the input field, in the case, receives or loses focus these functions will be executed. The state will be updated to reflect the new state. This makes it possible to exercise all sorts of creative visual effects in the UI.
                 1. onChangeText, onChange,
                     1. When values in the input fields are updated, this event will fire, and update the state of the instance.
+
             1. This component is responsible for call the server-side when it is clicked. The call will only be executed with the error property is false. That is determined using the validation function generated for the specific endpoint that is generated.
             ```tsx
                 <UpdateInsuranceProviderObjectbyManagementAgentForUpdate
