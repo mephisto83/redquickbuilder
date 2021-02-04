@@ -32,6 +32,7 @@ RedQuickBuilder is an application which can produce applications from a visual g
 1. VR (not yet realized)
 1. AR (not yet realized)
 
+![RedQuickBuilder](presentationsrc/generic_architecture.png)
 
 ### Architecture
 #### Output architecture
