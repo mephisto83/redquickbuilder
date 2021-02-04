@@ -1,23 +1,28 @@
 # RedQuickBuilder
 
 ## Intro
+This project was supposed to take like 8 weeks. Apparently, I'm bad at estimating and good at fooling myself. So, this is an attempt at explaining everything that is related to RedQuickBuilder, warts and all.
 
 ### Who am I
-	- Andrew Porter
-	- Software Engineer
-	- Minnesota
+
+Obligatory statement about who I am.
+- Andrew Porter
+- Software Engineer
+- Minnesota (where i live)
+
 ### What am I doing
-	1. State the problem
-		1. I want to execute my "what if ideas" faster.
-		1. I want to be able to execute other people's ideas faster
-		1. I want to build complete solutions that can scale to millions of users.
-			1. Why not billions.
-				1. I can solve those problems later.
+- I want to execute my "what if ideas" faster.
+- I want to be able to execute other people's ideas faster
+- I want to build complete solutions that can scale to millions of users.
+    - Why not billions?
+        - I can solve those problems later.
 ### State the solution
 
 The solution is abnoxiously large, at least for 1 dev.
 
-#### RedQuickBuilder
+### RedQuickBuilder
+
+![RedQuickBuilder](presentationsrc/redquickbuilder.png)
 
 RedQuickBuilder is an application which can produce applications from a visual graph representation. It is capabable of producing apps for different devices. The intention is to be able to generate apps for all sorts of different UI situations. The purpose of RedQuickBuilder isn't for continuously developing applications, but to jump start the app building process. It would be cool to only develop applications in RedQuickBuilder, but that won't happen for a long while.
     1. Web
