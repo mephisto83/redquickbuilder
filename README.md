@@ -14,44 +14,48 @@
 			1. Why not billions.
 				1. I can solve those problems later.
 ### State the solution
-	1. The solution is abnoxiously large
-	1. RedQuickBuilder
-        1. Is an application which can produce applications from a visual graph representation. It is capabable of producing apps for different devices. The intention is to be able to generate apps for all sorts of different UI situations. The purpose of RedQuickBuilder isn't for continuously developing applications, but to jump start the app building process.
-            1. Web
-            1. Native Mobile
-            1. Desktop
-            1. VR (not yet realized)
-            1. AR (not yet realized)
-		1. Models
-			1. Represent ideas.
-				1. The may represent 
-					1. people or personas
-					1. Things
-		1. Properties
-			1. The things that keep information about the models.
-			1. The may represent connections between models.
-			1. The may represent abstract concepts that only make sense within the context of the application.
-		1. Controllers 
-			1. Are the same controllers that exist in most .net core web api based applications.
-			1. Why use an API
-				1. Multiple UIs can use the same UI, instead of generating html or whatever for the client side to render.
-			1. Controllers Do
-				1. Authentication
-					1. Bearer Tokens 
-				1. Authorization
-					1. Business rules guide who can do what and when
-				1. Execution
-					1. Executing the logic 
-					1. Eliminating Race conditions
-				
-			1. Filtering
-				1. Filtering based on business rules
-		1. Views
-			1. Building basic UIs
-		1. Language
-			1. Building a title service to deliver content in the language of choice.
-		1. Scaling
-			1. Scaling the processing of commands, without losing the ability to guarentee no model is manipulated twice by the same
+
+The solution is abnoxiously large
+
+#### RedQuickBuilder
+
+RedQuickBuilder is an application which can produce applications from a visual graph representation. It is capabable of producing apps for different devices. The intention is to be able to generate apps for all sorts of different UI situations. The purpose of RedQuickBuilder isn't for continuously developing applications, but to jump start the app building process.
+    1. Web
+    1. Native Mobile
+    1. Desktop
+    1. VR (not yet realized)
+    1. AR (not yet realized)
+
+##### Models
+    1. Represent ideas.
+        1. The may represent 
+            1. people or personas
+            1. Things
+##### Properties
+    1. The things that keep information about the models.
+    1. The may represent connections between models.
+    1. The may represent abstract concepts that only make sense within the context of the application.
+##### Controllers 
+        1. Are the same controllers that exist in most .net core web api based applications.
+        1. Why use an API
+            1. Multiple UIs can use the same UI, instead of generating html or whatever for the client side to render.
+        1. Controllers Do
+            1. Authentication
+                1. Bearer Tokens 
+            1. Authorization
+                1. Business rules guide who can do what and when
+            1. Execution
+                1. Executing the logic 
+                1. Eliminating Race conditions
+            
+        1. Filtering
+            1. Filtering based on business rules
+    1. Views
+        1. Building basic UIs
+    1. Language
+        1. Building a title service to deliver content in the language of choice.
+    1. Scaling
+        1. Scaling the processing of commands, without losing the ability to guarentee no model is manipulated twice by the same
 ### Architecture
 #### Output architecture
 
