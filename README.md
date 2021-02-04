@@ -1,4 +1,26 @@
 # RedQuickBuilder
+## Quick Start
+
+### Dev mode
+    ```
+    > yarn install
+    > yarn dev
+    or
+    > yarn start
+    ```
+### Build release
+
+    ```
+    npm run package-win
+    ```
+    or
+    ```
+    npm run package-linux
+    ```
+    or
+    ```
+    npm run package-mac
+    ```
 
 ## Intro
 This project was supposed to take like 8 weeks. Apparently, I'm bad at estimating and good at fooling myself. So, this is an attempt at explaining everything that is related to RedQuickBuilder, warts and all.
@@ -18,7 +40,8 @@ Obligatory statement about who I am.
         - I can solve those problems later.
 ### State the solution
 
-The solution is abnoxiously large, at least for 1 dev.
+The solution is abnoxiously large, at least for 1 dev. 
+
 
 ### RedQuickBuilder
 
@@ -32,12 +55,55 @@ RedQuickBuilder is an application which can produce applications from a visual g
 1. VR (not yet realized)
 1. AR (not yet realized)
 
-![RedQuickBuilder](presentationsrc/generic_architecture.png)
+Currently, the system has 3 main parts. Main UI, "Workers", and an "Organization process". The workers and the organization process themselves don't use a lot of resources, but when they are working through a project they will consume a tremendous amount of resources. 
+
+Typically, when I am running locally I have 12 processes running, and a single organization process. I have seen it consume up to 75gb of ram, and utilize 80% of my processor resources. I have a very large machine, but have definitely had my other machines just crash because of resource consumption. The system is capable of distributing the work across multiple machines, but I haven't been able to resolve a reliability issue that keeps cropping up. And, I really haven't spent a lot of time trying either.
+
+This is a view of the Process monitoring screen. It gives an overview of the currently running processes and the current stage in the process.
+
+![Worker Screen](presentationsrc/worker_screen.png)
+
+The job list displays which step is currently being executed, and where the process currently is. In the image below, there isn't a current job running.
+
+![Job Stage List](presentationsrc/job_stage_list.png)
+
+The test applications that I have been working on have typically take around 4-6 hours to process all the way through, which is terribly long. But, I would estimate the amount of "me" time it would take to do it manually would be in the months range. So, from that perspective I'm calling it a win. I would also assume that since I've written the program in typescript, that isn't helping the speed at all. 
+
+#### Main UI
+The main UI, as previously described, will be where almost all the user's time will be spent organizing and building the application. When the application is ready to be "printed", new jobs can be kicked off from here and monitored in the UI.
+
+##### Starting the UI
+```
+> yarn start
+or
+> yarn dev
+```
+
+#### Worker Background Process
+This is an independently running agent that will respond to sub tasks distributed by the "organization process".
+
+##### Starting Worker Background Process
+```
+> npm run jwb
+```
+
+#### Organization Process
+When new jobs are detected, this will distribute work tasks to available background processes to handle the work. The process also keeps track of the process to ensure that the subtasks distributed to the workers is merged back together, and the next step can proceed.
+
+##### Starting Organization Process
+```
+> npm run jr
+```
 
 ### Architecture
 #### Output architecture
 
 RedQuickBuilder's goal is to generate applications, but those applications are designed to be generated in a way that seems human written. So, names of screens, properties and variables, hopefully, will give the impression that a human being wrote most of the code, and was following the application's intentions.
+
+
+![RedQuickBuilder](presentationsrc/generic_architecture.png)
+
+So any future UI invented should be able to be plugged into the system and live next to the others.
 
 #### Front End
 ##### Client Apps
