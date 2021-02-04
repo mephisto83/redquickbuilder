@@ -25,11 +25,12 @@ The solution is abnoxiously large, at least for 1 dev.
 ![RedQuickBuilder](presentationsrc/redquickbuilder.png)
 
 RedQuickBuilder is an application which can produce applications from a visual graph representation. It is capabable of producing apps for different devices. The intention is to be able to generate apps for all sorts of different UI situations. The purpose of RedQuickBuilder isn't for continuously developing applications, but to jump start the app building process. It would be cool to only develop applications in RedQuickBuilder, but that won't happen for a long while.
-    1. Web
-    1. Native Mobile
-    1. Desktop
-    1. VR (not yet realized)
-    1. AR (not yet realized)
+
+1. Web
+1. Native Mobile
+1. Desktop
+1. VR (not yet realized)
+1. AR (not yet realized)
 
 
 ### Architecture
