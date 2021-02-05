@@ -715,7 +715,7 @@ For Example: School will represent a school which in our case means a building o
 - User
     - Is a person that can operate as a Student Professor or Administrator
 
-
+#### Programatic details about models
 - Models encapsulate concepts that are pertinent to the application.
     - Models may be related to the functionality of the application or the operation of the application.
         - Operation
@@ -749,12 +749,128 @@ For Example: School will represent a school which in our case means a building o
             - If the model needs to encapsulate a Many to Many relationship, an intermediate Model can hold the references to the Models it is connecting. This also give an opportunity to keep more data describing the relationship on the intermediate model.
 
 ### Properties
+
 - Properties give models meaning. They have types which can be simple, like int, string, DateTime or they can be complex reference types.
 - Models are almost always connected to properties.
 - Attributes that are connected to properties, give clues to the expectations of the property.
     - Example: An attribute with an Email type, suggests that the property will have to have a string with a valid email address.
     - Attributes effects can be seen in the client and server side of the applications. The validation sections of the applications will generate code that enforce these attributes. The client side of the application will also attempt to enforce the rules descibed by the attributes.
     - There are no limits to the number of attributes that can be applied to a property, but if they attributes contradict the type of property, build or runtime errors may occur.
+
+#### Contrived example
+![property_in_graph](presentationsrc/property_in_graph.png)
+
+Continuing with the school app concept. The models now have properties attached. Not all the possible properties that could exist in a real school application, but enough to illustrate some relationships.
+
+- 1 to N
+    - The relationship between the Tenant and the Academic Period is 1 to many. The Tenant can have many academic periods, because we can assume a customer would operate over different years, or break school years up in to quarters, semesters or tri-mesters. So, we can encode the relationship with a link between them. In the menu, we define a relationship between the academic period as a logical child, which will add a link between those two nodes. The link itself will carry the information describing the relationship between the nodes.
+    ![many_to_one](presentationsrc/many_to_one.png)
+- 1 to 1
+    - The Course Node(black) and the Course Node(purple) demonstrates a 1 to 1 relationship. The black node is the property, and the purple node is the Model. The link between them encapsulates the idea that the Course property on the School Class model may 'point' to a Course model instance.
+- Model to Property
+    - The majority of other arrows between black nodes and purple nodes represent a simple "model - property" relationship.
+
+Since we have models and properties, we have enough to start generating a bit of code. This is what is generated for the Tenant Model based on the graph. There are a bunch of RedQuick libraries that are used, which RedQuickBuilder uses a lot, but they will be explained later. Also, I wish I could say the code comes out formatted like this but it doesn't. Basically, the tabbing isn't perfect, it isn't horrible just looks like a drunk person typed it. You many notice that there are a bunch of functions in the class that no one has described. Don't worry, they are there for a reason which will be explained later. 
+
+The big thing to notice, is that the relationships described in the graph are implemented. There are properties implemented that correspond to the relationship captured in the graph. One could definitely make the solid argument that lists like this could grow far too large, and destroy performance. That would be true. So, an alternative would be to create a property on the other model to reference the Tenant, in that case. So the District would have a property in its generated class that referenced the Tenant as an example.
+
+```csharp
+using RedQuickCore.Identity;
+using RedQuick.Data;
+using RedQuick.Attributes;
+using RedQuick.Interfaces;
+using RedQuick.Validation;
+using RedQuickCore.Validation.Rules;
+using RedQuickCore.Data;
+using RedQuick.Interfaces.Arbiter;
+using RedQuick.Configuration;
+using RedQuick.Util;
+using RedQuick.Interfaces.Data;
+using RedQuick.UI;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+
+namespace Baroque.Models 
+{
+    [Red]
+    public class Tenant : DBaseData
+    {
+
+        public static Tenant Create()
+        {
+            return new Tenant { };
+        }
+
+        public static Tenant Strip(Tenant model)
+        {
+            var new_model = Create();
+            new_model.Id = model?.Id;
+            return new_model;
+        }
+
+        public static Tenant Merge(Tenant a, Tenant b)
+        {
+            var model = Create();
+            if(a.District == null || a.District.Count == 0) {
+                model.District = b.District;
+            }
+            if(a.Course == null || a.Course.Count == 0) {
+                model.Course = b.Course;
+            }
+            if(a.AcademicPeriod == null || a.AcademicPeriod.Count == 0) {
+                model.AcademicPeriod = b.AcademicPeriod;
+            }
+
+            return model;
+        }
+
+        public static IList<Tenant> Merge(IList<Tenant> a, IList<Tenant> b)
+        {
+           var result = new List<Tenant>();
+           if(a != null)
+           {
+              foreach(var a_i in a) {
+                result.Add(a_i);
+              }
+           }
+           if(b != null)
+           {
+              foreach(var b_i in b)
+              {
+                var match = result.FirstOrDefault(x=> x.Id == b_i.Id);
+                if(match != null)
+                {
+                    var merged_item = Merge(match, b_i);
+                    result = result.Where(x=> x.Id != b_i.Id).ToList();
+                    result.Add(merged_item);
+                }
+                else {
+                  result.Add(b_i);
+                }
+              }
+           }
+           return result;
+        }
+
+        public static Tenant  GetDefaultModel() {
+            var result = Create();
+            return result;
+        }
+        public IList<string> District { get; set; }
+
+        public IList<string> Course { get; set; }
+
+        public IList<string> AcademicPeriod { get; set; }
+
+    }
+
+}
+```
 ## RedQuickBuilder Application
 ### Agent Access
 - Purpose
