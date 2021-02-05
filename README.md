@@ -757,6 +757,11 @@ For Example: School will represent a school which in our case means a building o
     - Attributes effects can be seen in the client and server side of the applications. The validation sections of the applications will generate code that enforce these attributes. The client side of the application will also attempt to enforce the rules descibed by the attributes.
     - There are no limits to the number of attributes that can be applied to a property, but if they attributes contradict the type of property, build or runtime errors may occur.
 
+### Agents
+Agents are special types of Models. They represent personas/actors who can view, create, update or delete data from the system. Technically the 'User' is also an actor, but is only being used in the intialization of "Agents".
+![agents_in_graph](presentationsrc/agents_in_graph.png)
+
+
 #### Contrived example
 ![property_in_graph](presentationsrc/property_in_graph.png)
 
@@ -871,7 +876,13 @@ namespace Baroque.Models
 
 }
 ```
+
+## Building Functionality
+
+In the current contrived example, Models and Agents have been defined but there is no functionality described. So, a user may login to the system but the user can't do anything. Which would make it a pretty useless application. So, the next step is defining the business logic of the system.
+
 ## RedQuickBuilder Application
+
 ### Agent Access
 - Purpose
     - Describes how screens will be generated
@@ -882,6 +893,80 @@ namespace Baroque.Models
     - Dashboard screens are meant as screens that direct "traffic" from on form to the next. At least at the time of this writing.
 - Agent Screens
 		- Agent screen are meant for forms that the Agents can use to Update, Create or View Data.     
+
+### Adding Functionality
+
+To setup the functionality we leave the graph, and go to the Agent Access screen.
+
+![agent_access_button](presentationsrc/agent_access_button.png)
+
+Then we will see a "Load Agent" button. Which will pull the current state into this screen, and make it possible to add functionality
+
+![agent_access](presentationsrc/agent_access.png)
+#### Screen Types
+
+- Get
+    - Displays a single model instance.
+- GetAll
+    - Displays a list of model instances 
+- Create
+    - A form screen used to create an model instance.
+- Update
+    - A form screen user to update an existing model instance.
+
+#### Adding Access
+The first step is adding access to screens. The grid represents which screens an "Agent" can access. So the top column header lists the Agent type and the Screen type, and the row header lists the model which will be interacted with. In the image above, the check box under Administrator Get on the Tenant row means that a user with an Administrator persona can look at a 'Get' page of a Tenant.
+
+Eagle eyes will see that a 'Baroque Agent' can update, create and view tenants. Baroque Agents are basically the imaginary 'Baroque' companies employees who are managing their school district customers/tenants. They were added to this contrived example, because I forgot to do it earlier. But that illustrates the idea that any idea that can be implemented can be changed.
+
+![agent_access_filled_in](presentationsrc/agen_access_filled_in.png)
+
+I filled in a bunch of checkboxes, which will define what screens are possible for a professor, student, administrator and baroque users to see. This doesn't need to mean that absolutely all the functionality is available for every professor on every professor screen. It only means that it is possible for a professor to navigate to that screen.
+
+#### Mounting
+
+![mounting_screen](presentationsrc/mounting_screen.png)
+In the mounting screen, all the screens that have the possibility of existing have buttons which will bring up a menu to define the mounting functions. Mounting functions are the functions that are executed after arriving on the screen. In a Create page, that may mean loading a default model for the create form. On a Get screen, that may mean the data that will be displayed for the instance of the model for that particular user.
+
+![mounting screen menu connection](presentationsrc/mounting_screen_menu_connection.png)
+
+
+![mounting screen menu](presentationsrc/mounting_screen_menu.png)
+##### Function theory
+Contructing a function with this menu should be very easy, but it maybe a bit intimidating without understanding the why. One of the main ideas behind this app is that most "business" applications are formulaic and repetitive when done correctly. Even in a complex process there are only a few unique situations that arise, but the combination of those situations can make code complex if not managed.
+
+##### Choosing a Function type
+In the menu, the first choice to be made is the what type of function is desired. It may be a bold claim that there are only 13 types of functions required to build an application, and I'm probably wrong. But at this point in time, I don't have any more than that. When/if I need more, I will just add them.
+
+![mounting function types](presentationsrc/mounting_screen_function_types.png)
+
+##### Function constraints 
+
+The function constraints are defining which agent and model(s) are used in the function. Usually this is automatically filled in, and it is usually undesireable to change. In this illustrated case, the model_output is a Tenant, and that is the expected output of the function. When the api call is made on behalf of the user, it will use the Baroque Agent's persona to execute the function.
+
+![mounting function constraints](presentationsrc/mounting_screen_method_constraints.png)
+
+##### Function permissions
+
+One of the most important things about any system is security, and one of the ways to manage that is through permissions. Permissions are added in the permission section of the menu. In the example below, it is using a plain text system to generate the rules that will transform in to documentation and into C# code. The hope is that the simplicity of the sentences allows for a developer to create the business rules required to meet the requirements.
+
+- The agent's deleted property is false
+    - This is saying the the Baroque User's deleted property must equal false in order to execute this function.
+
+![mounting function permission](presentationsrc/mounting_function_permission.png)
+
+For the sake of speed and efficiency the names of the functions are generated using the contextual properties and values. Some names leave a lot to be desired, but the pattern will be clear in what they do and mean.
+##### Function filtering
+
+Filtering the output of a function is important, and being able to filter what properties are coming out of the api is also. Filtering allows the models to be trimmed down to what each type of user should see out of the web api. The filtering can even filter based on some rules that can be implemented within the menu. 
+
+So, if a Baroque Users are restricted from seeing certain properties based on a status or security designation then that can be implemented with the menu.
+
+![mounting function filter](presentationsrc/mounting_function_filter.png)
+##### Mounting conclusion
+
+Typically for a mounting function, a model instance is retrieved or a default model is generated for the UI. There are more things that can be added to this function, but they are typically reserved for "Effects".
+
 ### Title System
 - Internationalization is a 1st class consideration in RedQuickBuilder. All text that is presented to the user, should be translated for end-users. Its very expensive to think about languages/cultures half way through the life-cycle of the applications, so we take care of it up front. Even if one language is used, just having the framwork setup for multiple languages lowers the effort immensely.
 - Currently, RedQuickBuilder is capable of adding translations in:
