@@ -757,6 +757,11 @@ For Example: School will represent a school which in our case means a building o
     - Attributes effects can be seen in the client and server side of the applications. The validation sections of the applications will generate code that enforce these attributes. The client side of the application will also attempt to enforce the rules descibed by the attributes.
     - There are no limits to the number of attributes that can be applied to a property, but if they attributes contradict the type of property, build or runtime errors may occur.
 
+### Attributes
+- Attributes are usefull because they can impart meaning or expectations to a property. These expectations can be used to defined validations for functions.
+
+![graph_property_attribute](presentationsrc/graph_property_attribute.png)
+
 ### Agents
 Agents are special types of Models. They represent personas/actors who can view, create, update or delete data from the system. Technically the 'User' is also an actor, but is only being used in the intialization of "Agents".
 ![agents_in_graph](presentationsrc/agents_in_graph.png)
@@ -1025,6 +1030,37 @@ So, if a Baroque Users are restricted from seeing certain properties based on a 
 ##### Mounting conclusion
 
 Typically for a mounting function, a model instance is retrieved or a default model is generated for the UI. There are more things that can be added to this function, but they are typically reserved for "Effects".
+### Effects
+Effects are functions that "effect" the systems state. For Example, when a model instance is created and stored in a database, the api endpoint is an effect. So just as mounting functions are defined in a grid, effects are also built in almost the same way.
+
+![effects_menu](presentationsrc/effects_menu.png)
+
+Just like the Mounting functions, effects are built in the same way. There are a few other features that are more likely to be used while creating an effect, like Validations, Executions and After Effects.
+
+#### Validations
+
+Validations, like [Permissions](#Permissions), can use the simple text input to describe the validations that should be applied to the model. The simple text inputs will also generate documentation as well as c# code to implement the validation.
+
+![effects validations](presentationsrc/effects_validations.png)
+
+The circled button will generate a list of text that implements all the assumptions added to the model's properties. In this case, an attribute was connected to the Name property that defines it as a name. So, it can generate a list of these assumptions and put them in the simple text input.
+
+![effect_validation_automatic](presentationsrc/effect_validation_automatic.png)
+
+The simple text input will generate a configuration that will turn into code. Since, it is a configuration then it can be customized to work as desired. 
+
+In this case, "The model's name property must conform to a name", translates into a configuration which says that the name property can't be null, and the minimum length of the name is 1 character long, and the maximum length of a name is 100 characters.
+
+
+![effects validation config](presentationsrc/effect_validation_config.png)
+#### Executions
+Executions, like [Permissions](#Permissions), can use simple text input to describe the execution steps that should be applied to the model. As before, documentation is generated at the same time.
+
+![effect_executions](presentationsrc/effect_executions.png)
+
+Just as before effects have their own configurations that can be customized for the needs of the application.
+
+![effect configuration](presentationsrc/effect_execution_config.png)
 
 ### Title System
 - Internationalization is a 1st class consideration in RedQuickBuilder. All text that is presented to the user, should be translated for end-users. Its very expensive to think about languages/cultures half way through the life-cycle of the applications, so we take care of it up front. Even if one language is used, just having the framwork setup for multiple languages lowers the effort immensely.
