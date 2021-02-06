@@ -956,6 +956,65 @@ One of the most important things about any system is security, and one of the wa
 ![mounting function permission](presentationsrc/mounting_function_permission.png)
 
 For the sake of speed and efficiency the names of the functions are generated using the contextual properties and values. Some names leave a lot to be desired, but the pattern will be clear in what they do and mean.
+
+You may be curious about what the code looks like. Just like before, the code has been formatted so that it is more legible. But, this is the implementation of the permission code for the function. There is plenty of properties that could be deleted from the class cause they aren't being used, but it is easier to generate code with extras than trimming out all the unnecessary parts.
+
+- [IRedArbiter](#IRedArbiter) 
+
+```csharp
+public class CanGetTenantbyBaroqueAgentForGetMountingPermissionForGet
+{
+    // d334aa78-bb68-4a44-afd0-bfcb76536df8
+    IRedArbiter<Tenant> arbiterTenant;
+    IRedArbiter<BaroqueAgent> arbiterBaroqueAgent;
+    static IRedArbiter<Tenant> arbiterTenantStatic {
+        get {
+            if(arbiterTenantStatic == null) {
+                _arbiterTenantStatic = RedStrapper.Resolve<IRedArbiter<Tenant>>();
+            }
+            return _arbiterTenantStatic;
+        }
+    }
+    static IRedArbiter<BaroqueAgent> arbiterBaroqueAgentStatic {
+        get {
+            if(arbiterBaroqueAgentStatic == null) {
+                _arbiterBaroqueAgentStatic = RedStrapper.Resolve<IRedArbiter<BaroqueAgent>>();
+            }
+            return _arbiterBaroqueAgentStatic;
+        }
+    }
+
+    static IRedArbiter<Tenant> _arbiterTenantStatic;
+    static IRedArbiter<BaroqueAgent> _arbiterBaroqueAgentStatic;
+
+    public CanGetTenantbyBaroqueAgentForGetMountingPermissionForGet(
+        IRedArbiter<Tenant> _arbiterTenant, 
+        IRedArbiter<BaroqueAgent> _arbiterBaroqueAgent) {
+        arbiterTenant = _arbiterTenant;
+        arbiterBaroqueAgent = _arbiterBaroqueAgent;
+    }
+
+    public static async Task<bool> Execute(Tenant model = null, BaroqueAgent agent = null)
+    {
+
+        Func<Task<bool>> func = async () => {
+            // build model value here.
+            var test_0 = !agent.Deleted;
+            var test_1 = test_0 && !model.Deleted;
+            var test_2 = test_1 && agent.Id == model.Owner;
+            if(!test_2) {
+                return false;
+            }
+
+            return true;
+        };
+
+        return await func();
+    }
+
+}
+```
+
 ##### Function filtering
 
 Filtering the output of a function is important, and being able to filter what properties are coming out of the api is also. Filtering allows the models to be trimmed down to what each type of user should see out of the web api. The filtering can even filter based on some rules that can be implemented within the menu. 
@@ -975,3 +1034,57 @@ Typically for a mounting function, a model instance is retrieved or a default mo
     - Norwegian
     - German
 - ![presentationsrc/title_input_screen.png](presentationsrc/title_input_screen.png)
+
+
+## RedQuick
+
+RedQuick is a library that is heavily relied upon by RedQuickBuilder. 
+
+- RedQuick implements
+    - easy to use CRUD functionality
+    - Identity based on [Microsoft.AspNetCore.Identity](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/identity?view=aspnetcore-5.0&tabs=visual-studio)
+    - Background Task
+        - Distributing workload across managed agents.
+
+### IRedArbiter
+
+IRedArbiter is the work horse of RedQuick. It is an interface that provides the CRUD functions for all the models that will exist in an application generated in RedQuickBuilder. Every model in the application will implement the **IDBaseData** interface. That gives the system all the information it needs to distribute work to many background agents. Update the versions of models so that front ends can know which version of the model is the latest without relying on comparing dates.
+
+```csharp
+    public interface IRedArbiter<T> where T : IDBaseData
+    {
+        Task<T> Create(T obj);
+        Task<T> GetUnique<T>(Func<T, bool> p);
+        Task<T> Get<T>(string id);
+        Task<IList<T>> GetAll<T>();
+        Task<bool> Delete(string id);
+        Task<bool> Delete(T id);
+        Task<T> Update(T obj);
+
+        Task<IList<O>> GetOwnedBy<O>(string id, Func<int> skip = null, Func<int> take = null, Func<O, float> orderBy = null)
+            where O : IDBaseData, IOwned;
+
+        Task<IList<V>> GetMachineOwnedBy<V>(string id, Func<int> skip = null, Func<int> take = null, Func<V, float> orderBy = null)
+            where V : IDBaseData, IRedMachineOwned;
+
+        Task<IList<T>> GetBy(Func<T, bool> p, Func<int> skip = null, Func<int> take = null, Func<T, float> orderBy = null);
+        Task<IList<T>> Query(Expression<Func<T, bool>> func, Func<int> skip = null, Func<int> take = null, Func<T, float> orderBy = null);
+    }
+```
+
+```csharp
+  public interface IDBaseData
+    {
+        string Id { get; set; }
+
+        DateTime Updated { get; set; }
+
+        DateTime Created { get; set; }
+
+        int Version { get; set; }
+        bool Deleted { get; set; }
+
+        string redtype { get; set; }
+
+    }
+```
