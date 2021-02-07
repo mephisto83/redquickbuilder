@@ -145,7 +145,7 @@ export default class AfterEffectInput extends Component<any, any> {
 			>
 				<TreeViewItemContainer>
 					<TextInput
-						texteditor
+						texteditor 
 						active={this.state.open}
 						label={'Sentences'}
 						context={{

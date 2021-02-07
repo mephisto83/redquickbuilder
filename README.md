@@ -1058,9 +1058,15 @@ Executions, like [Permissions](#Permissions), can use simple text input to descr
 
 ![effect_executions](presentationsrc/effect_executions.png)
 
-Just as before effects have their own configurations that can be customized for the needs of the application.
-
+Just as before effects have their own configurations that can be customized for the needs of the application. If 
 ![effect configuration](presentationsrc/effect_execution_config.png)
+
+#### After Effecfts
+
+Executing simple CRUD functions is very useful, but doesn't make building complex work flows inside the UI easy or possible. That is where After Effects show their power. An after effect chains a function to another. So, after a function completes it will execute the list of after effects. 
+
+Following the same pattern as Validation, a simple text entry can be used to describe the functions to be executed. The text is parsed, and used to generate the configuration which will eventually turn into c# code.
+![after effect configuration](presentationsrc/effects_aftereffect.png)
 
 ### Title System
 - Internationalization is a 1st class consideration in RedQuickBuilder. All text that is presented to the user, should be translated for end-users. Its very expensive to think about languages/cultures half way through the life-cycle of the applications, so we take care of it up front. Even if one language is used, just having the framwork setup for multiple languages lowers the effort immensely.

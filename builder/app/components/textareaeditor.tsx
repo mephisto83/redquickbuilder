@@ -77,10 +77,10 @@ export default class TextAreaEditor extends Component<any, any> {
 							monaco.languages.setMonarchTokensProvider('mySpecialLanguage', {
 								tokenizer: {
 									root: [
-										[ /\[error.*/, 'custom-error' ],
-										[ /\[notice.*/, 'custom-notice' ],
-										[ /\[info.*/, 'custom-info' ],
-										[ /\[[a-zA-Z 0-9:]+\]/, 'custom-date' ]
+										[/\[error.*/, 'custom-error'],
+										[/\[notice.*/, 'custom-notice'],
+										[/\[info.*/, 'custom-info'],
+										[/\[[a-zA-Z 0-9:]+\]/, 'custom-date']
 									]
 								}
 							});
@@ -122,7 +122,7 @@ export default class TextAreaEditor extends Component<any, any> {
 									let suggestions = getTextEditorSuggestions(searchText, textUntilPosition, this.props.context);
 									if (suggestions && suggestions.length) {
 										return {
-											suggestions: [ ...suggestions ]
+											suggestions: [...suggestions]
 										};
 									}
 									suggestions = getGlobalSuggestions();
@@ -134,10 +134,13 @@ export default class TextAreaEditor extends Component<any, any> {
 						language={'mySpecialLanguage'}
 						theme="myCoolTheme"
 						onChange={(val: string) => {
-							this.setState({ value: `${val}` });
-							if (this.props.onChange) {
-								this.props.onChange({ target: { value: val } });
-							}
+							let old_value = this.state.value;
+
+							this.setState({ value: `${val}` }, () => {
+								if (this.props.onChange && val !== old_value) {
+									this.props.onChange({ target: { value: val } });
+								}
+							});
 						}}
 						value={value}
 						options={options}
@@ -173,12 +176,12 @@ export default class TextAreaEditor extends Component<any, any> {
 let $internalComponentState: ComponentState;
 
 interface ComponentState {
-  ${[ ...screenEffectApis, ...contextParameters ]
-		.unique()
-		.map((param: string) => {
-			return `${param}: string | number | null,`;
-		})
-		.join(NEW_LINE)}
+  ${[...screenEffectApis, ...contextParameters]
+					.unique()
+					.map((param: string) => {
+						return `${param}: string | number | null,`;
+					})
+					.join(NEW_LINE)}
   viewModel: string,
   value: string,
   model: string
@@ -367,7 +370,7 @@ export declare function NavigateToScreen($id?: any, $internalComponentState?: {
 		let { state } = this.props;
 		const currentNode = UIA.Node(state, UIA.Visual(state, SELECTED_NODE));
 		if (currentNode) {
-			const models: Node[] = NodesByType(state, [ NodeTypes.Model, NodeTypes.Enumeration ])
+			const models: Node[] = NodesByType(state, [NodeTypes.Model, NodeTypes.Enumeration])
 				.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromController))
 				.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration));
 			models.sort((a, b) => GetCodeName(a).length - GetCodeName(b).length).forEach((item) => {
@@ -382,7 +385,7 @@ export declare function NavigateToScreen($id?: any, $internalComponentState?: {
 		const currentNode = UIA.Node(state, UIA.Visual(state, SELECTED_NODE));
 		if (currentNode) {
 			let tempvalue = GetNodeProp(currentNode, NodeProperties.LambdaInsertArguments) || {};
-			const models: Node[] = NodesByType(state, [ NodeTypes.Model, NodeTypes.Enumeration ])
+			const models: Node[] = NodesByType(state, [NodeTypes.Model, NodeTypes.Enumeration])
 				.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromController))
 				.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration));
 			models.sort((a, b) => GetCodeName(a).length - GetCodeName(b).length).forEach((item: Node) => {
@@ -406,7 +409,7 @@ function getGlobalSuggestions(): any[] {
 			label: 'Navigate to dashboard',
 			kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 			insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-			insertText: [ 'The ${1:agent} navigates to the dashboard ${2:dashboard}.' ].join(''),
+			insertText: ['The ${1:agent} navigates to the dashboard ${2:dashboard}.'].join(''),
 			documentation: 'Navigates to the dashboard.'
 		},
 		{
@@ -422,7 +425,7 @@ function getGlobalSuggestions(): any[] {
 			label: 'Execute func',
 			kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 			insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-			insertText: [ 'Execute the function ${1:method}' ].join(''),
+			insertText: ['Execute the function ${1:method}'].join(''),
 			documentation: 'Define which method will be called in an after effect'
 		},
 		{
@@ -465,7 +468,7 @@ function getGlobalSuggestions(): any[] {
 			label: 'Append to models list property',
 			kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 			insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-			insertText: [ 'Append the output ${1:property} property to the existing ${2:model} ${3:property}.' ].join(
+			insertText: ['Append the output ${1:property} property to the existing ${2:model} ${3:property}.'].join(
 				''
 			),
 			documentation: 'Append a value to a list property.'
@@ -474,7 +477,7 @@ function getGlobalSuggestions(): any[] {
 			label: 'Set to models property with property',
 			kind: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
 			insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-			insertText: [ 'Set the output ${1:property} property to the existing ${2:model} ${3:property}.' ].join(''),
+			insertText: ['Set the output ${1:property} property to the existing ${2:model} ${3:property}.'].join(''),
 			documentation: 'Set to models property to a model property.'
 		}
 	];
