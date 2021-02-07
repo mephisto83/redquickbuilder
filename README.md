@@ -149,7 +149,7 @@ The archictecture of all the client applications follows the same pattern, as il
 - AR
     - All the previous code architecture would apply to AR apps also.
 ### UI Architecture Details 
-React is used for all the implemented UIs, and will mostly likely be wedge into any eventual UIs. But there is no reason why another framework/libray couldn't be substituted.
+React is used for all the implemented UIs, and will mostly likely be wedged into any eventual UIs. But there is no reason why another framework/libray couldn't be substituted.
     
 - The current iterations of web apps generated with React come with:
     - redux
