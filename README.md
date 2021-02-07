@@ -642,11 +642,115 @@ This will get titles in the specified language from the [title system](#title-sy
 
 ## Back End
 ### Server side
+
+#### Server Side Architecture Overiew
+
+The layers that will be described are mostly logical layers, they don't have to run in separate processes. The application can be run locally on a single client which will perform all the layers. In order to scale up to handle millions of requests, the stream can distribute work to multiple background agents to handle the load.
+
+1. A call from the client is sent to a [Controller](https://docs.microsoft.com/en-us/aspnet/web-api/overview/getting-started-with-aspnet-web-api/tutorial-your-first-web-api).
+1. The maestro is a "invented" layer that performs the authorization step. Authorization, in this case, is the business logic check on whethere or not an action can be taken. It will test that the user executing the function has the correct persona for the action. The Permission function described in the Agent Access for the agent, model and method combination is executed. If either one of these checks fails, an appropriate error message will be return to the client.
+1. Update, Create and Delete functions use the Stream layer to pass the parameter to the agent that will process the action.
+1. The Orchestration will process the message. The final Validation step will take place in the orchestration step.
+1. The Arbiters will perform the CRUD operations on the model, using the parameters that were passed in.
+1. The Database will receive the changes.
+1. The Arbiters will return the results of the CRUD operation.
+1. The Orchestration will write the results to a Database.
+1. The stream will pick up the changes, and pass them back to the same thread that called it. Unless it was a long running task.
+1. The orchestration will receive the results, and check if there was a processing error.
+1. The controller will return the results to the client.
+
+![server_side_architecture](presentationsrc/call_to_client.png)
+
+##### Service Side Backend Agents
+
+When running in an multi-agent environment, the idea is to run multiple front-end webservers(red). Whenever they receive a command that will create, update or delete, it will write a message to the [datalake](#Datalake), and send a message to the background agent(green). The background agent will execute that command, and return the result.
+
+![front_to_backend_agents](presentationsrc/front_to_backend_agents.png)
+
+Distributing comands to random agents wouldn't help achieve the goal of eliminating two tasks operating on the same model instance. Using a scheme that relies on the model instance Id to distribute the commands has been devised. The agents will self organize so that, each agent will only operate on a subset of model types with certain Ids. This document wil. explain how that works in [another section](#markdown-header-agent-self-organization)
+
+
 ### Scaling Resources
 Considerations for scaling resources to handle large amounts of data starts from the model. The goal of this model is not for maximizing the speed of an individual transaction, but maximizing the amount of transactions that can take place. Since devops is a lifestyle, we want to enable ourselves to turn up and down the number of agent instances running at any moment. In order to achieve this, agents have to be self organizing to maintain the flow integrity requirement of the system.  Flow integrity, in this context, meaning that an instance of a model will never be worked on my two different agent instances.
 
 ### Background Agents
 Background agents process events in bulk to handle a large influx of messages, and maintain flow integrity.
+
+### Agent Self Organization
+
+In the current iteration, a webhost running a long running background task RedSimpleAgentCenter organizes and coordinates the agents. As new background agents come online, they message the RedSimpleAgentCenter. Then they will be told their assignment and when they can begin processing.
+
+1. RedSimpleAgentCenter workflow
+    1. RedSimpleAgentCenter starts.
+    1. RedSimpleAgentCenter waits for worker instance to call.
+    1. RedSimpleAgentCenter will notify the worker of its workload, and when it can start.
+    1. When a background agent shuts down, it informs other agents of change and to stop processing.
+    1. Re-calculate workloads and restart worker instances.
+
+1. Background agent workflow(RedSelfOrganizingService)
+    1. Call the simple agent center.
+    1. Receive workload.
+    1. Receive notification of ready state.
+    1. Periodically refresh state with the RedSimpleAgentCenter.
+    1. When shutting down, notify RedSimpleAgentCenter of shutdown.
+
+Calculating the workload is based on the stream type, model type and model Id. Stream types are application specific concepts, and allow the application to distribute more work to certain kinds of tasks then others. If you have a long running background task related to a specific set of models, increasing the number of instances that will process those situations is hopefully straightforword.
+
+- Example Stream Types
+    - Long Running
+    - Short Running
+- Example Model Types
+    - School
+    - District
+
+If the applications only relied on the stream and model types to distribute the workload, it wouldn't be able to distribute the work to a lot of clients and maintain the model instance race condition ban. Using the Id of the model being updated or deleted we can distribute to instances of agents using the first few characters of an Id to determine the agent which will process the command.
+
+For Example, Agent 2 may be assigned to handle the School models that have ids that start with 0, 1, 2 or 3. If the Id of the model instance is the following, it would be handled by Agent 2. Agent 3 wouldn't ever look at this model, unless the work is redistributed and it became apart of Agent 3's workload.
+
+```
+var Id = "087075e5-a794-45b0-94b5-6280ec958eaf";
+```
+When creating a new instance of a model, a guid key can be generated to determine which Agent would process the new command. There are probably an enumerable number of possible distribution models possible for this situation, but this is the current choice for RedQuickBuilder functionality.
+
+
+#### What are Worker Groups
+The background agents can be divided into groups for putting resources where they need to be. Since that is highly dependent on the applications needs. This is configured with an implementation of the IWorkTaskService interface. RedQuickBuilder will make an implementation for each application automatically, but it is recommended to tailor it to the applications needs.
+
+#### Setting up Worker Groups
+
+```csharp
+    public class ImplementingWorkTaskService: IWorkTaskService { 
+        public IList<WorkerGroup> BuildWorkerGroups(IList<WorkerMinister> ministers/*The agents that are running*/)
+        {
+            var result = new List<WorkerGroup>();
+            
+            // Divide the agents into the desired sets.
+            var minister_defaults = ministers.Take(2).ToList();
+            var workGroupsONly = ministers.Skip(2).Take(2).ToList();
+            var left_over_ministers = ministers.Skip(4).ToList();
+            
+            // Define a group that will only will process stream types equal to item1.
+            result.Add(WorkerGroup.BuildStreamTypeOnly(minister_defaults, new List<string> { "item1" }));
+            
+            // Define a group that will only will process work task types equal to task2.
+            result.Add(WorkerGroup.BuildWorkTaskOnly(workGroupsONly, new List<string> { "task2" }));
+            
+            // Defines a groupd that will process the rest.
+            var workGroup = WorkerGroup.BuildDefault(left_over_ministers);
+            
+            result.Add(workGroup);
+            return result;
+        }
+
+        public IList<string> GetWorkTasks() { 
+            throw new NotImplementedException();
+        }
+
+        public string GetWorkTaskFor(string streamType, string agentType, string changeType, string functionName) { 
+            throw new NotImplementedException();
+        }
+    }
+```
 
 ### Web Service
 ##### Controllers 
@@ -1066,7 +1170,12 @@ Just as before effects have their own configurations that can be customized for 
 Executing simple CRUD functions is very useful, but doesn't make building complex work flows inside the UI easy or possible. That is where After Effects show their power. An after effect chains a function to another. So, after a function completes it will execute the list of after effects. 
 
 Following the same pattern as Validation, a simple text entry can be used to describe the functions to be executed. The text is parsed, and used to generate the configuration which will eventually turn into c# code.
+
 ![after effect configuration](presentationsrc/effects_aftereffect.png)
+
+##### After Effects scripting
+
+TBD
 
 ### Title System
 - Internationalization is a 1st class consideration in RedQuickBuilder. All text that is presented to the user, should be translated for end-users. Its very expensive to think about languages/cultures half way through the life-cycle of the applications, so we take care of it up front. Even if one language is used, just having the framwork setup for multiple languages lowers the effort immensely.
@@ -1130,3 +1239,9 @@ IRedArbiter is the work horse of RedQuick. It is an interface that provides the 
 
     }
 ```
+
+# Definitions
+
+## Datalake
+
+A centralized data storage unit. Or a big ol' DB.
