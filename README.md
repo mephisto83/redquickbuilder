@@ -233,13 +233,13 @@ React is used for all the implemented UIs, and will mostly likely be wedged into
     ```
 #### Functions that may be interesting to you.
 - **setParameters**
-    - In the example above setParameters are executed when navigated to the screen. The parameters are pulled from the url on navigation, and set so that components can grab them for use. Not every screen has a parameter, but they all will execute that function. The idea being that if you want to add them later manually, it should be really easy.
+    - In the example above setParameters are executed when navigating to the screen. The parameters are pulled from the url on navigation, and set so that components can grab them. Not every screen has a parameter, but they all will execute that function. The idea being that if you want to add them later manually, it should be really easy. Also, I didn't have the energy to write code to trim the code when it is not needed.
     - You may notice that the viewModel is being pull from the *match.params*, but it is being immediately overridden by a function call. If we were writing this manually that wouldn't ever happen, but since this is being generated from a graph things like this happen. Since, it won't cause any known issues, its a low priority to fix at the moment. 
 - **viewModel**
-    - In the context of a RedQuickBuilder generated app, it describes the context in which a screen lives. Screens that are for Creating or Updating models have *viewModel* that are used as keys to store the current forms state. If a model is being updated, the model is copied to a different store key to be manipulated separately. If the work is saved, it will send an update command to the server side, and assuming a successfuly update. Its updated version will be reloaded and placed into the part of the state storing all the models of its type.
-- **model**
+    - In the context of a RedQuickBuilder generated app, it describes the context in which a screen lives. Screens that are for creating or updating models have a *viewModel* property that is used as keys to store the current form's state. If a model is being updated, the model is copied to a different store to be manipulated separately. If the work is saved, it will send an update command to the server side, and assuming a successfuly update. Its updated version will be reloaded and placed into the part of the state storing all the models of its type.
+- **model**(variable)
     - Usually the id of the model that will be pulled from the server-side on load, to ensure that the latest possible version of the model is loaded.
-- **viewModel** and **model**
+- **viewModel** and **model**(parameters passed to setParameters)
     - The two values are properties of most screens, if they exist, and will be passed down from the screen component to each of the child components.
 
 
@@ -332,7 +332,7 @@ React is used for all the implemented UIs, and will mostly likely be wedged into
     export default redConnect(InsuranceProviderUpdateManagementAgent);
     ```
 ### Screen Options
-- This is similar to Screens, but offer the opportunity to use business based components in composite screens later. There is a case to be made for, "you ain't gonna need it". Since, it costs just a bit of time to generate the code, you get the whole kitchen and the sink.
+- This is similar to Screens, but offers the opportunity to use business based components in composite screens. There is a case to be made for, "you ain't gonna need it". Since, it costs just a bit of time to generate the code, you get the whole kitchen and the sink without the effort.
     ```tsx
     import * as React from 'react';
     import { redConnect, titleService } from '../actions/util';
@@ -1268,7 +1268,13 @@ In the snippet below, the places where the snippets would be injected are marked
     - German
 - ![presentationsrc/title_input_screen.png](presentationsrc/title_input_screen.png)
 
+### Theme Builder 
 
+The the builder can create css themes for the generated UI. The theme uses css-grid heavily to build the UIs. Css-grid offers a lot of flexibility in placement and ordering of components in the screen despite the order the components are generated in. Fonts can be loaded on the fly, and applied to element in the UI. So there aren't any 
+
+![theme builder grid placement](presentationsrc/theme_builder_gridplacement.png)
+![theme builder grid placement](presentationsrc/theme_builder_variables.png)
+![theme builder grid placement](presentationsrc/theme_builder_other.png)
 ## RedQuick
 
 RedQuick is a library that is heavily relied upon by RedQuickBuilder. 
