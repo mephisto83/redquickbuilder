@@ -1328,6 +1328,10 @@ IRedArbiter is the work horse of RedQuick. It is an interface that provides the 
     }
 ```
 
+## Code Generation
+
+Code generation is accomplished with a combination of templates. Some templates are mostly fill in the blank, some require more processing. Generating the layouts for the components takes a bit more effort than the C# controllers.
+
 # Definitions
 
 ## Datalake
