@@ -1134,7 +1134,7 @@ So, if a Baroque Users are restricted from seeing certain properties based on a 
 ##### Mounting conclusion
 
 Typically for a mounting function, a model instance is retrieved or a default model is generated for the UI. There are more things that can be added to this function, but they are typically reserved for "Effects".
-### Effects
+#### Effects
 Effects are functions that "effect" the systems state. For Example, when a model instance is created and stored in a database, the api endpoint is an effect. So just as mounting functions are defined in a grid, effects are also built in almost the same way.
 
 ![effects_menu](presentationsrc/effects_menu.png)
@@ -1165,7 +1165,7 @@ Executions, like [Permissions](#Permissions), can use simple text input to descr
 Just as before effects have their own configurations that can be customized for the needs of the application. If 
 ![effect configuration](presentationsrc/effect_execution_config.png)
 
-#### After Effecfts
+#### After Effects
 
 Executing simple CRUD functions is very useful, but doesn't make building complex work flows inside the UI easy or possible. That is where After Effects show their power. An after effect chains a function to another. So, after a function completes it will execute the list of after effects. 
 
@@ -1176,6 +1176,88 @@ Following the same pattern as Validation, a simple text entry can be used to des
 ##### After Effects scripting
 
 TBD
+#### Routing
+
+Navigating between screens is paramount to any application. Setting up navigation is really easy with the Routing screen.
+
+![routing screen](presentationsrc/routing_screen.png);
+
+Describing the routes with sentences is optional. The sentences will be translated into the configuration that is shown below. 
+
+![routing screen](presentationsrc/routing_routes.png);
+In the example above, the administrator navigates from the District's GetAll screen to the District's Get screen. Also, the administrator navigates to the create screen. Each of these statements will generate a button in the client UI that will implement the actual navigation.
+
+#### Screen Effects
+Screen effects are used to add properties to the local state in the Client UI. Then those properties are available to apply to components or styles in the ui.
+In the following window, the property that will be generated is **showsomething**, and the [datachain](#DataChains) that will generate the function is **Get Should Show**.
+
+![screen_effects_screeneffects](presentationsrc/screen_effects_screeneffects.png)
+
+In the Client UI code:
+```tsx
+export default class SomeComponent extends Component<any, any> {
+	constructor(props: any) {
+		super(props);
+		this.state = {
+            showsomething: null
+        };
+    }
+    componentDidUpdate(prevProps: any) {
+        this.captureValues();
+    }
+    componentDidMount() {
+        this.captureValues();
+    }
+    captureValues() {
+        let updated = false;
+        let updates = {};
+
+
+        var new_showsomething =  DC.GetShouldShow(/* arguments */);
+        if (new_showsomething !== this.state.showsomething) {
+            updated = true;
+            updates = { ...updates, showsomething: new_showsomething };
+        }
+
+        if (updated) {
+            this.setState(() => {
+                return updates;
+            })
+        }
+    }
+}
+```
+#### Screen Inserts
+
+Screen inserts are snippets that will be injected into a screen. So, any custom UI elements that maybe difficult to construct with the regurlar layout engine can be added here. Shared screen snippets can be created in the graph and referenced to eliminate duplicate code snippets is possible.
+
+![screen_visual_inserts](presentationsrc/screen_visual_inserts.png)
+
+In the snippet below, the places where the snippets would be injected are marked.
+
+```tsx
+<div className={`get-quote-screen-io  main-screen  `} >
+    <!-- Start snippets added here  -->
+    <div className={`  main-screen-container  `} >
+        <div className={`  MainHeader  `} >
+        <GetTitle
+            label={titleService.get(`Title`)} />
+        </div>
+        <div className={`  MainMenu  `} >
+        <GetMenu
+            label={titleService.get(`Menu`)}
+            value={GetMenuDataSource(GetMenuSource, RedGraph)}
+        />
+        </div>
+        <div className={`  MainSection  `} >
+        <GetComponent
+            label={titleService.get(`Component`)} />
+        </div>
+    </div>
+    <!-- End snippets added here  -->
+</div>
+```
+
 
 ### Title System
 - Internationalization is a 1st class consideration in RedQuickBuilder. All text that is presented to the user, should be translated for end-users. Its very expensive to think about languages/cultures half way through the life-cycle of the applications, so we take care of it up front. Even if one language is used, just having the framwork setup for multiple languages lowers the effort immensely.
@@ -1245,3 +1327,7 @@ IRedArbiter is the work horse of RedQuick. It is an interface that provides the 
 ## Datalake
 
 A centralized data storage unit. Or a big ol' DB.
+
+## DataChains
+
+Datachains are functionality snippets that can be used to create complex functions. The idea is that you can change them together to build up more complex workflows. But, in practice they are bite sized pieces of code that implement small logical pieces.

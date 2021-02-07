@@ -73,7 +73,7 @@ export default class ScreenEffectComponent extends Component<any, any> {
 				<TreeViewItemContainer>
 					<SelectInput
 						label={Titles.DataChain}
-						options={UIA.NodesByType(null, NodeTypes.DataChain).toNodeSelect()}
+						options={UIA.NodesByType(null, NodeTypes.DataChain).filter((x: any) => !UIA.GetNodeProp(x, NodeProperties.CS)).toNodeSelect()}
 						value={screenEffect.dataChain}
 						onChange={(value: string) => {
 							screenEffect.dataChain = value;
