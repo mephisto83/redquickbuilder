@@ -143,7 +143,7 @@ The archictecture of all the client applications follows the same pattern, as il
     - All the previous code architecture applies to native mobile apps also.
 - VR
     - Unreal Engine using React(TBI)
-        - This is vaporware currently. The idea is to run the V8 engine inside Unreal on a Headset. So, that a javascript application can be implemented to run the applicatio. This will also require a render for placing components inside the virual environment.
+        - This is vaporware currently. The idea is to run the V8 engine inside Unreal on a Headset. So, that a javascript application can be implemented to run the application. This will also require a rendering engine for placing components inside the virtual environment.
         - Unreal.js is a potential avenue for getting React into VR, and being able to lower the threshold for web developers to create real VR apps for the general public without having to learn  C++. This hasn't been fully researched so its still just a hopeful idea.
     - All the previous code architecture would apply to VR apps also.
 - AR
