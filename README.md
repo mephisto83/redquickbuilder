@@ -4,7 +4,9 @@ If I was you, I wouldn't actually try to use this thing, cause its tied together
 
 ### Dev mode
     ```
+    > cd ./builder
     > yarn install
+
     > yarn dev
     or
     > yarn start
@@ -13,14 +15,17 @@ If I was you, I wouldn't actually try to use this thing, cause its tied together
 
 ```
 // windows
+cd ./builder
 npm run package-win
 ```
 ```
 // linux
+cd ./builder
 npm run package-linux
 ```
 ```
 // mac
+cd ./builder
 npm run package-mac
 ```
 
@@ -32,7 +37,7 @@ This project was supposed to take like 8 weeks. Apparently, I'm bad at estimatin
 Obligatory statement about who I am.
 - Andrew Porter
 - Software Engineer
-- Minnesota (where i live)
+- Minnesota, USA (where i live)
 
 ### What am I doing
 - I want to execute my "what if ideas" faster.
@@ -45,7 +50,7 @@ Obligatory statement about who I am.
 The solution is abnoxiously large, at least for 1 dev. 
 
 ### Something to know about the project
-The purpose of RedQuickBuilder isn't for continuously developing applications, but to jump start the app building process. Hopefully jump to as close to the end as possible.
+The purpose of RedQuickBuilder isn't for continuously developing applications, but to jump start the app building process. Hopefully, developers will be able to jump to as close to the end as possible.
 
  
 
@@ -53,7 +58,7 @@ The purpose of RedQuickBuilder isn't for continuously developing applications, b
 
 ![RedQuickBuilder](presentationsrc/redquickbuilder.png)
 
-RedQuickBuilder is an application which can produce applications from a visual graph representation. It is capabable of producing apps for different devices. The intention is to be able to generate apps for all sorts of different UI situations. The purpose of RedQuickBuilder isn't for continuously developing applications, but to jump start the app building process. It would be cool to only develop applications in RedQuickBuilder, but that won't happen for a long while.
+RedQuickBuilder is an application which can produce applications from a visual graph representation. It is capabable of producing apps for different devices. The intention is to be able to generate apps for all sorts of different UI situations.
 
 - List of UIs
     - Web (It actually works)
@@ -62,10 +67,11 @@ RedQuickBuilder is an application which can produce applications from a visual g
     - VR (not yet realized)
     - AR (not yet realized)
 
-Currently, the system has 3 main parts. Main UI, "Workers", and an "Organization process". The workers and the organization process themselves don't use a lot of resources, but when they are working through a project they will consume a tremendous amount of resources. 
+Currently, the RedQuickBuilder has 3 main parts. Main UI(eletron.io app), "Workers"(command line), and an "Organization process"(command line). The workers and the organization process themselves don't use a lot of resources, but when they are working through a project they will consume a tremendous amount of resources. 
 
-Typically, when I am running locally I have 12 processes running, and a single organization process. I have seen it consume up to 75gb of ram, and utilize 80% of my processor resources. I have a very large machine, but have definitely had my other machines just crash because of resource consumption. The system is capable of distributing the work across multiple machines, but I haven't been able to resolve a reliability issue that keeps cropping up. And, I really haven't spent a lot of time trying either.
+Typically, when I am running locally I have 12 processes running, and a single organization process. I have seen it consume up to 75gb of ram, and utilize 80% of my processor resources. I have a very large machine, but have definitely had my other machines just crash because of resource consumption. The system is capable of distributing the work across multiple machines, but I haven't resolved a reliability issue that keeps cropping up. And, I really haven't spent a lot of time trying either.
 
+### Progress monitoring screen
 This is a view of the Process monitoring screen. It gives an overview of the currently running processes and the current stage in the process.
 
 ![Worker Screen](presentationsrc/worker_screen.png)
@@ -74,7 +80,11 @@ The job list displays which step is currently being executed, and where the proc
 
 ![Job Stage List](presentationsrc/job_stage_list.png)
 
-The test applications that I have been working on have typically take around 4-6 hours to process all the way through, which is terribly long. But, I would estimate the amount of "me" time it would take to do it manually would be in the months range. So, from that perspective I'm calling it a win. I would also assume that since I've written the program in typescript, that isn't helping the speed at all. 
+### Typical experience 
+
+The test applications that I have been working on have typically take around 4-6 hours to process all the way through, which is terribly long. But, I would estimate the amount of "me" time it would take to do it manually would be in the months range. So, from that perspective I'm calling it a win. I would also assume that since I've written the program in [Typescript](https://www.typescriptlang.org/), that isn't helping the speed at all. 
+
+### A perfect world
 
 In a perfect world, these are the general steps of building an application in RedQuickBuilder.
 
@@ -94,13 +104,32 @@ The main UI, as previously described, will be where almost all the user's time w
 
 ##### Starting the UI
 ```
+> cd ./builder
+
 > yarn start
 or
 > yarn dev
 ```
 
 #### Worker Background Process
-This is an independently running agent that will respond to sub tasks distributed by the "organization process".
+This is an independently running agent that will respond to sub tasks distributed by the "organization process". The agent will kick off a configured number of threads that will perform the tasks, and communicate with organizational process.
+
+A developer can store a json file in the ~HomeDir/.rqb/applicationConfig.json file. I know that the keys are weird, and some day I will change them.
+
+- ./jobs
+    - That will be the folder where jobs are stored.
+- D:\\temp\\job_service_jobs
+    - That is where the parts of jobs will be stored.
+- threads
+    - The number of threads that will be generated.
+
+```json
+{
+    "./jobs":"D:\\temp\\d",
+    "D:\\temp\\job_service_jobs":"D:\\temp\\c",
+    "threads":12
+}
+```
 
 ##### Starting Worker Background Process
 ```
@@ -109,6 +138,9 @@ This is an independently running agent that will respond to sub tasks distribute
 
 #### Organization Process
 When new jobs are detected, this will distribute work tasks to available background processes to handle the work. The process also keeps track of the process to ensure that the subtasks distributed to the workers is merged back together, and the next step can proceed.
+
+The process will use the same configuration file as the background processes to configure itself.
+[Organization Process](/builder/reqthread/src/jobrunner.ts)
 
 ##### Starting Organization Process
 ```
@@ -667,7 +699,7 @@ When running in an multi-agent environment, the idea is to run multiple front-en
 
 ![front_to_backend_agents](presentationsrc/front_to_backend_agents.png)
 
-Distributing comands to random agents wouldn't help achieve the goal of eliminating two tasks operating on the same model instance. Using a scheme that relies on the model instance Id to distribute the commands has been devised. The agents will self organize so that, each agent will only operate on a subset of model types with certain Ids. This document wil. explain how that works in [another section](#markdown-header-agent-self-organization)
+Distributing comands to random agents wouldn't help achieve the goal of eliminating two tasks operating on the same model instance. Using a scheme that relies on the model instance Id to distribute the commands has been devised. The agents will self organize so that, each agent will only operate on a subset of model types with certain Ids. This document will explain how that works in [another section](#agent-self-organization)
 
 
 ### Scaling Resources
@@ -719,37 +751,37 @@ The background agents can be divided into groups for putting resources where the
 #### Setting up Worker Groups
 
 ```csharp
-    public class ImplementingWorkTaskService: IWorkTaskService { 
-        public IList<WorkerGroup> BuildWorkerGroups(IList<WorkerMinister> ministers/*The agents that are running*/)
-        {
-            var result = new List<WorkerGroup>();
-            
-            // Divide the agents into the desired sets.
-            var minister_defaults = ministers.Take(2).ToList();
-            var workGroupsONly = ministers.Skip(2).Take(2).ToList();
-            var left_over_ministers = ministers.Skip(4).ToList();
-            
-            // Define a group that will only will process stream types equal to item1.
-            result.Add(WorkerGroup.BuildStreamTypeOnly(minister_defaults, new List<string> { "item1" }));
-            
-            // Define a group that will only will process work task types equal to task2.
-            result.Add(WorkerGroup.BuildWorkTaskOnly(workGroupsONly, new List<string> { "task2" }));
-            
-            // Defines a groupd that will process the rest.
-            var workGroup = WorkerGroup.BuildDefault(left_over_ministers);
-            
-            result.Add(workGroup);
-            return result;
-        }
-
-        public IList<string> GetWorkTasks() { 
-            throw new NotImplementedException();
-        }
-
-        public string GetWorkTaskFor(string streamType, string agentType, string changeType, string functionName) { 
-            throw new NotImplementedException();
-        }
+public class ImplementingWorkTaskService: IWorkTaskService { 
+    public IList<WorkerGroup> BuildWorkerGroups(IList<WorkerMinister> ministers/*The agents that are running*/)
+    {
+        var result = new List<WorkerGroup>();
+        
+        // Divide the agents into the desired sets.
+        var minister_defaults = ministers.Take(2).ToList();
+        var workGroupsONly = ministers.Skip(2).Take(2).ToList();
+        var left_over_ministers = ministers.Skip(4).ToList();
+        
+        // Define a group that will only will process stream types equal to item1.
+        result.Add(WorkerGroup.BuildStreamTypeOnly(minister_defaults, new List<string> { "item1" }));
+        
+        // Define a group that will only will process work task types equal to task2.
+        result.Add(WorkerGroup.BuildWorkTaskOnly(workGroupsONly, new List<string> { "task2" }));
+        
+        // Defines a groupd that will process the rest.
+        var workGroup = WorkerGroup.BuildDefault(left_over_ministers);
+        
+        result.Add(workGroup);
+        return result;
     }
+
+    public IList<string> GetWorkTasks() { 
+        throw new NotImplementedException();
+    }
+
+    public string GetWorkTaskFor(string streamType, string agentType, string changeType, string functionName) { 
+        throw new NotImplementedException();
+    }
+}
 ```
 
 ### Web Service
@@ -1331,6 +1363,87 @@ IRedArbiter is the work horse of RedQuick. It is an interface that provides the 
 ## Code Generation
 
 Code generation is accomplished with a combination of templates. Some templates are mostly fill in the blank, some require more processing. Generating the layouts for the components takes a bit more effort than the C# controllers.
+
+### Generating Projects
+
+Generating the C# projects takes advantage of the [dotnet new command](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-new). The contents of the "builder\app\cake" are copied to the working directory. [Cake](https://cakebuild.net/) is used to execute the build.js. That will use the dotnet commands to build the solution and project files for the netcore site, electron app, react native app and web site.
+
+Any dependencies that the app is guarenteed to require are installed during this process. For the most part, specifying specific versions of libraries is avoided. Which has been a pain when versions update and have breaking changes. But, since I am trying to also stay as close to latest as possible, its a pain I am willing to accept. In the past year, I think I have only lost a 4 or 5 hours to thoses kinds of changes.
+
+### Function Types
+
+Most web api functions are the same. This is one of the main tenets of RedQuickBuilder. The idea is that most functions have a very formulaic pattern, and the parts that are unique can be configured. At the moment there are around 13 function types available.
+
+- Function Types
+    - Create Object => Object
+        - Creates an object and return the new object as an Agent.
+    - Create Object with User
+        - Creates an object and return the new object as a User.
+    - Create Parent/Child => IList<Child>
+        - Create an child object of a parent, and returns the complete list of children objects as an Agent.
+    - Fetch Service compatible function
+        - Gets a list of objects with their ids as an Agent.
+    - Get Default object for Agent
+        - Gets a default object for an agent. The default object can be contructed in what ever configuration desired.
+    - Get Defult object with Parent For Agent
+        - Similary to Get Default object for Agent, except will include a parent reference.
+    - Get Object by Agent
+        - Gets an instance of an object by id as an Agent.
+    - Get Parent/Child => IList<Child>
+        - Get a list of chilren of a parent as an Agent.
+    - Get Objects for an Agent
+        - Get a list of objects as an Agent.
+    - Get Self
+        - Get the user's object.
+    - Get Unique Object by Agent
+        - Gets an object by id for an Agent.
+    - Update Object by Agent
+         - Updates an object as an Agent.
+
+In the list of function types, the persona performing the action is an important factor to keep in mind. If a user doesn't have a persona that fits the endpoint being called, it can't perform the action.
+
+
+#### Function Type template
+
+##### Update Object by Agent template
+The double mustache patterns are replaced by the appropriate text at code generation. There are a few points of interest to highlight. 
+
+The type of Agent is checked for first. If the user doesn't have a reference to the correct Agent({{agent_type}}) an InvalidAgentException exception is thrown. If a user attempts to execute a function for a Professor, but the user is only a student. Then this function will fail. If the agent for some reason doesn't exist, an InvalidAgentException is thrown.
+
+Next step is a permissions check. The permissions function is also generated, based on the configurations setup in the Agent Access section. If that permissions call fails, a PermissionException is thrown.
+
+The "command" is buildt using a generated class which will create a StatedChange<T> where T is a IDBaseData type. The command is put into the stream process. In the update function, it will wait for the command to be processed. After the completion, it will load the latest version of the model instance.
+
+The final step before returning the model instance, is to filter the resulting model. If there is a list of results, the list can be filtered to only return the model instances desired. If it is returning only a model instance, the properties being returned can be filtered. Or the filter can be applied at the list and property level.
+
+```
+//Update model by agent
+public async Task<{{model}}> {{function_name}}({{user}} user, {{model}} value) {
+
+    if(user.{{agent_type}} == null) {
+        throw new InvalidAgentException();
+    }
+
+    var agent = await arbiter{{agent_type}}.Get<{{agent_type}}>(user.{{agent_type}});
+    
+    if(agent == null) {
+      throw new InvalidAgentException();
+    }
+    
+    if(await {{agent_type#lower}}Permissions.{{permission_function}}(value, agent).ConfigureAwait(false)) {
+
+        var parameters = {{model}}ChangeBy{{agent_type}}.Update(agent, value, FunctionName.{{default_executor_function_name}});
+
+        var result = await StreamProcess.{{model}}_{{agent_type}}(parameters);
+
+        var updatedItem = await arbiter{{model}}.Get<{{model}}>(result.IdValue);
+
+        return {{agent_type}}Return.{{filter_function}}(updatedItem, agent);
+    }
+    throw new PermissionException();
+}
+
+```
 
 # Definitions
 

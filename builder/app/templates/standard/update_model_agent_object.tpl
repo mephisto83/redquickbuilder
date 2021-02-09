@@ -6,6 +6,10 @@ public async Task<{{model}}> {{function_name}}({{user}} user, {{model}} value) {
             }
 
     var agent = await arbiter{{agent_type}}.Get<{{agent_type}}>(user.{{agent_type}});
+    
+    if(agent == null) {
+      throw new InvalidAgentException();
+    }
 
     if(await {{agent_type#lower}}Permissions.{{permission_function}}(value, agent).ConfigureAwait(false)) {
 
