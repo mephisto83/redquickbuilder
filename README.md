@@ -1449,8 +1449,48 @@ public async Task<{{model}}> {{function_name}}({{user}} user, {{model}} value) {
 
 ## Datalake
 
-A centralized data storage unit. Or a big ol' DB.
+A centralized data storage unit. Or a big ol' DB. By default, data is stored in an Azure Cosmos DB, but anything that implements the IRedContext interface can put data anywhere you choose.
 
+```
+public interface IRedContext : IDisposable
+{
+    IEnumerable<T> GetDistanceOver<T>(Point pointA)
+        where T : IDBaseData, IDistanceMeasurable;
+
+    IQueryable<T> QueryOver<T>() where T : IDBaseData;
+
+    Task<T> AddDocument<T>(T user) where T : IDBaseData;
+
+    Task<T> Get<T>(string id) where T : IDBaseData;
+
+    Task<T> Get<T>(Guid id) where T : IDBaseData;
+
+    Task<T> Update<T>(T update) where T : IDBaseData;
+
+    Task<bool> DeleteDocument<T>(string id) where T : IDBaseData;
+
+    Task<IList<T>> GetAll<T>() where T : IDBaseData;
+    Task<IQueryable<T>> Query<T>(Expression<Func<T, bool>> expression) where T : IDBaseData;
+    Task<IList<T>> GetNear<T>(Point point, string propertyName, long minDistance, long maxDistance, int maxPoints, int skip) where T : IDBaseData;
+
+    IEnumerable<T> GetOver<T>(Func<T, bool> wherefunc) where T : IDBaseData;
+
+    IEnumerable<T> GetOver<T>(Func<T, bool> wherefunc, Func<T, T> keySelector, IComparer<T> comparer) where T : IDBaseData;
+
+    Task<int> Count<T>() where T : IDBaseData;
+
+    Task<int> Count<T>(Func<T, bool> where) where T : IDBaseData;
+}
+```
 ## DataChains
 
-Datachains are functionality snippets that can be used to create complex functions. The idea is that you can change them together to build up more complex workflows. But, in practice they are bite sized pieces of code that implement small logical pieces.
+Datachains are functionality snippets that can be used to create complex functions. The idea is that you can change them together to build up more complex workflows. But, in practice they are bite sized pieces of code that implement small logical pieces. Datachains are used in both the client side and server side. Examples can be found in the [Component](#Components) example above and they are prefixed with the "DC" namespace.
+
+
+![data_chain_example](presentationsrc/data_chain_example.png)
+
+Datachains can either be Typescript or C#. For what I assume is obvious, you can't mix the nodes together. There are a lot of different datachain function types. Some are complete code blocks that perform specific functions, like storing the bearer token into state or storing models received from web api calls in the reducer's state. Others perform simple mathematical or logial functions.
+
+To create a C# data chain, check the C# checkbox. If the datachain is supposed to be callable, then check the "Entry Point" for Typescript datachains otherwise "C# Entry Point".
+
+![data_chain_config](presentationsrc/data_chain_config.png)
