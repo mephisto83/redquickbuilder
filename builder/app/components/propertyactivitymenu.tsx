@@ -132,15 +132,15 @@ class PropertyActivityMenu extends Component<any, any> {
 										value
 											? null
 											: {
-													operation: UIA.REMOVE_LINK_BETWEEN_NODES,
-													options: {
-														target:
-															currentNode.properties[
-																UIA.NodeProperties.ManyToManyNexusType
-															],
-														source: id
-													}
-												},
+												operation: UIA.REMOVE_LINK_BETWEEN_NODES,
+												options: {
+													target:
+														currentNode.properties[
+														UIA.NodeProperties.ManyToManyNexusType
+														],
+													source: id
+												}
+											},
 										{
 											operation: UIA.CHANGE_NODE_PROPERTY,
 											options: {
@@ -152,16 +152,16 @@ class PropertyActivityMenu extends Component<any, any> {
 										!value || !currentNode.properties[UIA.NodeProperties.ManyToManyNexusType]
 											? null
 											: {
-													operation: UIA.ADD_LINK_BETWEEN_NODES,
-													options: {
-														target:
-															currentNode.properties[
-																UIA.NodeProperties.ManyToManyNexusType
-															],
-														source: id,
-														properties: { ...UIA.LinkProperties.ManyToManyLink }
-													}
+												operation: UIA.ADD_LINK_BETWEEN_NODES,
+												options: {
+													target:
+														currentNode.properties[
+														UIA.NodeProperties.ManyToManyNexusType
+														],
+													source: id,
+													properties: { ...UIA.LinkProperties.ManyToManyLink }
 												}
+											}
 									].filter((x) => x)
 								);
 							}}
@@ -169,7 +169,7 @@ class PropertyActivityMenu extends Component<any, any> {
 						<SelectInput
 							options={Object.keys(GeneratedDataTypes).map((key) => ({ title: key, value: key }))}
 							label={Titles.PropertyGeneratedType}
-							onChange={(value) => {
+							onChange={(value: any) => {
 								this.props.graphOperation([
 									{
 										operation: UIA.CHANGE_NODE_PROPERTY,
@@ -225,6 +225,43 @@ class PropertyActivityMenu extends Component<any, any> {
 								value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.ManyToManyNexusType)}
 							/>
 						) : null}
+						<CheckBox
+							label={Titles.IsLabelValue}
+							value={
+								currentNode.properties ? currentNode.properties[UIA.NodeProperties.IsValueLabel] : ''
+							}
+							onChange={(value: boolean) => {
+								this.props.graphOperation([
+									{
+										operation: UIA.CHANGE_NODE_PROPERTY,
+										options: {
+											prop: UIA.NodeProperties.IsValueLabel,
+											id: currentNode.id,
+											value
+										}
+									}
+								]);
+							}}
+						/>
+
+						<CheckBox
+							label={Titles.IsFireTime}
+							value={
+								currentNode.properties ? currentNode.properties[UIA.NodeProperties.IsFireTime] : ''
+							}
+							onChange={(value: boolean) => {
+								this.props.graphOperation([
+									{
+										operation: UIA.CHANGE_NODE_PROPERTY,
+										options: {
+											prop: UIA.NodeProperties.IsFireTime,
+											id: currentNode.id,
+											value
+										}
+									}
+								]);
+							}}
+						/>
 
 						<CheckBox
 							label={Titles.UseModelAsType}
@@ -237,12 +274,12 @@ class PropertyActivityMenu extends Component<any, any> {
 									value
 										? null
 										: {
-												operation: UIA.REMOVE_LINK_BETWEEN_NODES,
-												options: {
-													target: currentNode.properties[UIA.NodeProperties.UIModelType],
-													source: id
-												}
-											},
+											operation: UIA.REMOVE_LINK_BETWEEN_NODES,
+											options: {
+												target: currentNode.properties[UIA.NodeProperties.UIModelType],
+												source: id
+											}
+										},
 									{
 										operation: UIA.CHANGE_NODE_PROPERTY,
 										options: {
@@ -254,13 +291,13 @@ class PropertyActivityMenu extends Component<any, any> {
 									!value || !currentNode.properties[UIA.NodeProperties.UIModelType]
 										? null
 										: {
-												operation: UIA.ADD_LINK_BETWEEN_NODES,
-												options: {
-													target: currentNode.properties[UIA.NodeProperties.UIModelType],
-													source: id,
-													properties: { ...UIA.LinkProperties.ModelTypeLink }
-												}
+											operation: UIA.ADD_LINK_BETWEEN_NODES,
+											options: {
+												target: currentNode.properties[UIA.NodeProperties.UIModelType],
+												source: id,
+												properties: { ...UIA.LinkProperties.ModelTypeLink }
 											}
+										}
 								]);
 							}}
 						/>

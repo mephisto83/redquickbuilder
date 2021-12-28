@@ -12,6 +12,10 @@ export const HandlerEvents = {
 		message: 'reactweb-project',
 		reply: 'reactweb-project-reply'
 	},
+	reactfirebase: {
+		message: 'reactfirbase-project',
+		reply: 'reactfirbase-project-reply'
+	},
 	remoteCommand: {
 		message: 'remote-command',
 		reply: 'remote-command-reply'

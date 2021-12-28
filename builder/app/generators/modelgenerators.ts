@@ -146,6 +146,22 @@ export default class ModelGenerator {
 
 		return result;
 	}
+	static GenerateFirebaseGeneratorRequirements(state: any) {
+		const models = NodesByType(state, NodeTypes.Model)
+			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromController))
+			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration));
+		const result: any = [];
+		models.map((model: { id: any }) => {
+			let connectedProperties = GetModelPropertyChildren(model.id); //Get all properties including link to other models
+			const logicalParents: any[] = []; // No more having parents referencing back.
+			connectedProperties = [...connectedProperties, ...logicalParents];
+			result.push({
+				model,
+				properties: connectedProperties
+			});
+		});
+		return result;
+	}
 	static GenerateModel(options: { graph: any; nodeId: any; state: any }) {
 		const { state, graph, nodeId } = options;
 		const usings: string[] = [];

@@ -69,6 +69,7 @@ import ModelGenerator from '../generators/modelgenerators';
 
 const { ipcRenderer } = require('electron');
 const REACTWEB = 'reactweb';
+const REACTFIREBASE = 'reactfirebase';
 const hub: any = {};
 ipcRenderer.on(HandlerEvents.viewWindow.message, (event, arg) => {
 	console.log(arg);
@@ -229,7 +230,19 @@ function send(mess: string, body: { solutionName: any; appName: any; workspace: 
 export function publishFiles() {
 	scaffoldProject({ filesOnly: true })(GetDispatchFunc(), GetStateFunc());
 }
+export function GetFirebaseRequirements() {
+	return (dispatch: any, getState: any) => {
+		const state = GetState();
+		const root = GetCurrentGraph();
 
+		let res = ModelGenerator.GenerateFirebaseGeneratorRequirements(state);
+		const workspace = root.workspaces ? root.workspaces[platform()] || root.workspace : root.workspace;
+		ensureDirectory(path.join(workspace));
+		ensureDirectory(path.join(workspace, root.title));
+		ensureDirectory(path.join(workspace, root.title, 'firebase'));
+		fs.writeFileSync(path.join(workspace, root.title, 'firebase', 'models.json'), JSON.stringify(res, null, 4));
+	}
+}
 export function scaffoldProject(options: any = {}) {
 	const { filesOnly } = options;
 	return (dispatch: any, getState: () => any) => {
@@ -268,6 +281,17 @@ export function scaffoldProject(options: any = {}) {
 							workspace: path.join(workspace, root.title, 'reactweb')
 						})
 			)
+			.then(
+				() =>
+					filesOnly
+						? Promise.resolve()
+						: send(HandlerEvents.reactfirebase.message, {
+							solutionName,
+							appName: root[GraphKeys.PROJECTNAME] || '',
+							workspace: path.join(workspace, root.title, REACTFIREBASE)
+						})
+			)
+
 			.then(errorHandler())
 			.then(
 				() =>
@@ -316,6 +340,14 @@ export function scaffoldProject(options: any = {}) {
 				}
 				console.log('generate react web files');
 				return generateReactWeb(path.join(workspace, root.title, REACTWEB, root[GraphKeys.PROJECTNAME]), state);
+			})
+			.then(() => {
+				console.log('generating react firebase');
+				if (options.exclusive && !options.reactfirebase) {
+					return Promise.resolve();
+				}
+				console.log('generate react firebase files');
+				return generateReactFirebase(path.join(workspace, root.title, REACTFIREBASE, root[GraphKeys.PROJECTNAME]), state);
 			})
 			.then(() => {
 				console.log('generating net core identity');
@@ -574,6 +606,14 @@ ${interfaceFunctions.join(NEW_LINE)}
 				return clearReactWebTheme(path.join(workspace, root.title, REACTWEB, root[GraphKeys.PROJECTNAME]));
 			})
 			.then(() => {
+				console.log('generating react firebase');
+				if (options.exclusive && !options.reactfirbase) {
+					return Promise.resolve();
+				}
+				console.log('Create react firebase theme');
+				return clearReactFirebaseTheme(path.join(workspace, root.title, REACTFIREBASE, root[GraphKeys.PROJECTNAME]));
+			})
+			.then(() => {
 				console.log('generating election io');
 				if (options.exclusive && !options.electrionio) {
 					return Promise.resolve();
@@ -605,6 +645,24 @@ ${interfaceFunctions.join(NEW_LINE)}
 						{},
 						null,
 						path.join(workspace, root.title, 'reactweb', appName)
+					);
+				}
+				console.warn('No app name given');
+			})
+			.then(() => {
+				console.log('generating react firbase');
+				if (options.exclusive && !options.reactfirbase) {
+					return Promise.resolve();
+				}
+				console.log('Write reactfirbase files');
+				const appName = root[GraphKeys.PROJECTNAME];
+				const version = 'v1';
+				if (appName) {
+					return generateFolderStructure(
+						path.join(`./app/templates/reactfirbase/${version}`),
+						{},
+						null,
+						path.join(workspace, root.title, 'reactfirbase', appName)
 					);
 				}
 				console.warn('No app name given');
@@ -787,6 +845,43 @@ function generateReactWeb(workspace: string, state: any) {
 	});
 }
 
+function generateReactFirebase(workspace: string, state: any) {
+	const codeTypes = [...Object.values(ReactNativeTypes)];
+
+	codeTypes.map((codeType) => {
+		const temp = Generator.generate({
+			type: codeType,
+			language: UITypes.ReactFirebase,
+			state,
+			writer: (temp: any) => {
+				Object.keys(temp).map((fileName) => {
+					let { relative } = temp[fileName];
+					relative = relative.replace('app', 'src');
+					let dirname = path.dirname(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`));
+					ensureDirectory(dirname);
+					console.log(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`));
+					writeFileSync(
+						path.join(workspace, relative, `${temp[fileName].relativeFilePath}`),
+						temp[fileName].template
+					);
+				});
+			}
+		});
+
+		Object.keys(temp).map((fileName) => {
+			let { relative } = temp[fileName];
+			relative = relative.replace('app', 'src');
+			let dirname = path.dirname(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`));
+			ensureDirectory(dirname);
+			console.log(path.join(workspace, relative, `${temp[fileName].relativeFilePath}`));
+			writeFileSync(
+				path.join(workspace, relative, `${temp[fileName].relativeFilePath}`),
+				temp[fileName].template
+			);
+		});
+	});
+}
+
 function clearElectronIOTheme(workspace: string, state: any) {
 	const results = ThemeServiceGenerator.Generate({
 		state,
@@ -806,6 +901,21 @@ function clearReactWebTheme(workspace: string, state?: any) {
 	const results = ThemeServiceGenerator.Generate({
 		state,
 		language: UITypes.ReactWeb
+	});
+	const toClear: string[] = [];
+	results.filter((x: any) => !x.userDefined).forEach((result: any) => {
+		if (result.theme) {
+			toClear.push(path.join(workspace, result.themerelative || result.relative));
+		}
+	});
+	toClear.forEach((dir) => {
+		deleteAll(dir);
+	});
+}
+function clearReactFirebaseTheme(workspace: string, state?: any) {
+	const results = ThemeServiceGenerator.Generate({
+		state,
+		language: UITypes.ReactFirebase
 	});
 	const toClear: string[] = [];
 	results.filter((x: any) => !x.userDefined).forEach((result: any) => {

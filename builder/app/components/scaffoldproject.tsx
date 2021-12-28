@@ -82,6 +82,17 @@ class ScaffoldProject extends Component<any, any> {
 								}}
 							/>
 							<TreeViewMenu
+								title={'React Firebase'}
+								onClick={() => {
+									this.props.GetFirebaseRequirements();
+									// this.props.scaffoldProject({
+									// 	filesOnly: true,
+									// 	exclusive: true,
+									// 	reactfirebase: true
+									// });
+								}}
+							/>
+							<TreeViewMenu
 								title={'Electron IO'}
 								onClick={() => {
 									this.props.scaffoldProject({
