@@ -8,7 +8,6 @@ import MainSideBar from './mainsidebar';
 import * as UIA from '../actions/uiactions';
 import TabPane from './tabpane';
 import SideBar from './sidebar';
-import EnumerationEditMenu from './enumerationeditmenu';
 import TreeViewMenu from './treeviewmenu';
 import * as Titles from './titles';
 import CheckBox from './checkbox';

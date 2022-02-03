@@ -15,7 +15,7 @@ class AttributeFormControl extends Component<any, any> {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Attribute);
         if (!active) {
-          return <div />;
+            return <div />;
         }
 
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
@@ -32,22 +32,30 @@ class AttributeFormControl extends Component<any, any> {
             }
         });
         var show_choice = currentNode && currentNode.properties && currentNode.properties[UIA.NodeProperties.UIAttributeType] == UIA.NodeAttributePropertyTypes.CHOICE;
+        let show_input_variables = currentNode && currentNode.properties && currentNode.properties[UIA.NodeProperties.NODEType] == UIA.NodeTypes.Attribute;
         var show_validations = UIA.Use(currentNode, UIA.NodeProperties.UseUIValidations);
         var show_options = UIA.Use(currentNode, UIA.NodeProperties.UseUIOptions);
         var show_extenions = UIA.Use(currentNode, UIA.NodeProperties.UseUIExtensionList);
-        var option_nodes = UIA.NodesByType(state, UIA.NodeTypes.OptionList).map(node => {
+        var show_enums = UIA.GetProperty(currentNode, UIA.NodeProperties.CodeName) === 'OneOf';
+        var option_nodes = !show_options ? [] : UIA.NodesByType(state, UIA.NodeTypes.OptionList).map(node => {
             return {
                 value: node.id,
                 title: UIA.GetNodeTitle(node)
             }
         });
-        var extension_nodes = UIA.NodesByType(state, UIA.NodeTypes.ExtensionType).map(node => {
+        var extension_nodes = !show_extenions ? [] : UIA.NodesByType(state, UIA.NodeTypes.ExtensionType).map(node => {
             return {
                 value: node.id,
                 title: UIA.GetNodeTitle(node)
             }
         });
 
+        var enumerations = !show_enums ? [] : UIA.NodesByType(state, UIA.NodeTypes.Enumeration).map(node => {
+            return {
+                value: node.id,
+                title: UIA.GetNodeTitle(node)
+            }
+        });
         return (
             <TabPane active={active}>
                 {currentNode ? (<FormControl>
@@ -55,7 +63,7 @@ class AttributeFormControl extends Component<any, any> {
                         label={Titles.UIName}
                         title={Titles.UINameDescription}
                         value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIName] : ''}
-                        onChange={(value) => {
+                        onChange={(value: any) => {
                             this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
                                 prop: UIA.NodeProperties.UIName,
                                 id: currentNode.id,
@@ -199,7 +207,29 @@ class AttributeFormControl extends Component<any, any> {
                         </ControlSideBarMenu>
                     ) : null}
 
+                    {show_input_variables ? <TextInput
+                        label={Titles.ParameterValueA}
+                        title={Titles.ParameterValueA}
+                        value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.ParameterValueA] : ''}
+                        onChange={(value: any) => {
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.ParameterValueA,
+                                id: currentNode.id,
+                                value
+                            });
+                        }} /> : null}
 
+                    {show_input_variables ? <TextInput
+                        label={Titles.ParameterValueB}
+                        title={Titles.ParameterValueB}
+                        value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.ParameterValueB] : ''}
+                        onChange={(value: any) => {
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.ParameterValueB,
+                                id: currentNode.id,
+                                value
+                            });
+                        }} /> : null}
                     <CheckBox
                         label={Titles.UseUIExtensions}
                         value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UseUIExtensionList] : ''}
@@ -210,7 +240,27 @@ class AttributeFormControl extends Component<any, any> {
                                 value
                             });
                         }} />
-
+                    {show_enums ? (<SelectInput
+                        label={Titles.Enumeration}
+                        options={enumerations}
+                        onChange={(value: any) => {
+                            var id = currentNode.id;
+                            this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                                target: currentNode.properties[UIA.NodeProperties.Enumeration],
+                                source: id
+                            })
+                            this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                                prop: UIA.NodeProperties.Enumeration,
+                                id,
+                                value
+                            });
+                            this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+                                target: value,
+                                source: id,
+                                properties: { ...UIA.LinkProperties.EnumerationLink }
+                            })
+                        }}
+                        value={UIA.GetProperty(currentNode, UIA.NodeProperties.Enumeration)} />) : null}
                     {show_extenions ? (<SelectInput
                         label={Titles.ExtensionTypes}
                         options={extension_nodes}

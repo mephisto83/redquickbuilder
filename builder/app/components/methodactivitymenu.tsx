@@ -28,7 +28,7 @@ class MethodActivityMenu extends Component<any, any> {
     var { state } = this.props;
     var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Method);
     if (!active) {
-			return <div />;
+      return <div />;
     }
 
     var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
@@ -42,7 +42,7 @@ class MethodActivityMenu extends Component<any, any> {
     return (
       <TabPane active={active}>
         {currentNode &&
-        !currentNode.properties[UIA.NodeProperties.UseScopeGraph] ? (
+          !currentNode.properties[UIA.NodeProperties.UseScopeGraph] ? (
           <SelectInput
             label={Titles.FunctionTypes}
             options={function_types}
@@ -61,6 +61,7 @@ class MethodActivityMenu extends Component<any, any> {
             }
           />
         ) : null}
+
         {currentNode ? (
           <SelectInput
             label={Titles.Methods}
@@ -80,7 +81,7 @@ class MethodActivityMenu extends Component<any, any> {
                 ? currentNode.properties[UIA.NodeProperties.MethodType]
                 : ""
             }
-          />
+        />
         ) : null}
         {currentNode ? (
           <SelectInput
@@ -142,7 +143,7 @@ class MethodActivityMenu extends Component<any, any> {
           />
         ) : null}
         {currentNode &&
-        UIA.GetNodeProp(currentNode, UIA.NodeProperties.AsForm) ? (
+          UIA.GetNodeProp(currentNode, UIA.NodeProperties.AsForm) ? (
           <CheckBox
             label={Titles.CollectCookies}
             onChange={(value: any) => {
@@ -186,7 +187,7 @@ class MethodActivityMenu extends Component<any, any> {
         ) : null}
         <ControlSideBarMenu>
           {currentNode &&
-          currentNode.properties[UIA.NodeProperties.UseScopeGraph] ? (
+            currentNode.properties[UIA.NodeProperties.UseScopeGraph] ? (
             <ControlSideBarMenuItem
               onClick={() => {
                 this.props.graphOperation([

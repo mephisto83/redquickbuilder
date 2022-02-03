@@ -155,6 +155,18 @@ export default class ModelGenerator {
 			let connectedProperties = GetModelPropertyChildren(model.id); //Get all properties including link to other models
 			const logicalParents: any[] = []; // No more having parents referencing back.
 			connectedProperties = [...connectedProperties, ...logicalParents];
+			let graph = GetCurrentGraph(state)
+			connectedProperties = connectedProperties.map((prop: any) => {
+				let attr: Node[] = GraphMethods.GetNodesLinkedTo(graph, {
+					id: prop.id,
+					link: LinkType.AttributeLink
+				});
+				prop.attributes = attr
+				return {
+					...prop,
+					attributes: attr
+				}
+			})
 			result.push({
 				model,
 				properties: connectedProperties

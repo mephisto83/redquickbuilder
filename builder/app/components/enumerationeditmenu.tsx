@@ -16,19 +16,26 @@ export default class EnumerationEditMenu extends Component<any, any> {
         super(props);
         this.state = { value: '' };
     }
+
     render() {
-        var { state } = this.props;
 
         return (
             <FormControl sidebarform={true}>
                 <TextInput onClick={() => {
-                    if (this.props.onComplete) {
+                    if (this.props.onChange) { }
+                    else if (this.props.onComplete) {
                         this.props.onComplete(this.state.value);
                         this.setState({ value: '' })
                     }
-                }} value={this.state.value} onChange={(value) => {
-                    this.setState({ value })
-                }} inputgroup={true} placeholder={Titles.Enumeration} />
+                }} value={this.props.onChange ? this.props.value : this.state.value}
+                    onChange={(value: string) => {
+                        if (this.props.onChange) {
+                            this.props.onChange(value);
+                        }
+                        else {
+                            this.setState({ value })
+                        }
+                    }} inputgroup={true} placeholder={this.props.title || Titles.Enumeration} />
             </FormControl>
         );
     }

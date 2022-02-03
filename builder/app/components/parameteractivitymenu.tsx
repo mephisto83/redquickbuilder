@@ -54,7 +54,7 @@ class ParameterActivityMenu extends Component<any, any> {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Parameter);
         if (!active) {
-          return <div />;
+            return <div />;
         }
 
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
@@ -130,6 +130,32 @@ class ParameterActivityMenu extends Component<any, any> {
                         });
                     }}
                     value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIChoiceNode] : ''} />) : null}
+                {currentNode ? (<SelectInput
+                    label={Titles.Type}
+                    options={UIA.NodesByType(state, UIA.NodeTypes.Model).map(node => {
+                        return {
+                            value: node.id,
+                            title: UIA.GetNodeTitle(node)
+                        }
+                    })}
+                    onChange={(value: any) => {
+                        var id = currentNode.id;
+                        this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                            target: currentNode.properties[UIA.NodeProperties.QueryParameterParamType],
+                            source: id
+                        })
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.QueryParameterParamType,
+                            id,
+                            value
+                        });
+                        this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+                            target: value,
+                            source: id,
+                            properties: { ...UIA.LinkProperties.FunctionApiParameterType }
+                        });
+                    }}
+                    value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.QueryParameterParamType] : ''} />) : null}
             </TabPane>
         );
     }

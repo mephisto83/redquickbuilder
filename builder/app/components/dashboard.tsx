@@ -179,8 +179,8 @@ class Dashboard extends Component<any, any> {
 	componentDidMount() {
 		this.props.setState();
 		this.props.setRemoteState();
-		this.props.setVisual(UIA.NODE_COST, 1);
-		this.props.setVisual(UIA.NODE_CONNECTION_COST, 1);
+		this.props.setVisual(UIA.NODE_COST, 2);
+		this.props.setVisual(UIA.NODE_CONNECTION_COST, 2);
 		setTimeout(() => {
 			this.props.loadApplicationConfigUI();
 		}, 5000);
@@ -217,7 +217,7 @@ class Dashboard extends Component<any, any> {
 						onClick: () => {
 							this.props.setVisual(CONNECTING_NODE, {
 								...LinkProperties.FunctionLink,
-								nodeTypes: [NodeTypes.Method]
+								nodeTypes: [NodeTypes.Method, NodeTypes.Function]
 							});
 						},
 						icon: 'fa  fa-music',
@@ -591,6 +591,19 @@ class Dashboard extends Component<any, any> {
 						});
 					}
 					return result;
+				case NodeTypes.FunctionOutput:
+					result.push({
+						onClick: () => {
+							this.props.setVisual(CONNECTING_NODE, {
+								...LinkProperties.FunctionOutputType,
+								singleLink: true,
+								nodeTypes: [NodeTypes.Model, NodeTypes.Enumeration, NodeTypes.Attribute]
+							});
+						},
+						icon: 'fa fa-share-alt',
+						title: Titles.ConnectType
+					})
+					break;
 				case NodeTypes.ComponentApi:
 					result.push(
 						{
@@ -2227,8 +2240,8 @@ class Dashboard extends Component<any, any> {
 												applicationConfig ? (
 													applicationConfig[JobServiceConstants.JOB_PATH] || Titles.JobPath
 												) : (
-														Titles.JobPath
-													)
+													Titles.JobPath
+												)
 											}
 											icon="fa fa-info"
 											onClick={() => {
@@ -2242,8 +2255,8 @@ class Dashboard extends Component<any, any> {
 													applicationConfig[JobServiceConstants.JOBS_FILE_PATH] ||
 													Titles.JobsFilePath
 												) : (
-														Titles.JobsFilePath
-													)
+													Titles.JobsFilePath
+												)
 											}
 											icon="fa fa-info"
 											onClick={() => {
@@ -2590,132 +2603,132 @@ class Dashboard extends Component<any, any> {
 							</SideBarTabs>
 							{currentNode &&
 								!ExcludeDefaultNode[UIA.GetNodeProp(currentNode, NodeProperties.NODEType)] ? (
-									<SideMenuContainer
-										active
-										tab={DEFAULT_TAB}
-										key="node-properties"
-										title={Titles.NodeProperties}
-									>
-										<FormControl>
-											<SideBarMenu>
-												<SideBarHeader
-													onClick={() => {
-														clipboard.writeText(UIA.Visual(state, UIA.SELECTED_NODE));
-													}}
-													title={UIA.Visual(state, UIA.SELECTED_NODE)}
-												/>
-											</SideBarMenu>
-											<ChoiceListItemActivityMenu />
-											{/* <ConditionActivityMenu /> */}
-											<DataChainActvityMenu />
-											<SwaggerActivity />
-											<TextInput
-												label={Titles.NodeLabel}
-												value={currentNode.properties ? currentNode.properties.text : ''}
-												onChange={(value) => {
-													this.props.graphOperation(UIA.CHANGE_NODE_TEXT, {
-														id: currentNode.id,
-														value
-													});
+								<SideMenuContainer
+									active
+									tab={DEFAULT_TAB}
+									key="node-properties"
+									title={Titles.NodeProperties}
+								>
+									<FormControl>
+										<SideBarMenu>
+											<SideBarHeader
+												onClick={() => {
+													clipboard.writeText(UIA.Visual(state, UIA.SELECTED_NODE));
 												}}
+												title={UIA.Visual(state, UIA.SELECTED_NODE)}
 											/>
-											{NotSelectableNodeTypes[
-												currentNode.properties
-													? UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType)
-													: null
-											] ? null : (
-													<SelectInput
-														disabled={!UIA.CanChangeType(currentNode)}
-														label={Titles.NodeType}
-														options={Object.keys(UIA.NodeTypes)
-															.filter((x) => !NotSelectableNodeTypes[UIA.NodeTypes[x]])
-															.sort((a, b) => a.localeCompare(b))
-															.map((x) => ({
-																value: UIA.NodeTypes[x],
-																title: x
-															}))}
-														onChange={(value) => {
-															this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-																prop: UIA.NodeProperties.NODEType,
-																id: currentNode.id,
-																value
-															});
-														}}
-														value={
-															currentNode.properties ? (
-																UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType)
-															) : null
-														}
-													/>
-												)}
-											<CheckBox
-												label={Titles.Collapsed}
-												value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Collapsed)}
+										</SideBarMenu>
+										<ChoiceListItemActivityMenu />
+										{/* <ConditionActivityMenu /> */}
+										<DataChainActvityMenu />
+										<SwaggerActivity />
+										<TextInput
+											label={Titles.NodeLabel}
+											value={currentNode.properties ? currentNode.properties.text : ''}
+											onChange={(value) => {
+												this.props.graphOperation(UIA.CHANGE_NODE_TEXT, {
+													id: currentNode.id,
+													value
+												});
+											}}
+										/>
+										{NotSelectableNodeTypes[
+											currentNode.properties
+												? UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType)
+												: null
+										] ? null : (
+											<SelectInput
+												disabled={!UIA.CanChangeType(currentNode)}
+												label={Titles.NodeType}
+												options={Object.keys(UIA.NodeTypes)
+													.filter((x) => !NotSelectableNodeTypes[UIA.NodeTypes[x]])
+													.sort((a, b) => a.localeCompare(b))
+													.map((x) => ({
+														value: UIA.NodeTypes[x],
+														title: x
+													}))}
 												onChange={(value) => {
 													this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-														prop: UIA.NodeProperties.Collapsed,
+														prop: UIA.NodeProperties.NODEType,
 														id: currentNode.id,
 														value
 													});
 												}}
+												value={
+													currentNode.properties ? (
+														UIA.GetNodeProp(currentNode, UIA.NodeProperties.NODEType)
+													) : null
+												}
 											/>
+										)}
+										<CheckBox
+											label={Titles.Collapsed}
+											value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Collapsed)}
+											onChange={(value) => {
+												this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+													prop: UIA.NodeProperties.Collapsed,
+													id: currentNode.id,
+													value
+												});
+											}}
+										/>
+										<CheckBox
+											label={Titles.Pinned}
+											title={Titles.PinnedShortCut}
+											value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Pinned)}
+											onChange={(value) => {
+												this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+													prop: UIA.NodeProperties.Pinned,
+													id: currentNode.id,
+													value
+												});
+											}}
+										/>
+										<CheckBox
+											label={Titles.Selected}
+											title={Titles.SelectedShortCut}
+											value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Selected)}
+											onChange={(value) => {
+												this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+													prop: UIA.NodeProperties.Selected,
+													id: currentNode.id,
+													value
+												});
+											}}
+										/>
+										{UIA.GetNodeProp(currentNode, NodeProperties.NODEType) ===
+											UIA.NodeTypes.ComponentExternalApi ? (
 											<CheckBox
-												label={Titles.Pinned}
-												title={Titles.PinnedShortCut}
-												value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Pinned)}
+												label={Titles.IsUrlParameter}
+												title={Titles.IsUrlParameter}
+												value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsUrlParameter)}
 												onChange={(value) => {
 													this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-														prop: UIA.NodeProperties.Pinned,
+														prop: UIA.NodeProperties.IsUrlParameter,
 														id: currentNode.id,
 														value
 													});
 												}}
 											/>
+										) : null}
+										{UIA.GetNodeProp(currentNode, NodeProperties.NODEType) ===
+											UIA.NodeTypes.ComponentApi ? (
 											<CheckBox
-												label={Titles.Selected}
-												title={Titles.SelectedShortCut}
-												value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Selected)}
+												label={Titles.AsLocalContext}
+												title={`${Titles.AsLocalContext}, usually for listitem.`}
+												value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.AsLocalContext)}
 												onChange={(value) => {
 													this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-														prop: UIA.NodeProperties.Selected,
+														prop: UIA.NodeProperties.AsLocalContext,
 														id: currentNode.id,
 														value
 													});
 												}}
 											/>
-											{UIA.GetNodeProp(currentNode, NodeProperties.NODEType) ===
-												UIA.NodeTypes.ComponentExternalApi ? (
-													<CheckBox
-														label={Titles.IsUrlParameter}
-														title={Titles.IsUrlParameter}
-														value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.IsUrlParameter)}
-														onChange={(value) => {
-															this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-																prop: UIA.NodeProperties.IsUrlParameter,
-																id: currentNode.id,
-																value
-															});
-														}}
-													/>
-												) : null}
-											{UIA.GetNodeProp(currentNode, NodeProperties.NODEType) ===
-												UIA.NodeTypes.ComponentApi ? (
-													<CheckBox
-														label={Titles.AsLocalContext}
-														title={`${Titles.AsLocalContext}, usually for listitem.`}
-														value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.AsLocalContext)}
-														onChange={(value) => {
-															this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-																prop: UIA.NodeProperties.AsLocalContext,
-																id: currentNode.id,
-																value
-															});
-														}}
-													/>
-												) : null}
-										</FormControl>
-									</SideMenuContainer>
-								) : null}
+										) : null}
+									</FormControl>
+								</SideMenuContainer>
+							) : null}
 
 							{UIA.VisualEq(state, SELECTED_TAB, PARAMETER_TAB) ? (
 								<ConditionFilterMenu methodDefinitionKey="validation" />

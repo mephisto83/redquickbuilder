@@ -230,18 +230,58 @@ function send(mess: string, body: { solutionName: any; appName: any; workspace: 
 export function publishFiles() {
 	scaffoldProject({ filesOnly: true })(GetDispatchFunc(), GetStateFunc());
 }
-export function GetFirebaseRequirements() {
+export function GetFirebaseRequirements(callback?: any) {
 	return (dispatch: any, getState: any) => {
 		const state = GetState();
 		const root = GetCurrentGraph();
 
 		let res = ModelGenerator.GenerateFirebaseGeneratorRequirements(state);
+		const enumerations = NodesByType(state, NodeTypes.Enumeration)
 		const workspace = root.workspaces ? root.workspaces[platform()] || root.workspace : root.workspace;
 		ensureDirectory(path.join(workspace));
 		ensureDirectory(path.join(workspace, root.title));
 		ensureDirectory(path.join(workspace, root.title, 'firebase'));
-		fs.writeFileSync(path.join(workspace, root.title, 'firebase', 'models.json'), JSON.stringify(res, null, 4));
+		fs.writeFileSync(path.join(workspace, root.title, 'firebase', 'models.json'), JSON.stringify({ models: res, enumerations }, null, 4));
+		if (callback) {
+			callback(JSON.stringify({ models: res, enumerations }, null, 4));
+		}
+		copyTextToClipboard(JSON.stringify({ models: res, enumerations }, null, 4))
 	}
+}
+
+function fallbackCopyTextToClipboard(text: any) {
+	var textArea = document.createElement("textarea");
+	textArea.value = text;
+
+	// Avoid scrolling to bottom
+	textArea.style.top = "0";
+	textArea.style.left = "0";
+	textArea.style.position = "fixed";
+
+	document.body.appendChild(textArea);
+	textArea.focus();
+	textArea.select();
+
+	try {
+		var successful = document.execCommand('copy');
+		var msg = successful ? 'successful' : 'unsuccessful';
+		console.log('Fallback: Copying text command was ' + msg);
+	} catch (err) {
+		console.error('Fallback: Oops, unable to copy', err);
+	}
+
+	document.body.removeChild(textArea);
+}
+function copyTextToClipboard(text: any) {
+	if (!navigator.clipboard) {
+		fallbackCopyTextToClipboard(text);
+		return;
+	}
+	navigator.clipboard.writeText(text).then(function () {
+		console.log('Async: Copying to clipboard was successful!');
+	}, function (err) {
+		console.error('Async: Could not copy text: ', err);
+	});
 }
 export function scaffoldProject(options: any = {}) {
 	const { filesOnly } = options;

@@ -6,7 +6,7 @@ import * as Titles from './titles';
 import CheckBox from './checkbox';
 import ButtonList from './buttonlist';
 import TextBox from './textinput';
-import { UITypes, NodeTypes, NodeProperties } from '../constants/nodetypes';
+import { UITypes, NodeTypes, NodeProperties, NodeAttributePropertyTypes, Methods } from '../constants/nodetypes';
 import {
 	GetSpecificModels,
 	GetAllModels,
@@ -38,7 +38,7 @@ import JobService from '../jobs/jobservice';
 import {
 	CollectionScreenWithoutDatachainDistributed,
 	CollectionConnectDataChainCollection,
-  CollectionPruneDataChain
+	CollectionPruneDataChain
 } from '../nodepacks/CollectionDataChainsIntoCollections';
 import ApplyTemplates from '../nodepacks/permission/ApplyTemplates';
 import ApplyValidationFromProperties from '../nodepacks/permission/ApplyValidationFromProperties';
@@ -89,6 +89,19 @@ class QuickMethods extends Component<any, any, any> {
 				.map((x: Node) => x.id);
 			return chosenChildren;
 		}
+		var function_types = Object.keys(MethodFunctions).map(funcKey => {
+			return {
+				title: MethodFunctions[funcKey].title || funcKey,
+				value: funcKey
+			}
+		})
+        var enum_nodes = UIA.NodesByType(state, UIA.NodeTypes.Enumeration).map(node => {
+            return {
+                value: node.id,
+                title: UIA.GetNodeTitle(node)
+            }
+        });
+		var model_nodes = UIA.NodesByType(state, UIA.NodeTypes.Model);
 		const defaultParameters = () => ({
 			viewName: UIA.Visual(state, 'View Package Title'),
 			isSharedComponent: UIA.Visual(state, sharedcontrolkey),
@@ -115,6 +128,256 @@ class QuickMethods extends Component<any, any, any> {
 							}}
 							icon="fa fa-tag"
 						>
+							<TreeViewMenu title={Titles.AddFunction}
+								active
+								toggle={() => {
+									this.props.toggleVisual(Titles.AddFunction);
+								}}
+								icon="fa fa-tag"
+								open={UIA.Visual(state, Titles.AddFunction)}>
+
+								<TreeViewItemContainer>
+									<TextBox
+										label={Titles.Name}
+										value={this.state.functionName}
+										onChange={(value: any) => {
+											this.setState({ functionName: value })
+										}}
+									/>
+									<TreeViewItemContainer>
+										<SelectInput
+											label={Titles.AgentOperator}
+											value={this.state.agentId}
+											onChange={(val: string) => {
+
+												this.setState({
+													agentId: val
+												})
+											}}
+											options={model_nodes.filter(x => UIA.GetNodeProp(x, UIA.NodeProperties.IsAgent)).map(node => {
+												return {
+													value: node.id,
+													title: UIA.GetNodeTitle(node)
+												}
+											})}
+										/> </TreeViewItemContainer>
+									<TreeViewItemContainer>
+										<SelectInput
+											label={Titles.Model}
+											value={this.state.model}
+											onChange={(val: string) => {
+
+												this.setState({
+													model: val
+												})
+											}}
+											options={model_nodes.map(node => {
+												return {
+													value: node.id,
+													title: UIA.GetNodeTitle(node)
+												}
+											})}
+										/> </TreeViewItemContainer>
+									<SelectInput
+										label={Titles.FunctionTypes}
+										options={function_types}
+										onChange={(value) => {
+											this.setState({ functionType: value })
+										}}
+										value={this.state.functionType} />
+									<SelectInput
+										label={Titles.Methods}
+										options={Object.keys(Methods).map(t => ({ title: t, value: Methods[t] }))}
+										onChange={(value) => {
+											this.setState({ method: value })
+										}}
+										value={this.state.method} />
+									<SelectInput
+										label={Titles.HttpMethod}
+										options={Object.keys(HTTP_METHODS).map(t => ({ title: t, value: HTTP_METHODS[t] }))}
+										onChange={(value) => {
+											this.setState({ httpMethod: value })
+										}}
+										value={this.state.httpMethod} />
+									<SelectInput
+										label={Titles.PermissionSource}
+										options={model_nodes.map(node => {
+											return {
+												value: node.id,
+												title: UIA.GetNodeTitle(node)
+											}
+										})}
+										onChange={(value: any) => {
+											this.setState({ permissionSource: value })
+										}}
+										value={this.state.permissionSource} />
+									<SelectInput
+										label={Titles.PermissionEnums}
+										options={enum_nodes}
+										onChange={(value: any) => {
+											this.setState({ permissionEnum: value })
+										}}
+										value={this.state.permissionEnum} />
+									<button
+										type="button"
+										className="btn btn-block btn-success btn-sm"
+										onClick={() => {
+											let parameters = this.state.parameters || [];
+											this.setState({
+												parameters: [...parameters, {
+													id: UIA.GUID(),
+													name: 'unknown',
+													type: null,
+													useEnum: false,
+													enum: null
+												}]
+											})
+
+										}}
+									>
+										{Titles.AddParameter}
+									</button>
+									{(this.state.parameters || []).map((param: any) => {
+										return (
+											<TreeViewMenu open active key={param.id}>
+												<TreeViewItemContainer >
+													<CheckBox
+														label={Titles.UseEnumeration}
+														onChange={(value: any) => {
+															let newparams = [...((this.state.parameters || []).filter(x => x.id !== param.id)), {
+																...param, useEnum: value
+															}];
+															this.setState({
+																parameters: newparams
+															})
+														}}
+														value={param.useEnum}
+													/>
+												</TreeViewItemContainer>
+												<TextBox
+													label={Titles.Name}
+													value={param.name}
+													onChange={(value: any) => {
+														let newparams = [...((this.state.parameters || []).filter(x => x.id !== param.id)), {
+															...param, name: value
+														}];
+														this.setState({
+															parameters: newparams
+														})
+													}}
+												/>
+												{param.useEnum ? null : <TreeViewItemContainer>
+													<SelectInput
+														label={Titles.Model}
+														value={param.type}
+														onChange={(val: string) => {
+															let newparams = [...((this.state.parameters || []).filter(x => x.id !== param.id)), {
+																...param, type: val
+															}];
+															this.setState({
+																parameters: newparams
+															})
+														}}
+														options={UIA.NodesByType(state, UIA.NodeTypes.Model).map((node: any) => {
+															return {
+																value: node.id,
+																title: UIA.GetNodeTitle(node)
+															}
+														})}
+													/> </TreeViewItemContainer>}
+												{!param.useEnum ? null : <TreeViewItemContainer>
+													<SelectInput
+														label={Titles.Enumeration}
+														value={param.enum}
+														onChange={(val: string) => {
+															let newparams = [...((this.state.parameters || []).filter(x => x.id !== param.id)), {
+																...param, enum: val
+															}];
+															this.setState({
+																parameters: newparams
+															})
+														}}
+														options={Object.entries(NodeAttributePropertyTypes).map((node: any) => {
+															return {
+																value: node[0],
+																title: node[0]
+															}
+														})}
+													/> </TreeViewItemContainer>}
+											</TreeViewMenu>
+										)
+									})}
+									<TreeViewItemContainer ><SelectInput
+										label={Titles.Maestros}
+										value={this.state.maestro}
+										onChange={(val: string) => {
+											this.setState({ maestro: val });
+										}}
+										options={UIA.NodesByType(state, UIA.NodeTypes.Maestro).map((node: any) => {
+											return {
+												value: node.id,
+												title: UIA.GetNodeTitle(node)
+											}
+										})}
+									/> </TreeViewItemContainer>
+									<TreeViewItemContainer >
+										<CheckBox
+											label={Titles.UseModelAsType}
+											onChange={(value: any) => {
+												this.setState({ useModelAsType: value })
+											}}
+											value={this.state.useModelAsType}
+										/>
+									</TreeViewItemContainer>
+									<TreeViewItemContainer >
+										<CheckBox
+											label={Titles.IsReferenceList}
+											onChange={(value: any) => {
+												this.setState({ referenceList: value })
+											}}
+											value={this.state.referenceList}
+										/>
+									</TreeViewItemContainer>
+									{this.state.useModelAsType ? <TreeViewItemContainer ><SelectInput
+										label={Titles.AddFunctionOutput}
+										value={this.state.selectedOutputModel}
+										onChange={(val: string) => {
+											this.setState({ selectedOutputModel: val });
+										}}
+										options={UIA.NodesByType(state, UIA.NodeTypes.Model).map((node: any) => {
+											return {
+												value: node.id,
+												title: UIA.GetNodeTitle(node)
+											}
+										})}
+									/> </TreeViewItemContainer> : <TreeViewItemContainer ><SelectInput
+										options={Object.keys(UIA.NodePropertyTypes)
+											.sort((a, b) => a.localeCompare(b))
+											.map((x) => {
+												return {
+													value: UIA.NodePropertyTypes[x],
+													title: x
+												};
+											})}
+										label={Titles.AddFunctionOutput}
+										onChange={(value: any) => {
+											this.setState({ selectedOutputType: value });
+										}}
+										value={this.state.selectedOutputType}
+									/> </TreeViewItemContainer>}
+								</TreeViewItemContainer>
+								<button
+									type="button"
+									className="btn btn-block btn-success btn-sm"
+									onClick={() => {
+										this.props.AddFunction({
+											...this.state
+										})
+									}}
+								>
+									{Titles.AddFunction}
+								</button>
+							</TreeViewMenu>
 							<TreeViewMenu
 								title="Check Shared Nodes"
 								open={UIA.Visual(state, 'Check Shared Nodes')}
@@ -220,7 +483,7 @@ class QuickMethods extends Component<any, any, any> {
 								<TreeViewMenu
 									title={'Create View Types'}
 									onClick={async () => {
-										const res = await CreateViewTypes(() => {});
+										const res = await CreateViewTypes(() => { });
 										graphOperation(res)(GetDispatchFunc(), GetStateFunc());
 									}}
 								/>
@@ -229,7 +492,7 @@ class QuickMethods extends Component<any, any, any> {
 									title="Create Component Shared All"
 									onClick={() => {
 										SetPause(true);
-										CreateComponentSharedAll(() => {}, null, (v: Node) => {
+										CreateComponentSharedAll(() => { }, null, (v: Node) => {
 											return true; // return v.id === currentNode.id;
 										}).then(() => {
 											SetPause(false);
@@ -241,7 +504,7 @@ class QuickMethods extends Component<any, any, any> {
 									title="Create Component All"
 									onClick={() => {
 										SetPause(true);
-										CreateComponentAll(() => {}).then(() => {
+										CreateComponentAll(() => { }).then(() => {
 											SetPause(false);
 										});
 									}}
@@ -251,7 +514,7 @@ class QuickMethods extends Component<any, any, any> {
 									title="Setup View Types"
 									onClick={() => {
 										SetPause(true);
-										SetupViewTypes(() => {}).then(() => {
+										SetupViewTypes(() => { }).then(() => {
 											SetPause(false);
 										});
 									}}
@@ -260,7 +523,7 @@ class QuickMethods extends Component<any, any, any> {
 								<TreeViewMenu
 									title="Add Agent Access Methods"
 									onClick={() => {
-										AddAgentAccessMethods(() => {});
+										AddAgentAccessMethods(() => { });
 									}}
 								/>
 								<TreeViewMenu
@@ -278,20 +541,20 @@ class QuickMethods extends Component<any, any, any> {
 								<TreeViewMenu
 									title="Connect Dashboards"
 									onClick={() => {
-										ConnectDashboards(() => true, () => {});
+										ConnectDashboards(() => true, () => { });
 									}}
 								/>
 								<TreeViewMenu
 									title="Connect Screens"
 									onClick={() => {
-										ConnectScreens(() => {}, () => true);
+										ConnectScreens(() => { }, () => true);
 									}}
 								/>
 								<TreeViewMenu
 									title="Connect Dashes only"
 									onClick={() => {
 										ConnectScreens(
-											() => {},
+											() => { },
 											(v: Node) => GetNodeProp(v, NodeProperties.IsDashboard)
 										);
 									}}
@@ -317,7 +580,7 @@ class QuickMethods extends Component<any, any, any> {
 								<TreeViewMenu
 									title="Connect Screen List Routes"
 									onClick={() => {
-										ConnectScreenListRoutes(() => {});
+										ConnectScreenListRoutes(() => { });
 									}}
 								/>
 								<TreeViewMenu
@@ -517,7 +780,7 @@ class QuickMethods extends Component<any, any, any> {
 									title="Connect Dashboards"
 									icon="fa fa-plus"
 									onClick={() => {
-										ConnectDashboards(() => true, () => {});
+										ConnectDashboards(() => true, () => { });
 									}}
 								/>
 								<TreeViewMenu
@@ -574,7 +837,7 @@ class QuickMethods extends Component<any, any, any> {
 										this.props.setState();
 										if (!this.state.buildingAll) {
 											this.setState({ buildingAll: true });
-											BuildAll(() => {});
+											BuildAll(() => { });
 										}
 									}}
 								/>
@@ -591,7 +854,7 @@ class QuickMethods extends Component<any, any, any> {
 									title="Update Screen Urls"
 									icon="fa fa-plus"
 									onClick={() => {
-										UpdateScreenUrls(() => {});
+										UpdateScreenUrls(() => { });
 									}}
 								/>
 								<TreeViewMenu
@@ -605,7 +868,7 @@ class QuickMethods extends Component<any, any, any> {
 								<TreeViewMenu
 									title="Add Title Service"
 									onClick={() => {
-										this.props.graphOperation([ addTitleService({ newItems: {} }) ]);
+										this.props.graphOperation([addTitleService({ newItems: {} })]);
 									}}
 								/>
 								<TreeViewMenu
@@ -626,21 +889,21 @@ class QuickMethods extends Component<any, any, any> {
 									title="Add Agent Methods"
 									icon="fa fa-plus"
 									onClick={() => {
-										AddAgentMethods(() => {});
+										AddAgentMethods(() => { });
 									}}
 								/>
 								<TreeViewMenu
 									title="Add Agent Access Methods"
 									icon="fa fa-plus"
 									onClick={() => {
-										AddAgentAccessMethods(() => {});
+										AddAgentAccessMethods(() => { });
 									}}
 								/>
 								<TreeViewMenu
 									title="Update Screen Parameters"
 									icon="fa fa-plus"
 									onClick={() => {
-										UpdateScreenParameters(() => {});
+										UpdateScreenParameters(() => { });
 									}}
 								/>
 							</TreeViewMenu>
@@ -763,7 +1026,7 @@ class QuickMethods extends Component<any, any, any> {
 											const viewName =
 												`${UIA.Visual(state, 'View Package Title') || ''}` ||
 												UIA.GetNodeTitle(currentNode);
-											[ ViewTypes.Create, ViewTypes.Update, ViewTypes.Delete, ViewTypes.Get ]
+											[ViewTypes.Create, ViewTypes.Update, ViewTypes.Delete, ViewTypes.Get]
 												.filter((x) => this.state.selectedMethods[x])
 												.map((t) => {
 													operations.push({

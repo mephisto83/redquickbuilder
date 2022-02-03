@@ -11,6 +11,7 @@ export const NodeTypes = {
 	Struct: 'struct',
 	UIMethod: 'UIMethod',
 	MethodApiParameters: 'method-api-parameters',
+	FunctionApiParameters: 'function-api-parameters',
 	EventHandler: 'EventHandler',
 	ComponentApiConnector: 'component-api-connector',
 	ScreenContainer: 'screen-container',
@@ -439,6 +440,7 @@ export const NodeProperties = {
 	DataChainCollectionChildrenCount: 'DataChainCollectionChildrenCount',
 	IsFetchOutput: 'IsFetchOutput',
 	UIActionMethod: 'UIActionMethod',
+	Maestro: 'Maestro',
 	HideStyle: 'HideStyle',
 	IsPropertyCentric: 'IsPropertyCentric',
 	RouteInjection: 'RouteInjection',
@@ -607,6 +609,8 @@ export const NodeProperties = {
 	UIPermissions: 'uiPermissions',
 	IsOwned: 'isOwned',
 	UIName: 'uiName', // The name used in the ui.
+	ParameterValueA: 'parameter-value-a',
+	ParameterValueB: 'parameter-value-b',
 	QueryParameterObjectExtendible: 'QueryParameterObjectExtendible',
 	QueryParameterObject: 'QueryParameterObject',
 	QueryParameterParam: 'QueryParameterParam',
@@ -820,8 +824,11 @@ export const LinkEvents = {
 export const LinkType = {
 	Choice: 'choice',
 	MethodApiParameters: 'MethodApiParameters',
+	FunctionApiParameterType: 'FunctionApiParameterType',
+	FunctionApiParameters: 'FunctionApiParameters',
 	DefaultViewType: 'DefaultViewType',
 	SharedComponent: 'SharedComponent',
+	PermissionSource: 'PermissionSource',
 	ScreenEffect: 'ScreenEffect', // Screen effects link to datachains, that can be used for defining $internalComponentState
 	// Connections to arguments used inside a lambda
 	ScreenEffectApi: 'ScreenEffectApi', // Screen effects api link to a datachain ,with the assumption that they will be an
@@ -893,6 +900,7 @@ export const LinkType = {
 	ValidatorModel: 'validator-model',
 	Configuration: 'configuration',
 	ExecutorFunction: 'executor-function',
+	FunctionOutputType: 'FunctionOutputType',
 	ValidatorFunction: 'validator-function',
 	ValidatorModelItem: 'validator-model-item',
 	ValidatorAgent: 'validator-agent',
@@ -1128,6 +1136,18 @@ export const LinkPropertyKeys = {
 export const LinkProperties = {
 	SharedComponent: {
 		type: LinkType.SharedComponent
+	},
+	FunctionOutputType: {
+		type: LinkType.FunctionOutputType
+	},
+	PermissionSource: {
+		type: LinkType.PermissionSource
+	},
+	FunctionApiParameters: {
+		type: LinkType.FunctionApiParameters
+	},
+	FunctionApiParameterType: {
+		type: LinkType.FunctionApiParameterType
 	},
 	UserOfAgentType: {
 		type: LinkType.UserOfAgentType
@@ -1527,6 +1547,9 @@ export const LinkProperties = {
 	ExecutorFunctionLink: {
 		type: LinkType.ExecutorFunction
 	},
+	FunctionOutput: {
+		type: LinkType.FunctionOutputType
+	},
 	OptionLink: {
 		type: LinkType.Option
 	},
@@ -1622,6 +1645,8 @@ export const ValidationRules: { [str: string]: string } = {
 	Email: 'email',
 	ExpirationMonth: 'expirationMonth',
 	BeforeNow: 'beforenow',
+	AfterNow: 'afternow',
+	BooleanOnly: 'booleanonly',
 	Year: 'year',
 	Debit: 'debit',
 	ExpirationYear: 'expirationYear',
@@ -1733,6 +1758,7 @@ export const NodeAttributePropertyTypes = {
 	MONEY: 'MONEY',
 	COUNTRY: 'COUNTRY',
 	DEBIT: 'DEBIT',
+	BIRTHDATE: "BIRTHDATE",
 	MONTH: 'MONTH',
 	STATE: 'STATE',
 	CHOICE: 'CHOICE',
@@ -1744,6 +1770,9 @@ export const NodeAttributePropertyTypes = {
 	BOOLEAN: 'BOOLEAN',
 	ACCOUNTNUMBER: 'ACCOUNTNUMBER',
 	ADDRESS: 'ADDRESS',
+	ADDRESSLINE1: 'ADDRESSLINE1',
+	ADDRESSLINE2: 'ADDRESSLINE2',
+	CITY: 'CITY',
 	COLLECTION: 'COLLECTION',
 	OBJECT: 'OBJECT',
 	RADIO: 'RADIO',
@@ -1752,7 +1781,56 @@ export const NodeAttributePropertyTypes = {
 	GEOLOCATION: 'GEOLOCATION',
 	YEAR: 'YEAR',
 	ENUMERATION: 'ENUMERATION',
-	NAME: 'NAME'
+	NAME: 'NAME',
+	CVV: 'cvv',
+	AlphaNumericLike: 'alphanumericlike',
+	AlphaNumeric: 'alphanumeric',
+	AlphaNumericPuncLike: 'alphaNumericpunclike',
+	AlphaOnly: 'alphaonly',
+	NumericOnly: 'numericonly',
+	Numeric: 'numeric',
+	Empty: 'empty',
+	AlphaOnlyWithSpaces: 'alphaonlywithspaces',
+	NotEmpty: 'notempty',
+	MaxLength: 'maxlength',
+	EqualsModelProperty: 'equals-model-property',
+	MinLength: 'minLength',
+	MaxLengthEqual: 'maxlengthEqual',
+	MinLengthEqual: 'minLengthEqual',
+	MaxLengthEqualOrEmpty: 'maxlengthEqualOrEmpty',
+	MinLengthEqualOrEmpty: 'minLengthEqualOrEmpty',
+	MaxValue: 'maxValue',
+	MinValue: 'minValue',
+	MaxValueEqual: 'maxValueEqual',
+	MinValueEqual: 'minValueEqual',
+	UrlEmpty: 'url_empty',
+	IsTrue: 'is_true',
+	IsFalse: 'is_false',
+	GreaterThan: 'greater_than',
+	GreaterThanOrEqualTo: 'greater_than_equal_to',
+	LessThan: 'less_than',
+	LessThanOrEqualTo: 'less_than_equal_to',
+	EqualTo: 'equal_to',
+	Any: 'any',
+	Url: 'url',
+	EmailEmpty: 'email_empty',
+	Credit: 'credit',
+	Email: 'email',
+	ExpirationMonth: 'expirationMonth',
+	BeforeNow: 'beforenow',
+	AfterNow: 'afternow',
+	BooleanOnly: 'booleanonly',
+	Year: 'year',
+	Debit: 'debit',
+	ExpirationYear: 'expirationYear',
+	PastDate: 'pastdate',
+	ZipEmpty: 'zipempty',
+	Zip: 'zip',
+	SocialSecurity: 'socialsecurity',
+	ListOfGuids: 'listofguids',
+	IsNull: 'isNull',
+	IsNotNull: 'isNotNull',
+	OneOf: 'one-of'
 };
 
 const COMMON_DATETIME_ARGS = {

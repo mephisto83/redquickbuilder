@@ -41,6 +41,7 @@ import { DataChainType } from '../nodepacks/datachain/BuildDataChainAfterEffectC
 import { ProgrammingLanguages, NodePropertyTypesByLanguage, NEW_LINE } from '../constants/nodetypes';
 import fs from 'fs';
 import routes from '../constants/routes';
+import AddAttributeOfType from '../nodepacks/attributes/AddAttributeOfType';
 export const VISUAL = 'VISUAL';
 export const MINIMIZED = 'MINIMIZED';
 export const BATCH = 'BATCH';
@@ -100,7 +101,7 @@ export function GetScreenUrl(op: any, overrideText: any = null) {
 	return convertToURLRoute(route);
 }
 export function convertToURLRoute(x: string) {
-	return [ ...x.split(' ') ].filter((x) => x).join('/').toLowerCase();
+	return [...x.split(' ')].filter((x) => x).join('/').toLowerCase();
 }
 export const UI_UPDATE = 'UI_UPDATE';
 export function GetC(state: any, section: any, item: any) {
@@ -142,7 +143,7 @@ export function ScreenOptionFilter(x: any) {
 	}
 
 	if (
-		[ 'Change User Password', 'Continue As', 'Forgot Login', 'Anonymous Guest', 'Authenticate', 'Register' ].some(
+		['Change User Password', 'Continue As', 'Forgot Login', 'Anonymous Guest', 'Authenticate', 'Register'].some(
 			(v) => v === GetNodeProp(x, NodeProperties.ViewPackageTitle)
 		)
 	) {
@@ -232,7 +233,7 @@ export function CopyKey(key: any) {
 export function IsCurrentNodeA(state: any, type: any) {
 	const currentNode: _.Node = Node(state, Visual(state, SELECTED_NODE));
 	if (!Array.isArray(type)) {
-		type = [ type ];
+		type = [type];
 	}
 	return currentNode && currentNode.properties && type.some((v: any) => v === currentNode.properties.nodeType);
 }
@@ -592,6 +593,388 @@ export function addQueryMethodParameter() {
 		PerformGraphOperation(operations)(dispatch, getState);
 	};
 }
+export function addFunctionParameter() {
+	return (dispatch: any, getState: Function) => {
+		const state = getState();
+		const currentNode: any = Node(state, Visual(state, SELECTED_NODE));
+		const operations = [];
+		operations.push({
+			operation: ADD_NEW_NODE,
+			options() {
+				return {
+					nodeType: NodeTypes.Parameter,
+					properties: {
+						[NodeProperties.UIText]: 'Parameter',
+						[NodeProperties.QueryParameterParam]: true
+					},
+					parent: currentNode.id,
+					groupProperties: {},
+					linkProperties: {
+						properties: {
+							...LinkProperties.FunctionApiParameters,
+							params: true,
+							query: true
+						}
+					}
+				};
+			}
+		});
+		PerformGraphOperation(operations)(dispatch, getState);
+	};
+}
+function _addFunctionParameter(parameterName: string, functionId: string, callback: any) {
+	return {
+		operation: ADD_NEW_NODE,
+		options() {
+			return {
+				nodeType: NodeTypes.Parameter,
+				properties: {
+					[NodeProperties.UIText]: parameterName,
+					[NodeProperties.QueryParameterParam]: true,
+					[NodeProperties.Pinned]: true
+				},
+				parent: functionId,
+				callback,
+				groupProperties: {},
+				linkProperties: {
+					properties: {
+						...LinkProperties.FunctionApiParameters,
+						params: true,
+						query: true
+					}
+				}
+			};
+		}
+	}
+}
+export function AddFunction(params: any) {
+	return (dispatch: any, getState: Function) => {
+		const state = getState();
+		let currentNode: any = null;
+		const operations: any = [{
+			operation: ADD_NEW_NODE,
+			options() {
+				return {
+					nodeType: NodeTypes.Function,
+					callback: (newnode: any) => {
+						functionId = newnode.id;
+						currentNode = newnode;
+					},
+					properties: {
+						[NodeProperties.UIText]: params.functionName,
+						[NodeProperties.Pinned]: true
+					},
+					links: []
+				};
+			}
+		}];
+		if (params.agentId) {
+			operations.push(function () {
+				return [{
+					operation: REMOVE_LINK_BETWEEN_NODES,
+					options: {
+						target: currentNode.properties[NodeProperties.Agent],
+						source: params.agentId
+					}
+				}, {
+					operation: CHANGE_NODE_PROPERTY,
+					options: {
+						prop: NodeProperties.Agent,
+						id: functionId,
+						value: params.agentId
+					}
+				}, {
+					operation: CHANGE_NODE_PROPERTY,
+					options: {
+						prop: NodeProperties.Pinned,
+						id: functionId,
+						value: true
+					}
+				}, {
+					operation: ADD_LINK_BETWEEN_NODES,
+					options: {
+						target: params.agentId,
+						source: functionId,
+						properties: { ...LinkProperties.FunctionOperator }
+					}
+				}]
+			})
+		}
+		if (params.maestro) {
+			operations.push(function () {
+				return [{
+					operation: REMOVE_LINK_BETWEEN_NODES,
+					options: {
+						target: currentNode.properties[NodeProperties.Maestro],
+						source: params.maestro
+					}
+				}, {
+					operation: CHANGE_NODE_PROPERTY,
+					options: {
+						prop: NodeProperties.Maestro,
+						id: functionId,
+						value: params.maestro
+					}
+				}, {
+					operation: CHANGE_NODE_PROPERTY,
+					options: {
+						prop: NodeProperties.Pinned,
+						id: params.maestro,
+						value: true
+					}
+				}, {
+					operation: ADD_LINK_BETWEEN_NODES,
+					options: {
+						target: params.maestro,
+						source: functionId,
+						properties: { ...LinkProperties.FunctionLink }
+					}
+				}]
+			})
+		}
+		if (params.model) {
+			operations.push(function () {
+				return [{
+					operation: REMOVE_LINK_BETWEEN_NODES,
+					options: {
+						target: currentNode.properties[NodeProperties.Model],
+						source: params.model
+					}
+				}, {
+					operation: CHANGE_NODE_PROPERTY,
+					options: {
+						prop: NodeProperties.Model,
+						id: functionId,
+						value: params.model
+					}
+				}, {
+					operation: CHANGE_NODE_PROPERTY,
+					options: {
+						prop: NodeProperties.Pinned,
+						id: params.model,
+						value: true
+					}
+				}, {
+					operation: ADD_LINK_BETWEEN_NODES,
+					options: {
+						target: params.model,
+						source: functionId,
+						properties: { ...LinkProperties.ModelTypeLink }
+					}
+				}]
+			})
+		}
+		if (params.functionType) {
+			operations.push(function () {
+				return [{
+					operation: CHANGE_NODE_PROPERTY,
+					options: {
+						prop: NodeProperties.FunctionType,
+						id: functionId,
+						value: params.functionType
+					}
+				}, {
+					operation: CHANGE_NODE_PROPERTY,
+					options: {
+						prop: NodeProperties.Pinned,
+						id: params.functionType,
+						value: true
+					}
+				}, {
+					operation: APPLY_FUNCTION_CONSTRAINTS,
+					options: {
+						id: functionId,
+						value: params.functionType
+					}
+				}]
+			})
+		}
+		if (params.method) {
+			operations.push(function () {
+				return [{
+					operation: CHANGE_NODE_PROPERTY,
+					options: {
+						prop: NodeProperties.MethodType,
+						id: functionId,
+						value: params.method
+					}
+				}]
+			});
+		}
+		if (params.httpMethod) {
+			operations.push(function () {
+				return [{
+					operation: CHANGE_NODE_PROPERTY,
+					options: {
+						prop: NodeProperties.HttpMethod,
+						id: functionId,
+						value: params.httpMethod
+					}
+				}]
+			});
+		}
+		if (params.permissionSource) {
+			operations.push(function () {
+				return [{
+					operation: REMOVE_LINK_BETWEEN_NODES,
+					options: {
+						target: currentNode.properties[NodeProperties.PermissionImpl],
+						source: params.permissionSource
+					}
+				}, {
+					operation: CHANGE_NODE_PROPERTY,
+					options: {
+						prop: NodeProperties.PermissionImpl,
+						id: functionId,
+						value: params.permissionSource
+					}
+				}, {
+					operation: CHANGE_NODE_PROPERTY,
+					options: {
+						prop: NodeProperties.Pinned,
+						id: params.permissionSource,
+						value: true
+					}
+				}, {
+					operation: ADD_LINK_BETWEEN_NODES,
+					options: {
+						target: params.permissionSource,
+						source: functionId,
+						properties: { ...LinkProperties.PermissionSource }
+					}
+				}]
+			})
+		}
+		if (params.permissionEnum) {
+			operations.push(function () {
+				return [{
+					operation: REMOVE_LINK_BETWEEN_NODES,
+					options: {
+						target: currentNode.properties[NodeProperties.PermissionValueType],
+						source: params.permissionEnum
+					}
+				}, {
+					operation: CHANGE_NODE_PROPERTY,
+					options: {
+						prop: NodeProperties.PermissionValueType,
+						id: functionId,
+						value: params.permissionEnum
+					}
+				}, {
+					operation: CHANGE_NODE_PROPERTY,
+					options: {
+						prop: NodeProperties.Pinned,
+						id: params.permissionEnum,
+						value: true
+					}
+				}, {
+					operation: ADD_LINK_BETWEEN_NODES,
+					options: {
+						target: params.permissionEnum,
+						source: functionId,
+						properties: { ...LinkProperties.PermissionLink }
+					}
+				}]
+			})
+		}
+		operations.push(function () {
+			let function_output_node: any = null;
+			return [{
+				operation: NEW_FUNCTION_OUTPUT_NODE,
+				options: {
+					parent: functionId,
+					callback: (newnode: any) => {
+						function_output_node = newnode;
+					},
+					linkProperties: {
+						properties: LinkProperties.FunctionOutput
+					}
+				}
+			}, function () {
+				return {
+					operation: CHANGE_NODE_PROPERTY,
+					options: {
+						prop: NodeProperties.Pinned,
+						id: function_output_node.id,
+						value: true
+					}
+				}
+			}]
+		})
+		let functionId: string = '';
+		(params.parameters || []).forEach((param: any) => {
+			let paramNodeId = '';
+			let newParamNode: any = null;
+			operations.push(() => {
+				return _addFunctionParameter(param.name, functionId, (newparameter: any) => {
+					paramNodeId = newparameter.id;
+					newParamNode = newparameter;
+				})
+			}, param.useEnum && param.enum ? () => {
+				return function () {
+					let param_Attr: any = null;
+					return [{
+						operation: NEW_ATTRIBUTE_NODE,
+						options: {
+							parent: paramNodeId,
+							groupProperties: {},
+							linkProperties: {
+								properties: {
+									type: 'attribute-link',
+									'attribute-link': {}
+								}
+							},
+							callback: (new_attr: any) => {
+								param_Attr = new_attr;
+							}
+						}
+					}, function () {
+						return {
+							operation: CHANGE_NODE_TEXT,
+							options: {
+								id: param_Attr.id,
+								value: param.enum
+							}
+						}
+					}, function () {
+						return {
+							operation: CHANGE_NODE_PROPERTY,
+							options: {
+								id: param_Attr.id,
+								value: NodeAttributePropertyTypes[param.enum]
+							}
+						}
+					}]
+				}
+			} : () => {
+				return function () {
+					return [{
+						operation: REMOVE_LINK_BETWEEN_NODES,
+						options: {
+							target: param.type,
+							source: paramNodeId
+						}
+					}, {
+						operation: CHANGE_NODE_PROPERTY,
+						options: {
+							prop: NodeProperties.QueryParameterParamType,
+							id: newParamNode.id,
+							value: param.type
+						}
+					}, {
+						operation: ADD_LINK_BETWEEN_NODES,
+						options: {
+							target: paramNodeId,
+							source: param.type,
+							properties: { ...LinkProperties.FunctionApiParameterType }
+						}
+					}]
+				}
+			});
+		})
+		PerformGraphOperation(operations)(dispatch, getState);
+	}
+}
 export function addQueryMethodApi() {
 	return (dispatch: any, getState: Function) => {
 		const state = getState();
@@ -646,7 +1029,7 @@ export function connectLifeCycleMethod(args: { properties: any; target: any; sou
 
 export function addComponentEventTo(node: any, apiName: any) {
 	return (dispatch: any, getState: any) => {
-		graphOperation([ ComponentEventTo(node, apiName) ])(dispatch, getState);
+		graphOperation([ComponentEventTo(node, apiName)])(dispatch, getState);
 	};
 }
 export function ComponentEventTo(node: any, apiName: any, callback?: Function) {
@@ -856,9 +1239,9 @@ export function GetRelativeDataChainPath(node: any): any {
 		direction: GraphMethods.SOURCE
 	});
 	if (collections && collections.length) {
-		return [ ...GetRelativeDataChainPath(collections[0]), GetJSCodeName(node) ];
+		return [...GetRelativeDataChainPath(collections[0]), GetJSCodeName(node)];
 	}
-	return [ GetJSCodeName(node) ];
+	return [GetJSCodeName(node)];
 }
 
 export function computeNamespace(node: any) {
@@ -903,7 +1286,7 @@ export function GetModelPropertyChildren(id: string, options: any = {}) {
 	if (GetNodeProp(id, NodeProperties.NODEType) === NodeTypes.Model || GetNodeProp(id, NodeProperties.IsUser)) {
 		userModels = GetUserReferenceNodes(id);
 	}
-	return [ ...userModels, ...propertyNodes, ...logicalChildren ]
+	return [...userModels, ...propertyNodes, ...logicalChildren]
 		.filter((x) => x.id !== id)
 		.unique((v: { id: any }) => v.id);
 }
@@ -931,7 +1314,7 @@ export function GetModelCodeProperties(id: string) {
 	if (GetNodeProp(id, NodeProperties.NODEType) === NodeTypes.Model || GetNodeProp(id, NodeProperties.IsUser)) {
 		userModels = GetUserReferenceNodes(id);
 	}
-	return [ ...userModels, ...propertyNodes, ...logicalChildren ]
+	return [...userModels, ...propertyNodes, ...logicalChildren]
 		.filter((x) => x.id !== id)
 		.unique((v: { id: any }) => v.id);
 }
@@ -1195,6 +1578,12 @@ export function GetConditionSetup(condition: any) {
 export function GetDataChainEntryNodes(cs?: any) {
 	return GraphMethods.GetDataChainEntryNodes(_getState(), cs);
 }
+export function GetProperty(currentNode: any, property: any) {
+	if (currentNode && currentNode.properties) {
+		return currentNode.properties[property]
+	}
+	return null;
+}
 export function IsModel(id: string) {
 	return GetNodeProp(id, NodeProperties.NODEType) === NodeTypes.Model;
 }
@@ -1347,7 +1736,7 @@ export function GenerateChainFunction(id: any, options: { language: any }) {
 		let interface_type: string = generateContextInterfaces(GetNodeById(id), anyType);
 		if (interface_type) {
 			anyType = `: ${interface_type}`;
-			overridArg = [ '$internalComponentState' ];
+			overridArg = ['$internalComponentState'];
 		}
 	}
 
@@ -1404,7 +1793,7 @@ function GetExtraArgs(id: string) {
 		let calculateEventArguments = GetEventArguments(argumentSource.id);
 		// let internalApiArgs = createInternalApiArgumentsCode(apiInternalNodes, calculateEventArguments);
 
-		return [ createInternalApiArguments(apiInternalNodes, calculateEventArguments) ];
+		return [createInternalApiArguments(apiInternalNodes, calculateEventArguments)];
 	}
 	return [];
 }
@@ -1453,13 +1842,13 @@ function generateContextInterfaces(currentNode: GraphTypes.Node, anyType?: strin
 	}
 	if (currentNode && (screenEffectApis.length || contextParameters.length)) {
 		result = `{
-${[ ...screenEffectApis, ...contextParameters, ...eventArgNames, ...possibleDataChainParams, 'viewModel', 'value' ]
-			.filter((x: string) => x)
-			.unique()
-			.map((param: string) => {
-				return `${param}?: string | number | null`;
-			})
-			.join(`,${NodeConstants.NEW_LINE}`)}
+${[...screenEffectApis, ...contextParameters, ...eventArgNames, ...possibleDataChainParams, 'viewModel', 'value']
+				.filter((x: string) => x)
+				.unique()
+				.map((param: string) => {
+					return `${param}?: string | number | null`;
+				})
+				.join(`,${NodeConstants.NEW_LINE}`)}
 }
     `;
 	}
@@ -1587,7 +1976,7 @@ export function GetDataChainArgs(id: string) {
 		if (merge) {
 			return Object.keys(ui);
 		}
-		return [ '$id?' ];
+		return ['$id?'];
 	}
 	return [];
 }
@@ -1699,14 +2088,14 @@ export function GetDataChainCollections(options: { language: any; collection: an
 	const graph = GetCurrentGraph();
 	const temp = collection
 		? GraphMethods.GetNodesLinkedTo(GetCurrentGraph(), {
-				id: collection,
-				link: NodeConstants.LinkType.DataChainCollection,
-				direction: GraphMethods.TARGET
-			}).filter(
-				(x: any) =>
-					GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.DataChainCollection &&
-					CollectionIsInLanguage(graph, x.id, language)
-			)
+			id: collection,
+			link: NodeConstants.LinkType.DataChainCollection,
+			direction: GraphMethods.TARGET
+		}).filter(
+			(x: any) =>
+				GetNodeProp(x, NodeProperties.NODEType) === NodeTypes.DataChainCollection &&
+				CollectionIsInLanguage(graph, x.id, language)
+		)
 		: [];
 
 	return NodesByType(null, NodeTypes.DataChainCollection)
@@ -1824,7 +2213,7 @@ export function GenerateChainFunctionSpecs(options: { language: any; collection:
 			return !collections || !collections.length;
 		});
 
-	const basicentryvalues = [ undefined, null, 0, {}, 'a string', 1.1, [], [ 1 ], [ '1' ], [ '1', 1 ] ];
+	const basicentryvalues = [undefined, null, 0, {}, 'a string', 1.1, [], [1], ['1'], ['1', 1]];
 
 	entryNodes.map((entryNode: any) => {
 		basicentryvalues.map((val) => {
@@ -1834,7 +2223,7 @@ export function GenerateChainFunctionSpecs(options: { language: any; collection:
 	return result;
 }
 export function GenerateSimpleTest(node: any, val: {} | null | undefined) {
-	let _value = [ 'object', 'string' ].some((v) => typeof val === v && val !== undefined && val !== null)
+	let _value = ['object', 'string'].some((v) => typeof val === v && val !== undefined && val !== null)
 		? JSON.stringify(val)
 		: val;
 	if (val === undefined) {
@@ -1916,9 +2305,9 @@ export function GetDataChainNextId(id: any, graph?: any) {
 	return next && next.id;
 }
 export function GetDataChainParts(id: any, result?: any) {
-	result = result || [ id ];
+	result = result || [id];
 	result.push(id);
-	result = [ ...result ].unique();
+	result = [...result].unique();
 	const node = GetNodeById(id);
 	const nodeGroup = GetNodeProp(node, NodeProperties.Groups) || {};
 	let groups = Object.values(nodeGroup);
@@ -1931,7 +2320,7 @@ export function GetDataChainParts(id: any, result?: any) {
 		);
 		result.push(...dc.map((v: { id: any }) => v.id));
 		dc.map((_dc: any) => {
-			groups = [ ...groups, ...Object.values(GetNodeProp(_dc, NodeProperties.Groups) || {}) ];
+			groups = [...groups, ...Object.values(GetNodeProp(_dc, NodeProperties.Groups) || {})];
 		});
 		groups.map((g) => {
 			const nodes = GetNodesInGroup(g);
@@ -1946,7 +2335,7 @@ export function GetNodesInGroup(groupId: unknown) {
 	return GraphMethods.GetNodesInGroup(GetCurrentGraph(_getState()), groupId);
 }
 export function GetDataChainFrom(id: any) {
-	const result = [ id ];
+	const result = [id];
 	let current = id;
 	const graph = GetRootGraph(_getState());
 	if (!graph) {
@@ -2320,8 +2709,8 @@ export function GenerateDataChainMethod(id: string, options: { language: any }) 
 		case DataChainFunctionKeys.Merge:
 			return `() => {
         ${Object.keys(funcs || {})
-			.map((key) => `let ${key}${anyType} = DC.${GetCodeName(funcs[key], { includeNameSpace: true })}();`)
-			.join(NodeConstants.NEW_LINE)}
+					.map((key) => `let ${key}${anyType} = DC.${GetCodeName(funcs[key], { includeNameSpace: true })}();`)
+					.join(NodeConstants.NEW_LINE)}
         ${lambda}
       }`;
 		case DataChainFunctionKeys.ListReference:
@@ -2490,7 +2879,7 @@ function buildModelMethodMenu(options: { language: any }) {
 		(x: any) => GetNodeProp(x, NodeProperties.ViewType) === ViewTypes.GetAll
 	);
 	const underPages = NodesByType(null, NodeTypes.Screen).filter((x: any) =>
-		[ ViewTypes.Create, ViewTypes.GetAll ].some((v) => v === GetNodeProp(x, NodeProperties.ViewType))
+		[ViewTypes.Create, ViewTypes.GetAll].some((v) => v === GetNodeProp(x, NodeProperties.ViewType))
 	);
 
 	const screens = listPages.map((v: any) => `{ title: '${GetNodeTitle(v)}', name: 'top-${GetCodeName(v)}' }`);
@@ -2510,7 +2899,7 @@ function buildModelMethodMenu(options: { language: any }) {
 }
 export function untransformLambda(value: string, currentNode: any): string {
 	if (currentNode) {
-		const models: _.Node[] = NodesByType(null, [ NodeTypes.Model, NodeTypes.Enumeration ])
+		const models: _.Node[] = NodesByType(null, [NodeTypes.Model, NodeTypes.Enumeration])
 			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromController))
 			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration));
 		models.sort((a, b) => GetCodeName(a).length - GetCodeName(b).length).forEach((item) => {
@@ -2553,7 +2942,7 @@ export function GetArbitersForNodeType(type: string) {
 		Object.values(methodProps).map((id: any) => {
 			const node = GetGraphNode(id);
 			const nodeType = GetNodeProp(node, NodeProperties.NODEType);
-			if ([ NodeTypes.Model ].some((v) => v === nodeType)) {
+			if ([NodeTypes.Model].some((v) => v === nodeType)) {
 				models.push(id);
 			}
 		});
@@ -2757,11 +3146,11 @@ export function GetCombinedCondition(id: any, language = NodeConstants.Programmi
 	conditions.map((condition: any) => {
 		const selectedConditionSetup = GetSelectedConditionSetup(id, condition);
 		const res = GetConditionsClauses(id, selectedConditionSetup, language, options);
-		clauses = [ ...clauses, ...res.map((t) => t.clause) ];
+		clauses = [...clauses, ...res.map((t) => t.clause)];
 	});
 	customMethods.map((customMethod: any) => {
 		const res = GetCustomMethodClauses(customMethod, methodNodeParameters, language);
-		clauses = [ ...clauses, ...res.map((t) => t.clause) ];
+		clauses = [...clauses, ...res.map((t) => t.clause)];
 	});
 
 	switch (GetNodeProp(node, NodeProperties.NODEType)) {
@@ -3571,7 +3960,7 @@ export function pin(ids: string[]) {
 }
 
 export function GUID() {
-	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
 		const r = (Math.random() * 16) | 0;
 
 		const v = c == 'x' ? r : (r & 0x3) | 0x8;
@@ -3607,7 +3996,7 @@ export function loadRedQuickConfiguration() {
 				}
 				let content = fs.readFileSync(path.join(redquickbuilder_folder, 'config.json'), 'utf-8');
 				let config = JSON.parse(content);
-				dispatch(Batch([ UIC(VISUAL, RED_QUICK_CONFIG, config) ]));
+				dispatch(Batch([UIC(VISUAL, RED_QUICK_CONFIG, config)]));
 			});
 		}
 	};
@@ -3639,7 +4028,7 @@ export function updateRedQuickConfiguration(config: RedQuickConfiguration) {
 				}
 				let content = fs.readFileSync(path.join(redquickbuilder_folder, 'config.json'), 'utf-8');
 				config = JSON.parse(content);
-				dispatch(Batch([ UIC(VISUAL, RED_QUICK_CONFIG, config) ]));
+				dispatch(Batch([UIC(VISUAL, RED_QUICK_CONFIG, config)]));
 			});
 		}
 	};
@@ -3803,7 +4192,7 @@ export const NODE_CONNECTIONS = 'NODE_CONNECTIONS';
 export function setVisual(key: string, value: any) {
 	if (key === SELECTED_NODE || key === SELECTED_NODE_BB)
 		if (GraphMethods.Paused()) {
-			return () => {};
+			return () => { };
 		}
 	return (dispatch: Function, getState: Function) => {
 		dispatch(UIC(VISUAL, key, value));
@@ -3989,7 +4378,7 @@ export function GetNodeTitle(node: any) {
 export function GetNodes(state: any) {
 	const currentGraph = GetCurrentGraph(state);
 	if (currentGraph) {
-		return [ ...currentGraph.nodes.map((t: any) => currentGraph.nodeLib[t]) ];
+		return [...currentGraph.nodes.map((t: any) => currentGraph.nodeLib[t])];
 	}
 	return [];
 }
@@ -4086,17 +4475,17 @@ export function $addComponentApiNodes(
 		},
 		externalApiId
 			? {
-					operation: ADD_LINK_BETWEEN_NODES,
-					options() {
-						return {
-							target: externalApiId,
-							source: componentExternalValue,
-							properties: {
-								...LinkProperties.ComponentExternalConnection
-							}
-						};
-					}
+				operation: ADD_LINK_BETWEEN_NODES,
+				options() {
+					return {
+						target: externalApiId,
+						source: componentExternalValue,
+						properties: {
+							...LinkProperties.ComponentExternalConnection
+						}
+					};
 				}
+			}
 			: null
 	].filter((x) => x);
 }
@@ -4153,7 +4542,7 @@ export function NodesByType(state: null, nodeType: string | any[], options: any 
 	const currentGraph = options.useRoot ? GetRootGraph(state) : GetCurrentGraph(state);
 	if (currentGraph) {
 		if (!Array.isArray(nodeType)) {
-			nodeType = [ nodeType ];
+			nodeType = [nodeType];
 		}
 		return GraphMethods.NodesByType(currentGraph, nodeType, options);
 	}
@@ -4221,7 +4610,7 @@ export const JOB_FILES = 'JOB_FILES';
 let runningGitRunPromise = false;
 let gitrunPromise = Promise.resolve();
 export function loadGitRuns() {
-	return (dispatch: Function, getState: Function) => {};
+	return (dispatch: Function, getState: Function) => { };
 }
 // }
 export const JOB_INFO = 'JOB_INFO';
@@ -4372,7 +4761,7 @@ export function getConnectedNodesByLinkType(model: any, linkType: any) {
 }
 export function setPinned(id: string | string[], pinned: boolean = false) {
 	if (!Array.isArray(id)) {
-		id = [ id ];
+		id = [id];
 	}
 	if (id) {
 		_dispatch(
@@ -4651,8 +5040,8 @@ export function setRootGraph(key: any, value: any) {
 export function setAppsettingsAssemblyPrefixes(prefixes: any) {
 	return (dispatch: Function, getState: Function) => {
 		const rootGraph = GetRootGraph(getState(), dispatch);
-		rootGraph.appConfig.AppSettings.AssemblyPrefixes = [ 'RedQuick', prefixes ].unique((x: any) => x).join(';');
-		rootGraph.appConfig.AppSettings.DatabaseId = [ prefixes ].unique((x: any) => x).join(';');
+		rootGraph.appConfig.AppSettings.AssemblyPrefixes = ['RedQuick', prefixes].unique((x: any) => x).join(';');
+		rootGraph.appConfig.AppSettings.DatabaseId = [prefixes].unique((x: any) => x).join(';');
 		SaveGraph(rootGraph, dispatch);
 	};
 }
@@ -4797,7 +5186,7 @@ export function GetNodesLinkTypes(id: any) {
 
 export function addInstanceFunc(node: any | any, callback: any, viewPackages?: any, option: any = {}) {
 	viewPackages = viewPackages || {};
-	return function() {
+	return function () {
 		if (typeof node === 'function') {
 			node = node();
 		}
@@ -4874,7 +5263,7 @@ export function selectAllConnected(id: string) {
 			id
 		});
 		graphOperation([
-			...[ ...nodes, GetNodeById(id) ].map((t) => ({
+			...[...nodes, GetNodeById(id)].map((t) => ({
 				operation: CHANGE_NODE_PROPERTY,
 				options() {
 					return {
@@ -4894,7 +5283,7 @@ export function selectAllInViewPackage(id: string) {
 			[NodeProperties.ViewPackage]: GetNodeProp(node, NodeProperties.ViewPackage)
 		});
 		graphOperation([
-			...[ ...nodes ].map((t) => ({
+			...[...nodes].map((t) => ({
 				operation: CHANGE_NODE_PROPERTY,
 				options() {
 					return {
@@ -5191,7 +5580,7 @@ export function graphOperation(operation: any, options?: any, stamp?: any, graph
 		}
 		let operations = operation;
 		if (!Array.isArray(operation)) {
-			operations = [ { operation, options } ];
+			operations = [{ operation, options }];
 		}
 
 		currentGraph = handleArrayOperations(
@@ -5353,7 +5742,7 @@ function handleOperation(
 							properties: {
 								...LinkProperties.TitleServiceLink,
 								singleLink: true,
-								nodeTypes: [ NodeTypes.TitleService ]
+								nodeTypes: [NodeTypes.TitleService]
 							}
 						},
 						(link: GraphLink) => {

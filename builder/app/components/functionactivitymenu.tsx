@@ -13,14 +13,31 @@ import { HTTP_METHODS, MethodFunctions } from '../constants/functiontypes';
 import { NodeProperties, Methods } from '../constants/nodetypes';
 
 class FunctionActivityMenu extends Component<any, any> {
+    constructor(props: any) {
+        super(props);
+        this.state = {}
+    }
     render() {
         var { state } = this.props;
         var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Function);
         if (!active) {
-          return <div />;
+            return <div />;
         }
         var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
-        var agent_nodes = UIA.NodesByType(state, UIA.NodeTypes.Model).filter(x => UIA.GetNodeProp(x, UIA.NodeProperties.IsAgent)).map(node => {
+        var model_nodes = UIA.NodesByType(state, UIA.NodeTypes.Model);
+        var agent_nodes = model_nodes.filter(x => UIA.GetNodeProp(x, UIA.NodeProperties.IsAgent)).map(node => {
+            return {
+                value: node.id,
+                title: UIA.GetNodeTitle(node)
+            }
+        });
+        model_nodes = model_nodes.map(node => {
+            return {
+                value: node.id,
+                title: UIA.GetNodeTitle(node)
+            }
+        });
+        var enum_nodes = UIA.NodesByType(state, UIA.NodeTypes.Enumeration).map(node => {
             return {
                 value: node.id,
                 title: UIA.GetNodeTitle(node)
@@ -40,11 +57,11 @@ class FunctionActivityMenu extends Component<any, any> {
                     onChange={(value) => {
                         var id = currentNode.id;
                         this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
-                            target: currentNode.properties[UIA.NodeProperties.UIExtension],
+                            target: currentNode.properties[UIA.NodeProperties.Agent],
                             source: id
                         })
                         this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
-                            prop: UIA.NodeProperties.UIExtension,
+                            prop: UIA.NodeProperties.Agent,
                             id: currentNode.id,
                             value
                         });
@@ -54,8 +71,47 @@ class FunctionActivityMenu extends Component<any, any> {
                             properties: { ...UIA.LinkProperties.FunctionOperator }
                         });
                     }}
-                    value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.UIPermissions] : ''} />) : null}
+                    value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.Agent] : ''} />) : null}
 
+                {!currentNode ? null : <SelectInput
+                    options={UIA.NodesByType(state, UIA.NodeTypes.Model)
+                        .map((x) => {
+                            return {
+                                value: x.id,
+                                title: UIA.GetNodeTitle(x)
+                            };
+                        })}
+                    label={Titles.Model}
+                    onChange={(value) => {
+                        var id = currentNode.id;
+                        this.props.graphOperation([
+                            {
+                                operation: UIA.REMOVE_LINK_BETWEEN_NODES,
+                                options: {
+                                    target: currentNode.properties[UIA.NodeProperties.Model],
+                                    source: id
+                                }
+                            },
+                            {
+                                operation: UIA.CHANGE_NODE_PROPERTY,
+                                options: {
+                                    prop: UIA.NodeProperties.Model,
+                                    id: currentNode.id,
+                                    value
+                                }
+                            },
+                            {
+                                operation: UIA.ADD_LINK_BETWEEN_NODES,
+                                options: {
+                                    target: value,
+                                    source: id,
+                                    properties: { ...UIA.LinkProperties.ModelTypeLink }
+                                }
+                            }
+                        ]);
+                    }}
+                    value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.Model)}
+                />}
                 {currentNode ? (<CheckBox
                     label={Titles.CustomFunction}
                     title={Titles.CustomFunctionDescription}
@@ -119,16 +175,61 @@ class FunctionActivityMenu extends Component<any, any> {
                         this.props.graphOperation([{ operation: UIA.ESTABLISH_SCOPE }, { options: { id: currentNode.id } }])
                     }} icon={'fa fa-puzzle-piece'} title={Titles.CustomFunction} description={Titles.CustomFunctionDescription} />) : null}
                     {currentNode ? (<ControlSideBarMenuItem onClick={() => {
-                        this.props.graphOperation(UIA.NEW_PARAMETER_NODE, {
-                            parent: UIA.Visual(state, UIA.SELECTED_NODE)
-                        });
+                        this.props.addFunctionParameter()
                     }} icon={'fa fa-puzzle-piece'} title={Titles.AddParameter} description={Titles.AddParameterDescription} />) : null}
                     {currentNode ? (<ControlSideBarMenuItem onClick={() => {
                         this.props.graphOperation(UIA.NEW_FUNCTION_OUTPUT_NODE, {
-                            parent: UIA.Visual(state, UIA.SELECTED_NODE)
+                            parent: UIA.Visual(state, UIA.SELECTED_NODE),
+                            linkProperties: {
+                                properties: UIA.LinkProperties.FunctionOutput
+                            }
                         });
+
                     }} icon={'fa fa-puzzle-piece'} title={Titles.AddFunctionOutput} description={Titles.AddFunctionOutputDescription} />) : null}
                 </ControlSideBarMenu>
+
+                {currentNode ? (<SelectInput
+                    label={Titles.PermissionSource}
+                    options={model_nodes}
+                    onChange={(value: any) => {
+                        var id = currentNode.id;
+                        this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                            target: currentNode.properties[UIA.NodeProperties.PermissionImpl],
+                            source: id
+                        })
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.PermissionImpl,
+                            id: currentNode.id,
+                            value
+                        });
+                        this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+                            target: value,
+                            source: id,
+                            properties: { ...UIA.LinkProperties.PermissionSource }
+                        });
+                    }}
+                    value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.PermissionImpl] : ''} />) : null}
+                {currentNode ? (<SelectInput
+                    label={Titles.PermissionEnums}
+                    options={enum_nodes}
+                    onChange={(value: any) => {
+                        var id = currentNode.id;
+                        this.props.graphOperation(UIA.REMOVE_LINK_BETWEEN_NODES, {
+                            target: currentNode.properties[UIA.NodeProperties.PermissionValueType],
+                            source: id
+                        })
+                        this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                            prop: UIA.NodeProperties.PermissionValueType,
+                            id: currentNode.id,
+                            value
+                        });
+                        this.props.graphOperation(UIA.ADD_LINK_BETWEEN_NODES, {
+                            target: value,
+                            source: id,
+                            properties: { ...UIA.LinkProperties.PermissionLink }
+                        });
+                    }}
+                    value={currentNode.properties ? currentNode.properties[UIA.NodeProperties.PermissionValueType] : ''} />) : null}
             </TabPane>
         );
     }

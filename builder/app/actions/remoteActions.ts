@@ -501,28 +501,34 @@ export async function BuildReport() {
 	if (root.reportDirectory && fs.existsSync(root.reportDirectory)) {
 		folder = root.reportDirectory;
 	}
-	let nodes = NodesByType(graph, [NodeTypes.Enumeration, NodeTypes.Model, NodeTypes.AgentAccessDescription]);
+	let nodes = NodesByType(graph, [NodeTypes.Method, NodeTypes.Enumeration, NodeTypes.Model, NodeTypes.AgentAccessDescription]);
 	let fileNameList: any[] = [];
 	await nodes.forEachAsync(async (currentNode: Node) => {
 		let nodeType = GetNodeProp(currentNode, NodeProperties.NODEType);
 		let setup: any = null;
 		switch (nodeType) {
+			case NodeTypes.Method:
+				setup = {
+					level1: [LinkType.FunctionOperator, LinkType.ValidatorFunction, LinkType.ExecutorFunction, LinkType.GeneralLink],
+					level2: [LinkType.AttributeLink, LinkType.Enumeration],
+				};
+				break;
 			case NodeTypes.Model:
 				setup = {
-					level1: LinkType.PropertyLink,
-					level2: [LinkType.AttributeLink, LinkType.Enumeration],
+					level1: [LinkType.PropertyLink, LinkType.LogicalChildren, LinkType.GeneralLink],
+					level2: [LinkType.AttributeLink, LinkType.Enumeration, LinkType.GeneralLink, LinkType.ModelTypeLink],
 				};
 				break;
 			case NodeTypes.Enumeration:
 				setup = {
 					level1: [LinkType.Enumeration, LinkType.GeneralLink],
-					level2: [LinkType.PropertyLink, LinkType.ModelTypeLink],
+					level2: [LinkType.PropertyLink, LinkType.ModelTypeLink, LinkType.GeneralLink],
 				};
 				break;
 			case NodeTypes.AgentAccessDescription:
 				setup = {
 					level1: [LinkType.ModelAccess, LinkType.AgentAccess, LinkType.GeneralLink],
-					level2: [LinkType.PropertyLink, LinkType.ModelTypeLink],
+					level2: [LinkType.PropertyLink, LinkType.ModelTypeLink, LinkType.GeneralLink],
 				};
 				break;
 
@@ -543,15 +549,40 @@ export async function BuildReport() {
 
 export async function populateGraphPackage(
 	modelId: string,
-	ops: { level1?: string; level2?: string[] }
+	ops: { level1?: string; level2?: string[], levels: string[][] }
 ) {
 	let links: GraphLink[] = [];
 	let graph = GetCurrentGraph();
 	let nodes: Node[] = [GetNodeById(modelId)];
 	let level1 = Array.isArray(ops.level1) ? ops.level1 : [ops.level1 || ''];
 	let level2 = Array.isArray(ops.level2) ? ops.level2 : [ops.level2 || ''];
+	let levels = ops.levels;
 	nodes.map(v => v).forEach((node: Node) => {
 		let forLevelTwo: Node[] = [];
+		if (levels) {
+			let nextLevel: any[] = [];
+			levels.forEach(level => {
+				nextLevel = [];
+				level.filter(v => v).forEach((lvl: any) => {
+					let temp = GetNodesLinkedTo(graph, {
+						id: node.id,
+						link: lvl
+					})
+					temp.forEach((tnode: Node) => {
+						let tlink = GetLinkBetween(node.id, tnode.id, graph) || GetLinkBetween(tnode.id, node.id, graph);
+						if (tlink) {
+							links.push(tlink);
+						}
+					})
+					nextLevel.push(...temp);
+				});
+				nextLevel.forEach(v => {
+					if (nodes.indexOf(v) === -1) {
+						nodes.push(v);
+					}
+				})
+			});
+		}
 		level1.filter(v => v).forEach((lvl) => {
 			let temp = GetNodesLinkedTo(graph, {
 				id: node.id,
@@ -593,7 +624,7 @@ export async function wait(time: number) {
 	return Promise.resolve().then(() => {
 		return new Promise((resolve) => {
 			setTimeout(() => {
-				resolve();
+				resolve(true);
 			}, time);
 		});
 	});
