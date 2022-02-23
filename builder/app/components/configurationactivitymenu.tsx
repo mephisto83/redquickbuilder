@@ -16,14 +16,21 @@ class ConfigurationActivityMenu extends Component<any, any> {
     var { state } = this.props;
     var active = UIA.IsCurrentNodeA(state, UIA.NodeTypes.Configuration);
     if (!active) {
-			return <div />;
-		}
+      return <div />;
+    }
     var currentNode = UIA.Node(state, UIA.Visual(state, UIA.SELECTED_NODE));
     var graph = UIA.GetCurrentGraph(state);
     let appSettingComponents = [];
     let appSettings;
     if (graph) {
-      appSettings = UIA.GetAppSettings(graph);
+      appSettings = {
+        firebaseConfig: '',
+        storage_bucket_domain: '',
+        intial_master: '',
+        web_app_domain: '',
+        path_to_serviceAccountKey: 'path/to/serviceAccountKey.json',
+        ...UIA.GetAppSettings(graph)
+      };
 
       appSettingComponents = Object.keys(appSettings || {}).map(key => {
         if (typeof appSettings[key] === 'boolean') {
@@ -52,7 +59,7 @@ class ConfigurationActivityMenu extends Component<any, any> {
       })
     }
     return (
-      <TabPane active={active} style={{ maxHeight: 400, overflow: 'auto' }}>
+      <TabPane active={active} style={{ maxHeight: `calc(100vh - 300px)`, overflow: 'auto' }}>
         <CheckBox
           label={Titles.UseHttps}
           value={UIA.GetNodeProp(currentNode, UIA.NodeProperties.UseHttps)}

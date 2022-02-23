@@ -56,6 +56,33 @@ export default class MaestroGenerator {
 		return res;
 	}
 
+	static GenerateFirebaseGeneratorRequirements(state: any) {
+		const maestros = NodesByType(state, NodeTypes.Maestro)
+		let root = GetRootGraph(state);
+
+		return maestros.map((maestro: any) => {
+			let models = GraphMethods.getNodesByLinkType(root, {
+				id: maestro.id,
+				type: LinkType.ModelTypeLink,
+				direction: GraphMethods.SOURCE
+			});
+			let functions = GraphMethods.GetNodesLinkedTo(root, {
+				id: maestro.id,
+				link: LinkType.FunctionLink
+			});
+			return {
+				id: maestro.id,
+				properties: { ...maestro.properties },
+				models: models.map((node) => {
+					return { id: node?.id, properties: node?.properties }
+				}),
+				functions: functions.map((node) => {
+					return { id: node?.id, properties: node?.properties }
+				}),
+			}
+		})
+	}
+
 	static Generate(options: { state: any; key: any; language?: any }) {
 		const { state, key } = options;
 		const graphRoot = GetRootGraph(state);
@@ -168,7 +195,7 @@ export default class MaestroGenerator {
 								agentTypeNode = GraphMethods.GetNode(
 									graphRoot,
 									methodProps[FunctionTemplateKeys.AgentType] ||
-										methodProps[FunctionTemplateKeys.Agent]
+									methodProps[FunctionTemplateKeys.Agent]
 								);
 								modelNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.Model]);
 								userTypeNode = GraphMethods.GetNode(graphRoot, methodProps[FunctionTemplateKeys.User]);
@@ -510,9 +537,9 @@ export default class MaestroGenerator {
 			const set_permissions = permissions.map(
 				(x: { agent_type: string }) =>
 					`${jNL +
-						MaestroGenerator.Tabs(
-							4
-						)}${x.agent_type.toLowerCase()}Permissions = _${x.agent_type.toLowerCase()}Permissions;`
+					MaestroGenerator.Tabs(
+						4
+					)}${x.agent_type.toLowerCase()}Permissions = _${x.agent_type.toLowerCase()}Permissions;`
 			);
 			const properties = arbiters.map(
 				(x: any) => `${jNL + MaestroGenerator.Tabs(3)}private readonly IRedArbiter<${x}> arbiter${x};`
@@ -520,9 +547,9 @@ export default class MaestroGenerator {
 			const permissions_properties = permissions.map(
 				(x: { agent_type: string }) =>
 					`${jNL +
-						MaestroGenerator.Tabs(
-							3
-						)}private readonly IPermissions${x.agent_type} ${x.agent_type.toLowerCase()}Permissions;`
+					MaestroGenerator.Tabs(
+						3
+					)}private readonly IPermissions${x.agent_type} ${x.agent_type.toLowerCase()}Permissions;`
 			);
 			const testTemplate = bindTemplate(_testClass, {
 				name: codeName,
@@ -530,9 +557,9 @@ export default class MaestroGenerator {
 			});
 			maestroTemplateClass = bindTemplate(maestroTemplateClass, {
 				codeName,
-				set_properties: [ ...set_properties, ...set_permissions ].join(jNL),
-				properties: [ ...permissions_properties, ...properties ].join(' '),
-				injected_services: [ ...injectedServices, ...injectedPermissionServices ]
+				set_properties: [...set_properties, ...set_permissions].join(jNL),
+				properties: [...permissions_properties, ...properties].join(' '),
+				injected_services: [...injectedServices, ...injectedPermissionServices]
 					.map((t, ti) => jNL + MaestroGenerator.Tabs(7) + t)
 					.join(','),
 				'codeName#alllower': codeName.toLowerCase(),
@@ -540,9 +567,9 @@ export default class MaestroGenerator {
 			});
 			const maestro_interface_template = bindTemplate(_MAESTRO_INTERFACE_TEMPLATE, {
 				codeName,
-				set_properties: [ ...set_properties, ...set_permissions ].join(jNL),
-				properties: [ ...permissions_properties, ...properties ].join(' '),
-				injected_services: [ ...injectedServices, ...injectedPermissionServices ]
+				set_properties: [...set_properties, ...set_permissions].join(jNL),
+				properties: [...permissions_properties, ...properties].join(' '),
+				injected_services: [...injectedServices, ...injectedPermissionServices]
 					.map((t, ti) => jNL + MaestroGenerator.Tabs(7) + t)
 					.join(','),
 				'codeName#alllower': codeName.toLowerCase(),

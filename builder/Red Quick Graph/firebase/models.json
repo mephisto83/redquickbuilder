@@ -1,0 +1,106 @@
+{
+    "models": [
+        {
+            "model": {
+                "id": "444d4b0c-5f9f-4475-913f-1eefeaee9c99",
+                "dirty": {
+                    "nodeType": true,
+                    "groups": true
+                },
+                "propertyVersions": {
+                    "text": 1,
+                    "nodeType": 1,
+                    "groups": 1
+                },
+                "properties": {
+                    "text": "Unknown",
+                    "nodeType": "model",
+                    "groups": {
+                        "group": "b76b700c-b7c6-47f8-9439-8577a0f4e00b"
+                    }
+                }
+            },
+            "properties": [
+                {
+                    "id": "d943f04e-ddd9-4d22-aa34-ffc3ef961a7e",
+                    "dirty": {
+                        "nodeType": true,
+                        "Pinned": true,
+                        "uiAttributeType": true,
+                        "groupParent": true,
+                        "text": true
+                    },
+                    "propertyVersions": {
+                        "text": 2,
+                        "nodeType": 1,
+                        "Pinned": 1,
+                        "uiAttributeType": 1,
+                        "groupParent": 1,
+                        "codeName": 1,
+                        "agentName": 1,
+                        "valueName": 1,
+                        "cssName": 1,
+                        "HttpRoute": 1,
+                        "uiName": 1,
+                        "Label": 1
+                    },
+                    "properties": {
+                        "text": "Name",
+                        "nodeType": "model-property",
+                        "Pinned": true,
+                        "uiAttributeType": "STRING",
+                        "groupParent": "b76b700c-b7c6-47f8-9439-8577a0f4e00b",
+                        "codeName": "Name",
+                        "agentName": "Name",
+                        "valueName": "Name",
+                        "cssName": "name",
+                        "HttpRoute": "name",
+                        "uiName": "Name",
+                        "Label": "Name"
+                    },
+                    "attributes": []
+                },
+                {
+                    "id": "2b9fa9c4-3611-4e69-bb73-e530155822c3",
+                    "dirty": {
+                        "nodeType": true,
+                        "Pinned": true,
+                        "uiAttributeType": true,
+                        "groupParent": true,
+                        "text": true
+                    },
+                    "propertyVersions": {
+                        "text": 2,
+                        "nodeType": 1,
+                        "Pinned": 1,
+                        "uiAttributeType": 1,
+                        "groupParent": 1,
+                        "codeName": 1,
+                        "agentName": 1,
+                        "valueName": 1,
+                        "cssName": 1,
+                        "HttpRoute": 1,
+                        "uiName": 1,
+                        "Label": 1
+                    },
+                    "properties": {
+                        "text": "Description",
+                        "nodeType": "model-property",
+                        "Pinned": true,
+                        "uiAttributeType": "STRING",
+                        "groupParent": "b76b700c-b7c6-47f8-9439-8577a0f4e00b",
+                        "codeName": "Description",
+                        "agentName": "Description",
+                        "valueName": "Description",
+                        "cssName": "description",
+                        "HttpRoute": "description",
+                        "uiName": "Description",
+                        "Label": "Description"
+                    },
+                    "attributes": []
+                }
+            ]
+        }
+    ],
+    "enumerations": []
+}

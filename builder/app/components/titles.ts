@@ -9,10 +9,15 @@ export const SelectExecution = 'Select Execution';
 export const SelectedValidations = 'Selected Validations';
 export const Remove = 'Remove';
 export const GraphOperations = 'Graph Operations';
+export const IsPermission = 'Is Permission';
 export const AgentBaseMethods = 'Agent Based Methods';
+export const IsGroup = 'Is Group';
+export const GroupMember = 'Group Member';
 export const IsLabelValue = 'Is LabelValue';
 export const LinkType = 'Link Type';
 export const DefaultViewModel = 'Default View Model';
+export const Role = 'Role';
+export const AgentInstanceOwnership = 'Agent Instance Ownership';
 export const IsFireTime = 'Is FireTime';
 export const Load = 'Load';
 export const DeleteType = 'Delete Type';
@@ -568,7 +573,7 @@ export const ExcludeFromController = 'Exclude from controller';
 export const UserModel = 'User Model';
 
 export const PropertyGeneratedType = 'Generated Type';
-
+export const IsPermissionPropertyContainer = 'Is permission property container';
 export const ManyToManyNexus = 'Many to many';
 export const ManyToManyExists = 'Many to many item must exists';
 export const ManyToManyNexusModel = 'Many to Many model';

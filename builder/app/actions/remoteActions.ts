@@ -501,12 +501,38 @@ export async function BuildReport() {
 	if (root.reportDirectory && fs.existsSync(root.reportDirectory)) {
 		folder = root.reportDirectory;
 	}
-	let nodes = NodesByType(graph, [NodeTypes.Method, NodeTypes.Enumeration, NodeTypes.Model, NodeTypes.AgentAccessDescription]);
+	let nodes = NodesByType(graph, [
+		NodeTypes.Method,
+		NodeTypes.Enumeration,
+		NodeTypes.Model,
+		NodeTypes.AgentAccessDescription,
+		NodeTypes.Controller,
+		NodeTypes.Maestro,
+		NodeTypes.Function]);
 	let fileNameList: any[] = [];
 	await nodes.forEachAsync(async (currentNode: Node) => {
 		let nodeType = GetNodeProp(currentNode, NodeProperties.NODEType);
 		let setup: any = null;
 		switch (nodeType) {
+			case NodeTypes.Controller:
+				setup = {
+					level1: [LinkType.MaestroLink, LinkType.FunctionLink, LinkType.ModelTypeLink, LinkType.GeneralLink],
+					level2: [LinkType.AttributeLink, LinkType.Enumeration],
+				};
+				break;
+			case NodeTypes.Maestro:
+				setup = {
+					level1: [LinkType.MaestroLink, LinkType.FunctionLink, LinkType.ModelTypeLink, LinkType.GeneralLink],
+					level2: [LinkType.AttributeLink, LinkType.Enumeration],
+				};
+				break;
+			case NodeTypes.Function:
+				setup = {
+					level1: [LinkType.FunctionOperator, LinkType.FunctionApiParameterType, LinkType.FunctionApiParameters,
+					LinkType.FunctionOutputType, LinkType.ModelTypeLink, LinkType.GeneralLink],
+					level2: [LinkType.AttributeLink, LinkType.Enumeration],
+				};
+				break;
 			case NodeTypes.Method:
 				setup = {
 					level1: [LinkType.FunctionOperator, LinkType.ValidatorFunction, LinkType.ExecutorFunction, LinkType.GeneralLink],

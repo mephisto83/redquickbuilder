@@ -102,32 +102,6 @@ export function createGraph(): Graph {
 				}
 			},
 			AppSettings: {
-				'Local-AuthorizationKey':
-					'C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==',
-				'Local-EndPointUrl': 'https://localhost:8081',
-				use_local: true,
-				DeveloperMode: true,
-				EndPointUrl: '',
-				AuthorizationKey: '',
-				DatabaseId: 'red-db-001',
-				AllowedOrigins: 'http://localhost:44338',
-				AssemblyPrefixes: 'Smash;RedQuick',
-				'Use-SingleCollection': true,
-				'storage-key': 'UseDevelopmentStorage=true',
-				'single-thread': true,
-				ConfirmEmailController: 'Account',
-				ConfirmEmailAction: 'ConfirmEmail',
-				HomeAction: 'Index',
-				HomeController: 'Home',
-				ResetPasswordAction: 'ResetPassword',
-				ResetPasswordController: 'Account',
-				SecurityKey: 'ajskdflajsdfklas20klasdkfj9laksdjfl4aksdjf3kanvdlnaekf',
-				AppSecret: 'YQBiAGMAZABlAGYAZwBoAGkAagBrAGwAbQBuAG8AcABxAHIAcwB0AHUAdgB3AHgAeQB6ADAAMQAyADMANAA1AA==',
-				Domain: 'https://localhost:44338',
-				TokenExpirationInMinutes: '250',
-				Issuer: 'https://localhost:44338',
-				Audience: 'https://localhost:44338',
-				DomainPort: '44338'
 			}
 		}
 	};

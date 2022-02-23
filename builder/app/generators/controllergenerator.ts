@@ -40,6 +40,34 @@ export default class ControllerGenerator {
 		}
 		return res;
 	}
+	static GenerateFirebaseGeneratorRequirements(state: any) {
+		const controllers = NodesByType(state, NodeTypes.Controller)
+		let root = GetRootGraph(state);
+
+		return controllers.map((controller: any) => {
+			let maestros = GraphMethods.getNodesByLinkType(root, {
+				id: controller.id,
+				type: LinkType.MaestroLink,
+				direction: GraphMethods.SOURCE
+			});
+			let models = GraphMethods.getNodesByLinkType(root, {
+				id: controller.id,
+				type: LinkType.ModelTypeLink,
+				direction: GraphMethods.SOURCE
+			});
+			return {
+				id: controller.id,
+				properties: { ...controller.properties },
+				maestros: maestros.map((node) => {
+					return { id: node?.id, properties: node?.properties }
+				}),
+				models: models.map((node) => {
+					return { id: node?.id, properties: node?.properties }
+				})
+			}
+		})
+
+	}
 	static Generate(options: any) {
 		var { state, key } = options;
 		let graphRoot = GetRootGraph(state);
@@ -89,7 +117,7 @@ export default class ControllerGenerator {
 								//If the function is a get then, use the get template.
 								if (!ft.controller)
 									if (
-										[ Methods.Get, Methods.GetAll ].some(
+										[Methods.Get, Methods.GetAll].some(
 											(v) => v === GetNodeProp(maestro_function, NodeProperties.MethodType)
 										)
 									) {

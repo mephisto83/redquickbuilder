@@ -65,6 +65,23 @@ export const NODE_COST = 'NODE_COST';
 export const ApplicationConfig = 'ApplicationConfig';
 export const NODE_CONNECTION_COST = 'NODE_CONNECTION_COST';
 
+
+export function toJavascriptName(str: string) {
+    if (str) {
+        str = str.trim();
+    }
+    if (str && str[0]) {
+        str = str.split(' ').join('');
+        try {
+            return str[0].toLowerCase() + str.substr(1);
+        } catch (e) {
+            console.log(str);
+            console.log(str.length);
+        }
+    }
+    return str;
+};
+
 export const BuildAllProgress = 'BuildAllProgress';
 export const CODE_EDITOR_INIT_VALUE = 'CODE_EDITOR_INIT_VALUE';
 export const BATCH_MODEL = 'BATCH_MODEL';
@@ -899,7 +916,60 @@ export function AddFunction(params: any) {
 						value: true
 					}
 				}
-			}]
+			}, params.selectedOutputModel && params.useModelAsType ? function () {
+				return {
+					operation: ADD_LINK_BETWEEN_NODES,
+					options: {
+						target: params.selectedOutputModel,
+						source: function_output_node.id,
+						properties: { ...LinkProperties.FunctionOutputType }
+					}
+				}
+			} : false, params.selectedOutputType && !params.useModelAsType ? function () {
+				return function () {
+					let param_Attr: any = null;
+					return [{
+						operation: NEW_ATTRIBUTE_NODE,
+						options: {
+							parent: function_output_node.id,
+							groupProperties: {},
+							linkProperties: {
+								properties: {
+									type: 'attribute-link',
+									'attribute-link': {}
+								}
+							},
+							callback: (new_attr: any) => {
+								param_Attr = new_attr;
+							}
+						}
+					}, function () {
+						return {
+							operation: CHANGE_NODE_TEXT,
+							options: {
+								id: param_Attr.id,
+								value: params.selectedOutputType
+							}
+						}
+					}, function () {
+						return {
+							operation: CHANGE_NODE_PROPERTY,
+							options: {
+								id: param_Attr.id,
+								value: NodeAttributePropertyTypes[params.selectedOutputType]
+							}
+						}
+					}]
+				}
+				return {
+					operation: ADD_LINK_BETWEEN_NODES,
+					options: {
+						target: params.selectedOutputModel,
+						source: function_output_node.id,
+						properties: { ...LinkProperties.FunctionOutputType }
+					}
+				}
+			} : false].filter(x => x)
 		})
 		let functionId: string = '';
 		(params.parameters || []).forEach((param: any) => {

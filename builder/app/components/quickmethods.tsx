@@ -95,12 +95,12 @@ class QuickMethods extends Component<any, any, any> {
 				value: funcKey
 			}
 		})
-        var enum_nodes = UIA.NodesByType(state, UIA.NodeTypes.Enumeration).map(node => {
-            return {
-                value: node.id,
-                title: UIA.GetNodeTitle(node)
-            }
-        });
+		var enum_nodes = UIA.NodesByType(state, UIA.NodeTypes.Enumeration).map(node => {
+			return {
+				value: node.id,
+				title: UIA.GetNodeTitle(node)
+			}
+		});
 		var model_nodes = UIA.NodesByType(state, UIA.NodeTypes.Model);
 		const defaultParameters = () => ({
 			viewName: UIA.Visual(state, 'View Package Title'),
@@ -201,7 +201,10 @@ class QuickMethods extends Component<any, any, any> {
 										value={this.state.httpMethod} />
 									<SelectInput
 										label={Titles.PermissionSource}
-										options={model_nodes.map(node => {
+										options={model_nodes.filter(x => {
+											let title = UIA.GetNodeTitle(x);
+											return `${title}`.toLocaleLowerCase().indexOf('role') !== -1
+										}).map(node => {
 											return {
 												value: node.id,
 												title: UIA.GetNodeTitle(node)
@@ -213,7 +216,10 @@ class QuickMethods extends Component<any, any, any> {
 										value={this.state.permissionSource} />
 									<SelectInput
 										label={Titles.PermissionEnums}
-										options={enum_nodes}
+										options={enum_nodes.filter(x => {
+											let { title } = x;
+											return `${title}`.toLocaleLowerCase().indexOf('permission') !== -1
+										})}
 										onChange={(value: any) => {
 											this.setState({ permissionEnum: value })
 										}}

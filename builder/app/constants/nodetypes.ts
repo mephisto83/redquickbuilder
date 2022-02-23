@@ -439,11 +439,17 @@ export const NodeProperties = {
 	ViewPackage: 'view-package',
 	DataChainCollectionChildrenCount: 'DataChainCollectionChildrenCount',
 	IsFetchOutput: 'IsFetchOutput',
+	GroupMember: 'GroupMember',
 	UIActionMethod: 'UIActionMethod',
+	IsPermissionPropertyContainer: 'IsPermissionPropertyContainer',
 	Maestro: 'Maestro',
 	HideStyle: 'HideStyle',
+	IsGroup: 'IsGroup',
 	IsPropertyCentric: 'IsPropertyCentric',
+	Role: 'Role',
+	IsPermission: 'IsPermission',
 	RouteInjection: 'RouteInjection',
+	AgentInstanceOwnership: 'AgentInstanceOwnership',
 	IsValueLabel: 'IsValueLabel',
 	IsFireTime: 'IsFireTime',
 	PropertyCentricType: 'PropertyCentricType',
@@ -828,6 +834,7 @@ export const LinkType = {
 	FunctionApiParameters: 'FunctionApiParameters',
 	DefaultViewType: 'DefaultViewType',
 	SharedComponent: 'SharedComponent',
+	GroupMember: 'GroupMember',
 	PermissionSource: 'PermissionSource',
 	ScreenEffect: 'ScreenEffect', // Screen effects link to datachains, that can be used for defining $internalComponentState
 	// Connections to arguments used inside a lambda
@@ -916,6 +923,7 @@ export const LinkType = {
 	FetchServiceOuput: 'FetchServiceOuput',
 	FetchSserviceAgent: 'FetchSserviceAgent',
 	Enumeration: 'enumeration',
+	PermissionEnum: 'PermissionEnum',
 	ClientMethod: 'ClientMethod',
 	DataSource: 'DataSource',
 	ComponentApi: 'ComponentApi',
@@ -1146,6 +1154,9 @@ export const LinkProperties = {
 	FunctionApiParameters: {
 		type: LinkType.FunctionApiParameters
 	},
+	GroupMember: {
+		type: LinkType.GroupMember
+	},
 	FunctionApiParameterType: {
 		type: LinkType.FunctionApiParameterType
 	},
@@ -1325,6 +1336,9 @@ export const LinkProperties = {
 	},
 	EnumerationLink: {
 		type: LinkType.Enumeration
+	},
+	PermissionEnum: {
+		type: LinkType.PermissionEnum
 	},
 	FetchService: {
 		type: LinkType.FetchService
@@ -1679,6 +1693,7 @@ export const NodePropertyTypes = {
 	STATE_PROVINCE: 'STATE_PROVINCE',
 	SSN: 'SSN',
 	LISTOFSTRINGS: 'LISTOFSTRINGS',
+	LIST: 'LIST',
 	DATETIME: 'DATETIME',
 	INT: 'INT',
 	FLOAT: 'FLOAT',
@@ -1688,6 +1703,7 @@ export const NodePropertyTypes = {
 	EMAIL: 'EMAIL',
 	REFERENCE: 'REFERENCE',
 	OBJECT: 'OBJECT',
+	DICTSTRING_NUM: 'DICTSTRING_NUM',
 	PHONENUMBER: 'PHONENUMBER'
 };
 export const NEW_LINE = `

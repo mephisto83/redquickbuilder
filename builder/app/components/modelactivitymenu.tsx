@@ -162,6 +162,106 @@ class ModelActivityMenu extends Component<any, any> {
                 }}
               />
               <CheckBox
+                label={Titles.Role}
+                title={Titles.Role}
+                value={UIA.GetNodeProp(
+                  currentNode,
+                  UIA.NodeProperties.Role
+                )}
+                onChange={(value: any) => {
+                  this.props.graphOperation([
+                    {
+                      operation: UIA.CHANGE_NODE_PROPERTY,
+                      options: {
+                        prop: UIA.NodeProperties.Role,
+                        id: currentNode.id,
+                        value
+                      }
+                    }
+                  ]);
+                }}
+              />
+              <CheckBox
+                label={Titles.AgentInstanceOwnership}
+                title={Titles.AgentInstanceOwnership}
+                value={UIA.GetNodeProp(
+                  currentNode,
+                  UIA.NodeProperties.AgentInstanceOwnership
+                )}
+                onChange={(value: any) => {
+                  this.props.graphOperation([
+                    {
+                      operation: UIA.CHANGE_NODE_PROPERTY,
+                      options: {
+                        prop: UIA.NodeProperties.AgentInstanceOwnership,
+                        id: currentNode.id,
+                        value
+                      }
+                    }
+                  ]);
+                }}
+              />
+
+              <CheckBox
+                label={Titles.IsGroup}
+                value={
+                  currentNode.properties
+                    ? currentNode.properties[UIA.NodeProperties.IsGroup]
+                    : ""
+                }
+                onChange={(value: any) => {
+                  this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                    prop: UIA.NodeProperties.IsGroup,
+                    id: currentNode.id,
+                    value
+                  });
+                }}
+              />
+              {(currentNode.properties
+                ? currentNode.properties[UIA.NodeProperties.IsGroup]
+                : "") ? (
+                <SelectInput
+                  options={UIA.NodesByType(state, NodeTypes.Model).map((x) => {
+                    return {
+                      value: x.id,
+                      title: UIA.GetNodeTitle(x)
+                    };
+                  })}
+                  label={Titles.GroupMember}
+                  onChange={(value: any) => {
+                    var id = currentNode.id;
+                    this.props.graphOperation([
+                      {
+                        operation: UIA.REMOVE_LINK_BETWEEN_NODES,
+                        options: {
+                          target: currentNode.properties[UIA.NodeProperties.GroupMember],
+                          source: id
+                        }
+                      },
+                      {
+                        operation: UIA.CHANGE_NODE_PROPERTY,
+                        options: {
+                          prop: UIA.NodeProperties.GroupMember,
+                          id: currentNode.id,
+                          value
+                        }
+                      },
+                      {
+                        operation: UIA.ADD_LINK_BETWEEN_NODES,
+                        options: {
+                          target: value,
+                          source: id,
+                          properties: { ...UIA.LinkProperties.GroupMember }
+                        }
+                      }
+                    ]);
+                  }}
+                  value={
+                    currentNode.properties ? currentNode.properties[UIA.NodeProperties.GroupMember] : ''
+                  }
+                />
+              ) : null}
+              <CheckBox
                 label={Titles.IsCompositeInput}
                 value={UIA.GetNodeProp(
                   currentNode,

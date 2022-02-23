@@ -49,7 +49,7 @@ import {
 	UIC,
 	setPinned,
 	handleCodeWindowMessage,
-	GetNodesByProperties, handleFlowCodeMessage, handleGraphMessage
+	GetNodesByProperties, handleFlowCodeMessage, handleGraphMessage, GetAppSettings
 } from './uiactions';
 import { GraphKeys, GetNodesLinkedTo, SetFlowModel } from '../methods/graph_methods';
 import { HandlerEvents } from '../ipc/handler-events';
@@ -66,6 +66,9 @@ import {
 } from './remoteActions';
 import ThemeServiceGenerator from '../generators/themeservicegenerator';
 import ModelGenerator from '../generators/modelgenerators';
+import ControllerGenerator from '../generators/controllergenerator';
+import FunctionGenerator from '../generators/functiongenerator';
+import MaestroGenerator from '../generators/maestrogenerator';
 
 const { ipcRenderer } = require('electron');
 const REACTWEB = 'reactweb';
@@ -236,16 +239,40 @@ export function GetFirebaseRequirements(callback?: any) {
 		const root = GetCurrentGraph();
 
 		let res = ModelGenerator.GenerateFirebaseGeneratorRequirements(state);
-		const enumerations = NodesByType(state, NodeTypes.Enumeration)
+		let config = ModelGenerator.GenerateFirebaseMasterRequirements(state);
+		let controllers = ControllerGenerator.GenerateFirebaseGeneratorRequirements(state);
+		let maestros = MaestroGenerator.GenerateFirebaseGeneratorRequirements(state);
+		const enumerations = NodesByType(state, NodeTypes.Enumeration);
+		const functions = FunctionGenerator.GenerateFirebaseGeneratorRequirements(state);
 		const workspace = root.workspaces ? root.workspaces[platform()] || root.workspace : root.workspace;
 		ensureDirectory(path.join(workspace));
 		ensureDirectory(path.join(workspace, root.title));
 		ensureDirectory(path.join(workspace, root.title, 'firebase'));
-		fs.writeFileSync(path.join(workspace, root.title, 'firebase', 'models.json'), JSON.stringify({ models: res, enumerations }, null, 4));
+		fs.writeFileSync(path.join(workspace, root.title, 'firebase', 'models.json'), JSON.stringify({
+			models: res,
+			enumerations,
+			functions,
+			maestros,
+			controllers,
+			config,
+			settings: GetAppSettings(root)
+		}));
 		if (callback) {
-			callback(JSON.stringify({ models: res, enumerations }, null, 4));
+			callback(JSON.stringify({
+				models: res,
+				enumerations,
+				maestros,
+				functions,
+				controllers
+			}, null, 4));
 		}
-		copyTextToClipboard(JSON.stringify({ models: res, enumerations }, null, 4))
+		copyTextToClipboard(JSON.stringify({
+			models: res,
+			enumerations,
+			maestros,
+			functions,
+			controllers
+		}))
 	}
 }
 

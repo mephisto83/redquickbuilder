@@ -1460,6 +1460,16 @@ class Dashboard extends Component<any, any> {
 			icon: 'fa fa-magnet',
 			title: `Enumeration Link`
 		});
+		result.push({
+			onClick: () => {
+				this.props.setVisual(CONNECTING_NODE, {
+					...LinkProperties.PermissionEnum,
+					nodeTypes: [NodeTypes.Enumeration]
+				});
+			},
+			icon: 'fas fa-anchor',
+			title: `Permission Link`
+		});
 
 		result.push({
 			onClick: () => {
@@ -2723,6 +2733,27 @@ class Dashboard extends Component<any, any> {
 														id: currentNode.id,
 														value
 													});
+												}}
+											/>
+										) : null}
+
+										{UIA.GetNodeProp(currentNode, NodeProperties.NODEType) ===
+											UIA.NodeTypes.Enumeration ? (<CheckBox
+												label={Titles.IsPermission}
+												value={
+													currentNode.properties ? currentNode.properties[UIA.NodeProperties.IsPermission] : ''
+												}
+												onChange={(value: boolean) => {
+													this.props.graphOperation([
+														{
+															operation: UIA.CHANGE_NODE_PROPERTY,
+															options: {
+																prop: UIA.NodeProperties.IsPermission,
+																id: currentNode.id,
+																value
+															}
+														}
+													]);
 												}}
 											/>
 										) : null}

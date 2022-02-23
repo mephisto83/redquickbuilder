@@ -17,7 +17,9 @@ import {
 	GetSnakeCase,
 	GetModelPropertyNodes,
 	GetState,
-	GetNodeTitle
+	GetNodeTitle,
+	toJavascriptName,
+	GetNodeById
 } from '../actions/uiactions';
 import {
 	LinkType,
@@ -146,6 +148,98 @@ export default class ModelGenerator {
 
 		return result;
 	}
+	static GenerateFirebaseMasterRequirements(state: any) {
+		const models = NodesByType(state, NodeTypes.Model)
+			.filter((x: Node) => !GetNodeProp(x, NodeProperties.ExcludeFromController))
+			.filter((x: Node) => !GetNodeProp(x, NodeProperties.ExcludeFromGeneration));
+		let agents = models.filter((x: Node) => {
+			return GetNodeProp(x, NodeProperties.IsAgent) && !GetNodeProp(x, NodeProperties.IsUser);
+		});
+		let graph = GetCurrentGraph(state)
+		let processFunc = (agent: Node) => {
+			let connectedProperties = GetModelPropertyChildren(agent.id);
+			let agentObj: any = {};
+			let agentPermissionLink: any = {};
+			let isList: any = {};
+			let permission: any = {}
+			connectedProperties.forEach((property: Node) => {
+				let defaultValue = GetNodeProp(property, NodeProperties.DefaultValue);
+				let isModelType = GetNodeProp(property, NodeProperties.UseModelAsType);
+				if (defaultValue && !isModelType) {
+					switch (GetNodeProp(property, NodeProperties.UIAttributeType)) {
+						case NodePropertyTypes.BOOLEAN:
+							agentObj[toJavascriptName(property.properties.codeName)] = defaultValue === 'true' ? true : false;
+							break;
+						case NodePropertyTypes.INT:
+							agentObj[toJavascriptName(property.properties.codeName)] = parseInt(defaultValue);
+							break
+						case NodePropertyTypes.DOUBLE:
+							agentObj[toJavascriptName(property.properties.codeName)] = parseFloat(defaultValue);
+							break
+						case NodePropertyTypes.EMAIL:
+						case NodePropertyTypes.STRING:
+						case NodePropertyTypes.PHONENUMBER:
+						case NodePropertyTypes.SSN:
+						case NodePropertyTypes.STATE_PROVINCE:
+						default:
+							agentObj[toJavascriptName(property.properties.codeName)] = defaultValue;
+							break;
+					}
+				}
+				else if (isModelType) {
+					if (GetNodeProp(property, NodeProperties.IsPermissionPropertyContainer)) {
+						let otherNode = GetNodeById(GetNodeProp(property, NodeProperties.UIModelType))
+						agentPermissionLink[toJavascriptName(property.properties.codeName)] = otherNode.properties.codeName;
+						isList[toJavascriptName(property.properties.codeName)] = property.properties.isReferenceList;
+					}
+				}
+				if (!isModelType) {
+					let permissions = GraphMethods.GetNodesLinkedTo(graph, {
+						id: property.id,
+						link: LinkType.PermissionEnum
+					});
+					let allpermissions: any[] = [];
+					permissions.map((perm: Node) => {
+						let enumerations = GetNodeProp(perm, NodeProperties.Enumeration);
+						if (enumerations) {
+							allpermissions.push(...enumerations.map(v => {
+								return v.value || v.label;
+							}))
+						}
+					});
+					if (allpermissions.length)
+						permission[toJavascriptName(property.properties.codeName)] = allpermissions;
+
+				}
+			});
+			return {
+				properties: { [GetNodeProp(agent, NodeProperties.CodeName)]: JSON.stringify(agentObj) },
+				agent: { [GetNodeProp(agent, NodeProperties.CodeName)]: JSON.stringify(agentPermissionLink) },
+				isList: { [GetNodeProp(agent, NodeProperties.CodeName)]: isList },
+				permission: { [GetNodeProp(agent, NodeProperties.CodeName)]: JSON.stringify(permission) }
+			};
+		}
+		agents = agents.map(processFunc).map(f => {
+			return f;
+		})
+		let users = models.filter((x: any) => {
+			return GetNodeProp(x, NodeProperties.IsUser);
+		});
+		let usersObjs = users.map(processFunc).map(f => {
+			return f;
+		});
+
+		let roles = models.filter((x: any) => {
+			return GetNodeProp(x, NodeProperties.Role);
+		}).map(processFunc).map(f => {
+			return f;
+		});
+		return {
+			agents,
+			users: usersObjs,
+			roles
+		}
+	}
 	static GenerateFirebaseGeneratorRequirements(state: any) {
 		const models = NodesByType(state, NodeTypes.Model)
 			.filter((x: any) => !GetNodeProp(x, NodeProperties.ExcludeFromController))
@@ -161,15 +255,40 @@ export default class ModelGenerator {
 					id: prop.id,
 					link: LinkType.AttributeLink
 				});
+				let permissions: Node[] = GraphMethods.GetNodesLinkedTo(graph, {
+					id: prop.id,
+					link: LinkType.PermissionEnum
+				});
 				prop.attributes = attr
 				return {
 					...prop,
-					attributes: attr
+					attributes: attr,
+					permissions
 				}
 			})
+			let referenceProperties = []
+			let referenceObjectTypes = GraphMethods.GetNodesLinkedTo(graph, {
+				id: model.id,
+				link: LinkType.ModelTypeLink
+			});
+			if (referenceObjectTypes.length) {
+				let references = referenceObjectTypes.map((refObject: { id: any }) => {
+					let obj = GraphMethods.GetNodeLinkedTo(graph, {
+						id: refObject.id,
+						link: LinkType.PropertyLink
+					});
+					return {
+						object: obj,
+						referenceProperty: refObject
+					}
+				}).filter((x: any) => x.object);
+
+				referenceProperties.push(...references);
+			}
 			result.push({
 				model,
-				properties: connectedProperties
+				properties: connectedProperties,
+				referenceProperties
 			});
 		});
 		return result;

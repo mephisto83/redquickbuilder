@@ -264,6 +264,21 @@ class PropertyActivityMenu extends Component<any, any> {
 						/>
 
 						<CheckBox
+							label={Titles.IsPermissionPropertyContainer}
+							value={
+								currentNode.properties
+									? currentNode.properties[UIA.NodeProperties.IsPermissionPropertyContainer]
+									: ""
+							}
+							onChange={(value: any) => {
+								this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+									prop: UIA.NodeProperties.IsPermissionPropertyContainer,
+									id: currentNode.id,
+									value
+								});
+							}}
+						/>
+						<CheckBox
 							label={Titles.UseModelAsType}
 							value={
 								currentNode.properties ? currentNode.properties[UIA.NodeProperties.UseModelAsType] : ''

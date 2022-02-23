@@ -130,6 +130,7 @@ import ClearScreenConnection from '../nodepacks/screens/ClearScreenConnections';
 import { ClearApiBetweenComponents } from '../nodepacks/ClearApiBetweenComponents';
 import ConnectScreens from '../nodepacks/batch/ConnectScreens';
 import AddComponentsToScreenOptions from '../nodepacks/batch/AddComponentsToScreenOptions';
+import AddGroupProperties from '../nodepacks/AddGroupProperties';
 
 const MAX_CONTENT_MENU_HEIGHT = 500;
 class ContextMenu extends Component<any, any> {
@@ -2831,12 +2832,18 @@ class ContextMenu extends Component<any, any> {
 							this.props.toggleVisual('OPERATIONS');
 						}}
 					>
-						<TreeViewMenu
-							title={`${Titles.Add} Name|Description`}
-							onClick={() => {
-								this.props.graphOperation(AddNameDescription({ node0: currentNode.id }));
-							}}
-						/>
+					<TreeViewMenu
+						title={`${Titles.Add} Name|Description`}
+						onClick={() => {
+							this.props.graphOperation(AddNameDescription({ node0: currentNode.id }));
+						}}
+					/>
+					<TreeViewMenu
+						title={`${Titles.Add} Group Properties`}
+						onClick={() => {
+							this.props.graphOperation(AddGroupProperties({ node0: currentNode.id }));
+						}}
+					/>
 						<TreeViewMenu
 							title={`Make Mapping`}
 							open={UIA.Visual(state, `Make Mapping`)}
