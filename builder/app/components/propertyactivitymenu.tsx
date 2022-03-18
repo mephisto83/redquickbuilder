@@ -22,6 +22,7 @@ class PropertyActivityMenu extends Component<any, any> {
 			var show_dependent =
 				currentNode && currentNode.properties && currentNode.properties[UIA.NodeProperties.UseUIDependsOn];
 			var use_model_as_type = UIA.GetNodeProp(currentNode, UIA.NodeProperties.UseModelAsType);
+			var use_model_as_local = UIA.GetNodeProp(currentNode, UIA.NodeProperties.UseModelAsLocal);
 			var many_to_many_enabled = UIA.GetNodeProp(currentNode, UIA.NodeProperties.ManyToManyNexus);
 			var property_nodes = UIA.NodesByType(state, UIA.NodeTypes.Property)
 				.filter((x) => {
@@ -316,6 +317,44 @@ class PropertyActivityMenu extends Component<any, any> {
 								]);
 							}}
 						/>
+						<CheckBox
+							label={Titles.UseModelAsLocal}
+							value={
+								currentNode.properties ? currentNode.properties[UIA.NodeProperties.UseModelAsLocal] : ''
+							}
+							onChange={(value: boolean) => {
+								var id = currentNode.id;
+								this.props.graphOperation([
+									value
+										? null
+										: {
+											operation: UIA.REMOVE_LINK_BETWEEN_NODES,
+											options: {
+												target: currentNode.properties[UIA.NodeProperties.UIModelType],
+												source: id
+											}
+										},
+									{
+										operation: UIA.CHANGE_NODE_PROPERTY,
+										options: {
+											prop: UIA.NodeProperties.UseModelAsLocal,
+											id: currentNode.id,
+											value
+										}
+									},
+									!value || !currentNode.properties[UIA.NodeProperties.UIModelType]
+										? null
+										: {
+											operation: UIA.ADD_LINK_BETWEEN_NODES,
+											options: {
+												target: currentNode.properties[UIA.NodeProperties.UIModelType],
+												source: id,
+												properties: { ...UIA.LinkProperties.ModelTypeLink }
+											}
+										}
+								]);
+							}}
+						/>
 						{!use_model_as_type ? (
 							<SelectInput
 								options={Object.keys(UIA.NodePropertyTypes)
@@ -343,7 +382,7 @@ class PropertyActivityMenu extends Component<any, any> {
 								}
 							/>
 						) : null}
-						{use_model_as_type ? (
+						{use_model_as_type || use_model_as_local ? (
 							<SelectInput
 								options={UIA.NodesByType(state, NodeTypes.Model).map((x) => {
 									return {
@@ -385,7 +424,7 @@ class PropertyActivityMenu extends Component<any, any> {
 								}
 							/>
 						) : null}
-						{use_model_as_type ? (
+						{use_model_as_type || use_model_as_local ? (
 							<CheckBox
 								label={Titles.IsReferenceList}
 								value={

@@ -165,7 +165,8 @@ export default class ModelGenerator {
 			connectedProperties.forEach((property: Node) => {
 				let defaultValue = GetNodeProp(property, NodeProperties.DefaultValue);
 				let isModelType = GetNodeProp(property, NodeProperties.UseModelAsType);
-				if (defaultValue && !isModelType) {
+				let isModelLocalType = GetNodeProp(property, NodeProperties.UseModelAsLocal);
+				if (defaultValue && !isModelType && !isModelLocalType) {
 					switch (GetNodeProp(property, NodeProperties.UIAttributeType)) {
 						case NodePropertyTypes.BOOLEAN:
 							agentObj[toJavascriptName(property.properties.codeName)] = defaultValue === 'true' ? true : false;
@@ -186,14 +187,14 @@ export default class ModelGenerator {
 							break;
 					}
 				}
-				else if (isModelType) {
+				else if (isModelType || isModelLocalType) {
 					if (GetNodeProp(property, NodeProperties.IsPermissionPropertyContainer)) {
 						let otherNode = GetNodeById(GetNodeProp(property, NodeProperties.UIModelType))
 						agentPermissionLink[toJavascriptName(property.properties.codeName)] = otherNode.properties.codeName;
 						isList[toJavascriptName(property.properties.codeName)] = property.properties.isReferenceList;
 					}
 				}
-				if (!isModelType) {
+				if (!isModelType && !isModelLocalType) {
 					let permissions = GraphMethods.GetNodesLinkedTo(graph, {
 						id: property.id,
 						link: LinkType.PermissionEnum
@@ -272,11 +273,16 @@ export default class ModelGenerator {
 				link: LinkType.ModelTypeLink
 			});
 			if (referenceObjectTypes.length) {
-				let references = referenceObjectTypes.map((refObject: { id: any }) => {
+				let references = referenceObjectTypes.map((refObject: { id: any, properties?: any }) => {
 					let obj = GraphMethods.GetNodeLinkedTo(graph, {
 						id: refObject.id,
 						link: LinkType.PropertyLink
 					});
+					if (refObject && refObject.properties[NodeProperties.UseModelAsLocal]) {
+						return {
+							object: false
+						}
+					}
 					return {
 						object: obj,
 						referenceProperty: refObject

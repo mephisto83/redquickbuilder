@@ -444,6 +444,7 @@ export const NodeProperties = {
 	IsPermissionPropertyContainer: 'IsPermissionPropertyContainer',
 	Maestro: 'Maestro',
 	HideStyle: 'HideStyle',
+	BuildDefault: 'BuildDefault',
 	IsGroup: 'IsGroup',
 	IsPropertyCentric: 'IsPropertyCentric',
 	Role: 'Role',
@@ -709,6 +710,7 @@ export const NodeProperties = {
 	UIAttributeType: 'uiAttributeType',
 	PermissionValueType: 'PermissionValueType',
 	UseModelAsType: 'useModelAsType',
+	UseModelAsLocal: 'UseModelAsLocal',
 
 	IsDefaultProperty: 'isDefaultProperty',
 	ExecuteComponent: 'ExecuteComponent',

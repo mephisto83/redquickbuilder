@@ -262,6 +262,20 @@ class ModelActivityMenu extends Component<any, any> {
                 />
               ) : null}
               <CheckBox
+                label={Titles.BuildDefault}
+                value={UIA.GetNodeProp(
+                  currentNode,
+                  UIA.NodeProperties.BuildDefault
+                )}
+                onChange={(value: any) => {
+                  this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                    prop: UIA.NodeProperties.BuildDefault,
+                    id: currentNode.id,
+                    value
+                  });
+                }}
+              />
+              <CheckBox
                 label={Titles.IsCompositeInput}
                 value={UIA.GetNodeProp(
                   currentNode,
