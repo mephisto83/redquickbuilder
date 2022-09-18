@@ -323,6 +323,7 @@ export const Menu = 'Menu';
 export const AddFunctionOutputDescription = 'The output of the function';
 export const IsAgent = 'Agent';
 export const IsOwnedByAgents = 'Is Owned By Agents';
+export const IsCache = 'Is Cache';
 export const IsOwnedByAgentsDescriptions = 'That would mean any agent/model could own this object.';
 export const ComponentDidMount = 'Component Did Mount';
 export const IsUser = 'User';

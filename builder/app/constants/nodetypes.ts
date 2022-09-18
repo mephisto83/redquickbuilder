@@ -611,6 +611,7 @@ export const NodeProperties = {
 	IsParent: 'isParent', //This is a program setting. Just for allowing us to hide and show the model picker.
 	IsUser: 'IsUser', //User is the object directly associated with a IdentityProvider.
 	IsOwnedByAgents: 'IsOwnedByAgents',
+	IsCache: 'isCache',
 	UIUser: 'uiUser',
 	IsSharedResource: 'isSharedResource', // Not sure if this helps anything.
 	UIPermissions: 'uiPermissions',

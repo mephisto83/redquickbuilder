@@ -142,6 +142,22 @@ class ModelActivityMenu extends Component<any, any> {
                 }}
               />
               <CheckBox
+                label={Titles.IsCache}
+                title={Titles.IsCache}
+                value={
+                  currentNode.properties
+                    ? currentNode.properties[UIA.NodeProperties.IsCache]
+                    : ""
+                }
+                onChange={(value: any) => {
+                  this.props.graphOperation(UIA.CHANGE_NODE_PROPERTY, {
+                    prop: UIA.NodeProperties.IsCache,
+                    id: currentNode.id,
+                    value
+                  });
+                }}
+              />
+              <CheckBox
                 label={Titles.ManyToManyNexus}
                 title={Titles.ManyToManyNexusDescription}
                 value={UIA.GetNodeProp(

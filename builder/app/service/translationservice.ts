@@ -1,6 +1,5 @@
 /* eslint-disable compat/compat */
-/* eslint-disable prefer-destructuring */
-import { LanguagesCode } from "../constants/nodetypes";
+/* eslint-disable prefer-destructuring */ 
 const memory = {}
 export default function translationservice(sourceText, sourceLang, targetLang) {
   if (memory[sourceText] && memory[sourceText][sourceLang] && memory[sourceText][sourceLang][targetLang]) {
